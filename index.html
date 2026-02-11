@@ -1,9 +1,4 @@
 <!DOCTYPE HTML>
-<!--
-	Dimension by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html>
 
 <head>
@@ -14,14 +9,37 @@
 	<noscript>
 		<link rel="stylesheet" href="assets/css/noscript.css" />
 	</noscript>
+
+	<style>
+		#network-canvas {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 0; /* Sits above the base background but behind the content wrapper */
+			pointer-events: none; /* Allows clicking through to links */
+		}
+		
+		/* Ensure the wrapper sits above the canvas */
+		#wrapper {
+			position: relative;
+			z-index: 2;
+		}
+		
+		/* Ensure the background div sits behind the canvas */
+		#bg {
+			z-index: -1;
+		}
+	</style>
 </head>
 
 <body class="is-preload">
 
-	<!-- Wrapper -->
+	<canvas id="network-canvas"></canvas>
+
 	<div id="wrapper">
 
-		<!-- Header -->
 		<header id="header">
 			<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
@@ -41,188 +59,13 @@
 					<li><a href="#work">Work</a></li>
 					<li><a href="#about">About</a></li>
 					<li><a href="#contact">Contact</a></li>
-					<!--<li><a href="#elements">Elements</a></li>-->
-				</ul>
+					</ul>
 			</nav>
 		</header>
 
-		<!-- Main -->
 		<div id="main">
 
-			<!-- Intro -->
 			<article id="intro">
-				<h2 class="major">Intro</h2>
-				<!-- Network graph container -->
-				<div id="network" style="width:100%; height:400px;"></div>
-
-				<!-- Include D3.js -->
-				<script src="https://d3js.org/d3.v7.min.js"></script>
-				<script>
-					// Complex network data with staff (orange) and patients (purple)
-					const nodes = [
-						// Staff nodes (orange)
-						{ id: 'S1', type: 'staff', name: 'Nurse A' },
-						{ id: 'S2', type: 'staff', name: 'Nurse B' },
-						{ id: 'S3', type: 'staff', name: 'Nurse C' },
-						{ id: 'S4', type: 'staff', name: 'Doctor X' },
-						{ id: 'S5', type: 'staff', name: 'Doctor Y' },
-						{ id: 'S6', type: 'staff', name: 'Aide 1' },
-						{ id: 'S7', type: 'staff', name: 'Aide 2' },
-						{ id: 'S8', type: 'staff', name: 'Technician' },
-						// Patient nodes (purple)
-						{ id: 'P1', type: 'patient', name: 'Patient 101' },
-						{ id: 'P2', type: 'patient', name: 'Patient 102' },
-						{ id: 'P3', type: 'patient', name: 'Patient 103' },
-						{ id: 'P4', type: 'patient', name: 'Patient 104' },
-						{ id: 'P5', type: 'patient', name: 'Patient 105' },
-						{ id: 'P6', type: 'patient', name: 'Patient 106' },
-						{ id: 'P7', type: 'patient', name: 'Patient 107' },
-						{ id: 'P8', type: 'patient', name: 'Patient 108' },
-						{ id: 'P9', type: 'patient', name: 'Patient 109' },
-						{ id: 'P10', type: 'patient', name: 'Patient 110' },
-						{ id: 'P11', type: 'patient', name: 'Patient 111' },
-						{ id: 'P12', type: 'patient', name: 'Patient 112' }
-					];
-
-					const links = [
-						// Staff to patient contacts
-						{ source: 'S1', target: 'P1' },
-						{ source: 'S1', target: 'P2' },
-						{ source: 'S1', target: 'P3' },
-						{ source: 'S2', target: 'P3' },
-						{ source: 'S2', target: 'P4' },
-						{ source: 'S2', target: 'P5' },
-						{ source: 'S3', target: 'P6' },
-						{ source: 'S3', target: 'P7' },
-						{ source: 'S3', target: 'P8' },
-						{ source: 'S4', target: 'P1' },
-						{ source: 'S4', target: 'P4' },
-						{ source: 'S4', target: 'P9' },
-						{ source: 'S5', target: 'P2' },
-						{ source: 'S5', target: 'P6' },
-						{ source: 'S5', target: 'P10' },
-						{ source: 'S6', target: 'P5' },
-						{ source: 'S6', target: 'P11' },
-						{ source: 'S7', target: 'P7' },
-						{ source: 'S7', target: 'P12' },
-						{ source: 'S8', target: 'P8' },
-						{ source: 'S8', target: 'P9' },
-						// Patient to patient potential transmission
-						{ source: 'P1', target: 'P2' },
-						{ source: 'P3', target: 'P4' },
-						{ source: 'P5', target: 'P6' },
-						{ source: 'P9', target: 'P10' },
-						{ source: 'P11', target: 'P12' },
-						// Staff to staff interactions
-						{ source: 'S1', target: 'S2' },
-						{ source: 'S2', target: 'S3' },
-						{ source: 'S4', target: 'S5' },
-						{ source: 'S6', target: 'S7' },
-						{ source: 'S1', target: 'S4' },
-						{ source: 'S3', target: 'S8' }
-					];
-
-					const width = document.getElementById('network').clientWidth;
-					const height = 400;
-
-					const svg = d3.select('#network').append('svg')
-						.attr('width', width)
-						.attr('height', height);
-
-					const simulation = d3.forceSimulation(nodes)
-						.force('link', d3.forceLink(links).id(d => d.id).distance(80))
-						.force('charge', d3.forceManyBody().strength(-200))
-						.force('center', d3.forceCenter(width / 2, height / 2))
-						.force('collision', d3.forceCollide().radius(15));
-
-					const link = svg.append('g')
-						.attr('stroke', '#999')
-						.attr('stroke-opacity', 0.6)
-						.selectAll('line')
-						.data(links)
-						.join('line')
-						.attr('stroke-width', 1.5);
-
-					const node = svg.append('g')
-						.attr('stroke', '#fff')
-						.attr('stroke-width', 2)
-						.selectAll('circle')
-						.data(nodes)
-						.join('circle')
-						.attr('r', 8)
-						.attr('fill', d => d.type === 'staff' ? '#ff8c00' : '#9370db')
-						.call(drag(simulation));
-
-					node.append('title').text(d => d.name);
-
-					// Add legend
-					const legend = svg.append('g')
-						.attr('transform', 'translate(20, 20)');
-
-					legend.append('circle')
-						.attr('cx', 0)
-						.attr('cy', 0)
-						.attr('r', 6)
-						.attr('fill', '#ff8c00')
-						.attr('stroke', '#fff')
-						.attr('stroke-width', 2);
-
-					legend.append('text')
-						.attr('x', 15)
-						.attr('y', 5)
-						.text('Staff')
-						.style('font-size', '12px')
-						.attr('fill', '#fff');
-
-					legend.append('circle')
-						.attr('cx', 0)
-						.attr('cy', 25)
-						.attr('r', 6)
-						.attr('fill', '#9370db')
-						.attr('stroke', '#fff')
-						.attr('stroke-width', 2);
-
-					legend.append('text')
-						.attr('x', 15)
-						.attr('y', 30)
-						.text('Patient')
-						.style('font-size', '12px')
-						.attr('fill', '#fff');
-
-					simulation.on('tick', () => {
-						link
-							.attr('x1', d => d.source.x)
-							.attr('y1', d => d.source.y)
-							.attr('x2', d => d.target.x)
-							.attr('y2', d => d.target.y);
-
-						node
-							.attr('cx', d => d.x)
-							.attr('cy', d => d.y);
-					});
-
-					// Drag behaviour
-					function drag(simulation) {
-						function dragstarted(event, d) {
-							if (!event.active) simulation.alphaTarget(0.3).restart();
-							d.fx = d.x;
-							d.fy = d.y;
-						}
-						function dragged(event, d) {
-							d.fx = event.x;
-							d.fy = event.y;
-						}
-						function dragended(event, d) {
-							if (!event.active) simulation.alphaTarget(0);
-							d.fx = null;
-							d.fy = null;
-						}
-						return d3.drag()
-							.on('start', dragstarted)
-							.on('drag', dragged)
-							.on('end', dragended);
-					}
-				</script>
 				<p style="text-align: justify;">
 					<b>Healthcare-associated infections (HAIs)</b> affect 2 million Americans annually, causing 100,000
 					deaths and 8 million additional hospital days, costing over $40 billion. Preventable outbreaks
@@ -241,7 +84,6 @@
 
 			</article>
 
-			<!-- Work -->
 			<article id="work">
 				<h2 class="major">Work</h2>
 				<span class="image main"><img src="images/pic02.jpg" alt="" /></span>
@@ -255,7 +97,6 @@
 					tempus.</p>
 			</article>
 
-			<!-- About -->
 			<article id="about">
 				<h2 class="major">About</h2>
 				<span class="image main"><img src="images/pic03.jpg" alt="" /></span>
@@ -266,7 +107,6 @@
 					dolor sit amet.</p>
 			</article>
 
-			<!-- Contact -->
 			<article id="contact">
 				<h2 class="major">Contact</h2>
 				<form method="post" action="#">
@@ -297,7 +137,6 @@
 				</ul>
 			</article>
 
-			<!-- Elements -->
 			<article id="elements">
 				<h2 class="major">Elements</h2>
 
@@ -549,22 +388,161 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 
 		</div>
 
-		<!-- Footer -->
 		<footer id="footer">
 			<p class="copyright">&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 		</footer>
 
 	</div>
 
-	<!-- BG -->
 	<div id="bg"></div>
 
-	<!-- Scripts -->
 	<script src="assets/js/jquery.min.js"></script>
 	<script src="assets/js/browser.min.js"></script>
 	<script src="assets/js/breakpoints.min.js"></script>
 	<script src="assets/js/util.js"></script>
 	<script src="assets/js/main.js"></script>
-</body>
 
+    <script>
+    (function() {
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        // CONFIGURATION
+        const particleCount = 110;       // Denser network
+        const connectionDistance = 140;  // How close to draw lines
+        const infectionDistance = 140;   // Infection transmission range (same as lines)
+        const particleSpeed = 0.6;       // Speed of movement
+        
+        // VISUALS
+        const healthyColor = 'rgba(200, 200, 200, 0.6)'; // Grey
+        const infectedColor = 'rgba(255, 50, 50, 0.9)';  // Red
+        const healthyLine = '200, 200, 200';
+        const infectedLine = '255, 50, 50';
+
+        // INFECTION LOGIC
+        const infectionChance = 0.02;    // Chance to infect per frame per contact (2%)
+        const recoveryTime = 600;        // Frames until recovery (approx 10 seconds @ 60fps)
+
+        // Resize handling
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Particle Class
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * particleSpeed;
+                this.vy = (Math.random() - 0.5) * particleSpeed;
+                this.size = Math.random() * 2 + 1;
+                
+                this.isInfected = false;
+                this.infectionTimer = 0;
+            }
+
+            infect() {
+                if (!this.isInfected) {
+                    this.isInfected = true;
+                    this.infectionTimer = recoveryTime;
+                }
+            }
+
+            update() {
+                // Move
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Bounce off edges
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                // Handle Infection Timer
+                if (this.isInfected) {
+                    this.infectionTimer--;
+                    if (this.infectionTimer <= 0) {
+                        this.isInfected = false; // Recover
+                    }
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = this.isInfected ? infectedColor : healthyColor;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Initialize particles
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                let p = new Particle();
+                // Randomly infect a few "Patient Zeros"
+                if (Math.random() < 0.05) {
+                    p.infect();
+                }
+                particles.push(p);
+            }
+        }
+        initParticles();
+
+        // Animation Loop
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Re-ignite infection if everyone recovers
+            if (!particles.some(p => p.isInfected)) {
+                 // Pick a random lucky winner to restart the outbreak
+                 particles[Math.floor(Math.random() * particles.length)].infect();
+            }
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                // Check connections
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < connectionDistance) {
+                        // Infection Spread Logic
+                        if (particles[i].isInfected && !particles[j].isInfected) {
+                            if (Math.random() < infectionChance) particles[j].infect();
+                        } else if (!particles[i].isInfected && particles[j].isInfected) {
+                            if (Math.random() < infectionChance) particles[i].infect();
+                        }
+
+                        // Draw Line
+                        ctx.beginPath();
+                        const opacity = 1 - (distance / connectionDistance);
+                        
+                        // If either is infected, line is red
+                        if (particles[i].isInfected || particles[j].isInfected) {
+                            ctx.strokeStyle = `rgba(${infectedLine}, ${opacity})`;
+                        } else {
+                            ctx.strokeStyle = `rgba(${healthyLine}, ${opacity * 0.5})`; // Fainter lines for healthy
+                        }
+
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    })();
+    </script>
+</body>
 </html>
