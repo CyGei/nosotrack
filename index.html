@@ -23,9 +23,12 @@
 
 		<!-- Header -->
 		<header id="header">
+			<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
 			<div class="logo">
-				<span class="icon fa-gem"></span>
+				<span class="fa-solid fa-biohazard"></span>
 			</div>
+
 			<div class="content">
 				<div class="inner">
 					<h1>NosoTrack</h1>
@@ -45,133 +48,196 @@
 
 		<!-- Main -->
 		<div id="main">
+
 			<!-- Intro -->
 			<article id="intro">
 				<h2 class="major">Intro</h2>
 				<!-- Network graph container -->
 				<div id="network" style="width:100%; height:400px;"></div>
-			</article>
 
-			<!-- Include D3.js -->
-			<script src="https://d3js.org/d3.v7.min.js"></script>
-			<script>
-				// Sample network data
-				const nodes = [
-					{ id: 'A' }, { id: 'B' }, { id: 'C' }, { id: 'D' }, { id: 'E' }
-				];
-				const links = [
-					{ source: 'A', target: 'B' },
-					{ source: 'A', target: 'C' },
-					{ source: 'B', target: 'D' },
-					{ source: 'C', target: 'D' },
-					{ source: 'D', target: 'E' }
-				];
+				<!-- Include D3.js -->
+				<script src="https://d3js.org/d3.v7.min.js"></script>
+				<script>
+					// Complex network data with staff (orange) and patients (purple)
+					const nodes = [
+						// Staff nodes (orange)
+						{ id: 'S1', type: 'staff', name: 'Nurse A' },
+						{ id: 'S2', type: 'staff', name: 'Nurse B' },
+						{ id: 'S3', type: 'staff', name: 'Nurse C' },
+						{ id: 'S4', type: 'staff', name: 'Doctor X' },
+						{ id: 'S5', type: 'staff', name: 'Doctor Y' },
+						{ id: 'S6', type: 'staff', name: 'Aide 1' },
+						{ id: 'S7', type: 'staff', name: 'Aide 2' },
+						{ id: 'S8', type: 'staff', name: 'Technician' },
+						// Patient nodes (purple)
+						{ id: 'P1', type: 'patient', name: 'Patient 101' },
+						{ id: 'P2', type: 'patient', name: 'Patient 102' },
+						{ id: 'P3', type: 'patient', name: 'Patient 103' },
+						{ id: 'P4', type: 'patient', name: 'Patient 104' },
+						{ id: 'P5', type: 'patient', name: 'Patient 105' },
+						{ id: 'P6', type: 'patient', name: 'Patient 106' },
+						{ id: 'P7', type: 'patient', name: 'Patient 107' },
+						{ id: 'P8', type: 'patient', name: 'Patient 108' },
+						{ id: 'P9', type: 'patient', name: 'Patient 109' },
+						{ id: 'P10', type: 'patient', name: 'Patient 110' },
+						{ id: 'P11', type: 'patient', name: 'Patient 111' },
+						{ id: 'P12', type: 'patient', name: 'Patient 112' }
+					];
 
-				const width = document.getElementById('network').clientWidth;
-				const height = 400;
+					const links = [
+						// Staff to patient contacts
+						{ source: 'S1', target: 'P1' },
+						{ source: 'S1', target: 'P2' },
+						{ source: 'S1', target: 'P3' },
+						{ source: 'S2', target: 'P3' },
+						{ source: 'S2', target: 'P4' },
+						{ source: 'S2', target: 'P5' },
+						{ source: 'S3', target: 'P6' },
+						{ source: 'S3', target: 'P7' },
+						{ source: 'S3', target: 'P8' },
+						{ source: 'S4', target: 'P1' },
+						{ source: 'S4', target: 'P4' },
+						{ source: 'S4', target: 'P9' },
+						{ source: 'S5', target: 'P2' },
+						{ source: 'S5', target: 'P6' },
+						{ source: 'S5', target: 'P10' },
+						{ source: 'S6', target: 'P5' },
+						{ source: 'S6', target: 'P11' },
+						{ source: 'S7', target: 'P7' },
+						{ source: 'S7', target: 'P12' },
+						{ source: 'S8', target: 'P8' },
+						{ source: 'S8', target: 'P9' },
+						// Patient to patient potential transmission
+						{ source: 'P1', target: 'P2' },
+						{ source: 'P3', target: 'P4' },
+						{ source: 'P5', target: 'P6' },
+						{ source: 'P9', target: 'P10' },
+						{ source: 'P11', target: 'P12' },
+						// Staff to staff interactions
+						{ source: 'S1', target: 'S2' },
+						{ source: 'S2', target: 'S3' },
+						{ source: 'S4', target: 'S5' },
+						{ source: 'S6', target: 'S7' },
+						{ source: 'S1', target: 'S4' },
+						{ source: 'S3', target: 'S8' }
+					];
 
-				const svg = d3.select('#network').append('svg')
-					.attr('width', width)
-					.attr('height', height);
+					const width = document.getElementById('network').clientWidth;
+					const height = 400;
 
-				const simulation = d3.forceSimulation(nodes)
-					.force('link', d3.forceLink(links).id(d => d.id).distance(100))
-					.force('charge', d3.forceManyBody().strength(-300))
-					.force('center', d3.forceCenter(width / 2, height / 2));
+					const svg = d3.select('#network').append('svg')
+						.attr('width', width)
+						.attr('height', height);
 
-				const link = svg.append('g')
-					.attr('stroke', '#aaa')
-					.selectAll('line')
-					.data(links)
-					.join('line')
-					.attr('stroke-width', 2);
+					const simulation = d3.forceSimulation(nodes)
+						.force('link', d3.forceLink(links).id(d => d.id).distance(80))
+						.force('charge', d3.forceManyBody().strength(-200))
+						.force('center', d3.forceCenter(width / 2, height / 2))
+						.force('collision', d3.forceCollide().radius(15));
 
-				const node = svg.append('g')
-					.attr('stroke', '#fff')
-					.attr('stroke-width', 1.5)
-					.selectAll('circle')
-					.data(nodes)
-					.join('circle')
-					.attr('r', 10)
-					.attr('fill', '#0077cc')
-					.call(drag(simulation));
+					const link = svg.append('g')
+						.attr('stroke', '#999')
+						.attr('stroke-opacity', 0.6)
+						.selectAll('line')
+						.data(links)
+						.join('line')
+						.attr('stroke-width', 1.5);
 
-				node.append('title').text(d => d.id);
+					const node = svg.append('g')
+						.attr('stroke', '#fff')
+						.attr('stroke-width', 2)
+						.selectAll('circle')
+						.data(nodes)
+						.join('circle')
+						.attr('r', 8)
+						.attr('fill', d => d.type === 'staff' ? '#ff8c00' : '#9370db')
+						.call(drag(simulation));
 
-				simulation.on('tick', () => {
-					link
-						.attr('x1', d => d.source.x)
-						.attr('y1', d => d.source.y)
-						.attr('x2', d => d.target.x)
-						.attr('y2', d => d.target.y);
+					node.append('title').text(d => d.name);
 
-					node
-						.attr('cx', d => d.x)
-						.attr('cy', d => d.y);
-				});
+					// Add legend
+					const legend = svg.append('g')
+						.attr('transform', 'translate(20, 20)');
 
-				// Drag behaviour
-				function drag(simulation) {
-					function dragstarted(event, d) {
-						if (!event.active) simulation.alphaTarget(0.3).restart();
-						d.fx = d.x;
-						d.fy = d.y;
+					legend.append('circle')
+						.attr('cx', 0)
+						.attr('cy', 0)
+						.attr('r', 6)
+						.attr('fill', '#ff8c00')
+						.attr('stroke', '#fff')
+						.attr('stroke-width', 2);
+
+					legend.append('text')
+						.attr('x', 15)
+						.attr('y', 5)
+						.text('Staff')
+						.style('font-size', '12px')
+						.attr('fill', '#fff');
+
+					legend.append('circle')
+						.attr('cx', 0)
+						.attr('cy', 25)
+						.attr('r', 6)
+						.attr('fill', '#9370db')
+						.attr('stroke', '#fff')
+						.attr('stroke-width', 2);
+
+					legend.append('text')
+						.attr('x', 15)
+						.attr('y', 30)
+						.text('Patient')
+						.style('font-size', '12px')
+						.attr('fill', '#fff');
+
+					simulation.on('tick', () => {
+						link
+							.attr('x1', d => d.source.x)
+							.attr('y1', d => d.source.y)
+							.attr('x2', d => d.target.x)
+							.attr('y2', d => d.target.y);
+
+						node
+							.attr('cx', d => d.x)
+							.attr('cy', d => d.y);
+					});
+
+					// Drag behaviour
+					function drag(simulation) {
+						function dragstarted(event, d) {
+							if (!event.active) simulation.alphaTarget(0.3).restart();
+							d.fx = d.x;
+							d.fy = d.y;
+						}
+						function dragged(event, d) {
+							d.fx = event.x;
+							d.fy = event.y;
+						}
+						function dragended(event, d) {
+							if (!event.active) simulation.alphaTarget(0);
+							d.fx = null;
+							d.fy = null;
+						}
+						return d3.drag()
+							.on('start', dragstarted)
+							.on('drag', dragged)
+							.on('end', dragended);
 					}
-					function dragged(event, d) {
-						d.fx = event.x;
-						d.fy = event.y;
-					}
-					function dragended(event, d) {
-						if (!event.active) simulation.alphaTarget(0);
-						d.fx = null;
-						d.fy = null;
-					}
-					return d3.drag()
-						.on('start', dragstarted)
-						.on('drag', dragged)
-						.on('end', dragended);
-				}
-			</script>
-
-			<section>
-				<p>
-					Healthcare-associated infections (HAIs) affect 2 million Americans annually, causing 100,000
-					deaths and 8 million additional hospital days, costing over $40 billion.
-					Many infections are endemic and tied to invasive procedures, but preventable outbreaks driven by
-					person to person transmitted pathogens such as SARS-CoV-2, influenza, RSV, Clostridioides
-					difficile, Klebsiella pneumoniae, and MRSA generate the most acute clinical and operational
-					crises, triggering staff shortages, ward closures, and delayed procedures.
-				</p>
-
-				<p>
+				</script>
+				<p style="text-align: justify;">
+					<b>Healthcare-associated infections (HAIs)</b> affect 2 million Americans annually, causing 100,000
+					deaths and 8 million additional hospital days, costing over $40 billion. Preventable outbreaks
+					driven by person to person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides
+						difficile</em>, <em>Klebsiella pneumoniae</em>, and MRSA generate the most acute clinical and
+					operational crises, triggering staff shortages, ward
+					closures, and delayed procedures.
 					Current response practice relies on broad testing and isolation protocols. However, effective
-					control depends on identifying the specific drivers of an outbreak, including the index case,
-					modes and locations of spread, superspreading events, and undetected or imported cases. Novel
-					computational methods that reconstruct transmission chains from clinical, contact, and genetic
-					data are well suited to this task.
+					control depends on identifying the <b>specific drivers of an outbreak</b>: 'patient 0',
+					modes and locations of spread, superspreading events, and undetected or imported cases.<br>
+					<span style="color: rgb(255, 119, 0); font-weight: bold;">NosoTrack</span> <b>is an outbreak
+						analytics platform that infers who infected whom in near real-time</b> by integrating data from hospital Electronic
+					Health Records with Bluetooth enabled contact tracing. 
 				</p>
 
-				<p>
-					These tools are currently used almost exclusively in retrospective analyses because they are not
-					integrated with existing hospital surveillance systems. There is a need for an automated system
-					that can deploy these models in near real time to guide proactive intervention.
-				</p>
-
-				<p>
-					<span style="color: rgb(255, 145, 0); font-weight: bold;">NosoTrack</span> is an outbreak analytics
-					platform that connects to hospital Electronic Health Records data together with Bluetooth enabled
-					contact tracing among staff and patients.
-					By merging these data streams, the platform reconstructs transmission chains in near real time and
-					produces
-					early warnings and operational reports that enable infection prevention teams to deploy targeted
-					interventions before an outbreak escalates.
-				</p>
-
-				<p>
-					Timely detection and control of outbreaks in healthcare settings can reduce patient morbidity
-					and mortality and protect healthcare capacity.
-				</p>
-			</section>
 
 			</article>
 
@@ -179,17 +245,25 @@
 			<article id="work">
 				<h2 class="major">Work</h2>
 				<span class="image main"><img src="images/pic02.jpg" alt="" /></span>
-				<p>Outbreak Reconstruction is an established field of Infectious Disease Epidmemiology with various
-					methods and tools available. A list of commonly used methods and tools can be found <a
-						href="https://pubmed.ncbi.nlm.nih.gov/35215195/">here</a>.</p>
-
+				<p>Adipiscing magna sed dolor elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac.
+					Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula lacinia quam. Integer
+					sollicitudin mauris nec lorem luctus ultrices.</p>
+				<p>Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero. Mauris aliquet magna magna
+					sed nunc rhoncus pharetra. Pellentesque condimentum sem. In efficitur ligula tate urna. Maecenas
+					laoreet massa vel lacinia pellentesque lorem ipsum dolor. Nullam et orci eu lorem consequat
+					tincidunt. Vivamus et sagittis libero. Mauris aliquet magna magna sed nunc rhoncus amet feugiat
+					tempus.</p>
 			</article>
 
 			<!-- About -->
 			<article id="about">
 				<h2 class="major">About</h2>
 				<span class="image main"><img src="images/pic03.jpg" alt="" /></span>
-				<p></p>
+				<p>Lorem ipsum dolor sit amet, consectetur et adipiscing elit. Praesent eleifend dignissim arcu, at
+					eleifend sapien imperdiet ac. Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula
+					lacinia quam. Integer sollicitudin mauris nec lorem luctus ultrices. Aliquam libero et malesuada
+					fames ac ante ipsum primis in faucibus. Cras viverra ligula sit amet ex mollis mattis lorem ipsum
+					dolor sit amet.</p>
 			</article>
 
 			<!-- Contact -->
@@ -491,7 +565,6 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 	<script src="assets/js/breakpoints.min.js"></script>
 	<script src="assets/js/util.js"></script>
 	<script src="assets/js/main.js"></script>
-	<script src="https://d3js.org/d3.v7.min.js"></script>
 </body>
 
 </html>
