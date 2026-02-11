@@ -42,12 +42,6 @@
 	<div id="wrapper">
 
 		<header id="header">
-			<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
-			<div class="logo">
-				<span class="fa-solid fa-biohazard"></span>
-			</div>
-
 			<div class="content">
 				<div class="inner">
 					<h1>NosoTrack</h1>
@@ -58,6 +52,7 @@
 				<ul>
 					<li><a href="#intro">Intro</a></li>
 					<li><a href="#research">Research</a></li>
+					<li><a href="#team">Team</a></li>
 					<li><a href="#contact">Contact</a></li>
 				</ul>
 			</nav>
@@ -82,8 +77,7 @@
 					</div>
 					<div
 						style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 4px; text-align: center; border-bottom: 2px solid #ff073a;">
-						<span style="display: block; font-size: 0.7rem; color: #888; letter-spacing: 1px;">ECON.
-							BURDEN</span>
+						<span style="display: block; font-size: 0.7rem; color: #888; letter-spacing: 1px;">COST</span>
 						<span style="font-size: 1.5rem; font-weight: bold; color: #fff;">$40B+</span>
 						<span style="display:block; font-size:0.65rem; color:#aaa; margin-top:4px;">US per year</span>
 
@@ -154,37 +148,91 @@
 
 			<article id="research">
 				<h2 class="major">Research</h2>
-				<span class="image main"><img src="images/pic02.jpg" alt="" /></span>
-				<p> Novel computational methods that reconstruct who infected whom from clinical, contact, and
-					genetic data have a strong track record of generating critical insights informing control
-					strategies.
-					These approaches have been successfully applied to a wide range of
-					pathogens, including <a href="LINK_SARS2">SARS-CoV-2</a>, <a href="LINK_EBOLA">Ebola</a>, <a
-						href="LINK_INFLUENZA">influenza</a>, and <a href="LINK_AMR">drug-resistant bacteria</a>.
+				<p style="text-align: justify;">
+					Novel computational methods that reconstruct who infected whom from clinical, contact, and
+					genetic data have proven effective in guiding outbreak control across pathogens such as SARS-CoV-2,
+					influenza, Ebola, and antimicrobial-resistant bacteria
 
-					Despite their value, these methods are used almost exclusively restrospectively, as they are not
-					integrated with
-					existing hospital surveillance systems. What is missing is an automated system that can deploy these
-					models in near real-time to support proactive intervention. This is the aim of <span
-						style="color: red; font-weight: bold; font-family: Consolas, 'Courier New', Monaco, monospace; font-size: 24px;">
-						NosoTrack
-					</span>. <br><br>
+					Yet, they remain largely retrospective, with no integration into routine hospital surveillance. What
+					is lacking is an automated system capable of deploying these models in near real-time:
+					this is the aim of <span style="color: #ff073a; font-weight: bold;">NosoTrack</span>.
+				</p>
 
-					Publications are available here:
-					## DO a nice dynamic list of publications with links to papers
-					https://pubmed.ncbi.nlm.nih.gov/35215195/ # A litterature review on outbreak reconstruction methods
-					https://link.springer.com/article/10.1186/s12859-018-2330-z # outbreaker2 software
-					https://cygei.github.io/o2ools/index.html # o2ools software
-					https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037 # Associated analytical
-					methods
-					https://pubmed.ncbi.nlm.nih.gov/40302215/ # Proof of concept using Real-Time Genomic Surveillance
+				<h3>Selected publications and software</h3>
+
+				<div class="pub-grid">
+
+					<a class="pub-card" href="https://pubmed.ncbi.nlm.nih.gov/35215195/" target="_blank">
+						<span class="pub-tag">Paper</span>
+						<div class="pub-title">Literature review</div>
+						<div class="pub-desc">A systematic review of outbreak reconstruction methods.</div>
+					</a>
+
+					<a class="pub-card" href="https://link.springer.com/article/10.1186/s12859-018-2330-z"
+						target="_blank">
+						<span class="pub-tag">Paper</span>
+						<div class="pub-title">A modular platform for outbreak reconstruction</div>
+						<div class="pub-desc">The paper for outbreaker2.</div>
+					</a>
+
+					<a class="pub-card" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037"
+						target="_blank">
+						<span class="pub-tag">Paper</span>
+						<div class="pub-title">linktree</div>
+						<div class="pub-desc">A method to infer transmission patterns between staff and patients.</div>
+					</a>
+
+					<a class="pub-card" href="https://pubmed.ncbi.nlm.nih.gov/40302215/" target="_blank">
+						<span class="pub-tag">Paper</span>
+						<div class="pub-title">Real time genomic surveillance for nosocomial outbreaks</div>
+						<div class="pub-desc">Proof of concept for near real time surveillance.</div>
+					</a>
+
+					<a class="pub-card" href="https://github.com/reconhub/outbreaker2" target="_blank">
+						<span class="pub-tag">Software</span>
+						<div class="pub-title">outbreaker2</div>
+						<div class="pub-desc">Software to reconstruct transmission trees.</div>
+					</a>
+
+					<a class="pub-card" href="https://cygei.github.io/o2ools/index.html" target="_blank">
+						<span class="pub-tag">Software</span>
+						<div class="pub-title">o2ools</div>
+						<div class="pub-desc">Software to analyse transmission trees.</div>
+					</a>
+
+				</div>
+
+			</article>
+
+			<article id="team">
+				<h2 class="major">Team</h2>
+				<img src="images/mugshot.jpg" alt="Cyril Geismar"
+					style="width:150px; float:left; margin-right:15px; border-radius:10%;">
+
+				<p style="text-align: justify;">
+					<span style="color: #ff073a; font-weight: bold;">Cyril Geismar</span> is a postdoctoral researcher
+					at Johns Hopkins University.
+					He completed his PhD in Infectious disease modelling at Imperial College London, with a focus on
+					outbreak reconstruction.
+					He is a software developer for the <a href="https://www.repidemicsconsortium.org/" target="_blank">R
+						Epidemics Consortium</a>
+					and teaches outbreak analytics at <a
+						href="https://sismid.sph.emory.edu/online-modules/recon-tools/index.html" target="_blank">Emory
+						University</a>
+					and <a href="https://data.org/our-work/epiverse/training-africa/course/" target="_blank">the London
+						School of Hygiene & Tropical Medicine</a>.
 				</p>
 			</article>
 
 
 			<article id="contact">
 				<h2 class="major">Contact</h2>
-				<form method="post" action="#">
+				<p>
+					We are actively seeking collaborations and funding. Whether you are a researcher, hospital
+					staff, patient, or
+					an investor, we would love to hear from you.
+				</p>
+				<form method="POST" action="https://formspree.io/f/maqdqzqw">
 					<div class="fields">
 						<div class="field half">
 							<label for="name">Name</label>
@@ -205,266 +253,15 @@
 					</ul>
 				</form>
 				<ul class="icons">
-					<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-					<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-					<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-					<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+					<li><a href="https://github.com/CyGei" class="icon brands fa-github"><span
+								class="label">GitHub</span></a></li>
 				</ul>
-			</article>
-
-			<article id="elements">
-				<h2 class="major">Elements</h2>
-
-				<section>
-					<h3 class="major">Text</h3>
-					<p>This is <b>bold</b> and this is <strong>strong</strong>. This is <i>italic</i> and this is
-						<em>emphasized</em>.
-						This is <sup>superscript</sup> text and this is <sub>subscript</sub> text.
-						This is <u>underlined</u> and this is code: <code>for (;;) { ... }</code>. Finally, <a
-							href="#">this is a link</a>.
-					</p>
-					<hr />
-					<h2>Heading Level 2</h2>
-					<h3>Heading Level 3</h3>
-					<h4>Heading Level 4</h4>
-					<h5>Heading Level 5</h5>
-					<h6>Heading Level 6</h6>
-					<hr />
-					<h4>Blockquote</h4>
-					<blockquote>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget tempus
-						euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis
-						iaculis volutpat ac adipiscing accumsan faucibus. Vestibulum ante ipsum primis in faucibus lorem
-						ipsum dolor sit amet nullam adipiscing eu felis.</blockquote>
-					<h4>Preformatted</h4>
-					<pre><code>i = 0;
-
-while (!deck.isInOrder()) {
-    print 'Iteration ' + i;
-    deck.shuffle();
-    i++;
-}
-
-print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
-				</section>
-
-				<section>
-					<h3 class="major">Lists</h3>
-
-					<h4>Unordered</h4>
-					<ul>
-						<li>Dolor pulvinar etiam.</li>
-						<li>Sagittis adipiscing.</li>
-						<li>Felis enim feugiat.</li>
-					</ul>
-
-					<h4>Alternate</h4>
-					<ul class="alt">
-						<li>Dolor pulvinar etiam.</li>
-						<li>Sagittis adipiscing.</li>
-						<li>Felis enim feugiat.</li>
-					</ul>
-
-					<h4>Ordered</h4>
-					<ol>
-						<li>Dolor pulvinar etiam.</li>
-						<li>Etiam vel felis viverra.</li>
-						<li>Felis enim feugiat.</li>
-						<li>Dolor pulvinar etiam.</li>
-						<li>Etiam vel felis lorem.</li>
-						<li>Felis enim et feugiat.</li>
-					</ol>
-					<h4>Icons</h4>
-					<ul class="icons">
-						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-						<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-						<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
-					</ul>
-
-					<h4>Actions</h4>
-					<ul class="actions">
-						<li><a href="#" class="button primary">Default</a></li>
-						<li><a href="#" class="button">Default</a></li>
-					</ul>
-					<ul class="actions stacked">
-						<li><a href="#" class="button primary">Default</a></li>
-						<li><a href="#" class="button">Default</a></li>
-					</ul>
-				</section>
-
-				<section>
-					<h3 class="major">Table</h3>
-					<h4>Default</h4>
-					<div class="table-wrapper">
-						<table>
-							<thead>
-								<tr>
-									<th>Name</th>
-									<th>Description</th>
-									<th>Price</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>Item One</td>
-									<td>Ante turpis integer aliquet porttitor.</td>
-									<td>29.99</td>
-								</tr>
-								<tr>
-									<td>Item Two</td>
-									<td>Vis ac commodo adipiscing arcu aliquet.</td>
-									<td>19.99</td>
-								</tr>
-								<tr>
-									<td>Item Three</td>
-									<td> Morbi faucibus arcu accumsan lorem.</td>
-									<td>29.99</td>
-								</tr>
-								<tr>
-									<td>Item Four</td>
-									<td>Vitae integer tempus condimentum.</td>
-									<td>19.99</td>
-								</tr>
-								<tr>
-									<td>Item Five</td>
-									<td>Ante turpis integer aliquet porttitor.</td>
-									<td>29.99</td>
-								</tr>
-							</tbody>
-							<tfoot>
-								<tr>
-									<td colspan="2"></td>
-									<td>100.00</td>
-								</tr>
-							</tfoot>
-						</table>
-					</div>
-
-					<h4>Alternate</h4>
-					<div class="table-wrapper">
-						<table class="alt">
-							<thead>
-								<tr>
-									<th>Name</th>
-									<th>Description</th>
-									<th>Price</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>Item One</td>
-									<td>Ante turpis integer aliquet porttitor.</td>
-									<td>29.99</td>
-								</tr>
-								<tr>
-									<td>Item Two</td>
-									<td>Vis ac commodo adipiscing arcu aliquet.</td>
-									<td>19.99</td>
-								</tr>
-								<tr>
-									<td>Item Three</td>
-									<td> Morbi faucibus arcu accumsan lorem.</td>
-									<td>29.99</td>
-								</tr>
-								<tr>
-									<td>Item Four</td>
-									<td>Vitae integer tempus condimentum.</td>
-									<td>19.99</td>
-								</tr>
-								<tr>
-									<td>Item Five</td>
-									<td>Ante turpis integer aliquet porttitor.</td>
-									<td>29.99</td>
-								</tr>
-							</tbody>
-							<tfoot>
-								<tr>
-									<td colspan="2"></td>
-									<td>100.00</td>
-								</tr>
-							</tfoot>
-						</table>
-					</div>
-				</section>
-
-				<section>
-					<h3 class="major">Buttons</h3>
-					<ul class="actions">
-						<li><a href="#" class="button primary">Primary</a></li>
-						<li><a href="#" class="button">Default</a></li>
-					</ul>
-					<ul class="actions">
-						<li><a href="#" class="button">Default</a></li>
-						<li><a href="#" class="button small">Small</a></li>
-					</ul>
-					<ul class="actions">
-						<li><a href="#" class="button primary icon solid fa-download">Icon</a></li>
-						<li><a href="#" class="button icon solid fa-download">Icon</a></li>
-					</ul>
-					<ul class="actions">
-						<li><span class="button primary disabled">Disabled</span></li>
-						<li><span class="button disabled">Disabled</span></li>
-					</ul>
-				</section>
-
-				<section>
-					<h3 class="major">Form</h3>
-					<form method="post" action="#">
-						<div class="fields">
-							<div class="field half">
-								<label for="demo-name">Name</label>
-								<input type="text" name="demo-name" id="demo-name" value="" placeholder="Jane Doe" />
-							</div>
-							<div class="field half">
-								<label for="demo-email">Email</label>
-								<input type="email" name="demo-email" id="demo-email" value=""
-									placeholder="jane@untitled.tld" />
-							</div>
-							<div class="field">
-								<label for="demo-category">Category</label>
-								<select name="demo-category" id="demo-category">
-									<option value="">-</option>
-									<option value="1">Manufacturing</option>
-									<option value="1">Shipping</option>
-									<option value="1">Administration</option>
-									<option value="1">Human Resources</option>
-								</select>
-							</div>
-							<div class="field half">
-								<input type="radio" id="demo-priority-low" name="demo-priority" checked>
-								<label for="demo-priority-low">Low</label>
-							</div>
-							<div class="field half">
-								<input type="radio" id="demo-priority-high" name="demo-priority">
-								<label for="demo-priority-high">High</label>
-							</div>
-							<div class="field half">
-								<input type="checkbox" id="demo-copy" name="demo-copy">
-								<label for="demo-copy">Email me a copy</label>
-							</div>
-							<div class="field half">
-								<input type="checkbox" id="demo-human" name="demo-human" checked>
-								<label for="demo-human">Not a robot</label>
-							</div>
-							<div class="field">
-								<label for="demo-message">Message</label>
-								<textarea name="demo-message" id="demo-message" placeholder="Enter your message"
-									rows="6"></textarea>
-							</div>
-						</div>
-						<ul class="actions">
-							<li><input type="submit" value="Send Message" class="primary" /></li>
-							<li><input type="reset" value="Reset" /></li>
-						</ul>
-					</form>
-				</section>
-
 			</article>
 
 		</div>
 
 		<footer id="footer">
-			<p class="copyright">&copy; Cyril Geismar. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+			<p class="copyright">&copy; Cyril Geismar.</p>
 		</footer>
 
 	</div>
