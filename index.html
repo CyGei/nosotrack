@@ -57,8 +57,7 @@
 			<nav>
 				<ul>
 					<li><a href="#intro">Intro</a></li>
-					<li><a href="#work">Work</a></li>
-					<li><a href="#about">About</a></li>
+					<li><a href="#research">Research</a></li>
 					<li><a href="#contact">Contact</a></li>
 				</ul>
 			</nav>
@@ -67,25 +66,56 @@
 		<div id="main">
 
 			<article id="intro">
+				<h2 class="major">Intro</h2>
+				<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 2rem;">
+					<div
+						style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 4px; text-align: center; border-bottom: 2px solid #ff073a;">
+						<span style="display:block; font-size:0.7rem; color:#888; letter-spacing:1px;">CASES</span>
+						<span style="font-size:1.5rem; font-weight:bold; color:#fff;">2.0M</span>
+						<span style="display:block; font-size:0.65rem; color:#aaa; margin-top:4px;">US per year</span>
+					</div>
+					<div
+						style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 4px; text-align: center; border-bottom: 2px solid #ff073a;">
+						<span style="display: block; font-size: 0.7rem; color: #888; letter-spacing: 1px;">DEATHS</span>
+						<span style="font-size: 1.5rem; font-weight: bold; color: #fff;">100K</span>
+						<span style="display:block; font-size:0.65rem; color:#aaa; margin-top:4px;">US per year</span>
+					</div>
+					<div
+						style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 4px; text-align: center; border-bottom: 2px solid #ff073a;">
+						<span style="display: block; font-size: 0.7rem; color: #888; letter-spacing: 1px;">ECON.
+							BURDEN</span>
+						<span style="font-size: 1.5rem; font-weight: bold; color: #fff;">$40B+</span>
+						<span style="display:block; font-size:0.65rem; color:#aaa; margin-top:4px;">US per year</span>
+
+					</div>
+				</div>
 				<p style="text-align: justify;">
-					<b>Healthcare-associated infections (HAIs)</b> affect 2 million Americans annually, causing 100,000
-					deaths and 8 million additional hospital days, costing over $40 billion. Preventable outbreaks
+					<b>Healthcare-associated infections (HAIs)</b> affect approximately 1 in 10 patients worldwide,
+					causing significant morbidity, mortality, and economic strain on healthcare systems. <b>Nosocomial
+						outbreaks</b>
 					driven by person to person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides
 						difficile</em>, <em>Klebsiella pneumoniae</em>, and MRSA generate the most acute clinical and
-					operational crises, triggering staff shortages, ward
-					closures, and delayed procedures.
-					Current response practice relies on broad testing and isolation protocols. However, effective
-					control depends on identifying the <b>specific drivers of an outbreak</b>: 'patient 0',
-					modes and locations of spread, superspreading events, and undetected or imported cases.<br>
-					<span style="color: red; font-weight: bold;">NosoTrack</span> <b>is an outbreak
+					operational crises, triggering staff shortages, ward closures, and delayed procedures.
+					Current control measures rely on broad testing and isolation protocols, but <b>effective
+						intervention
+						requires identifying the specific drivers of an outbreak</b>: such as patient zero,
+					superspreaders, transmission routes, and undetected or imported cases. <br><br>
+					<span
+						style="color: red; font-weight: bold; font-family: Consolas, 'Courier New', Monaco, monospace; font-size: 24px;">
+						NosoTrack
+					</span>
+					<b>is an outbreak
 						analytics platform that infers who infected whom in near real-time</b> by integrating data from
-					hospital Electronic
-					Health Records with Bluetooth enabled contact tracing.
+					hospital Electronic Health Records with Bluetooth enabled contact tracing.It delivers early warnings
+					and actionable reports, enabling hospital infection prevention teams to target interventions
+					promptly before an outbreak escalates.
 				</p>
-				<div id="network-container" style="position: relative; width:100%; height:400px; border:1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); border-radius: 4px;">
-    <div id="mynetwork" style="width:100%; height:100%;"></div>
 
-    <div id="network-legend" style="
+				<div id="network-container"
+					style="position: relative; width:100%; height:400px; border:1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); border-radius: 4px;">
+					<div id="mynetwork" style="width:100%; height:100%;"></div>
+
+					<div id="network-legend" style="
         position: absolute; 
         top: 15px; 
         left: 15px; 
@@ -99,12 +129,14 @@
         pointer-events: none;
         letter-spacing: 1px;
     ">
-        <div style="display: flex; align-items: center; margin-bottom: 8px;">
-            <div style="width: 10px; height: 10px; background: #888; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 5px rgba(255,255,255,0.2);"></div>
-            <span>PATIENT</span>
-        </div>
-        <div style="display: flex; align-items: center;">
-            <div style="
+						<div style="display: flex; align-items: center; margin-bottom: 8px;">
+							<div
+								style="width: 10px; height: 10px; background: #888; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 5px rgba(255,255,255,0.2);">
+							</div>
+							<span>PATIENT</span>
+						</div>
+						<div style="display: flex; align-items: center;">
+							<div style="
                 width: 0; 
                 height: 0; 
                 border-left: 6px solid transparent; 
@@ -113,35 +145,42 @@
                 margin-right: 9px;
                 filter: drop-shadow(0 0 3px rgba(255,255,255,0.2));
             "></div>
-            <span>STAFF</span>
-        </div>
-    </div>
-</div>
+							<span>STAFF</span>
+						</div>
+					</div>
+				</div>
 
 			</article>
 
-			<article id="work">
-				<h2 class="major">Work</h2>
+			<article id="research">
+				<h2 class="major">Research</h2>
 				<span class="image main"><img src="images/pic02.jpg" alt="" /></span>
-				<p>Adipiscing magna sed dolor elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac.
-					Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula lacinia quam. Integer
-					sollicitudin mauris nec lorem luctus ultrices.</p>
-				<p>Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero. Mauris aliquet magna magna
-					sed nunc rhoncus pharetra. Pellentesque condimentum sem. In efficitur ligula tate urna. Maecenas
-					laoreet massa vel lacinia pellentesque lorem ipsum dolor. Nullam et orci eu lorem consequat
-					tincidunt. Vivamus et sagittis libero. Mauris aliquet magna magna sed nunc rhoncus amet feugiat
-					tempus.</p>
+				<p> Novel computational methods that reconstruct who infected whom from clinical, contact, and
+					genetic data have a strong track record of generating critical insights informing control
+					strategies.
+					These approaches have been successfully applied to a wide range of
+					pathogens, including <a href="LINK_SARS2">SARS-CoV-2</a>, <a href="LINK_EBOLA">Ebola</a>, <a
+						href="LINK_INFLUENZA">influenza</a>, and <a href="LINK_AMR">drug-resistant bacteria</a>.
+
+					Despite their value, these methods are used almost exclusively restrospectively, as they are not
+					integrated with
+					existing hospital surveillance systems. What is missing is an automated system that can deploy these
+					models in near real-time to support proactive intervention. This is the aim of <span
+						style="color: red; font-weight: bold; font-family: Consolas, 'Courier New', Monaco, monospace; font-size: 24px;">
+						NosoTrack
+					</span>. <br><br>
+
+					Publications are available here:
+					## DO a nice dynamic list of publications with links to papers
+					https://pubmed.ncbi.nlm.nih.gov/35215195/ # A litterature review on outbreak reconstruction methods
+					https://link.springer.com/article/10.1186/s12859-018-2330-z # outbreaker2 software
+					https://cygei.github.io/o2ools/index.html # o2ools software
+					https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037 # Associated analytical
+					methods
+					https://pubmed.ncbi.nlm.nih.gov/40302215/ # Proof of concept using Real-Time Genomic Surveillance
+				</p>
 			</article>
 
-			<article id="about">
-				<h2 class="major">About</h2>
-				<span class="image main"><img src="images/pic03.jpg" alt="" /></span>
-				<p>Lorem ipsum dolor sit amet, consectetur et adipiscing elit. Praesent eleifend dignissim arcu, at
-					eleifend sapien imperdiet ac. Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula
-					lacinia quam. Integer sollicitudin mauris nec lorem luctus ultrices. Aliquam libero et malesuada
-					fames ac ante ipsum primis in faucibus. Cras viverra ligula sit amet ex mollis mattis lorem ipsum
-					dolor sit amet.</p>
-			</article>
 
 			<article id="contact">
 				<h2 class="major">Contact</h2>
