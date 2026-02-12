@@ -50,7 +50,7 @@
 			</div>
 			<nav>
 				<ul>
-					<li><a href="#intro">Intro</a></li>
+					<li><a href="#about">About</a></li>
 					<li><a href="#research">Research</a></li>
 					<li><a href="#team">Team</a></li>
 					<li><a href="#contact">Contact</a></li>
@@ -60,8 +60,8 @@
 
 		<div id="main">
 
-			<article id="intro">
-				<h2 class="major">Intro</h2>
+			<article id="about">
+				<h2 class="major">About</h2>
 				<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 2rem;">
 					<div
 						style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 4px; text-align: center; border-bottom: 2px solid #ff073a;">
@@ -87,9 +87,9 @@
 					<b>Healthcare-associated infections (HAIs)</b> affect approximately 1 in 10 patients worldwide,
 					causing significant morbidity, mortality, and economic strain on healthcare systems. <b>Nosocomial
 						outbreaks</b>
-					driven by person to person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides
+					driven by person-to-person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides
 						difficile</em>, <em>Klebsiella pneumoniae</em>, and MRSA generate the most acute clinical and
-					operational crises, triggering staff shortages, ward closures, and delayed procedures.
+					operational crises: triggering staff shortages, ward closures, and delayed procedures.
 					Current control measures rely on broad testing and isolation protocols, but <b>effective
 						intervention
 						requires identifying the specific drivers of an outbreak</b>: such as patient zero,
@@ -124,23 +124,51 @@
         pointer-events: none;
         letter-spacing: 1px;
     ">
-						<div style="display: flex; align-items: center; margin-bottom: 8px;">
-							<div
-								style="width: 10px; height: 10px; background: #888; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 5px rgba(255,255,255,0.2);">
+						<!-- TYPE Section -->
+						<div
+							style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+							<div style="font-weight: bold; margin-bottom: 8px; color: #aaa; font-size: 10px;">TYPE</div>
+							<div style="display: flex; align-items: center; margin-bottom: 8px;">
+								<div
+									style="width: 10px; height: 10px; background: #888; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 5px rgba(255,255,255,0.2);">
+								</div>
+								<span>PATIENT</span>
 							</div>
-							<span>PATIENT</span>
+							<div style="display: flex; align-items: center;">
+								<div style="
+                    width: 0; 
+                    height: 0; 
+                    border-left: 6px solid transparent; 
+                    border-right: 6px solid transparent; 
+                    border-bottom: 11px solid #888; 
+                    margin-right: 9px;
+                    filter: drop-shadow(0 0 3px rgba(255,255,255,0.2));
+                "></div>
+								<span>STAFF</span>
+							</div>
 						</div>
-						<div style="display: flex; align-items: center;">
-							<div style="
-                width: 0; 
-                height: 0; 
-                border-left: 6px solid transparent; 
-                border-right: 6px solid transparent; 
-                border-bottom: 11px solid #888; 
-                margin-right: 9px;
-                filter: drop-shadow(0 0 3px rgba(255,255,255,0.2));
-            "></div>
-							<span>STAFF</span>
+
+						<!-- WARD Section -->
+						<div>
+							<div style="font-weight: bold; margin-bottom: 8px; color: #aaa; font-size: 10px;">WARD</div>
+							<div style="display: flex; align-items: center; margin-bottom: 6px;">
+								<div
+									style="width: 12px; height: 12px; background: rgba(100, 150, 255, 0.4); border: 1px solid rgba(100, 150, 255, 0.6); margin-right: 10px;">
+								</div>
+								<span>WARD A</span>
+							</div>
+							<div style="display: flex; align-items: center; margin-bottom: 6px;">
+								<div
+									style="width: 12px; height: 12px; background: rgba(255, 150, 100, 0.4); border: 1px solid rgba(255, 150, 100, 0.6); margin-right: 10px;">
+								</div>
+								<span>WARD B</span>
+							</div>
+							<div style="display: flex; align-items: center;">
+								<div
+									style="width: 12px; height: 12px; background: rgba(150, 255, 100, 0.4); border: 1px solid rgba(150, 255, 100, 0.6); margin-right: 10px;">
+								</div>
+								<span>WARD C</span>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -207,23 +235,82 @@
 
 			<article id="team">
 				<h2 class="major">Team</h2>
-				<img src="images/mugshot.jpg" alt="Cyril Geismar"
-					style="width:150px; float:left; margin-right:15px; border-radius:10%;">
 
-				<p style="text-align: justify;">
-					<span style="color: #ff073a; font-weight: bold;">Cyril Geismar</span> is a postdoctoral researcher
-					at Johns Hopkins University.
-					He completed his PhD in Infectious disease modelling at Imperial College London, with a focus on
-					outbreak reconstruction.
-					He is a software developer for the <a href="https://www.repidemicsconsortium.org/" target="_blank">R
-						Epidemics Consortium</a>
-					and teaches outbreak analytics at <a
-						href="https://sismid.sph.emory.edu/online-modules/recon-tools/index.html" target="_blank">Emory
-						University</a>
-					and <a href="https://data.org/our-work/epiverse/training-africa/course/" target="_blank">the London
-						School of Hygiene & Tropical Medicine</a>.
-				</p>
+				<!-- Cyril -->
+				<div style="display:flex; align-items:flex-start; margin-bottom:20px; flex-wrap: wrap;">
+					<img src="images/cyril.jpg" alt="Dr Cyril Geismar"
+						style="width:150px; border-radius:10%; margin-right:15px; margin-bottom:10px;">
+					<p style="text-align: justify; flex:1;">
+						<span style="color: #ff073a; font-weight: bold;">Dr Cyril Geismar</span> is a postdoctoral
+						research fellow at Johns Hopkins University. He earned his PhD in the mathematical modelling of
+						infectious diseases at Imperial College London, where his research focused on developing methods
+						and software for SARS-CoV-2 outbreak reconstruction. He serves on the executive board and
+						contributes as a software developer for the <a href="https://www.repidemicsconsortium.org/"
+							target="_blank">R Epidemics Consortium</a> and teaches outbreak analytics at <a
+							href="https://sismid.sph.emory.edu/online-modules/recon-tools/index.html"
+							target="_blank">Emory University</a> and <a
+							href="https://data.org/our-work/epiverse/training-africa/course/" target="_blank">the London
+							School of Hygiene & Tropical Medicine</a>.
+					</p>
+				</div>
+
+				<!-- Thibaut Jombart -->
+				<div style="display:flex; align-items:flex-start; margin-bottom:20px; flex-wrap: wrap;">
+					<img src="images/thibaut.jpg" alt="Dr Thibaut Jombart"
+						style="width:150px; border-radius:10%; margin-right:15px; margin-bottom:10px;">
+					<p style="text-align: justify; flex:1;">
+						<span style="color: #ff073a; font-weight: bold;">Dr Thibaut Jombart</span> is a Senior Lecturer
+						at Imperial College London specialising in outbreak response analytics, with expertise in
+						biostatistics, population genetics, and R programming. He is the lead author of <a
+							href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457"
+							target="_blank">outbreaker</a> and
+						founder of the <a href="https://www.repidemicsconsortium.org/" target="_blank">R Epidemics
+							Consortium</a>. He has field experience in outbreak response, including Ebola deployments in
+						the Democratic Republic of the Congo.
+					</p>
+				</div>
+
+				<!-- Anne Cori -->
+				<div style="display:flex; align-items:flex-start; margin-bottom:20px; flex-wrap: wrap;">
+					<img src="images/anne.jpg" alt="Dr Anne Cori"
+						style="width:150px; border-radius:10%; margin-right:15px; margin-bottom:10px;">
+					<p style="text-align: justify; flex:1;">
+						<span style="color: #ff073a; font-weight: bold;">Dr Anne Cori</span> is a Senior Lecturer at
+						Imperial
+						College London specialising in real-time outbreak analysis and estimation of epidemiological
+						parameters. She
+						is the lead author of <a href="https://academic.oup.com/aje/article/178/9/1505/89262"
+							target="_blank">EpiEstim</a> and co-author of <a
+							href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457"
+							target="_blank">outbreaker</a>. Her
+						research develops statistical methods for outbreak
+						reconstruction
+						and rapid assessment of transmissibility, integrating epidemiological and genomic data to inform
+						control
+						strategies.
+					</p>
+				</div>
+
+				<!-- Shaun Truelove -->
+				<div style="display:flex; align-items:flex-start; margin-bottom:20px; flex-wrap: wrap;">
+					<img src="images/shaun.jpg" alt="Dr Shaun Truelove"
+						style="width:150px; border-radius:10%; margin-right:15px; margin-bottom:10px;">
+					<p style="text-align: justify; flex:1;">
+						<span style="color: #ff073a; font-weight: bold;">Dr Shaun Truelove</span> is an Associate
+						Professor at Johns Hopkins University. His
+						work focuses on applying infectious disease dynamics
+						and modelling to inform public health response, and policy, particularly for
+						COVID-19, influenza, and vaccine-preventable diseases.
+						He co-leads the <a href="https://scenariomodelinghub.org/" target="_blank">US Scenario Modeling
+							Hubs</a> and <a href="https://insightnet.us/centers/accidda/" target="_blank">ACCIDA</a>, a
+						consortium of
+						researchers producing epidemic scenario projections and forecasts.
+					</p>
+				</div>
+
+
 			</article>
+
 
 
 			<article id="contact">
@@ -427,39 +514,76 @@
 				superspreader: '#ff0000',
 				healthyBorder: '#666666',
 				text: '#ffffff',
-				edge: 'rgba(255, 255, 255, 0.15)'
+				edge: 'rgba(255, 255, 255, 0.15)',
+				wardA: 'rgba(100, 150, 255, 0.2)',
+				wardB: 'rgba(255, 150, 100, 0.2)',
+				wardC: 'rgba(150, 255, 100, 0.2)',
+				wardABorder: 'rgba(100, 150, 255, 0.5)',
+				wardBBorder: 'rgba(255, 150, 100, 0.5)',
+				wardCBorder: 'rgba(150, 255, 100, 0.5)'
+			};
+
+			// Ward boundaries (square boxes)
+			const WARDS = {
+				A: { xCenter: -400, yBase: 0, width: 300, label: 'Ward A', color: COLORS.wardA, borderColor: COLORS.wardABorder },
+				B: { xCenter: 0, yBase: 0, width: 300, label: 'Ward B', color: COLORS.wardB, borderColor: COLORS.wardBBorder },
+				C: { xCenter: 400, yBase: 0, width: 300, label: 'Ward C', color: COLORS.wardC, borderColor: COLORS.wardCBorder }
 			};
 
 			// Helper function to add small random noise to y-coordinate
-			const noise = (baseY) => baseY + (Math.random() - 0.5) * 60;
+			const noise = (baseY) => baseY + (Math.random() - 0.5) * 40;
 
-			const nodes = new vis.DataSet([
-				{ id: 1, label: 'P0', shape: 'dot', size: 25, x: 0, y: noise(0) },
-				{ id: 2, label: 'S1', shape: 'triangle', size: 25, x: -200, y: noise(100) },
-				{ id: 3, label: 'P2', shape: 'dot', size: 25, x: 200, y: noise(100) },
-				{ id: 4, label: 'P3', shape: 'dot', size: 25, x: -300, y: noise(200) },
-				{ id: 5, label: 'P4', shape: 'dot', size: 25, x: -100, y: noise(150) },
-				{ id: 6, label: 'P5', shape: 'dot', size: 25, x: 100, y: noise(150) },
-				{ id: 7, label: 'P6', shape: 'dot', size: 25, x: 250, y: noise(200) },
-				{ id: 8, label: 'P7', shape: 'dot', size: 25, x: 400, y: noise(200) },
-				{ id: 10, label: 'S3', shape: 'triangle', size: 40, x: 0, y: noise(250) },
+			// Helper to position node within ward bounds
+			const wardPos = (ward, yBase, xOffset = 0) => ({
+				x: WARDS[ward].xCenter + xOffset + (Math.random() - 0.5) * 80,
+				y: WARDS[ward].yBase + yBase + noise(0)
+			});
+
+			// Node assignments to wards
+			const nodeData = [
+				{ id: 1, label: 'P0', ward: 'A', y: 0, xOffset: 0 },
+				{ id: 2, label: 'S1', ward: 'A', y: 70, xOffset: 50 },
+				{ id: 3, label: 'S2', ward: 'B', y: 50, xOffset: 0 },
+				{ id: 4, label: 'P3', ward: 'A', y: 200, xOffset: 50 },
+				{ id: 5, label: 'P4', ward: 'A', y: 180, xOffset: 80 },
+				{ id: 6, label: 'P5', ward: 'B', y: 150, xOffset: -50 },
+				{ id: 7, label: 'P6', ward: 'B', y: 200, xOffset: 50 },
+				{ id: 8, label: 'P7', ward: 'C', y: 200, xOffset: 0 },
+				{ id: 10, label: 'S3', ward: 'B', y: 250, xOffset: 0 },
 				// Generation 4: Superspreader burst
-				{ id: 9, label: 'S2', shape: 'triangle', size: 25, x: -350, y: noise(320) },
-				{ id: 11, label: 'S4', shape: 'triangle', size: 25, x: -250, y: noise(400) },
-				{ id: 12, label: 'P10', shape: 'dot', size: 25, x: -150, y: noise(400) },
-				{ id: 13, label: 'S5', shape: 'triangle', size: 25, x: -50, y: noise(500) },
-				{ id: 14, label: 'P12', shape: 'dot', size: 25, x: 50, y: noise(450) },
-				{ id: 15, label: 'P13', shape: 'dot', size: 25, x: 150, y: noise(400) },
-				{ id: 16, label: 'S6', shape: 'triangle', size: 25, x: 250, y: noise(400) },
-				{ id: 18, label: 'S7', shape: 'triangle', size: 25, x: 450, y: noise(400) },
+				{ id: 9, label: 'P2', ward: 'A', y: 320, xOffset: 0 },
+				{ id: 11, label: 'S4', ward: 'A', y: 400, xOffset: 60 },
+				{ id: 12, label: 'P10', ward: 'B', y: 400, xOffset: -70 },
+				{ id: 13, label: 'S5', ward: 'B', y: 500, xOffset: 0 },
+				{ id: 14, label: 'P12', ward: 'B', y: 450, xOffset: 80 },
+				{ id: 15, label: 'P13', ward: 'B', y: 400, xOffset: 30 },
+				{ id: 16, label: 'S6', ward: 'C', y: 400, xOffset: -40 },
+				{ id: 18, label: 'S7', ward: 'C', y: 300, xOffset: 50 },
 				// Later generations
-				{ id: 19, label: 'P17', shape: 'dot', size: 25, x: 450, y: noise(500) },
-				{ id: 20, label: 'P18', shape: 'dot', size: 25, x: 300, y: noise(550) },
-				{ id: 21, label: 'S8', shape: 'triangle', size: 25, x: -350, y: noise(400) },
-				{ id: 17, label: 'P15', shape: 'dot', size: 25, x: 200, y: noise(520) },
-				{ id: 22, label: 'P20', shape: 'dot', size: 25, x: -200, y: noise(510) },
-				{ id: 23, label: 'P21', shape: 'dot', size: 25, x: -350, y: noise(510) }
-			]);
+				{ id: 19, label: 'P17', ward: 'C', y: 500, xOffset: 60 },
+				{ id: 20, label: 'P18', ward: 'C', y: 550, xOffset: -70 },
+				{ id: 21, label: 'S8', ward: 'A', y: 400, xOffset: -30 },
+				{ id: 17, label: 'P15', ward: 'C', y: 520, xOffset: 20 },
+				{ id: 22, label: 'P20', ward: 'A', y: 510, xOffset: 40 },
+				{ id: 23, label: 'P21', ward: 'A', y: 510, xOffset: -50 }
+			];
+
+			// Create nodes with ward-based positioning
+			const nodes = new vis.DataSet(
+				nodeData.map(n => {
+					const pos = wardPos(n.ward, n.y, n.xOffset);
+					const isStaff = n.label.startsWith('S');
+					return {
+						id: n.id,
+						label: n.label,
+						shape: isStaff ? 'triangle' : 'dot',
+						size: (n.id === 10) ? 40 : 25,
+						x: pos.x,
+						y: pos.y,
+						ward: n.ward
+					};
+				})
+			);
 
 			const edges = new vis.DataSet([
 				// Generation 0 → Generation 1
@@ -494,6 +618,7 @@
 				{ id: 'e13', from: 21, to: 23 },
 				{ id: 'e14', from: 16, to: 17 }
 			]);
+
 			const options = {
 				layout: {
 					hierarchical: {
@@ -516,6 +641,34 @@
 			};
 
 			const network = new vis.Network(container, { nodes, edges }, options);
+
+			// Draw ward boxes after network is initialized
+			network.on('afterDrawing', function (ctx) {
+				// Draw ward boxes (extended vertically)
+				Object.values(WARDS).forEach(ward => {
+					const halfWidth = ward.width / 2;
+
+					// Convert network coordinates to canvas coordinates
+					const topLeft = network.canvasToDOM({ x: ward.xCenter - halfWidth, y: -100 });
+					const bottomRight = network.canvasToDOM({ x: ward.xCenter + halfWidth, y: 800 });
+
+					const canvasTopLeft = network.DOMtoCanvas(topLeft);
+					const canvasBottomRight = network.DOMtoCanvas(bottomRight);
+
+					// Draw ward box
+					ctx.strokeStyle = ward.borderColor;
+					ctx.fillStyle = ward.color;
+					ctx.lineWidth = 2;
+
+					const boxX = canvasTopLeft.x;
+					const boxY = canvasTopLeft.y;
+					const boxWidth = canvasBottomRight.x - canvasTopLeft.x;
+					const boxHeight = canvasBottomRight.y - canvasTopLeft.y;
+
+					ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+					ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+				});
+			});
 
 			// Fit the network to view after a short delay
 			setTimeout(() => network.fit(), 100);
@@ -581,7 +734,6 @@
 			runSimulation();
 		})();
 	</script>
-
 </body>
 
 </html>
