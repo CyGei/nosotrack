@@ -100,7 +100,8 @@
 					</span>
 					<b>is an outbreak
 						analytics platform that infers who infected whom in near real-time</b> by integrating data from
-					hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings
+					hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early
+					warnings
 					and actionable reports, enabling hospital infection prevention teams to target interventions
 					promptly before an outbreak escalates.
 				</p>
@@ -423,52 +424,80 @@
 			const COLORS = {
 				healthy: '#444444',
 				infected: '#ff073a',
-				superspreader: '#ff0000', // Brighter red
+				superspreader: '#ff0000',
 				healthyBorder: '#666666',
 				text: '#ffffff',
 				edge: 'rgba(255, 255, 255, 0.15)'
 			};
 
-			// 15 Nodes: Node 2 is the clear superspreader
+			// Helper function to add small random noise to y-coordinate
+			const noise = (baseY) => baseY + (Math.random() - 0.5) * 60;
+
 			const nodes = new vis.DataSet([
-				{ id: 1, label: 'P0', shape: 'dot', size: 15 },
-				{ id: 2, label: 'S1', shape: 'triangle', size: 30 }, // Larger Staff node
-				{ id: 3, label: 'P2', shape: 'dot', size: 15 },
-				{ id: 4, label: 'P3', shape: 'dot', size: 15 },
-				{ id: 5, label: 'P4', shape: 'dot', size: 15 },
-				{ id: 6, label: 'P5', shape: 'dot', size: 15 },
-				{ id: 7, label: 'P6', shape: 'dot', size: 15 },
-				{ id: 8, label: 'P7', shape: 'dot', size: 15 },
-				{ id: 9, label: 'P8', shape: 'dot', size: 15 },
-				{ id: 10, label: 'S2', shape: 'triangle', size: 15 },
-				{ id: 11, label: 'P9', shape: 'dot', size: 15 },
-				{ id: 12, label: 'P10', shape: 'dot', size: 15 },
-				{ id: 13, label: 'P11', shape: 'dot', size: 15 },
-				{ id: 14, label: 'S3', shape: 'triangle', size: 15 },
-				{ id: 15, label: 'P12', shape: 'dot', size: 15 }
+				{ id: 1, label: 'P0', shape: 'dot', size: 25, x: 0, y: noise(0) },
+				{ id: 2, label: 'S1', shape: 'triangle', size: 25, x: -200, y: noise(100) },
+				{ id: 3, label: 'P2', shape: 'dot', size: 25, x: 200, y: noise(100) },
+				{ id: 4, label: 'P3', shape: 'dot', size: 25, x: -300, y: noise(200) },
+				{ id: 5, label: 'P4', shape: 'dot', size: 25, x: -100, y: noise(150) },
+				{ id: 6, label: 'P5', shape: 'dot', size: 25, x: 100, y: noise(150) },
+				{ id: 7, label: 'P6', shape: 'dot', size: 25, x: 250, y: noise(200) },
+				{ id: 8, label: 'P7', shape: 'dot', size: 25, x: 400, y: noise(200) },
+				{ id: 10, label: 'S3', shape: 'triangle', size: 40, x: 0, y: noise(250) },
+				// Generation 4: Superspreader burst
+				{ id: 9, label: 'S2', shape: 'triangle', size: 25, x: -350, y: noise(320) },
+				{ id: 11, label: 'S4', shape: 'triangle', size: 25, x: -250, y: noise(400) },
+				{ id: 12, label: 'P10', shape: 'dot', size: 25, x: -150, y: noise(400) },
+				{ id: 13, label: 'S5', shape: 'triangle', size: 25, x: -50, y: noise(500) },
+				{ id: 14, label: 'P12', shape: 'dot', size: 25, x: 50, y: noise(450) },
+				{ id: 15, label: 'P13', shape: 'dot', size: 25, x: 150, y: noise(400) },
+				{ id: 16, label: 'S6', shape: 'triangle', size: 25, x: 250, y: noise(400) },
+				{ id: 18, label: 'S7', shape: 'triangle', size: 25, x: 450, y: noise(400) },
+				// Later generations
+				{ id: 19, label: 'P17', shape: 'dot', size: 25, x: 450, y: noise(500) },
+				{ id: 20, label: 'P18', shape: 'dot', size: 25, x: 300, y: noise(550) },
+				{ id: 21, label: 'S8', shape: 'triangle', size: 25, x: -350, y: noise(400) },
+				{ id: 17, label: 'P15', shape: 'dot', size: 25, x: 200, y: noise(520) },
+				{ id: 22, label: 'P20', shape: 'dot', size: 25, x: -200, y: noise(510) },
+				{ id: 23, label: 'P21', shape: 'dot', size: 25, x: -350, y: noise(510) }
 			]);
 
-			// Topology: Node 2 connects to almost half the network
 			const edges = new vis.DataSet([
+				// Generation 0 → Generation 1
 				{ id: 'e1', from: 1, to: 2 },
 				{ id: 'e2', from: 1, to: 3 },
-				// Superspreader burst
-				{ id: 's1', from: 2, to: 4 }, { id: 's2', from: 2, to: 5 },
-				{ id: 's3', from: 2, to: 6 }, { id: 's4', from: 2, to: 7 },
-				{ id: 's5', from: 2, to: 8 }, { id: 's6', from: 2, to: 9 },
-				// Standard paths
-				{ id: 'e3', from: 3, to: 10 }, { id: 'e4', from: 10, to: 11 },
-				{ id: 'e5', from: 4, to: 12 }, { id: 'e6', from: 8, to: 13 },
-				{ id: 'e7', from: 13, to: 14 }, { id: 'e8', from: 14, to: 15 }
-			]);
 
+				// Generation 1 → Generation 2
+				{ id: 'e3', from: 2, to: 4 },
+				{ id: 'e4', from: 2, to: 5 },
+				{ id: 'e5', from: 3, to: 6 },
+				{ id: 'e6', from: 3, to: 7 },
+				{ id: 'e7', from: 3, to: 8 },
+
+				// Generation 2 → Generation 3 (Superspreader)
+				{ id: 'e8', from: 6, to: 10 },
+
+				// Generation 3 → Generation 4 (Superspreader burst)
+				{ id: 's1', from: 10, to: 9 },
+				{ id: 's2', from: 10, to: 11 },
+				{ id: 's3', from: 10, to: 12 },
+				{ id: 's4', from: 10, to: 13 },
+				{ id: 's5', from: 10, to: 14 },
+				{ id: 's6', from: 10, to: 15 },
+				{ id: 's7', from: 10, to: 16 },
+				{ id: 's8', from: 10, to: 18 },
+
+				// Generation 4 → Generation 5+
+				{ id: 'e9', from: 18, to: 19 },
+				{ id: 'e10', from: 18, to: 20 },
+				{ id: 'e11', from: 9, to: 21 },
+				{ id: 'e12', from: 21, to: 22 },
+				{ id: 'e13', from: 21, to: 23 },
+				{ id: 'e14', from: 16, to: 17 }
+			]);
 			const options = {
 				layout: {
 					hierarchical: {
-						direction: 'UD',
-						sortMethod: 'directed',
-						levelSeparation: 80,
-						nodeSpacing: 100
+						enabled: false
 					}
 				},
 				physics: { enabled: false },
@@ -476,32 +505,34 @@
 					arrows: { to: { enabled: true, scaleFactor: 0.8 } },
 					color: { color: COLORS.edge, opacity: 0.3 },
 					width: 1.5,
-					smooth: { type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.4 }
+					smooth: { type: 'cubicBezier', roundness: 0.4 }
 				},
 				nodes: {
 					font: { color: COLORS.text, face: 'monospace', size: 20, vadjust: -35 },
 					borderWidth: 2,
 					color: { background: COLORS.healthy, border: COLORS.healthyBorder }
 				},
-				interaction: { dragNodes: true, zoomView: false, dragView: false }
+				interaction: { dragNodes: true, zoomView: true, dragView: true }
 			};
 
 			const network = new vis.Network(container, { nodes, edges }, options);
+
+			// Fit the network to view after a short delay
+			setTimeout(() => network.fit(), 100);
+
 			const observer = new ResizeObserver(() => { network.fit(); });
 			observer.observe(container);
 
 			let infectedIds = new Set();
+			const SUPERSPREADER_ID = 10;
 
 			function runSimulation() {
-				// Reset
 				nodes.forEach(n => nodes.update({ id: n.id, color: { background: COLORS.healthy, border: COLORS.healthyBorder }, shadow: false }));
 				edges.forEach(e => edges.update({ id: e.id, color: COLORS.edge, width: 1.5 }));
 				infectedIds.clear();
 
-				// Start simulation
 				infectNode(1, null);
 
-				let step = 0;
 				const spreadInterval = setInterval(() => {
 					let targets = [];
 
@@ -515,14 +546,10 @@
 					});
 
 					if (targets.length > 0) {
-						// SPECIAL LOGIC: If the source is Node 2 (Superspreader), infect multiple people at once
-						const superspreaderTargets = targets.filter(t => t.sourceId === 2);
-
-						if (superspreaderTargets.length > 0 && infectedIds.has(2)) {
-							// Rapid burst: infect all targets of the superspreader in one go
+						const superspreaderTargets = targets.filter(t => t.sourceId === SUPERSPREADER_ID);
+						if (superspreaderTargets.length > 0 && infectedIds.has(SUPERSPREADER_ID)) {
 							superspreaderTargets.forEach(t => infectNode(t.nodeId, t.edgeId));
 						} else {
-							// Standard spread: infect 1 random person
 							const t = targets[Math.floor(Math.random() * targets.length)];
 							infectNode(t.nodeId, t.edgeId);
 						}
@@ -530,12 +557,12 @@
 						clearInterval(spreadInterval);
 						setTimeout(runSimulation, 5000);
 					}
-				}, 1000);
+				}, 800);
 			}
 
 			function infectNode(nodeId, edgeId) {
 				infectedIds.add(nodeId);
-				const isSuperspreader = (nodeId === 2);
+				const isSuperspreader = (nodeId === SUPERSPREADER_ID);
 
 				nodes.update({
 					id: nodeId,
@@ -543,19 +570,18 @@
 					shadow: {
 						enabled: true,
 						color: COLORS.infected,
-						size: isSuperspreader ? 30 : 12, // Bigger glow for superspreader
+						size: isSuperspreader ? 35 : 12,
 						x: 0, y: 0
 					}
 				});
 
-				if (edgeId) {
-					edges.update({ id: edgeId, color: COLORS.infected, width: 3 });
-				}
+				if (edgeId) edges.update({ id: edgeId, color: COLORS.infected, width: 3 });
 			}
 
 			runSimulation();
 		})();
 	</script>
+
 </body>
 
 </html>
