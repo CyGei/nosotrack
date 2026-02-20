@@ -391,6 +391,37 @@
             line-height: 1.7;
         }
 
+        /* ========== PIPELINE ========== */
+        #pipeline-canvas {
+            width: 100%;
+            height: 340px;
+            display: block;
+            margin-top: 48px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        .pipeline-fallback {
+            margin-top: 48px;
+        }
+        .pipeline-fallback ol {
+            list-style: none;
+            counter-reset: pipeline-step;
+        }
+        .pipeline-fallback li {
+            counter-increment: pipeline-step;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .pipeline-fallback li::before {
+            content: counter(pipeline-step, decimal-leading-zero) ' ';
+            color: var(--accent);
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
         /* ========== RESEARCH ========== */
         .research-intro {
             max-width: 700px;
@@ -624,12 +655,13 @@
             .team-grid { grid-template-columns: 1fr; }
             .hero-title { font-size: clamp(2.5rem, 10vw, 4rem); }
             .section-padding { padding: 80px 0; }
+            #pipeline-canvas { height: 700px; }
         }
 
         /* ========== 3D VIZ ========== */
         #three-container {
             width: 100%;
-            height: 600px;
+            height: 650px;
             position: relative;
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -819,26 +851,20 @@
     <div class="container">
         <span class="section-tag reveal">02 — Process</span>
         <h2 class="section-title reveal">How It Works</h2>
-        <div class="steps-grid">
-            <div class="step-card reveal">
-                <div class="step-number">01</div>
-                <div class="step-label">Step 01</div>
-                <h3 class="step-title">Data Ingestion</h3>
-                <p class="step-desc">Hospital Electronic Health Records and Bluetooth-enabled contact tracing data are automatically ingested and harmonized into a unified temporal contact network.</p>
+        <canvas id="pipeline-canvas" class="reveal"></canvas>
+        <noscript>
+            <div class="pipeline-fallback">
+                <ol>
+                    <li><strong>DNA Sequencing</strong> — Pathogen genomes are sequenced and read</li>
+                    <li><strong>Contact Tracing</strong> — Bluetooth devices detect proximity between individuals</li>
+                    <li><strong>Electronic Health Records</strong> — Clinical data is extracted from hospital systems</li>
+                    <li><strong>Data Anonymisation</strong> — Patient identifiers are masked and encrypted</li>
+                    <li><strong>Data Merging</strong> — Multiple data streams converge into NosoTrack</li>
+                    <li><strong>Transmission Tree Reconstruction</strong> — Statistical models infer who infected whom</li>
+                    <li><strong>Warning System</strong> — Alert notifications are dispatched to IPC teams</li>
+                </ol>
             </div>
-            <div class="step-card reveal" style="transition-delay: 0.15s;">
-                <div class="step-number">02</div>
-                <div class="step-label">Step 02</div>
-                <h3 class="step-title">Transmission Inference</h3>
-                <p class="step-desc">Statistical models reconstruct the most likely transmission tree — identifying who infected whom, superspreaders, and undetected cases using epidemiological and genomic data.</p>
-            </div>
-            <div class="step-card reveal" style="transition-delay: 0.3s;">
-                <div class="step-number">03</div>
-                <div class="step-label">Step 03</div>
-                <h3 class="step-title">Targeted Intervention</h3>
-                <p class="step-desc">Actionable reports and early warnings are generated in near real-time, enabling infection prevention teams to deploy precise, evidence-based interventions before outbreaks escalate.</p>
-            </div>
-        </div>
+        </noscript>
     </div>
 </section>
 
@@ -1119,6 +1145,333 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 // ==========================================
+// PIPELINE ANIMATION (Canvas 2D)
+// ==========================================
+(function() {
+    const canvas = document.getElementById('pipeline-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const ACCENT = '#e63946';
+    const ACCENT_DIM = 'rgba(230, 57, 70, 0.15)';
+    const DIM = '#333333';
+    const ACTIVE = '#f0f0f0';
+    const BG = '#111111';
+    const MONO = '"JetBrains Mono", monospace';
+
+    const steps = [
+        { title: 'DNA Sequencing',     desc: 'Pathogen genomes are sequenced',   draw: drawDNA },
+        { title: 'Contact Tracing',    desc: 'Bluetooth proximity detection',     draw: drawContact },
+        { title: 'Health Records',     desc: 'Clinical data from hospital EHR',   draw: drawEHR },
+        { title: 'Anonymisation',      desc: 'Identifiers masked & encrypted',    draw: drawAnon },
+        { title: 'Data Merging',       desc: 'Streams converge into NosoTrack',   draw: drawMerge },
+        { title: 'Transmission Tree',  desc: 'Infer who infected whom',           draw: drawTree },
+        { title: 'Warning System',     desc: 'Alerts dispatched to IPC teams',    draw: drawAlert },
+    ];
+
+    let W, H, vertical, dpr;
+    let activeStep = -1, stepTimer = 0, particleT = -1;
+    const STEP_DUR = 130;
+    const P_SPEED = 0.022;
+    let descFade = new Array(steps.length).fill(0);
+    let stepLit = new Array(steps.length).fill(0);
+
+    function resize() {
+        dpr = Math.min(window.devicePixelRatio, 2);
+        const r = canvas.getBoundingClientRect();
+        W = r.width; H = r.height;
+        canvas.width = W * dpr; canvas.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        vertical = W < 600;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function pos(i) {
+        if (vertical) {
+            const m = 70, sp = (H - m * 2) / (steps.length - 1);
+            return { x: W / 2, y: m + i * sp };
+        }
+        const m = 80, sp = (W - m * 2) / (steps.length - 1);
+        return { x: m + i * sp, y: H * 0.42 };
+    }
+
+    function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+
+    // === ICON FUNCTIONS ===
+    function drawDNA(cx, cy, s, col) {
+        ctx.strokeStyle = col; ctx.lineWidth = 2;
+        const amp = s * 0.4;
+        for (let strand = 0; strand < 2; strand++) {
+            const sign = strand === 0 ? 1 : -1;
+            ctx.beginPath();
+            for (let i = 0; i <= 24; i++) {
+                const t = i / 24;
+                const y = cy - s + t * s * 2;
+                const x = cx + Math.sin(t * Math.PI * 3) * amp * sign;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+        ctx.lineWidth = 1; ctx.globalAlpha = 0.5;
+        for (let i = 0; i < 4; i++) {
+            const t = (i + 0.25) / 4;
+            const y = cy - s + t * s * 2;
+            const x1 = cx + Math.sin(t * Math.PI * 3) * amp;
+            const x2 = cx - Math.sin(t * Math.PI * 3) * amp;
+            ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+    }
+
+    function drawContact(cx, cy, s, col) {
+        ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.5;
+        // Central device
+        const dw = s * 0.25, dh = s * 0.45;
+        ctx.strokeRect(cx - dw, cy - dh, dw * 2, dh * 2);
+        // Small dot in device center
+        ctx.beginPath(); ctx.arc(cx, cy, 2, 0, Math.PI * 2); ctx.fill();
+        // People dots
+        const angles = [-1.2, -0.4, 0.4, 1.2, Math.PI - 0.4, Math.PI + 0.4];
+        angles.forEach(a => {
+            const px = cx + Math.cos(a) * s * 0.85;
+            const py = cy + Math.sin(a) * s * 0.55;
+            ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI * 2); ctx.fill();
+        });
+        // Signal arcs
+        ctx.globalAlpha = 0.4;
+        for (let r = 1; r <= 2; r++) {
+            ctx.beginPath();
+            ctx.arc(cx, cy, s * 0.35 * r, -0.8, 0.8);
+            ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+    }
+
+    function drawEHR(cx, cy, s, col) {
+        ctx.strokeStyle = col; ctx.lineWidth = 1.5;
+        const w = s * 0.65, h = s * 1.1;
+        // Document outline
+        ctx.beginPath();
+        ctx.moveTo(cx - w/2, cy - h/2);
+        ctx.lineTo(cx + w/2 - 6, cy - h/2);
+        ctx.lineTo(cx + w/2, cy - h/2 + 6);
+        ctx.lineTo(cx + w/2, cy + h/2);
+        ctx.lineTo(cx - w/2, cy + h/2);
+        ctx.closePath(); ctx.stroke();
+        // Dog ear
+        ctx.beginPath();
+        ctx.moveTo(cx + w/2 - 6, cy - h/2);
+        ctx.lineTo(cx + w/2 - 6, cy - h/2 + 6);
+        ctx.lineTo(cx + w/2, cy - h/2 + 6);
+        ctx.stroke();
+        // Data lines
+        ctx.globalAlpha = 0.6;
+        for (let i = 0; i < 4; i++) {
+            const y = cy - h/2 + h * 0.25 + i * h * 0.17;
+            const lw = i === 0 ? w * 0.7 : w * 0.5 + (i % 2) * w * 0.1;
+            ctx.beginPath(); ctx.moveTo(cx - w/2 + 6, y); ctx.lineTo(cx - w/2 + 6 + lw, y); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+    }
+
+    function drawAnon(cx, cy, s, col) {
+        ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.5;
+        const bw = s * 0.55, bh = s * 0.5;
+        // Lock body
+        ctx.strokeRect(cx - bw/2, cy - bh/6, bw, bh);
+        // Shackle
+        ctx.beginPath();
+        ctx.arc(cx, cy - bh/6, bw * 0.32, Math.PI, 0);
+        ctx.stroke();
+        // Keyhole
+        ctx.beginPath(); ctx.arc(cx, cy + bh * 0.15, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(cx, cy + bh * 0.15 + 3); ctx.lineTo(cx, cy + bh * 0.15 + 8); ctx.stroke();
+    }
+
+    function drawMerge(cx, cy, s, col) {
+        ctx.strokeStyle = col; ctx.lineWidth = 2;
+        const offsets = [-s * 0.55, 0, s * 0.55];
+        offsets.forEach(yOff => {
+            ctx.beginPath();
+            ctx.moveTo(cx - s * 0.9, cy + yOff);
+            ctx.bezierCurveTo(cx - s * 0.2, cy + yOff, cx - s * 0.2, cy, cx + s * 0.15, cy);
+            ctx.stroke();
+        });
+        // Arrow
+        ctx.fillStyle = col;
+        ctx.beginPath();
+        ctx.moveTo(cx + s * 0.15, cy - 5);
+        ctx.lineTo(cx + s * 0.45, cy);
+        ctx.lineTo(cx + s * 0.15, cy + 5);
+        ctx.closePath(); ctx.fill();
+        // NosoTrack box
+        ctx.strokeRect(cx + s * 0.5, cy - 8, s * 0.4, 16);
+        ctx.font = `500 7px ${MONO}`;
+        ctx.fillStyle = col; ctx.textAlign = 'center';
+        ctx.fillText('NT', cx + s * 0.7, cy + 3);
+    }
+
+    function drawTree(cx, cy, s, col) {
+        ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.5;
+        // Root
+        ctx.beginPath(); ctx.arc(cx, cy - s * 0.65, 4, 0, Math.PI * 2); ctx.fill();
+        // Main branches
+        ctx.beginPath(); ctx.moveTo(cx, cy - s * 0.65); ctx.lineTo(cx - s * 0.45, cy - s * 0.05); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx, cy - s * 0.65); ctx.lineTo(cx + s * 0.45, cy - s * 0.05); ctx.stroke();
+        // L2 nodes
+        ctx.beginPath(); ctx.arc(cx - s * 0.45, cy - s * 0.05, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx + s * 0.45, cy - s * 0.05, 3, 0, Math.PI * 2); ctx.fill();
+        // Sub-branches
+        const subs = [[-0.45, -0.2], [-0.45, 0.2], [0.45, -0.2], [0.45, 0.2]];
+        subs.forEach(([px, dx]) => {
+            ctx.beginPath(); ctx.moveTo(cx + px * s, cy - s * 0.05);
+            ctx.lineTo(cx + (px + dx) * s, cy + s * 0.5); ctx.stroke();
+            ctx.beginPath(); ctx.arc(cx + (px + dx) * s, cy + s * 0.5, 2.5, 0, Math.PI * 2); ctx.fill();
+        });
+    }
+
+    function drawAlert(cx, cy, s, col) {
+        ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.5;
+        const w = s * 0.85, h = s * 0.55;
+        // Envelope body
+        ctx.strokeRect(cx - w/2, cy - h/2 + 4, w, h);
+        // Flap
+        ctx.beginPath();
+        ctx.moveTo(cx - w/2, cy - h/2 + 4);
+        ctx.lineTo(cx, cy + 6);
+        ctx.lineTo(cx + w/2, cy - h/2 + 4);
+        ctx.stroke();
+        // Notification badge
+        ctx.beginPath(); ctx.arc(cx + w/2 - 2, cy - h/2, 5, 0, Math.PI * 2); ctx.fill();
+        // Exclamation in badge
+        ctx.fillStyle = BG;
+        ctx.font = `700 7px ${MONO}`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('!', cx + w/2 - 2, cy - h/2);
+        ctx.textBaseline = 'alphabetic';
+    }
+
+    // === ANIMATION LOOP ===
+    function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+
+        stepTimer++;
+        if (stepTimer >= STEP_DUR) {
+            stepTimer = 0;
+            activeStep++;
+            if (activeStep >= steps.length) {
+                activeStep = 0;
+                stepLit.fill(0); descFade.fill(0);
+            }
+            stepLit[activeStep] = 1;
+            particleT = 0;
+        }
+
+        // Fade descriptions
+        for (let i = 0; i < steps.length; i++) {
+            descFade[i] = i <= activeStep
+                ? Math.min(1, descFade[i] + 0.04)
+                : Math.max(0, descFade[i] - 0.06);
+        }
+
+        // Connecting lines
+        for (let i = 0; i < steps.length - 1; i++) {
+            const a = pos(i), b = pos(i + 1);
+            const lit = i < activeStep;
+            ctx.strokeStyle = lit ? ACCENT : DIM;
+            ctx.lineWidth = lit ? 2 : 1;
+            ctx.globalAlpha = lit ? 0.5 : 0.2;
+
+            // Dashed line style for unlit
+            if (!lit) { ctx.setLineDash([4, 4]); } else { ctx.setLineDash([]); }
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 1;
+
+            // Small arrow at midpoint for lit lines
+            if (lit) {
+                const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+                const ang = Math.atan2(b.y - a.y, b.x - a.x);
+                ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.6;
+                ctx.beginPath();
+                ctx.moveTo(mx + Math.cos(ang) * 6, my + Math.sin(ang) * 6);
+                ctx.lineTo(mx + Math.cos(ang + 2.5) * 5, my + Math.sin(ang + 2.5) * 5);
+                ctx.lineTo(mx + Math.cos(ang - 2.5) * 5, my + Math.sin(ang - 2.5) * 5);
+                ctx.closePath(); ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        // Traveling particle
+        if (particleT >= 0 && particleT < 1 && activeStep < steps.length - 1) {
+            particleT += P_SPEED;
+            const a = pos(activeStep), b = pos(activeStep + 1);
+            const t = ease(Math.min(particleT, 1));
+            const px = a.x + (b.x - a.x) * t;
+            const py = a.y + (b.y - a.y) * t;
+            const grad = ctx.createRadialGradient(px, py, 0, px, py, 14);
+            grad.addColorStop(0, ACCENT);
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(px, py, 14, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI * 2); ctx.fill();
+        }
+
+        // Draw steps
+        const iconSize = vertical ? 18 : 22;
+        for (let i = 0; i < steps.length; i++) {
+            const p = pos(i), step = steps[i];
+            const lit = stepLit[i] > 0;
+            const col = lit ? ACTIVE : DIM;
+
+            // Background circle
+            ctx.fillStyle = lit ? ACCENT_DIM : 'rgba(255,255,255,0.03)';
+            ctx.beginPath(); ctx.arc(p.x, p.y, iconSize + 12, 0, Math.PI * 2); ctx.fill();
+
+            // Accent ring pulse for active
+            if (lit) {
+                ctx.strokeStyle = ACCENT;
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = 0.4 + Math.sin(stepTimer * 0.06) * 0.15;
+                ctx.beginPath(); ctx.arc(p.x, p.y, iconSize + 12, 0, Math.PI * 2); ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
+
+            // Icon
+            step.draw(p.x, p.y, iconSize, col);
+
+            // Step number
+            ctx.font = `500 10px ${MONO}`;
+            ctx.fillStyle = lit ? ACCENT : DIM;
+            ctx.textAlign = 'center';
+            ctx.fillText(`0${i + 1}`, p.x, p.y - iconSize - 20);
+
+            // Title
+            ctx.font = `600 ${vertical ? 10 : 11}px ${MONO}`;
+            ctx.fillStyle = lit ? ACTIVE : DIM;
+            const ty = p.y + iconSize + 26;
+            ctx.fillText(step.title, p.x, ty);
+
+            // Description (fades in)
+            if (descFade[i] > 0.01) {
+                ctx.globalAlpha = descFade[i];
+                ctx.font = `300 ${vertical ? 9 : 10}px ${MONO}`;
+                ctx.fillStyle = '#888';
+                ctx.fillText(step.desc, p.x, ty + 16);
+                ctx.globalAlpha = 1;
+            }
+        }
+    }
+
+    // Start after a short delay to ensure font is loaded
+    setTimeout(() => { resize(); requestAnimationFrame(animate); }, 100);
+})();
+
+// ==========================================
 // 3D TRANSMISSION NETWORK (Three.js)
 // ==========================================
 (function() {
@@ -1132,10 +1485,10 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0a0a);
-    scene.fog = new THREE.FogExp2(0x0a0a0a, 0.0015);
+    scene.fog = new THREE.FogExp2(0x0a0a0a, 0.0012);
 
     const camera = new THREE.PerspectiveCamera(55, W / H, 1, 2000);
-    camera.position.set(0, 80, 400);
+    camera.position.set(0, 90, 420);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(W, H);
@@ -1204,7 +1557,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     // Force-directed layout
     const nodeMap = {};
-    const wardCenters = { A: { x: -120, z: -60 }, B: { x: 0, z: 60 }, C: { x: 120, z: -30 } };
+    const wardCenters = { A: { x: -180, z: -80 }, B: { x: 0, z: 90 }, C: { x: 180, z: -40 } };
 
     nodeData.forEach(n => {
         const wc = wardCenters[n.ward];
@@ -1252,9 +1605,9 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             // Ward gravity
             nodes.forEach(n => {
                 const wc = wardCenters[n.ward];
-                n.vx += (wc.x - n.x) * 0.01;
-                n.vz += (wc.z - n.z) * 0.01;
-                n.vy += (0 - n.y) * 0.005;
+                n.vx += (wc.x - n.x) * 0.025;
+                n.vz += (wc.z - n.z) * 0.025;
+                n.vy += (0 - n.y) * 0.012;
             });
             // Damping & update
             const damping = 0.85;
@@ -1265,6 +1618,59 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         }
     }
     simulateForces(200);
+
+    // Ward ground planes & labels
+    const wardConfig = {
+        A: { color: COLORS.wardA, radius: 80 },
+        B: { color: COLORS.wardB, radius: 90 },
+        C: { color: COLORS.wardC, radius: 75 },
+    };
+    Object.entries(wardCenters).forEach(([ward, center]) => {
+        const cfg = wardConfig[ward];
+        // Semi-transparent disc
+        const discGeo = new THREE.CircleGeometry(cfg.radius, 64);
+        const discMat = new THREE.MeshBasicMaterial({
+            color: cfg.color, transparent: true, opacity: 0.07,
+            side: THREE.DoubleSide, depthWrite: false,
+        });
+        const disc = new THREE.Mesh(discGeo, discMat);
+        disc.rotation.x = -Math.PI / 2;
+        disc.position.set(center.x, -45, center.z);
+        scene.add(disc);
+
+        // Ring border
+        const ringGeo = new THREE.RingGeometry(cfg.radius - 1.5, cfg.radius, 64);
+        const ringMat = new THREE.MeshBasicMaterial({
+            color: cfg.color, transparent: true, opacity: 0.15,
+            side: THREE.DoubleSide, depthWrite: false,
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = -Math.PI / 2;
+        ring.position.set(center.x, -44.5, center.z);
+        scene.add(ring);
+    });
+
+    // Ward label sprites
+    function createWardLabel(text, color) {
+        const c = document.createElement('canvas');
+        c.width = 256; c.height = 64;
+        const cx = c.getContext('2d');
+        cx.font = '500 28px "JetBrains Mono", monospace';
+        cx.textAlign = 'center'; cx.textBaseline = 'middle';
+        cx.fillStyle = '#' + new THREE.Color(color).getHexString();
+        cx.globalAlpha = 0.7;
+        cx.fillText(text, 128, 32);
+        const texture = new THREE.CanvasTexture(c);
+        const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false });
+        const sprite = new THREE.Sprite(mat);
+        sprite.scale.set(80, 20, 1);
+        return sprite;
+    }
+    Object.entries(wardCenters).forEach(([ward, center]) => {
+        const label = createWardLabel('Ward ' + ward, wardConfig[ward].color);
+        label.position.set(center.x, 55, center.z);
+        scene.add(label);
+    });
 
     // Create 3D nodes
     const nodeMeshes = [];
@@ -1498,9 +1904,9 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         orbitAngle += 0.002;
 
         // Camera orbit
-        camera.position.x = Math.sin(orbitAngle) * 350;
-        camera.position.z = Math.cos(orbitAngle) * 350;
-        camera.position.y = 80 + Math.sin(orbitAngle * 0.5) * 40;
+        camera.position.x = Math.sin(orbitAngle) * 420;
+        camera.position.z = Math.cos(orbitAngle) * 420;
+        camera.position.y = 90 + Math.sin(orbitAngle * 0.5) * 40;
         camera.lookAt(0, 0, 0);
 
         // Node breathing
