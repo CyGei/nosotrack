@@ -1,739 +1,1611 @@
-<!DOCTYPE HTML>
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<title>NosoTrack</title>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-	<link rel="stylesheet" href="assets/css/main.css" />
-	<noscript>
-		<link rel="stylesheet" href="assets/css/noscript.css" />
-	</noscript>
-	<link rel="stylesheet" href="https://unpkg.com/vis-network/styles/vis-network.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NosoTrack — Real-Time Nosocomial Outbreak Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ========== RESET & BASE ========== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            font-weight: 300;
+            line-height: 1.7;
+        }
+        a { color: inherit; text-decoration: none; }
+        img { max-width: 100%; display: block; }
 
-	<style>
-		#network-canvas {
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			z-index: 0;
-			pointer-events: none;
-		}
+        /* ========== VARIABLES ========== */
+        :root {
+            --accent: #e63946;
+            --accent-dim: rgba(230, 57, 70, 0.15);
+            --accent-glow: rgba(230, 57, 70, 0.4);
+            --bg: #0a0a0a;
+            --bg-card: #111111;
+            --bg-card-hover: #1a1a1a;
+            --text-primary: #f0f0f0;
+            --text-secondary: #888888;
+            --text-dim: #555555;
+            --border: rgba(255,255,255,0.06);
+            --mono: 'JetBrains Mono', monospace;
+            --display: 'Syne', sans-serif;
+            --body: 'Inter', sans-serif;
+            --container: 1200px;
+        }
 
-		/* Ensure the wrapper sits above the canvas */
-		#wrapper {
-			position: relative;
-			z-index: 2;
-		}
+        /* ========== UTILITIES ========== */
+        .container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+        .section-tag {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--accent);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .section-title {
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            color: var(--text-primary);
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+        .section-padding { padding: 120px 0; }
 
-		/* Ensure the background div sits behind the canvas */
-		#bg {
-			z-index: -1;
-		}
-	</style>
+        /* ========== SCROLL ANIMATIONS ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ========== NAV ========== */
+        nav.main-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10,10,10,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-inner {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+        .nav-logo {
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+        .nav-logo span { color: var(--accent); }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+        .nav-links a {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+        .nav-cta {
+            background: var(--accent);
+            color: #fff !important;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .nav-cta:hover { background: #c1303c; transform: translateY(-1px); }
+        .nav-hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px;
+        }
+        .nav-hamburger span {
+            width: 24px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        /* ========== HERO ========== */
+        #hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+        #network-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 24px;
+            padding-top: 100px;
+        }
+        .hero-eyebrow {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+        .hero-title {
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: clamp(3rem, 7vw, 7rem);
+            line-height: 1.05;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+        }
+        .hero-title .accent { color: var(--accent); }
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 580px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+        .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent);
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 4px;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: background 0.3s, transform 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary:hover { background: #c1303c; transform: translateY(-2px); }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            color: var(--text-primary);
+            padding: 14px 32px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.15);
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: border-color 0.3s, transform 0.2s;
+            cursor: pointer;
+        }
+        .btn-secondary:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+        /* ========== MARQUEE ========== */
+        .marquee-section {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+            overflow: hidden;
+            background: var(--bg);
+        }
+        .marquee-track {
+            display: flex;
+            gap: 60px;
+            animation: marquee 30s linear infinite;
+            width: max-content;
+        }
+        .marquee-track span {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            white-space: nowrap;
+        }
+        .marquee-track span::after {
+            content: '//';
+            margin-left: 60px;
+            color: var(--accent);
+            opacity: 0.5;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ========== STATS ========== */
+        #stats {
+            padding: 80px 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            padding: 48px 32px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: background 0.3s;
+        }
+        .stat-card:hover { background: var(--bg-card-hover); }
+        .stat-label {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        .stat-value {
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .stat-sub {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+        .stat-accent-line {
+            width: 40px;
+            height: 2px;
+            background: var(--accent);
+            margin: 16px auto 0;
+        }
+
+        /* ========== ABOUT ========== */
+        #about .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: start;
+        }
+        .about-text p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            text-align: justify;
+            font-size: 1.02rem;
+        }
+        .about-text strong { color: var(--text-primary); font-weight: 500; }
+        .about-text em { color: var(--text-secondary); font-style: italic; }
+        .nosotrack-highlight {
+            color: var(--accent);
+            font-weight: 700;
+            font-family: var(--mono);
+            font-size: 1.1rem;
+        }
+        .about-visual {
+            position: relative;
+        }
+        #viz-container {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* ========== HOW IT WORKS ========== */
+        #how-it-works { background: var(--bg-card); }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-top: 64px;
+        }
+        .step-card {
+            position: relative;
+            padding: 48px 32px 40px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            transition: border-color 0.3s, transform 0.3s;
+            overflow: hidden;
+        }
+        .step-card:hover {
+            border-color: rgba(230,57,70,0.3);
+            transform: translateY(-4px);
+        }
+        .step-number {
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: 6rem;
+            line-height: 1;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.06);
+            position: absolute;
+            top: -10px;
+            right: 16px;
+        }
+        .step-label {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+        .step-title {
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+        .step-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* ========== RESEARCH ========== */
+        .research-intro {
+            max-width: 700px;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            font-size: 1.05rem;
+            text-align: justify;
+        }
+        .research-sub {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+        }
+        .pub-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .pub-card {
+            display: block;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 28px;
+            transition: border-color 0.3s, transform 0.3s, background 0.3s;
+        }
+        .pub-card:hover {
+            border-color: rgba(230,57,70,0.3);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+        .pub-tag {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: var(--accent-dim);
+            padding: 4px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        .pub-title {
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .pub-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .pub-arrow {
+            display: inline-block;
+            margin-top: 12px;
+            color: var(--accent);
+            font-size: 0.85rem;
+            transition: transform 0.3s;
+        }
+        .pub-card:hover .pub-arrow { transform: translateX(4px); }
+
+        /* ========== TEAM ========== */
+        #team { background: var(--bg-card); }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-top: 48px;
+        }
+        .team-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        .team-card:hover {
+            border-color: rgba(230,57,70,0.3);
+            transform: translateY(-4px);
+        }
+        .team-photo {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            filter: grayscale(30%);
+            transition: filter 0.3s;
+        }
+        .team-card:hover .team-photo { filter: grayscale(0%); }
+        .team-info { padding: 20px; }
+        .team-name {
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .team-role {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+        .team-bio {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+        .team-bio a {
+            color: var(--accent);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .team-bio a:hover { color: var(--text-primary); }
+
+        /* ========== CONTACT ========== */
+        #contact .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: start;
+        }
+        .contact-heading {
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            color: var(--text-primary);
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+        .contact-sub {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 32px;
+        }
+        .contact-form label {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 8px;
+        }
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-family: var(--body);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        .contact-form input:focus,
+        .contact-form textarea:focus { border-color: var(--accent); }
+        .contact-form textarea { resize: vertical; min-height: 120px; }
+        .form-buttons { display: flex; gap: 12px; }
+
+        /* ========== FOOTER ========== */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 48px 0;
+        }
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .footer-logo {
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+        .footer-logo span { color: var(--accent); }
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+        .footer-links a {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            transition: color 0.3s;
+        }
+        .footer-links a:hover { color: var(--text-primary); }
+        .footer-copy {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+            .steps-grid { grid-template-columns: 1fr; }
+            .team-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 72px;
+                left: 0;
+                width: 100%;
+                background: rgba(10,10,10,0.98);
+                backdrop-filter: blur(20px);
+                padding: 32px 24px;
+                gap: 24px;
+                border-bottom: 1px solid var(--border);
+            }
+            .nav-hamburger { display: flex; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .pub-grid { grid-template-columns: 1fr; }
+            .team-grid { grid-template-columns: 1fr; }
+            .hero-title { font-size: clamp(2.5rem, 10vw, 4rem); }
+            .section-padding { padding: 80px 0; }
+        }
+
+        /* ========== 3D VIZ ========== */
+        #three-container {
+            width: 100%;
+            height: 600px;
+            position: relative;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 48px;
+        }
+        #three-container canvas { display: block; }
+        .viz-legend {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(10,10,10,0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            z-index: 10;
+        }
+        .viz-legend-title {
+            font-weight: 600;
+            color: var(--text-dim);
+            font-size: 0.6rem;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+        .viz-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .viz-legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .viz-legend-tri {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 9px solid #888;
+        }
+        .viz-tooltip {
+            position: absolute;
+            background: rgba(10,10,10,0.9);
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            pointer-events: none;
+            z-index: 20;
+            display: none;
+        }
+    </style>
 </head>
+<body>
+
+<!-- ========== NAV ========== -->
+<nav class="main-nav">
+    <div class="nav-inner">
+        <a href="#" class="nav-logo">Noso<span>Track</span></a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#about">About</a></li>
+            <li><a href="#how-it-works">Process</a></li>
+            <li><a href="#research">Research</a></li>
+            <li><a href="#team">Team</a></li>
+            <li><a href="#contact" class="nav-cta">Get in Touch</a></li>
+        </ul>
+        <button class="nav-hamburger" id="navToggle" aria-label="Toggle navigation">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<section id="hero">
+    <canvas id="network-canvas"></canvas>
+    <div class="hero-content">
+        <div class="hero-eyebrow">Real-Time Outbreak Analytics</div>
+        <h1 class="hero-title">
+            Track. Trace.<br><span class="accent">Intervene.</span>
+        </h1>
+        <p class="hero-subtitle">
+            NosoTrack infers who infected whom in near real-time, empowering hospital infection prevention teams to stop outbreaks before they escalate.
+        </p>
+        <div class="hero-buttons">
+            <a href="#about" class="btn-primary">Learn More &darr;</a>
+            <a href="#contact" class="btn-secondary">Collaborate</a>
+        </div>
+    </div>
+</section>
+
+<!-- ========== MARQUEE ========== -->
+<div class="marquee-section">
+    <div class="marquee-track">
+        <span>Outbreak Reconstruction</span>
+        <span>Contact Tracing</span>
+        <span>Genomic Surveillance</span>
+        <span>Transmission Trees</span>
+        <span>Real-Time Analytics</span>
+        <span>Infection Prevention</span>
+        <span>Hospital Epidemiology</span>
+        <span>Superspreader Detection</span>
+        <span>Outbreak Reconstruction</span>
+        <span>Contact Tracing</span>
+        <span>Genomic Surveillance</span>
+        <span>Transmission Trees</span>
+        <span>Real-Time Analytics</span>
+        <span>Infection Prevention</span>
+        <span>Hospital Epidemiology</span>
+        <span>Superspreader Detection</span>
+    </div>
+</div>
+
+<!-- ========== STATS ========== -->
+<section id="stats">
+    <div class="container">
+        <div class="stats-grid reveal">
+            <div class="stat-card">
+                <div class="stat-label">Cases</div>
+                <div class="stat-value">2.0M</div>
+                <div class="stat-sub">US per year</div>
+                <div class="stat-accent-line"></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Deaths</div>
+                <div class="stat-value">100K</div>
+                <div class="stat-sub">US per year</div>
+                <div class="stat-accent-line"></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Cost</div>
+                <div class="stat-value">$40B+</div>
+                <div class="stat-sub">US per year</div>
+                <div class="stat-accent-line"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== ABOUT ========== -->
+<section id="about" class="section-padding">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-text reveal">
+                <span class="section-tag">01 — About</span>
+                <h2 class="section-title">The Problem<br>& The Solution</h2>
+                <p>
+                    <strong>Healthcare-associated infections (HAIs)</strong> affect approximately 1 in 10 patients worldwide, causing significant morbidity, mortality, and economic strain on healthcare systems. <strong>Nosocomial outbreaks</strong> driven by person-to-person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides difficile</em>, <em>Klebsiella pneumoniae</em>, and MRSA generate the most acute clinical and operational crises: triggering staff shortages, ward closures, and delayed procedures. Current control measures rely on broad testing and isolation protocols, but <strong>effective intervention requires identifying the specific drivers of an outbreak</strong>: such as patient zero, superspreaders, transmission routes, and undetected or imported cases.
+                </p>
+                <p>
+                    <span class="nosotrack-highlight">NosoTrack</span> <strong>is an outbreak analytics platform that infers who infected whom in near real-time</strong> by integrating data from hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings and actionable reports, enabling hospital infection prevention teams to target interventions promptly before an outbreak escalates.
+                </p>
+            </div>
+            <div class="about-visual reveal" style="transition-delay: 0.2s;">
+                <div id="three-container">
+                    <div class="viz-legend">
+                        <div class="viz-legend-title">TYPE</div>
+                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#888;"></div> Patient</div>
+                        <div class="viz-legend-item"><div class="viz-legend-tri"></div> Staff</div>
+                        <div style="margin-top:12px;"></div>
+                        <div class="viz-legend-title">WARD</div>
+                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(100,150,255,0.7);"></div> Ward A</div>
+                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(255,150,100,0.7);"></div> Ward B</div>
+                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(150,255,100,0.7);"></div> Ward C</div>
+                        <div style="margin-top:12px;"></div>
+                        <div class="viz-legend-title">STATUS</div>
+                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#555;"></div> Susceptible</div>
+                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#e63946; box-shadow: 0 0 6px rgba(230,57,70,0.6);"></div> Infected</div>
+                    </div>
+                    <div class="viz-tooltip" id="vizTooltip"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== HOW IT WORKS ========== -->
+<section id="how-it-works" class="section-padding">
+    <div class="container">
+        <span class="section-tag reveal">02 — Process</span>
+        <h2 class="section-title reveal">How It Works</h2>
+        <div class="steps-grid">
+            <div class="step-card reveal">
+                <div class="step-number">01</div>
+                <div class="step-label">Step 01</div>
+                <h3 class="step-title">Data Ingestion</h3>
+                <p class="step-desc">Hospital Electronic Health Records and Bluetooth-enabled contact tracing data are automatically ingested and harmonized into a unified temporal contact network.</p>
+            </div>
+            <div class="step-card reveal" style="transition-delay: 0.15s;">
+                <div class="step-number">02</div>
+                <div class="step-label">Step 02</div>
+                <h3 class="step-title">Transmission Inference</h3>
+                <p class="step-desc">Statistical models reconstruct the most likely transmission tree — identifying who infected whom, superspreaders, and undetected cases using epidemiological and genomic data.</p>
+            </div>
+            <div class="step-card reveal" style="transition-delay: 0.3s;">
+                <div class="step-number">03</div>
+                <div class="step-label">Step 03</div>
+                <h3 class="step-title">Targeted Intervention</h3>
+                <p class="step-desc">Actionable reports and early warnings are generated in near real-time, enabling infection prevention teams to deploy precise, evidence-based interventions before outbreaks escalate.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== RESEARCH ========== -->
+<section id="research" class="section-padding">
+    <div class="container">
+        <span class="section-tag reveal">03 — Research</span>
+        <h2 class="section-title reveal">Publications<br>& Software</h2>
+        <p class="research-intro reveal">
+            Novel computational methods that reconstruct who infected whom from clinical, contact, and genetic data have proven effective in guiding outbreak control across pathogens such as SARS-CoV-2, influenza, Ebola, and antimicrobial-resistant bacteria. Yet, they remain largely retrospective, with no integration into routine hospital surveillance. What is lacking is an automated system capable of deploying these models in near real-time: this is the aim of <span class="nosotrack-highlight">NosoTrack</span>.
+        </p>
+
+        <h3 class="research-sub reveal">Selected Publications</h3>
+        <div class="pub-grid reveal">
+            <a class="pub-card" href="https://pubmed.ncbi.nlm.nih.gov/35215195/" target="_blank">
+                <span class="pub-tag">Paper</span>
+                <div class="pub-title">Literature review</div>
+                <div class="pub-desc">A systematic review of outbreak reconstruction methods.</div>
+                <span class="pub-arrow">&rarr;</span>
+            </a>
+            <a class="pub-card" href="https://link.springer.com/article/10.1186/s12859-018-2330-z" target="_blank">
+                <span class="pub-tag">Paper</span>
+                <div class="pub-title">A modular platform for outbreak reconstruction</div>
+                <div class="pub-desc">The paper for outbreaker2.</div>
+                <span class="pub-arrow">&rarr;</span>
+            </a>
+            <a class="pub-card" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037" target="_blank">
+                <span class="pub-tag">Paper</span>
+                <div class="pub-title">linktree</div>
+                <div class="pub-desc">A method to infer transmission patterns between staff and patients.</div>
+                <span class="pub-arrow">&rarr;</span>
+            </a>
+            <a class="pub-card" href="https://pubmed.ncbi.nlm.nih.gov/40302215/" target="_blank">
+                <span class="pub-tag">Paper</span>
+                <div class="pub-title">Real time genomic surveillance for nosocomial outbreaks</div>
+                <div class="pub-desc">Proof of concept for near real time surveillance.</div>
+                <span class="pub-arrow">&rarr;</span>
+            </a>
+        </div>
+
+        <h3 class="research-sub reveal" style="margin-top: 48px;">Software</h3>
+        <div class="pub-grid reveal">
+            <a class="pub-card" href="https://github.com/reconhub/outbreaker2" target="_blank">
+                <span class="pub-tag">Software</span>
+                <div class="pub-title">outbreaker2</div>
+                <div class="pub-desc">Software to reconstruct transmission trees.</div>
+                <span class="pub-arrow">&rarr;</span>
+            </a>
+            <a class="pub-card" href="https://cygei.github.io/o2ools/index.html" target="_blank">
+                <span class="pub-tag">Software</span>
+                <div class="pub-title">o2ools</div>
+                <div class="pub-desc">Software to analyse transmission trees.</div>
+                <span class="pub-arrow">&rarr;</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ========== TEAM ========== -->
+<section id="team" class="section-padding">
+    <div class="container">
+        <span class="section-tag reveal">04 — Team</span>
+        <h2 class="section-title reveal">The People<br>Behind NosoTrack</h2>
+        <div class="team-grid">
+            <div class="team-card reveal">
+                <img src="images/cyril.jpg" alt="Dr Cyril Geismar" class="team-photo">
+                <div class="team-info">
+                    <div class="team-name">Dr Cyril Geismar</div>
+                    <div class="team-role">Johns Hopkins University</div>
+                    <p class="team-bio">Postdoctoral research fellow. PhD in mathematical modelling of infectious diseases at Imperial College London, focused on SARS-CoV-2 outbreak reconstruction. Executive board member and developer for the <a href="https://www.repidemicsconsortium.org/" target="_blank">R Epidemics Consortium</a>. Teaches outbreak analytics at <a href="https://sismid.sph.emory.edu/online-modules/recon-tools/index.html" target="_blank">Emory University</a> and <a href="https://data.org/our-work/epiverse/training-africa/course/" target="_blank">LSHTM</a>.</p>
+                </div>
+            </div>
+            <div class="team-card reveal" style="transition-delay: 0.1s;">
+                <img src="images/thibaut.jpg" alt="Dr Thibaut Jombart" class="team-photo">
+                <div class="team-info">
+                    <div class="team-name">Dr Thibaut Jombart</div>
+                    <div class="team-role">Imperial College London</div>
+                    <p class="team-bio">Senior Lecturer specialising in outbreak response analytics, biostatistics, population genetics, and R programming. Lead author of <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457" target="_blank">outbreaker</a> and founder of the <a href="https://www.repidemicsconsortium.org/" target="_blank">R Epidemics Consortium</a>. Field experience in Ebola deployments in the Democratic Republic of the Congo.</p>
+                </div>
+            </div>
+            <div class="team-card reveal" style="transition-delay: 0.2s;">
+                <img src="images/anne.jpg" alt="Dr Anne Cori" class="team-photo">
+                <div class="team-info">
+                    <div class="team-name">Dr Anne Cori</div>
+                    <div class="team-role">Imperial College London</div>
+                    <p class="team-bio">Senior Lecturer specialising in real-time outbreak analysis and epidemiological parameters. Lead author of <a href="https://academic.oup.com/aje/article/178/9/1505/89262" target="_blank">EpiEstim</a> and co-author of <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457" target="_blank">outbreaker</a>. Develops statistical methods for outbreak reconstruction and rapid transmissibility assessment.</p>
+                </div>
+            </div>
+            <div class="team-card reveal" style="transition-delay: 0.3s;">
+                <img src="images/shaun.jpg" alt="Dr Shaun Truelove" class="team-photo">
+                <div class="team-info">
+                    <div class="team-name">Dr Shaun Truelove</div>
+                    <div class="team-role">Johns Hopkins University</div>
+                    <p class="team-bio">Associate Professor focused on infectious disease dynamics and modelling for public health response and policy (COVID-19, influenza, vaccine-preventable diseases). Co-leads the <a href="https://scenariomodelinghub.org/" target="_blank">US Scenario Modeling Hubs</a> and <a href="https://insightnet.us/centers/accidda/" target="_blank">ACCIDA</a>, a consortium producing epidemic scenario projections and forecasts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== CONTACT ========== -->
+<section id="contact" class="section-padding">
+    <div class="container">
+        <div class="contact-grid">
+            <div class="reveal">
+                <span class="section-tag">05 — Contact</span>
+                <h2 class="contact-heading">Let's Work<br>Together</h2>
+                <p class="contact-sub">We are actively seeking collaborations and funding. Please reach out!</p>
+                <a href="https://github.com/CyGei" target="_blank" style="display:inline-flex; align-items:center; gap:8px; color:var(--text-secondary); font-family:var(--mono); font-size:0.8rem; transition:color 0.3s;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    github.com/CyGei
+                </a>
+            </div>
+            <div class="reveal" style="transition-delay: 0.2s;">
+                <form class="contact-form" method="POST" action="https://formspree.io/f/maqdqzqw">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" id="name" required>
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" required>
+                    <label for="message">Message</label>
+                    <textarea name="message" id="message" rows="5" required></textarea>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-primary">Send Message</button>
+                        <button type="reset" class="btn-secondary">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer>
+    <div class="container">
+        <div class="footer-inner">
+            <div class="footer-logo">Noso<span>Track</span></div>
+            <ul class="footer-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#research">Research</a></li>
+                <li><a href="#team">Team</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="https://github.com/CyGei" target="_blank">GitHub</a></li>
+            </ul>
+            <div class="footer-copy">&copy; Cyril Geismar.</div>
+        </div>
+    </div>
+</footer>
+
+<!-- ========== SCRIPTS ========== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ==========================================
+// BACKGROUND NETWORK ANIMATION (Canvas 2D)
+// ==========================================
+(function() {
+    const canvas = document.getElementById('network-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+
+    const particleCount = 120;
+    const connectionDistance = 140;
+    const particleSpeed = 0.4;
+    const infectionChance = 0.015;
+    const recoveryTime = 700;
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * particleSpeed;
+            this.vy = (Math.random() - 0.5) * particleSpeed;
+            this.size = Math.random() * 1.5 + 0.5;
+            this.isInfected = false;
+            this.infectionTimer = 0;
+        }
+        infect() {
+            if (!this.isInfected) {
+                this.isInfected = true;
+                this.infectionTimer = recoveryTime;
+            }
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0 || this.x > width) this.vx *= -1;
+            if (this.y < 0 || this.y > height) this.vy *= -1;
+            if (this.isInfected) {
+                this.infectionTimer--;
+                if (this.infectionTimer <= 0) this.isInfected = false;
+            }
+        }
+        draw() {
+            ctx.fillStyle = this.isInfected ? 'rgba(230, 57, 70, 0.8)' : 'rgba(150, 150, 150, 0.4)';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            if (this.isInfected) {
+                ctx.fillStyle = 'rgba(230, 57, 70, 0.15)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size + 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < particleCount; i++) {
+            const p = new Particle();
+            if (Math.random() < 0.04) p.infect();
+            particles.push(p);
+        }
+    }
+    initParticles();
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        if (!particles.some(p => p.isInfected)) {
+            particles[Math.floor(Math.random() * particles.length)].infect();
+        }
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < connectionDistance) {
+                    if (particles[i].isInfected && !particles[j].isInfected && Math.random() < infectionChance) particles[j].infect();
+                    else if (!particles[i].isInfected && particles[j].isInfected && Math.random() < infectionChance) particles[i].infect();
+                    const opacity = 1 - (dist / connectionDistance);
+                    if (particles[i].isInfected || particles[j].isInfected) {
+                        ctx.strokeStyle = `rgba(230, 57, 70, ${opacity * 0.4})`;
+                    } else {
+                        ctx.strokeStyle = `rgba(150, 150, 150, ${opacity * 0.12})`;
+                    }
+                    ctx.lineWidth = 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
+})();
+
+// ==========================================
+// NAV TOGGLE
+// ==========================================
+document.getElementById('navToggle').addEventListener('click', function() {
+    document.getElementById('navLinks').classList.toggle('open');
+});
+document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+});
+
+// ==========================================
+// SCROLL REVEAL
+// ==========================================
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ==========================================
+// 3D TRANSMISSION NETWORK (Three.js)
+// ==========================================
+(function() {
+    const container = document.getElementById('three-container');
+    const tooltip = document.getElementById('vizTooltip');
+    if (!container) return;
+
+    const W = container.clientWidth;
+    const H = container.clientHeight || 600;
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a0a);
+    scene.fog = new THREE.FogExp2(0x0a0a0a, 0.0015);
+
+    const camera = new THREE.PerspectiveCamera(55, W / H, 1, 2000);
+    camera.position.set(0, 80, 400);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(W, H);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xffffff, 0.6, 800);
+    pointLight.position.set(100, 200, 200);
+    scene.add(pointLight);
+
+    // Colors
+    const COLORS = {
+        healthy: 0x555555,
+        infected: 0xe63946,
+        wardA: 0x6496ff,
+        wardB: 0xff9664,
+        wardC: 0x96ff64,
+        edge: 0x333333,
+        edgeInfected: 0xe63946,
+        particle: 0xe63946,
+    };
+
+    // Node data
+    const nodeData = [
+        { id: 1, label: 'P0', ward: 'A', type: 'patient' },
+        { id: 2, label: 'S1', ward: 'A', type: 'staff' },
+        { id: 3, label: 'S2', ward: 'B', type: 'staff' },
+        { id: 4, label: 'P3', ward: 'A', type: 'patient' },
+        { id: 5, label: 'P4', ward: 'A', type: 'patient' },
+        { id: 6, label: 'P5', ward: 'B', type: 'patient' },
+        { id: 7, label: 'P6', ward: 'B', type: 'patient' },
+        { id: 8, label: 'P7', ward: 'C', type: 'patient' },
+        { id: 10, label: 'S3', ward: 'B', type: 'staff' },
+        { id: 9, label: 'P2', ward: 'A', type: 'patient' },
+        { id: 11, label: 'S4', ward: 'A', type: 'staff' },
+        { id: 12, label: 'P10', ward: 'B', type: 'patient' },
+        { id: 13, label: 'S5', ward: 'B', type: 'staff' },
+        { id: 14, label: 'P12', ward: 'B', type: 'patient' },
+        { id: 15, label: 'P13', ward: 'B', type: 'patient' },
+        { id: 16, label: 'S6', ward: 'C', type: 'staff' },
+        { id: 18, label: 'S7', ward: 'C', type: 'staff' },
+        { id: 19, label: 'P17', ward: 'C', type: 'patient' },
+        { id: 20, label: 'P18', ward: 'C', type: 'patient' },
+        { id: 21, label: 'S8', ward: 'A', type: 'staff' },
+        { id: 17, label: 'P15', ward: 'C', type: 'patient' },
+        { id: 22, label: 'P20', ward: 'A', type: 'patient' },
+        { id: 23, label: 'P21', ward: 'A', type: 'patient' },
+    ];
+
+    const edgeData = [
+        { from: 1, to: 2 }, { from: 1, to: 3 },
+        { from: 2, to: 4 }, { from: 2, to: 5 },
+        { from: 3, to: 6 }, { from: 3, to: 7 }, { from: 3, to: 8 },
+        { from: 6, to: 10 },
+        { from: 10, to: 9 }, { from: 10, to: 11 }, { from: 10, to: 12 },
+        { from: 10, to: 13 }, { from: 10, to: 14 }, { from: 10, to: 15 },
+        { from: 10, to: 16 }, { from: 10, to: 18 },
+        { from: 18, to: 19 }, { from: 18, to: 20 },
+        { from: 9, to: 21 },
+        { from: 21, to: 22 }, { from: 21, to: 23 },
+        { from: 16, to: 17 },
+    ];
+
+    // Force-directed layout
+    const nodeMap = {};
+    const wardCenters = { A: { x: -120, z: -60 }, B: { x: 0, z: 60 }, C: { x: 120, z: -30 } };
+
+    nodeData.forEach(n => {
+        const wc = wardCenters[n.ward];
+        nodeMap[n.id] = {
+            ...n,
+            x: wc.x + (Math.random() - 0.5) * 100,
+            y: (Math.random() - 0.5) * 80,
+            z: wc.z + (Math.random() - 0.5) * 100,
+            vx: 0, vy: 0, vz: 0,
+            infected: false,
+            mesh: null,
+            glow: null,
+        };
+    });
+
+    // Run force simulation
+    function simulateForces(iterations) {
+        const nodes = Object.values(nodeMap);
+        for (let iter = 0; iter < iterations; iter++) {
+            // Repulsion
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x;
+                    const dy = nodes[i].y - nodes[j].y;
+                    const dz = nodes[i].z - nodes[j].z;
+                    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) + 0.1;
+                    const force = 800 / (dist * dist);
+                    const fx = (dx/dist) * force;
+                    const fy = (dy/dist) * force;
+                    const fz = (dz/dist) * force;
+                    nodes[i].vx += fx; nodes[i].vy += fy; nodes[i].vz += fz;
+                    nodes[j].vx -= fx; nodes[j].vy -= fy; nodes[j].vz -= fz;
+                }
+            }
+            // Attraction along edges
+            edgeData.forEach(e => {
+                const a = nodeMap[e.from], b = nodeMap[e.to];
+                const dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z;
+                const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) + 0.1;
+                const force = (dist - 50) * 0.04;
+                const fx = (dx/dist)*force, fy = (dy/dist)*force, fz = (dz/dist)*force;
+                a.vx += fx; a.vy += fy; a.vz += fz;
+                b.vx -= fx; b.vy -= fy; b.vz -= fz;
+            });
+            // Ward gravity
+            nodes.forEach(n => {
+                const wc = wardCenters[n.ward];
+                n.vx += (wc.x - n.x) * 0.01;
+                n.vz += (wc.z - n.z) * 0.01;
+                n.vy += (0 - n.y) * 0.005;
+            });
+            // Damping & update
+            const damping = 0.85;
+            nodes.forEach(n => {
+                n.vx *= damping; n.vy *= damping; n.vz *= damping;
+                n.x += n.vx; n.y += n.vy; n.z += n.vz;
+            });
+        }
+    }
+    simulateForces(200);
+
+    // Create 3D nodes
+    const nodeMeshes = [];
+    const glowMeshes = [];
+    Object.values(nodeMap).forEach(n => {
+        const wardColor = COLORS['ward' + n.ward];
+        const isStaff = n.type === 'staff';
+        const size = n.id === 10 ? 7 : (isStaff ? 4.5 : 5);
+
+        let geometry;
+        if (isStaff) {
+            geometry = new THREE.OctahedronGeometry(size, 0);
+        } else {
+            geometry = new THREE.SphereGeometry(size, 16, 16);
+        }
+
+        const material = new THREE.MeshPhongMaterial({
+            color: COLORS.healthy,
+            emissive: 0x000000,
+            shininess: 60,
+            transparent: true,
+            opacity: 0.9,
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(n.x, n.y, n.z);
+        mesh.userData = { nodeId: n.id, label: n.label, ward: n.ward, type: n.type, wardColor };
+        scene.add(mesh);
+        n.mesh = mesh;
+        nodeMeshes.push(mesh);
+
+        // Glow sphere
+        const glowGeo = new THREE.SphereGeometry(size * 2.5, 12, 12);
+        const glowMat = new THREE.MeshBasicMaterial({
+            color: COLORS.infected,
+            transparent: true,
+            opacity: 0,
+        });
+        const glow = new THREE.Mesh(glowGeo, glowMat);
+        glow.position.copy(mesh.position);
+        scene.add(glow);
+        n.glow = glow;
+        glowMeshes.push(glow);
+    });
+
+    // Create edges
+    const edgeMeshes = [];
+    edgeData.forEach(e => {
+        const a = nodeMap[e.from], b = nodeMap[e.to];
+        const points = [new THREE.Vector3(a.x, a.y, a.z), new THREE.Vector3(b.x, b.y, b.z)];
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const material = new THREE.LineBasicMaterial({ color: COLORS.edge, transparent: true, opacity: 0.25 });
+        const line = new THREE.Line(geometry, material);
+        line.userData = { from: e.from, to: e.to };
+        scene.add(line);
+        edgeMeshes.push(line);
+    });
+
+    // Transmission particles
+    const transmissionParticles = [];
+    function createTransmissionParticle(fromId, toId) {
+        const a = nodeMap[fromId], b = nodeMap[toId];
+        const geo = new THREE.SphereGeometry(2, 8, 8);
+        const mat = new THREE.MeshBasicMaterial({ color: COLORS.particle, transparent: true, opacity: 1 });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(a.x, a.y, a.z);
+        scene.add(mesh);
+
+        // Trail
+        const trailPositions = [];
+        for (let i = 0; i < 8; i++) trailPositions.push(a.x, a.y, a.z);
+        const trailGeo = new THREE.BufferGeometry();
+        trailGeo.setAttribute('position', new THREE.Float32BufferAttribute(trailPositions, 3));
+        const trailMat = new THREE.LineBasicMaterial({ color: COLORS.particle, transparent: true, opacity: 0.3 });
+        const trail = new THREE.Line(trailGeo, trailMat);
+        scene.add(trail);
+
+        transmissionParticles.push({
+            mesh, trail, trailGeo,
+            from: new THREE.Vector3(a.x, a.y, a.z),
+            to: new THREE.Vector3(b.x, b.y, b.z),
+            progress: 0,
+            targetId: toId,
+            speed: 0.012 + Math.random() * 0.008,
+            trailPositions: trailPositions.slice(),
+        });
+    }
+
+    // Infection simulation
+    const infectedSet = new Set();
+    let simQueue = [];
+    let simTimer = 0;
+    const SIM_INTERVAL = 80;
+
+    function resetSimulation() {
+        infectedSet.clear();
+        transmissionParticles.forEach(p => { scene.remove(p.mesh); scene.remove(p.trail); });
+        transmissionParticles.length = 0;
+
+        Object.values(nodeMap).forEach(n => {
+            n.infected = false;
+            n.mesh.material.color.setHex(COLORS.healthy);
+            n.mesh.material.emissive.setHex(0x000000);
+            n.glow.material.opacity = 0;
+        });
+        edgeMeshes.forEach(e => {
+            e.material.color.setHex(COLORS.edge);
+            e.material.opacity = 0.25;
+        });
+
+        // Build infection order from edges (BFS)
+        simQueue = [];
+        const visited = new Set();
+        const queue = [1]; // Start from P0
+        visited.add(1);
+        infectNode(1);
+
+        while (queue.length > 0) {
+            const current = queue.shift();
+            const downstream = edgeData.filter(e => e.from === current && !visited.has(e.to));
+            // Superspreader (id=10) infects all at once
+            if (current === 10) {
+                downstream.forEach(e => {
+                    visited.add(e.to);
+                    simQueue.push({ from: current, to: e.to });
+                    queue.push(e.to);
+                });
+            } else {
+                downstream.forEach(e => {
+                    visited.add(e.to);
+                    simQueue.push({ from: current, to: e.to });
+                    queue.push(e.to);
+                });
+            }
+        }
+    }
+
+    function infectNode(id) {
+        const n = nodeMap[id];
+        if (!n) return;
+        n.infected = true;
+        infectedSet.add(id);
+        n.mesh.material.color.setHex(COLORS.infected);
+        n.mesh.material.emissive.setHex(0x661118);
+    }
+
+    resetSimulation();
+
+    // Raycaster for interaction
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let hoveredNode = null;
+
+    container.addEventListener('mousemove', (event) => {
+        const rect = container.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(nodeMeshes);
+
+        if (intersects.length > 0) {
+            const obj = intersects[0].object;
+            if (hoveredNode !== obj) {
+                if (hoveredNode) resetHighlight();
+                hoveredNode = obj;
+                highlightConnections(obj.userData.nodeId);
+                tooltip.style.display = 'block';
+                tooltip.textContent = `${obj.userData.label} (${obj.userData.type}) — Ward ${obj.userData.ward}`;
+            }
+            tooltip.style.left = (event.clientX - container.getBoundingClientRect().left + 12) + 'px';
+            tooltip.style.top = (event.clientY - container.getBoundingClientRect().top - 12) + 'px';
+            container.style.cursor = 'pointer';
+        } else {
+            if (hoveredNode) {
+                resetHighlight();
+                hoveredNode = null;
+            }
+            tooltip.style.display = 'none';
+            container.style.cursor = 'default';
+        }
+    });
+
+    container.addEventListener('mouseleave', () => {
+        if (hoveredNode) { resetHighlight(); hoveredNode = null; }
+        tooltip.style.display = 'none';
+    });
+
+    function highlightConnections(nodeId) {
+        // Dim all
+        nodeMeshes.forEach(m => { m.material.opacity = 0.2; });
+        edgeMeshes.forEach(e => { e.material.opacity = 0.05; });
+        // Highlight connected
+        const connectedIds = new Set([nodeId]);
+        edgeData.forEach(e => {
+            if (e.from === nodeId) connectedIds.add(e.to);
+            if (e.to === nodeId) connectedIds.add(e.from);
+        });
+        nodeMeshes.forEach(m => {
+            if (connectedIds.has(m.userData.nodeId)) m.material.opacity = 1;
+        });
+        edgeMeshes.forEach(e => {
+            if (e.userData.from === nodeId || e.userData.to === nodeId) {
+                e.material.opacity = 0.8;
+                e.material.color.setHex(0xffffff);
+            }
+        });
+    }
+
+    function resetHighlight() {
+        nodeMeshes.forEach(m => { m.material.opacity = 0.9; });
+        edgeMeshes.forEach(e => {
+            const fromInfected = nodeMap[e.userData.from].infected;
+            const toInfected = nodeMap[e.userData.to].infected;
+            if (fromInfected && toInfected) {
+                e.material.color.setHex(COLORS.edgeInfected);
+                e.material.opacity = 0.5;
+            } else {
+                e.material.color.setHex(COLORS.edge);
+                e.material.opacity = 0.25;
+            }
+        });
+    }
+
+    // Animation loop
+    let time = 0;
+    let orbitAngle = 0;
+
+    function animateViz() {
+        requestAnimationFrame(animateViz);
+        time++;
+        orbitAngle += 0.002;
+
+        // Camera orbit
+        camera.position.x = Math.sin(orbitAngle) * 350;
+        camera.position.z = Math.cos(orbitAngle) * 350;
+        camera.position.y = 80 + Math.sin(orbitAngle * 0.5) * 40;
+        camera.lookAt(0, 0, 0);
+
+        // Node breathing
+        nodeMeshes.forEach(m => {
+            const s = 1 + Math.sin(time * 0.03 + m.userData.nodeId) * 0.05;
+            m.scale.set(s, s, s);
+        });
+
+        // Glow animation for infected
+        glowMeshes.forEach((g, i) => {
+            const n = Object.values(nodeMap)[i];
+            if (n.infected) {
+                g.material.opacity = 0.12 + Math.sin(time * 0.05 + n.id) * 0.06;
+                g.position.copy(n.mesh.position);
+            } else {
+                g.material.opacity = 0;
+            }
+        });
+
+        // Transmission simulation
+        simTimer++;
+        if (simTimer > SIM_INTERVAL && simQueue.length > 0) {
+            simTimer = 0;
+            // Check if the current front has a superspreader
+            const next = simQueue[0];
+            if (next.from === 10) {
+                // Fire all superspreader edges at once
+                const batch = [];
+                while (simQueue.length > 0 && simQueue[0].from === 10) {
+                    batch.push(simQueue.shift());
+                }
+                batch.forEach(t => createTransmissionParticle(t.from, t.to));
+            } else {
+                simQueue.shift();
+                createTransmissionParticle(next.from, next.to);
+            }
+        }
+
+        // All done? Reset after pause
+        if (simQueue.length === 0 && transmissionParticles.length === 0 && infectedSet.size > 1) {
+            simTimer = -200; // pause
+            if (simTimer === -200) {
+                setTimeout(() => resetSimulation(), 4000);
+                simQueue.push({}); // prevent re-trigger
+            }
+        }
+
+        // Update transmission particles
+        for (let i = transmissionParticles.length - 1; i >= 0; i--) {
+            const p = transmissionParticles[i];
+            p.progress += p.speed;
+
+            if (p.progress >= 1) {
+                infectNode(p.targetId);
+                // Update edge color
+                edgeMeshes.forEach(e => {
+                    if ((e.userData.from === nodeMap[p.targetId] || e.userData.to === nodeMap[p.targetId])) {
+                        // check both directions
+                    }
+                });
+                edgeData.forEach((ed, idx) => {
+                    if ((ed.from === p.targetId || ed.to === p.targetId) &&
+                        nodeMap[ed.from].infected && nodeMap[ed.to].infected) {
+                        edgeMeshes[idx].material.color.setHex(COLORS.edgeInfected);
+                        edgeMeshes[idx].material.opacity = 0.5;
+                    }
+                });
+
+                scene.remove(p.mesh);
+                scene.remove(p.trail);
+                transmissionParticles.splice(i, 1);
+                continue;
+            }
+
+            const pos = new THREE.Vector3().lerpVectors(p.from, p.to, p.progress);
+            // Arc
+            pos.y += Math.sin(p.progress * Math.PI) * 15;
+            p.mesh.position.copy(pos);
+            p.mesh.material.opacity = 1 - p.progress * 0.3;
+
+            // Update trail
+            const positions = p.trailGeo.attributes.position.array;
+            for (let t = positions.length - 3; t >= 3; t -= 3) {
+                positions[t] = positions[t-3];
+                positions[t+1] = positions[t-2];
+                positions[t+2] = positions[t-1];
+            }
+            positions[0] = pos.x; positions[1] = pos.y; positions[2] = pos.z;
+            p.trailGeo.attributes.position.needsUpdate = true;
+        }
+
+        renderer.render(scene, camera);
+    }
+    animateViz();
+
+    // Resize handling
+    window.addEventListener('resize', () => {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+    });
+})();
+</script>
 
-<body class="is-preload">
-
-	<canvas id="network-canvas"></canvas>
-
-	<div id="wrapper">
-
-		<header id="header">
-			<div class="content">
-				<div class="inner">
-					<h1>NosoTrack</h1>
-					<p>A Real-Time Platform for Nosocomial Outbreak Analytics </p>
-				</div>
-			</div>
-			<nav>
-				<ul>
-					<li><a href="#about">About</a></li>
-					<li><a href="#research">Research</a></li>
-					<li><a href="#team">Team</a></li>
-					<li><a href="#contact">Contact</a></li>
-				</ul>
-			</nav>
-		</header>
-
-		<div id="main">
-
-			<article id="about">
-				<h2 class="major">About</h2>
-				<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 2rem;">
-					<div
-						style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 4px; text-align: center; border-bottom: 2px solid #ff073a;">
-						<span style="display:block; font-size:0.7rem; color:#888; letter-spacing:1px;">CASES</span>
-						<span style="font-size:1.5rem; font-weight:bold; color:#fff;">2.0M</span>
-						<span style="display:block; font-size:0.65rem; color:#aaa; margin-top:4px;">US per year</span>
-					</div>
-					<div
-						style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 4px; text-align: center; border-bottom: 2px solid #ff073a;">
-						<span style="display: block; font-size: 0.7rem; color: #888; letter-spacing: 1px;">DEATHS</span>
-						<span style="font-size: 1.5rem; font-weight: bold; color: #fff;">100K</span>
-						<span style="display:block; font-size:0.65rem; color:#aaa; margin-top:4px;">US per year</span>
-					</div>
-					<div
-						style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 4px; text-align: center; border-bottom: 2px solid #ff073a;">
-						<span style="display: block; font-size: 0.7rem; color: #888; letter-spacing: 1px;">COST</span>
-						<span style="font-size: 1.5rem; font-weight: bold; color: #fff;">$40B+</span>
-						<span style="display:block; font-size:0.65rem; color:#aaa; margin-top:4px;">US per year</span>
-
-					</div>
-				</div>
-				<p style="text-align: justify;">
-					<b>Healthcare-associated infections (HAIs)</b> affect approximately 1 in 10 patients worldwide,
-					causing significant morbidity, mortality, and economic strain on healthcare systems. <b>Nosocomial
-						outbreaks</b>
-					driven by person-to-person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides
-						difficile</em>, <em>Klebsiella pneumoniae</em>, and MRSA generate the most acute clinical and
-					operational crises: triggering staff shortages, ward closures, and delayed procedures.
-					Current control measures rely on broad testing and isolation protocols, but <b>effective
-						intervention
-						requires identifying the specific drivers of an outbreak</b>: such as patient zero,
-					superspreaders, transmission routes, and undetected or imported cases. <br><br>
-					<span
-						style="color: red; font-weight: bold; font-family: Consolas, 'Courier New', Monaco, monospace; font-size: 24px;">
-						NosoTrack
-					</span>
-					<b>is an outbreak
-						analytics platform that infers who infected whom in near real-time</b> by integrating data from
-					hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early
-					warnings
-					and actionable reports, enabling hospital infection prevention teams to target interventions
-					promptly before an outbreak escalates.
-				</p>
-
-				<div id="network-container"
-					style="position: relative; width:100%; height:400px; border:1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); border-radius: 4px;">
-					<div id="mynetwork" style="width:100%; height:100%;"></div>
-
-					<div id="network-legend" style="
-        position: absolute; 
-        top: 15px; 
-        left: 15px; 
-        background: rgba(20, 20, 20, 0.8); 
-        padding: 12px; 
-        border-radius: 4px; 
-        border: 1px solid rgba(255, 255, 255, 0.1); 
-        font-family: monospace; 
-        font-size: 11px; 
-        color: #fff; 
-        pointer-events: none;
-        letter-spacing: 1px;
-    ">
-						<!-- TYPE Section -->
-						<div
-							style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-							<div style="font-weight: bold; margin-bottom: 8px; color: #aaa; font-size: 10px;">TYPE</div>
-							<div style="display: flex; align-items: center; margin-bottom: 8px;">
-								<div
-									style="width: 10px; height: 10px; background: #888; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 5px rgba(255,255,255,0.2);">
-								</div>
-								<span>PATIENT</span>
-							</div>
-							<div style="display: flex; align-items: center;">
-								<div style="
-                    width: 0; 
-                    height: 0; 
-                    border-left: 6px solid transparent; 
-                    border-right: 6px solid transparent; 
-                    border-bottom: 11px solid #888; 
-                    margin-right: 9px;
-                    filter: drop-shadow(0 0 3px rgba(255,255,255,0.2));
-                "></div>
-								<span>STAFF</span>
-							</div>
-						</div>
-
-						<!-- WARD Section -->
-						<div>
-							<div style="font-weight: bold; margin-bottom: 8px; color: #aaa; font-size: 10px;">WARD</div>
-							<div style="display: flex; align-items: center; margin-bottom: 6px;">
-								<div
-									style="width: 12px; height: 12px; background: rgba(100, 150, 255, 0.4); border: 1px solid rgba(100, 150, 255, 0.6); margin-right: 10px;">
-								</div>
-								<span>WARD A</span>
-							</div>
-							<div style="display: flex; align-items: center; margin-bottom: 6px;">
-								<div
-									style="width: 12px; height: 12px; background: rgba(255, 150, 100, 0.4); border: 1px solid rgba(255, 150, 100, 0.6); margin-right: 10px;">
-								</div>
-								<span>WARD B</span>
-							</div>
-							<div style="display: flex; align-items: center;">
-								<div
-									style="width: 12px; height: 12px; background: rgba(150, 255, 100, 0.4); border: 1px solid rgba(150, 255, 100, 0.6); margin-right: 10px;">
-								</div>
-								<span>WARD C</span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-			</article>
-
-			<article id="research">
-				<h2 class="major">Research</h2>
-				<p style="text-align: justify;">
-					Novel computational methods that reconstruct who infected whom from clinical, contact, and
-					genetic data have proven effective in guiding outbreak control across pathogens such as SARS-CoV-2,
-					influenza, Ebola, and antimicrobial-resistant bacteria
-
-					Yet, they remain largely retrospective, with no integration into routine hospital surveillance. What
-					is lacking is an automated system capable of deploying these models in near real-time:
-					this is the aim of <span style="color: #ff073a; font-weight: bold;">NosoTrack</span>.
-				</p>
-
-				<h3>Selected publications and software</h3>
-
-				<div class="pub-grid">
-
-					<a class="pub-card" href="https://pubmed.ncbi.nlm.nih.gov/35215195/" target="_blank">
-						<span class="pub-tag">Paper</span>
-						<div class="pub-title">Literature review</div>
-						<div class="pub-desc">A systematic review of outbreak reconstruction methods.</div>
-					</a>
-
-					<a class="pub-card" href="https://link.springer.com/article/10.1186/s12859-018-2330-z"
-						target="_blank">
-						<span class="pub-tag">Paper</span>
-						<div class="pub-title">A modular platform for outbreak reconstruction</div>
-						<div class="pub-desc">The paper for outbreaker2.</div>
-					</a>
-
-					<a class="pub-card" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037"
-						target="_blank">
-						<span class="pub-tag">Paper</span>
-						<div class="pub-title">linktree</div>
-						<div class="pub-desc">A method to infer transmission patterns between staff and patients.</div>
-					</a>
-
-					<a class="pub-card" href="https://pubmed.ncbi.nlm.nih.gov/40302215/" target="_blank">
-						<span class="pub-tag">Paper</span>
-						<div class="pub-title">Real time genomic surveillance for nosocomial outbreaks</div>
-						<div class="pub-desc">Proof of concept for near real time surveillance.</div>
-					</a>
-
-					<a class="pub-card" href="https://github.com/reconhub/outbreaker2" target="_blank">
-						<span class="pub-tag">Software</span>
-						<div class="pub-title">outbreaker2</div>
-						<div class="pub-desc">Software to reconstruct transmission trees.</div>
-					</a>
-
-					<a class="pub-card" href="https://cygei.github.io/o2ools/index.html" target="_blank">
-						<span class="pub-tag">Software</span>
-						<div class="pub-title">o2ools</div>
-						<div class="pub-desc">Software to analyse transmission trees.</div>
-					</a>
-
-				</div>
-
-			</article>
-
-			<article id="team">
-				<h2 class="major">Team</h2>
-
-				<!-- Cyril -->
-				<div style="display:flex; align-items:flex-start; margin-bottom:20px; flex-wrap: wrap;">
-					<img src="images/cyril.jpg" alt="Dr Cyril Geismar"
-						style="width:150px; border-radius:10%; margin-right:15px; margin-bottom:10px;">
-					<p style="text-align: justify; flex:1;">
-						<span style="color: #ff073a; font-weight: bold;">Dr Cyril Geismar</span> is a postdoctoral
-						research fellow at Johns Hopkins University. He earned his PhD in the mathematical modelling of
-						infectious diseases at Imperial College London, where his research focused on developing methods
-						and software for SARS-CoV-2 outbreak reconstruction. He serves on the executive board and
-						contributes as a software developer for the <a href="https://www.repidemicsconsortium.org/"
-							target="_blank">R Epidemics Consortium</a> and teaches outbreak analytics at <a
-							href="https://sismid.sph.emory.edu/online-modules/recon-tools/index.html"
-							target="_blank">Emory University</a> and <a
-							href="https://data.org/our-work/epiverse/training-africa/course/" target="_blank">the London
-							School of Hygiene & Tropical Medicine</a>.
-					</p>
-				</div>
-
-				<!-- Thibaut Jombart -->
-				<div style="display:flex; align-items:flex-start; margin-bottom:20px; flex-wrap: wrap;">
-					<img src="images/thibaut.jpg" alt="Dr Thibaut Jombart"
-						style="width:150px; border-radius:10%; margin-right:15px; margin-bottom:10px;">
-					<p style="text-align: justify; flex:1;">
-						<span style="color: #ff073a; font-weight: bold;">Dr Thibaut Jombart</span> is a Senior Lecturer
-						at Imperial College London specialising in outbreak response analytics, with expertise in
-						biostatistics, population genetics, and R programming. He is the lead author of <a
-							href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457"
-							target="_blank">outbreaker</a> and
-						founder of the <a href="https://www.repidemicsconsortium.org/" target="_blank">R Epidemics
-							Consortium</a>. He has field experience in outbreak response, including Ebola deployments in
-						the Democratic Republic of the Congo.
-					</p>
-				</div>
-
-				<!-- Anne Cori -->
-				<div style="display:flex; align-items:flex-start; margin-bottom:20px; flex-wrap: wrap;">
-					<img src="images/anne.jpg" alt="Dr Anne Cori"
-						style="width:150px; border-radius:10%; margin-right:15px; margin-bottom:10px;">
-					<p style="text-align: justify; flex:1;">
-						<span style="color: #ff073a; font-weight: bold;">Dr Anne Cori</span> is a Senior Lecturer at
-						Imperial
-						College London specialising in real-time outbreak analysis and estimation of epidemiological
-						parameters. She
-						is the lead author of <a href="https://academic.oup.com/aje/article/178/9/1505/89262"
-							target="_blank">EpiEstim</a> and co-author of <a
-							href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457"
-							target="_blank">outbreaker</a>. Her
-						research develops statistical methods for outbreak
-						reconstruction
-						and rapid assessment of transmissibility, integrating epidemiological and genomic data to inform
-						control
-						strategies.
-					</p>
-				</div>
-
-				<!-- Shaun Truelove -->
-				<div style="display:flex; align-items:flex-start; margin-bottom:20px; flex-wrap: wrap;">
-					<img src="images/shaun.jpg" alt="Dr Shaun Truelove"
-						style="width:150px; border-radius:10%; margin-right:15px; margin-bottom:10px;">
-					<p style="text-align: justify; flex:1;">
-						<span style="color: #ff073a; font-weight: bold;">Dr Shaun Truelove</span> is an Associate
-						Professor at Johns Hopkins University. His
-						work focuses on applying infectious disease dynamics
-						and modelling to inform public health response, and policy, particularly for
-						COVID-19, influenza, and vaccine-preventable diseases.
-						He co-leads the <a href="https://scenariomodelinghub.org/" target="_blank">US Scenario Modeling
-							Hubs</a> and <a href="https://insightnet.us/centers/accidda/" target="_blank">ACCIDA</a>, a
-						consortium of
-						researchers producing epidemic scenario projections and forecasts.
-					</p>
-				</div>
-
-
-			</article>
-
-
-
-			<article id="contact">
-				<h2 class="major">Contact</h2>
-				<p>
-					We are actively seeking collaborations and funding. Please reach out!
-				</p>
-				<form method="POST" action="https://formspree.io/f/maqdqzqw">
-					<div class="fields">
-						<div class="field half">
-							<label for="name">Name</label>
-							<input type="text" name="name" id="name" />
-						</div>
-						<div class="field half">
-							<label for="email">Email</label>
-							<input type="text" name="email" id="email" />
-						</div>
-						<div class="field">
-							<label for="message">Message</label>
-							<textarea name="message" id="message" rows="4"></textarea>
-						</div>
-					</div>
-					<ul class="actions">
-						<li><input type="submit" value="Send Message" class="primary" /></li>
-						<li><input type="reset" value="Reset" /></li>
-					</ul>
-				</form>
-				<ul class="icons">
-					<li><a href="https://github.com/CyGei" class="icon brands fa-github"><span
-								class="label">GitHub</span></a></li>
-				</ul>
-			</article>
-
-		</div>
-
-		<footer id="footer">
-			<p class="copyright">&copy; Cyril Geismar.</p>
-		</footer>
-
-	</div>
-
-	<div id="bg"></div>
-
-	<script src="assets/js/jquery.min.js"></script>
-	<script src="assets/js/browser.min.js"></script>
-	<script src="assets/js/breakpoints.min.js"></script>
-	<script src="assets/js/util.js"></script>
-	<script src="assets/js/main.js"></script>
-
-	<script>
-		(function () {
-			const canvas = document.getElementById('network-canvas');
-			const ctx = canvas.getContext('2d');
-			let width, height;
-			let particles = [];
-
-			// CONFIGURATION
-			const particleCount = 110;       // Denser network
-			const connectionDistance = 140;  // How close to draw lines
-			const infectionDistance = 140;   // Infection transmission range (same as lines)
-			const particleSpeed = 0.6;       // Speed of movement
-
-			// VISUALS
-			const healthyColor = 'rgba(200, 200, 200, 0.6)'; // Grey
-			const infectedColor = 'rgba(255, 50, 50, 0.9)';  // Red
-			const healthyLine = '200, 200, 200';
-			const infectedLine = '255, 50, 50';
-
-			// INFECTION LOGIC
-			const infectionChance = 0.02;    // Chance to infect per frame per contact (2%)
-			const recoveryTime = 600;        // Frames until recovery (approx 10 seconds @ 60fps)
-
-			// Resize handling
-			function resize() {
-				width = canvas.width = window.innerWidth;
-				height = canvas.height = window.innerHeight;
-			}
-			window.addEventListener('resize', resize);
-			resize();
-
-			// Particle Class
-			class Particle {
-				constructor() {
-					this.x = Math.random() * width;
-					this.y = Math.random() * height;
-					this.vx = (Math.random() - 0.5) * particleSpeed;
-					this.vy = (Math.random() - 0.5) * particleSpeed;
-					this.size = Math.random() * 2 + 1;
-
-					this.isInfected = false;
-					this.infectionTimer = 0;
-				}
-
-				infect() {
-					if (!this.isInfected) {
-						this.isInfected = true;
-						this.infectionTimer = recoveryTime;
-					}
-				}
-
-				update() {
-					// Move
-					this.x += this.vx;
-					this.y += this.vy;
-
-					// Bounce off edges
-					if (this.x < 0 || this.x > width) this.vx *= -1;
-					if (this.y < 0 || this.y > height) this.vy *= -1;
-
-					// Handle Infection Timer
-					if (this.isInfected) {
-						this.infectionTimer--;
-						if (this.infectionTimer <= 0) {
-							this.isInfected = false; // Recover
-						}
-					}
-				}
-
-				draw() {
-					ctx.fillStyle = this.isInfected ? infectedColor : healthyColor;
-					ctx.beginPath();
-					ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-					ctx.fill();
-				}
-			}
-
-			// Initialize particles
-			function initParticles() {
-				particles = [];
-				for (let i = 0; i < particleCount; i++) {
-					let p = new Particle();
-					// Randomly infect a few "Patient Zeros"
-					if (Math.random() < 0.05) {
-						p.infect();
-					}
-					particles.push(p);
-				}
-			}
-			initParticles();
-
-			// Animation Loop
-			function animate() {
-				ctx.clearRect(0, 0, width, height);
-
-				// Re-ignite infection if everyone recovers
-				if (!particles.some(p => p.isInfected)) {
-					// Pick a random lucky winner to restart the outbreak
-					particles[Math.floor(Math.random() * particles.length)].infect();
-				}
-
-				for (let i = 0; i < particles.length; i++) {
-					particles[i].update();
-					particles[i].draw();
-
-					// Check connections
-					for (let j = i; j < particles.length; j++) {
-						const dx = particles[i].x - particles[j].x;
-						const dy = particles[i].y - particles[j].y;
-						const distance = Math.sqrt(dx * dx + dy * dy);
-
-						if (distance < connectionDistance) {
-							// Infection Spread Logic
-							if (particles[i].isInfected && !particles[j].isInfected) {
-								if (Math.random() < infectionChance) particles[j].infect();
-							} else if (!particles[i].isInfected && particles[j].isInfected) {
-								if (Math.random() < infectionChance) particles[i].infect();
-							}
-
-							// Draw Line
-							ctx.beginPath();
-							const opacity = 1 - (distance / connectionDistance);
-
-							// If either is infected, line is red
-							if (particles[i].isInfected || particles[j].isInfected) {
-								ctx.strokeStyle = `rgba(${infectedLine}, ${opacity})`;
-							} else {
-								ctx.strokeStyle = `rgba(${healthyLine}, ${opacity * 0.5})`; // Fainter lines for healthy
-							}
-
-							ctx.lineWidth = 1;
-							ctx.moveTo(particles[i].x, particles[i].y);
-							ctx.lineTo(particles[j].x, particles[j].y);
-							ctx.stroke();
-						}
-					}
-				}
-				requestAnimationFrame(animate);
-			}
-			animate();
-		})();
-	</script>
-
-	<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-	<script>
-		(function () {
-			const container = document.getElementById('mynetwork');
-
-			const COLORS = {
-				healthy: '#444444',
-				infected: '#ff073a',
-				superspreader: '#ff0000',
-				healthyBorder: '#666666',
-				text: '#ffffff',
-				edge: 'rgba(255, 255, 255, 0.15)',
-				wardA: 'rgba(100, 150, 255, 0.2)',
-				wardB: 'rgba(255, 150, 100, 0.2)',
-				wardC: 'rgba(150, 255, 100, 0.2)',
-				wardABorder: 'rgba(100, 150, 255, 0.5)',
-				wardBBorder: 'rgba(255, 150, 100, 0.5)',
-				wardCBorder: 'rgba(150, 255, 100, 0.5)'
-			};
-
-			// Ward boundaries (square boxes)
-			const WARDS = {
-				A: { xCenter: -400, yBase: 0, width: 300, label: 'Ward A', color: COLORS.wardA, borderColor: COLORS.wardABorder },
-				B: { xCenter: 0, yBase: 0, width: 300, label: 'Ward B', color: COLORS.wardB, borderColor: COLORS.wardBBorder },
-				C: { xCenter: 400, yBase: 0, width: 300, label: 'Ward C', color: COLORS.wardC, borderColor: COLORS.wardCBorder }
-			};
-
-			// Helper function to add small random noise to y-coordinate
-			const noise = (baseY) => baseY + (Math.random() - 0.5) * 40;
-
-			// Helper to position node within ward bounds
-			const wardPos = (ward, yBase, xOffset = 0) => ({
-				x: WARDS[ward].xCenter + xOffset + (Math.random() - 0.5) * 80,
-				y: WARDS[ward].yBase + yBase + noise(0)
-			});
-
-			// Node assignments to wards
-			const nodeData = [
-				{ id: 1, label: 'P0', ward: 'A', y: 0, xOffset: 0 },
-				{ id: 2, label: 'S1', ward: 'A', y: 70, xOffset: 50 },
-				{ id: 3, label: 'S2', ward: 'B', y: 50, xOffset: 0 },
-				{ id: 4, label: 'P3', ward: 'A', y: 200, xOffset: 50 },
-				{ id: 5, label: 'P4', ward: 'A', y: 180, xOffset: 80 },
-				{ id: 6, label: 'P5', ward: 'B', y: 150, xOffset: -50 },
-				{ id: 7, label: 'P6', ward: 'B', y: 200, xOffset: 50 },
-				{ id: 8, label: 'P7', ward: 'C', y: 200, xOffset: 0 },
-				{ id: 10, label: 'S3', ward: 'B', y: 250, xOffset: 0 },
-				// Generation 4: Superspreader burst
-				{ id: 9, label: 'P2', ward: 'A', y: 320, xOffset: 0 },
-				{ id: 11, label: 'S4', ward: 'A', y: 400, xOffset: 60 },
-				{ id: 12, label: 'P10', ward: 'B', y: 400, xOffset: -70 },
-				{ id: 13, label: 'S5', ward: 'B', y: 500, xOffset: 0 },
-				{ id: 14, label: 'P12', ward: 'B', y: 450, xOffset: 80 },
-				{ id: 15, label: 'P13', ward: 'B', y: 400, xOffset: 30 },
-				{ id: 16, label: 'S6', ward: 'C', y: 400, xOffset: -40 },
-				{ id: 18, label: 'S7', ward: 'C', y: 300, xOffset: 50 },
-				// Later generations
-				{ id: 19, label: 'P17', ward: 'C', y: 500, xOffset: 60 },
-				{ id: 20, label: 'P18', ward: 'C', y: 550, xOffset: -70 },
-				{ id: 21, label: 'S8', ward: 'A', y: 400, xOffset: -30 },
-				{ id: 17, label: 'P15', ward: 'C', y: 520, xOffset: 20 },
-				{ id: 22, label: 'P20', ward: 'A', y: 510, xOffset: 40 },
-				{ id: 23, label: 'P21', ward: 'A', y: 510, xOffset: -50 }
-			];
-
-			// Create nodes with ward-based positioning
-			const nodes = new vis.DataSet(
-				nodeData.map(n => {
-					const pos = wardPos(n.ward, n.y, n.xOffset);
-					const isStaff = n.label.startsWith('S');
-					return {
-						id: n.id,
-						label: n.label,
-						shape: isStaff ? 'triangle' : 'dot',
-						size: (n.id === 10) ? 40 : 25,
-						x: pos.x,
-						y: pos.y,
-						ward: n.ward
-					};
-				})
-			);
-
-			const edges = new vis.DataSet([
-				// Generation 0 → Generation 1
-				{ id: 'e1', from: 1, to: 2 },
-				{ id: 'e2', from: 1, to: 3 },
-
-				// Generation 1 → Generation 2
-				{ id: 'e3', from: 2, to: 4 },
-				{ id: 'e4', from: 2, to: 5 },
-				{ id: 'e5', from: 3, to: 6 },
-				{ id: 'e6', from: 3, to: 7 },
-				{ id: 'e7', from: 3, to: 8 },
-
-				// Generation 2 → Generation 3 (Superspreader)
-				{ id: 'e8', from: 6, to: 10 },
-
-				// Generation 3 → Generation 4 (Superspreader burst)
-				{ id: 's1', from: 10, to: 9 },
-				{ id: 's2', from: 10, to: 11 },
-				{ id: 's3', from: 10, to: 12 },
-				{ id: 's4', from: 10, to: 13 },
-				{ id: 's5', from: 10, to: 14 },
-				{ id: 's6', from: 10, to: 15 },
-				{ id: 's7', from: 10, to: 16 },
-				{ id: 's8', from: 10, to: 18 },
-
-				// Generation 4 → Generation 5+
-				{ id: 'e9', from: 18, to: 19 },
-				{ id: 'e10', from: 18, to: 20 },
-				{ id: 'e11', from: 9, to: 21 },
-				{ id: 'e12', from: 21, to: 22 },
-				{ id: 'e13', from: 21, to: 23 },
-				{ id: 'e14', from: 16, to: 17 }
-			]);
-
-			const options = {
-				layout: {
-					hierarchical: {
-						enabled: false
-					}
-				},
-				physics: { enabled: false },
-				edges: {
-					arrows: { to: { enabled: true, scaleFactor: 0.8 } },
-					color: { color: COLORS.edge, opacity: 0.3 },
-					width: 1.5,
-					smooth: { type: 'cubicBezier', roundness: 0.4 }
-				},
-				nodes: {
-					font: { color: COLORS.text, face: 'monospace', size: 20, vadjust: -35 },
-					borderWidth: 2,
-					color: { background: COLORS.healthy, border: COLORS.healthyBorder }
-				},
-				interaction: { dragNodes: true, zoomView: true, dragView: true }
-			};
-
-			const network = new vis.Network(container, { nodes, edges }, options);
-
-			// Draw ward boxes after network is initialized
-			network.on('afterDrawing', function (ctx) {
-				// Draw ward boxes (extended vertically)
-				Object.values(WARDS).forEach(ward => {
-					const halfWidth = ward.width / 2;
-
-					// Convert network coordinates to canvas coordinates
-					const topLeft = network.canvasToDOM({ x: ward.xCenter - halfWidth, y: -100 });
-					const bottomRight = network.canvasToDOM({ x: ward.xCenter + halfWidth, y: 800 });
-
-					const canvasTopLeft = network.DOMtoCanvas(topLeft);
-					const canvasBottomRight = network.DOMtoCanvas(bottomRight);
-
-					// Draw ward box
-					ctx.strokeStyle = ward.borderColor;
-					ctx.fillStyle = ward.color;
-					ctx.lineWidth = 2;
-
-					const boxX = canvasTopLeft.x;
-					const boxY = canvasTopLeft.y;
-					const boxWidth = canvasBottomRight.x - canvasTopLeft.x;
-					const boxHeight = canvasBottomRight.y - canvasTopLeft.y;
-
-					ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-					ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
-				});
-			});
-
-			// Fit the network to view after a short delay
-			setTimeout(() => network.fit(), 100);
-
-			const observer = new ResizeObserver(() => { network.fit(); });
-			observer.observe(container);
-
-			let infectedIds = new Set();
-			const SUPERSPREADER_ID = 10;
-
-			function runSimulation() {
-				nodes.forEach(n => nodes.update({ id: n.id, color: { background: COLORS.healthy, border: COLORS.healthyBorder }, shadow: false }));
-				edges.forEach(e => edges.update({ id: e.id, color: COLORS.edge, width: 1.5 }));
-				infectedIds.clear();
-
-				infectNode(1, null);
-
-				const spreadInterval = setInterval(() => {
-					let targets = [];
-
-					infectedIds.forEach(id => {
-						const downstream = edges.get({ filter: (e) => e.from === id });
-						downstream.forEach(edge => {
-							if (!infectedIds.has(edge.to)) {
-								targets.push({ nodeId: edge.to, edgeId: edge.id, sourceId: id });
-							}
-						});
-					});
-
-					if (targets.length > 0) {
-						const superspreaderTargets = targets.filter(t => t.sourceId === SUPERSPREADER_ID);
-						if (superspreaderTargets.length > 0 && infectedIds.has(SUPERSPREADER_ID)) {
-							superspreaderTargets.forEach(t => infectNode(t.nodeId, t.edgeId));
-						} else {
-							const t = targets[Math.floor(Math.random() * targets.length)];
-							infectNode(t.nodeId, t.edgeId);
-						}
-					} else {
-						clearInterval(spreadInterval);
-						setTimeout(runSimulation, 5000);
-					}
-				}, 800);
-			}
-
-			function infectNode(nodeId, edgeId) {
-				infectedIds.add(nodeId);
-				const isSuperspreader = (nodeId === SUPERSPREADER_ID);
-
-				nodes.update({
-					id: nodeId,
-					color: { background: COLORS.infected, border: '#ffffff' },
-					shadow: {
-						enabled: true,
-						color: COLORS.infected,
-						size: isSuperspreader ? 35 : 12,
-						x: 0, y: 0
-					}
-				});
-
-				if (edgeId) edges.update({ id: edgeId, color: COLORS.infected, width: 3 });
-			}
-
-			runSimulation();
-		})();
-	</script>
 </body>
-
 </html>
