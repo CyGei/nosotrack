@@ -347,29 +347,55 @@
             margin-bottom: 56px; line-height: 1.7;
         }
 
-        /* Sources row — 3 columns */
+        /* ── 5-Step vertical flow ── */
+        .pipeline-flow {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 0; max-width: 900px; margin: 0 auto;
+        }
+
+        /* Step wrapper */
+        .pipeline-step {
+            width: 100%; position: relative;
+        }
+
+        /* Step number badge */
+        .pipeline-step-badge {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 16px;
+        }
+        .pipeline-step-num {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(230,57,70,0.12); border: 1px solid rgba(230,57,70,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+            color: var(--accent); flex-shrink: 0;
+        }
+        .pipeline-step-label {
+            font-family: var(--mono); font-size: 0.6rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        /* Sources row — 3 columns inside step 1 */
         .pipeline-sources {
             display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 20px; margin-bottom: 8px;
+            gap: 16px;
         }
 
-        /* Connector zone */
+        /* Full-width single card steps */
+        .pipeline-single { width: 100%; }
+
+        /* Connector between steps — vertical line with particles */
         .pipeline-connector {
             display: flex; align-items: center; justify-content: center;
-            height: 80px; position: relative;
+            flex-direction: column; height: 64px; position: relative;
+            width: 100%;
         }
         .pipeline-connector canvas { width: 100%; height: 100%; display: block; }
-
-        /* Processing row — 2 columns */
-        .pipeline-process {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 20px; margin-bottom: 8px;
-        }
-
-        /* Output row — 2 columns */
-        .pipeline-output {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .pipeline-connector-label {
+            font-family: var(--mono); font-size: 0.55rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--text-dim); margin-top: 2px;
         }
 
         /* Glassmorphism card */
@@ -377,7 +403,7 @@
             position: relative;
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 24px;
             overflow: hidden;
             transition: border-color 0.4s, transform 0.4s, box-shadow 0.4s;
@@ -406,6 +432,32 @@
             background: rgba(0,0,0,0.3);
         }
 
+        /* NosoTrack Engine — hero card with large 3D canvas */
+        .p-card--engine {
+            border-color: rgba(230,57,70,0.15);
+            background: rgba(230,57,70,0.02);
+        }
+        .p-card--engine .p-card-canvas {
+            height: 280px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .engine-features {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px; margin-top: 16px;
+        }
+        .engine-feat {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 8px; padding: 10px 12px;
+            font-family: var(--mono); font-size: 0.65rem;
+            color: var(--text-secondary); letter-spacing: 0.5px;
+        }
+        .engine-feat strong {
+            display: block; color: var(--text-primary);
+            font-family: var(--display); font-size: 0.8rem;
+            margin-bottom: 3px; font-weight: 600;
+        }
+
         .p-card-tag {
             font-family: var(--mono); font-size: 0.6rem;
             letter-spacing: 2px; text-transform: uppercase;
@@ -417,26 +469,19 @@
             font-size: 1.05rem; color: var(--text-primary);
             margin-bottom: 6px; line-height: 1.3;
         }
+        .p-card--engine .p-card-title {
+            font-size: 1.3rem; margin-bottom: 8px;
+        }
         .p-card-desc {
             font-size: 0.82rem; color: var(--text-secondary);
             line-height: 1.6;
         }
 
-        /* Arrow labels between rows */
-        .pipeline-arrow-label {
-            display: flex; align-items: center; justify-content: center;
-            gap: 10px; padding: 6px 0;
-            font-family: var(--mono); font-size: 0.65rem;
-            letter-spacing: 2px; text-transform: uppercase;
-            color: var(--text-dim);
-        }
-        .pipeline-arrow-label svg { opacity: 0.3; }
-
         @media (max-width: 768px) {
             .pipeline-sources { grid-template-columns: 1fr; }
-            .pipeline-process { grid-template-columns: 1fr; }
-            .pipeline-output { grid-template-columns: 1fr; }
+            .engine-features { grid-template-columns: 1fr; }
             .p-card-canvas { height: 90px; }
+            .p-card--engine .p-card-canvas { height: 220px; }
         }
 
         /* ========== RESEARCH ========== */
@@ -868,91 +913,134 @@
     <div class="container pipeline-wrap">
         <span class="section-tag reveal">02 — Process</span>
         <h2 class="section-title reveal">How It Works</h2>
-        <p class="pipeline-subtitle reveal">Three data streams enter the NosoTrack pipeline, are anonymised and merged, then analysed to reconstruct transmission chains and trigger real-time alerts.</p>
+        <p class="pipeline-subtitle reveal">Three data streams converge into the NosoTrack pipeline — anonymised, merged, and analysed to reconstruct transmission chains and trigger real-time alerts.</p>
 
-        <!-- ROW 1: Data Sources -->
-        <div class="pipeline-sources">
-            <div class="p-card reveal" data-pipeline="dna">
-                <div class="p-card-glow"></div>
-                <canvas class="p-card-canvas" data-viz="dna"></canvas>
-                <div class="p-card-tag">Input 01</div>
-                <div class="p-card-title">Genomic Sequencing</div>
-                <div class="p-card-desc">Pathogen genomes are sequenced, providing phylogenetic signal for transmission linkage.</div>
-            </div>
-            <div class="p-card reveal" data-pipeline="contact" style="transition-delay:0.1s">
-                <div class="p-card-glow"></div>
-                <canvas class="p-card-canvas" data-viz="contact"></canvas>
-                <div class="p-card-tag">Input 02</div>
-                <div class="p-card-title">Contact Tracing</div>
-                <div class="p-card-desc">Bluetooth-enabled devices record proximity events between patients and staff.</div>
-            </div>
-            <div class="p-card reveal" data-pipeline="ehr" style="transition-delay:0.2s">
-                <div class="p-card-glow"></div>
-                <canvas class="p-card-canvas" data-viz="ehr"></canvas>
-                <div class="p-card-tag">Input 03</div>
-                <div class="p-card-title">Health Records</div>
-                <div class="p-card-desc">Electronic Health Records provide ward movements, test results, and clinical timelines.</div>
-            </div>
-        </div>
+        <div class="pipeline-flow">
 
-        <!-- Arrow down -->
-        <div class="pipeline-arrow-label reveal">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>converge &amp; anonymise</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-
-        <!-- Connector canvas — particles flowing down -->
-        <div class="pipeline-connector reveal">
-            <canvas id="connector-top"></canvas>
-        </div>
-
-        <!-- ROW 2: Processing -->
-        <div class="pipeline-process">
-            <div class="p-card reveal" data-pipeline="anon">
-                <div class="p-card-glow"></div>
-                <canvas class="p-card-canvas" data-viz="anon"></canvas>
-                <div class="p-card-tag">Process</div>
-                <div class="p-card-title">Data Anonymisation</div>
-                <div class="p-card-desc">Patient identifiers are stripped, hashed, and encrypted before any analysis — ensuring full GDPR compliance.</div>
+            <!-- STEP 1: Data Inputs -->
+            <div class="pipeline-step reveal">
+                <div class="pipeline-step-badge">
+                    <div class="pipeline-step-num">01</div>
+                    <div class="pipeline-step-label">Data Inputs</div>
+                </div>
+                <div class="pipeline-sources">
+                    <div class="p-card" data-pipeline="dna">
+                        <div class="p-card-glow"></div>
+                        <canvas class="p-card-canvas" data-viz="dna"></canvas>
+                        <div class="p-card-tag">Genomic</div>
+                        <div class="p-card-title">DNA Sequencing</div>
+                        <div class="p-card-desc">Pathogen genomes are sequenced, providing phylogenetic signal for transmission linkage.</div>
+                    </div>
+                    <div class="p-card" data-pipeline="contact">
+                        <div class="p-card-glow"></div>
+                        <canvas class="p-card-canvas" data-viz="contact"></canvas>
+                        <div class="p-card-tag">Proximity</div>
+                        <div class="p-card-title">Contact Tracing</div>
+                        <div class="p-card-desc">Bluetooth-enabled devices record proximity events between patients and staff.</div>
+                    </div>
+                    <div class="p-card" data-pipeline="ehr">
+                        <div class="p-card-glow"></div>
+                        <canvas class="p-card-canvas" data-viz="ehr"></canvas>
+                        <div class="p-card-tag">Clinical</div>
+                        <div class="p-card-title">Health Records</div>
+                        <div class="p-card-desc">Electronic Health Records provide ward movements, test results, and clinical timelines.</div>
+                    </div>
+                </div>
             </div>
-            <div class="p-card reveal" data-pipeline="merge" style="transition-delay:0.1s">
-                <div class="p-card-glow"></div>
-                <canvas class="p-card-canvas" data-viz="merge"></canvas>
-                <div class="p-card-tag">Integrate</div>
-                <div class="p-card-title">NosoTrack Engine</div>
-                <div class="p-card-desc">Anonymised streams are fused into a unified temporal contact network within the NosoTrack platform.</div>
-            </div>
-        </div>
 
-        <!-- Arrow down -->
-        <div class="pipeline-arrow-label reveal">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>analyse &amp; act</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-
-        <!-- Connector canvas -->
-        <div class="pipeline-connector reveal">
-            <canvas id="connector-bot"></canvas>
-        </div>
-
-        <!-- ROW 3: Outputs -->
-        <div class="pipeline-output">
-            <div class="p-card reveal" data-pipeline="tree">
-                <div class="p-card-glow"></div>
-                <canvas class="p-card-canvas" data-viz="tree"></canvas>
-                <div class="p-card-tag">Output</div>
-                <div class="p-card-title">Transmission Tree</div>
-                <div class="p-card-desc">Statistical models reconstruct who infected whom — revealing patient zero, superspreaders, and hidden chains.</div>
+            <!-- Connector 1→2 -->
+            <div class="pipeline-connector reveal">
+                <canvas id="connector-1"></canvas>
             </div>
-            <div class="p-card reveal" data-pipeline="alert" style="transition-delay:0.1s">
-                <div class="p-card-glow"></div>
-                <canvas class="p-card-canvas" data-viz="alert"></canvas>
-                <div class="p-card-tag">Action</div>
-                <div class="p-card-title">Early Warning System</div>
-                <div class="p-card-desc">Real-time alerts and reports are dispatched to infection prevention teams before outbreaks escalate.</div>
+
+            <!-- STEP 2: Anonymisation -->
+            <div class="pipeline-step reveal">
+                <div class="pipeline-step-badge">
+                    <div class="pipeline-step-num">02</div>
+                    <div class="pipeline-step-label">Anonymisation</div>
+                </div>
+                <div class="pipeline-single">
+                    <div class="p-card" data-pipeline="anon">
+                        <div class="p-card-glow"></div>
+                        <canvas class="p-card-canvas" data-viz="anon"></canvas>
+                        <div class="p-card-tag">GDPR Compliance</div>
+                        <div class="p-card-title">Data Anonymisation</div>
+                        <div class="p-card-desc">Patient identifiers are stripped, hashed, and encrypted before any analysis — ensuring full GDPR compliance. All three data streams are processed through a secure anonymisation layer.</div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Connector 2→3 -->
+            <div class="pipeline-connector reveal">
+                <canvas id="connector-2"></canvas>
+            </div>
+
+            <!-- STEP 3: NosoTrack Engine (hero card) -->
+            <div class="pipeline-step reveal">
+                <div class="pipeline-step-badge">
+                    <div class="pipeline-step-num">03</div>
+                    <div class="pipeline-step-label">Core Platform</div>
+                </div>
+                <div class="pipeline-single">
+                    <div class="p-card p-card--engine" data-pipeline="engine">
+                        <div class="p-card-glow"></div>
+                        <canvas class="p-card-canvas" data-viz="engine" id="engine-canvas"></canvas>
+                        <div class="p-card-tag">Analytics Engine</div>
+                        <div class="p-card-title">NosoTrack Engine</div>
+                        <div class="p-card-desc">Anonymised data streams are fused into a unified temporal contact network. The engine runs Bayesian phylodynamic models in near real-time, combining genomic distances, contact matrices, and ward movements to infer transmission probabilities.</div>
+                        <div class="engine-features">
+                            <div class="engine-feat"><strong>Data Fusion</strong>Genomic + contact + EHR integration</div>
+                            <div class="engine-feat"><strong>Bayesian Models</strong>Phylodynamic transmission inference</div>
+                            <div class="engine-feat"><strong>Real-Time</strong>Near real-time pipeline processing</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connector 3→4 -->
+            <div class="pipeline-connector reveal">
+                <canvas id="connector-3"></canvas>
+            </div>
+
+            <!-- STEP 4: Transmission Tree -->
+            <div class="pipeline-step reveal">
+                <div class="pipeline-step-badge">
+                    <div class="pipeline-step-num">04</div>
+                    <div class="pipeline-step-label">Output</div>
+                </div>
+                <div class="pipeline-single">
+                    <div class="p-card" data-pipeline="tree">
+                        <div class="p-card-glow"></div>
+                        <canvas class="p-card-canvas" data-viz="tree"></canvas>
+                        <div class="p-card-tag">Reconstruction</div>
+                        <div class="p-card-title">Transmission Tree</div>
+                        <div class="p-card-desc">Statistical models reconstruct who infected whom — revealing patient zero, superspreaders, and hidden chains of nosocomial transmission.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connector 4→5 -->
+            <div class="pipeline-connector reveal">
+                <canvas id="connector-4"></canvas>
+            </div>
+
+            <!-- STEP 5: Early Warning -->
+            <div class="pipeline-step reveal">
+                <div class="pipeline-step-badge">
+                    <div class="pipeline-step-num">05</div>
+                    <div class="pipeline-step-label">Action</div>
+                </div>
+                <div class="pipeline-single">
+                    <div class="p-card" data-pipeline="alert">
+                        <div class="p-card-glow"></div>
+                        <canvas class="p-card-canvas" data-viz="alert"></canvas>
+                        <div class="p-card-tag">Alerts</div>
+                        <div class="p-card-title">Early Warning System</div>
+                        <div class="p-card-desc">Real-time alerts and reports are dispatched to infection prevention teams before outbreaks escalate — enabling rapid containment and ward-level interventions.</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </section>
@@ -1234,8 +1322,9 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 // ==========================================
-// PIPELINE — Card mini-canvas animations +
-// background particle flow + connectors
+// PIPELINE — 5-step vertical flow with
+// mini-canvas animations, 3D engine viz,
+// background particles + connectors
 // ==========================================
 (function() {
     const ACCENT = '#e63946';
@@ -1286,7 +1375,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             bgCtx.fillStyle = `rgba(230,57,70,${p.opacity})`;
             bgCtx.beginPath(); bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2); bgCtx.fill();
         });
-        // Faint vertical lines
         bgCtx.strokeStyle = 'rgba(255,255,255,0.015)'; bgCtx.lineWidth = 1;
         for (let i = 1; i < 4; i++) {
             const x = bgW * i / 4;
@@ -1294,42 +1382,43 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         }
     }
 
-    // ── Connector canvases — particles flowing between rows ──
-    function drawConnector(c, count) {
+    // ── 4 Connector canvases between steps ──
+    function makeConnector(c, count) {
         const info = initCanvas(c);
-        if (!info) return;
+        if (!info) return null;
         const { ctx, w, h } = info;
         const particles = [];
         for (let i = 0; i < count; i++) {
             particles.push({
-                x: w * (0.15 + Math.random() * 0.7),
+                x: w * (0.3 + Math.random() * 0.4),
                 y: Math.random() * h,
                 vy: 0.3 + Math.random() * 0.5,
                 size: Math.random() * 1.5 + 0.5,
                 phase: Math.random() * Math.PI * 2,
             });
         }
-        return { ctx, w, h, particles };
+        return { ctx, w, h, particles, el: c };
     }
-    const connTop = drawConnector(document.getElementById('connector-top'), 12);
-    const connBot = drawConnector(document.getElementById('connector-bot'), 10);
+    const connectors = [];
+    for (let i = 1; i <= 4; i++) {
+        const c = makeConnector(document.getElementById('connector-' + i), 8);
+        if (c) connectors.push(c);
+    }
 
     function animateConnector(c) {
         if (!c) return;
         c.ctx.clearRect(0, 0, c.w, c.h);
-        // Dashed guide lines
         c.ctx.strokeStyle = 'rgba(255,255,255,0.04)'; c.ctx.lineWidth = 1;
         c.ctx.setLineDash([2, 6]);
         const cx = c.w / 2;
         c.ctx.beginPath(); c.ctx.moveTo(cx, 0); c.ctx.lineTo(cx, c.h); c.ctx.stroke();
         c.ctx.setLineDash([]);
-        // Particles falling
         c.particles.forEach(p => {
             p.y += p.vy;
             p.x += Math.sin(frame * 0.02 + p.phase) * 0.3;
-            if (p.y > c.h + 4) { p.y = -4; p.x = c.w * (0.2 + Math.random() * 0.6); }
+            if (p.y > c.h + 4) { p.y = -4; p.x = c.w * (0.35 + Math.random() * 0.3); }
             const grad = c.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 4);
-            grad.addColorStop(0, `rgba(230,57,70,0.6)`);
+            grad.addColorStop(0, 'rgba(230,57,70,0.6)');
             grad.addColorStop(1, 'transparent');
             c.ctx.fillStyle = grad;
             c.ctx.beginPath(); c.ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI * 2); c.ctx.fill();
@@ -1339,10 +1428,11 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     }
 
     // ═══════════════════════════════════════════
-    // MINI-CANVAS ANIMATIONS inside each card
+    // MINI-CANVAS ANIMATIONS (2D cards)
     // ═══════════════════════════════════════════
     const vizCanvases = {};
     document.querySelectorAll('.p-card-canvas[data-viz]').forEach(c => {
+        if (c.dataset.viz === 'engine') return; // engine uses Three.js
         const info = initCanvas(c);
         if (info) vizCanvases[c.dataset.viz] = { el: c, ...info };
     });
@@ -1353,7 +1443,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         const { ctx, w, h } = v;
         ctx.clearRect(0, 0, w, h);
         const cx = w / 2, cy = h / 2, amp = 28, len = h * 0.8;
-        // Helix
         for (let strand = -1; strand <= 1; strand += 2) {
             ctx.strokeStyle = strand === 1 ? ACCENT : ACTIVE;
             ctx.lineWidth = 1.8; ctx.globalAlpha = strand === 1 ? 0.7 : 0.35;
@@ -1367,7 +1456,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             ctx.stroke();
         }
         ctx.globalAlpha = 1;
-        // Rungs with colored base pairs
         const baseCols = ['#5b9bd5','#70ad47','#e63946','#ffc000'];
         for (let i = 0; i < 7; i++) {
             const t = (i + 0.3) / 7;
@@ -1377,7 +1465,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             ctx.beginPath(); ctx.moveTo(cx + off, y); ctx.lineTo(cx - off, y); ctx.stroke();
         }
         ctx.globalAlpha = 1;
-        // Scanning highlight
         const scanY = cy - len/2 + ((frame * 1.2) % len);
         ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = 0.4;
         ctx.beginPath(); ctx.moveTo(cx - amp - 10, scanY); ctx.lineTo(cx + amp + 10, scanY); ctx.stroke();
@@ -1390,26 +1477,22 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         const { ctx, w, h } = v;
         ctx.clearRect(0, 0, w, h);
         const cx = w/2, cy = h/2;
-        // Network nodes
         const nodes = [
             { x: cx, y: cy, r: 6, staff: true },
             { x: cx-50, y: cy-25, r: 4 }, { x: cx+55, y: cy-20, r: 4 },
             { x: cx-40, y: cy+30, r: 4 }, { x: cx+45, y: cy+28, r: 4 },
             { x: cx-10, y: cy-38, r: 3.5 }, { x: cx+15, y: cy+40, r: 3.5 },
         ];
-        // Edges
         const edges = [[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,5],[2,4],[3,6]];
         edges.forEach(([a,b]) => {
             ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(nodes[a].x, nodes[a].y); ctx.lineTo(nodes[b].x, nodes[b].y); ctx.stroke();
         });
-        // BT pulse rings from center
         const pulseR = 15 + ((frame * 0.5) % 40);
         ctx.strokeStyle = ACCENT; ctx.lineWidth = 1;
         ctx.globalAlpha = Math.max(0, 0.3 - (pulseR - 15) / 55);
         ctx.beginPath(); ctx.arc(cx, cy, pulseR, 0, Math.PI * 2); ctx.stroke();
         ctx.globalAlpha = 1;
-        // Nodes
         nodes.forEach((n, i) => {
             ctx.fillStyle = n.staff ? ACCENT : 'rgba(255,255,255,0.5)';
             ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill();
@@ -1419,7 +1502,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
                 ctx.fillText('B', n.x, n.y); ctx.textBaseline = 'alphabetic';
             }
         });
-        // Traveling dot along an edge
         const edgeIdx = Math.floor((frame * 0.01) % edges.length);
         const [a, b] = edges[edgeIdx];
         const t = (frame * 0.015) % 1;
@@ -1435,7 +1517,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         const v = vizCanvases.ehr; if (!v) return;
         const { ctx, w, h } = v;
         ctx.clearRect(0, 0, w, h);
-        // Scrolling rows of data
         const rowH = 18, cols = [w*0.08, w*0.28, w*0.55, w*0.78];
         const scrollY = (frame * 0.4) % (rowH * 8);
         ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, h); ctx.clip();
@@ -1444,7 +1525,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             if (y < -rowH || y > h + rowH) continue;
             const rowAlpha = 1 - Math.abs(y - h/2) / (h * 0.6);
             ctx.globalAlpha = Math.max(0.05, Math.min(0.5, rowAlpha));
-            // Header row
             if (r === 0) {
                 ctx.font = `600 8px ${MONO}`; ctx.fillStyle = ACCENT;
                 ['ID', 'WARD', 'DATE', 'STATUS'].forEach((t, i) => {
@@ -1465,7 +1545,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             }
         }
         ctx.restore(); ctx.globalAlpha = 1;
-        // Fade edges
         const fadeH = 20;
         const gradTop = ctx.createLinearGradient(0, 0, 0, fadeH);
         gradTop.addColorStop(0, 'rgba(0,0,0,0.8)'); gradTop.addColorStop(1, 'transparent');
@@ -1481,7 +1560,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         const { ctx, w, h } = v;
         ctx.clearRect(0, 0, w, h);
         const cx = w/2, cy = h/2;
-        // Shield outline
         ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1.5;
         const sw = 35, sh = 42;
         ctx.beginPath();
@@ -1491,25 +1569,21 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         ctx.quadraticCurveTo(cx - sw * 0.6, cy + sh * 0.6, cx - sw, cy);
         ctx.quadraticCurveTo(cx - sw, cy - sh * 0.6, cx, cy - sh);
         ctx.stroke();
-        // Data rows being redacted — left side
         const rows = ['John Smith', 'DOB: 1985-03', 'MRN: 47291', 'Ward: B'];
         const redactPhase = (frame * 0.008) % 1;
         rows.forEach((text, i) => {
             const x = cx - sw - 55, y = cy - 25 + i * 16;
             ctx.font = `400 8px ${MONO}`;
-            // Original text fading
             const fade = Math.max(0, 1 - redactPhase * 3 + i * 0.3);
             ctx.fillStyle = `rgba(255,255,255,${fade * 0.3})`; ctx.textAlign = 'left';
             ctx.fillText(text, x, y);
-            // Redaction bar growing
             const barW = Math.min(1, Math.max(0, redactPhase * 3 - i * 0.3)) * ctx.measureText(text).width;
             if (barW > 0) {
-                ctx.fillStyle = `rgba(230,57,70,0.25)`;
+                ctx.fillStyle = 'rgba(230,57,70,0.25)';
                 ctx.fillRect(x - 1, y - 8, barW + 2, 11);
             }
         });
-        // Output side — anonymised
-        const anon = ['HASH_7f3a', '****-**', 'ID: ████', 'Ward: B'];
+        const anon = ['HASH_7f3a', '****-**', 'ID: \u2588\u2588\u2588\u2588', 'Ward: B'];
         anon.forEach((text, i) => {
             const x = cx + sw + 15, y = cy - 25 + i * 16;
             const appear = Math.max(0, Math.min(1, redactPhase * 3 - 1 - i * 0.2));
@@ -1517,53 +1591,10 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             ctx.fillStyle = `rgba(100,255,100,${appear * 0.4})`; ctx.textAlign = 'left';
             ctx.fillText(text, x, y);
         });
-        // Scanning line
         const scanY = cy - sh + ((frame * 0.8) % (sh * 2));
         ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = 0.3;
         ctx.beginPath(); ctx.moveTo(cx - sw, scanY); ctx.lineTo(cx + sw, scanY); ctx.stroke();
         ctx.globalAlpha = 1;
-    }
-
-    // ── Merge: converging streams into NT hub ──
-    function vizMerge() {
-        const v = vizCanvases.merge; if (!v) return;
-        const { ctx, w, h } = v;
-        ctx.clearRect(0, 0, w, h);
-        const cx = w/2, cy = h/2;
-        // Central hub
-        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.arc(cx, cy, 22, 0, Math.PI * 2); ctx.stroke();
-        ctx.globalAlpha = 0.15;
-        ctx.fillStyle = ACCENT;
-        ctx.beginPath(); ctx.arc(cx, cy, 22, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha = 1;
-        // NT text
-        ctx.fillStyle = ACTIVE; ctx.font = `800 12px ${SYNE}`;
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('NT', cx, cy); ctx.textBaseline = 'alphabetic';
-        // Orbiting data dots
-        for (let i = 0; i < 4; i++) {
-            const a = frame * 0.02 + i * Math.PI / 2;
-            const r = 32 + Math.sin(frame * 0.03 + i) * 4;
-            const dx = Math.cos(a) * r, dy = Math.sin(a) * r;
-            ctx.fillStyle = [ACCENT, '#5b9bd5', '#70ad47', '#ffc000'][i];
-            ctx.globalAlpha = 0.6;
-            ctx.beginPath(); ctx.arc(cx + dx, cy + dy, 3, 0, Math.PI * 2); ctx.fill();
-        }
-        ctx.globalAlpha = 1;
-        // Converging streams from edges
-        for (let i = 0; i < 3; i++) {
-            const fromX = w * 0.05, fromY = h * (0.2 + i * 0.3);
-            const t = ((frame * 0.012) + i * 0.33) % 1;
-            const px = fromX + (cx - fromX) * t;
-            const py = fromY + (cy - fromY) * t;
-            ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(cx, cy); ctx.stroke();
-            const grad = ctx.createRadialGradient(px, py, 0, px, py, 6);
-            grad.addColorStop(0, ACCENT); grad.addColorStop(1, 'transparent');
-            ctx.fillStyle = grad;
-            ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
-        }
     }
 
     // ── Transmission tree: growing animated tree ──
@@ -1572,7 +1603,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         const { ctx, w, h } = v;
         ctx.clearRect(0, 0, w, h);
         const cx = w/2, top = 16;
-        // Tree structure
         const treeNodes = [
             { x: cx, y: top, r: 5, infected: true },
             { x: cx - 50, y: top + 30, r: 4 }, { x: cx + 50, y: top + 30, r: 4 },
@@ -1581,7 +1611,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             { x: cx - 80, y: top + 85, r: 3 }, { x: cx - 55, y: top + 85, r: 3 },
         ];
         const treeEdges = [[0,1],[0,2],[1,3],[1,4],[2,5],[2,6],[3,7],[3,8]];
-        // Progressive reveal
         const reveal = ((frame * 0.006) % 1.5);
         treeEdges.forEach(([a,b], i) => {
             const t = Math.max(0, Math.min(1, reveal * treeEdges.length - i));
@@ -1602,7 +1631,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
                 ctx.beginPath(); ctx.arc(n.x, n.y, n.r * 2.5, 0, Math.PI * 2); ctx.fill();
             }
         });
-        // Arrow showing direction
         ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.font = `400 8px ${MONO}`;
         ctx.textAlign = 'center'; ctx.fillText('who infected whom', cx, h - 6);
     }
@@ -1613,20 +1641,17 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         const { ctx, w, h } = v;
         ctx.clearRect(0, 0, w, h);
         const cx = w/2, cy = h/2;
-        // Email envelope
         const ew = 36, eh = 24;
         ctx.strokeStyle = ACTIVE; ctx.lineWidth = 1.3; ctx.globalAlpha = 0.4;
         ctx.strokeRect(cx - ew/2, cy - eh/2, ew, eh);
         ctx.beginPath(); ctx.moveTo(cx - ew/2, cy - eh/2); ctx.lineTo(cx, cy + 2); ctx.lineTo(cx + ew/2, cy - eh/2); ctx.stroke();
         ctx.globalAlpha = 1;
-        // Notification badge
         const pulse = 0.7 + Math.sin(frame * 0.08) * 0.3;
         ctx.fillStyle = ACCENT; ctx.globalAlpha = pulse;
         ctx.beginPath(); ctx.arc(cx + ew/2 + 2, cy - eh/2 - 2, 6, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = '#fff'; ctx.globalAlpha = 1; ctx.font = `700 7px ${MONO}`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText('!', cx + ew/2 + 2, cy - eh/2 - 2); ctx.textBaseline = 'alphabetic';
-        // Emanating alert rings
         for (let i = 0; i < 3; i++) {
             const r = 30 + ((frame * 0.4 + i * 18) % 50);
             const alpha = Math.max(0, 0.2 - (r - 30) / 70);
@@ -1634,21 +1659,19 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             ctx.beginPath(); ctx.arc(cx, cy - 5, r, -0.8, 0.8); ctx.stroke();
         }
         ctx.globalAlpha = 1;
-        // Dispatching arrows
         const targets = [
             { x: cx + 65, y: cy - 20, label: 'IPC Team' },
             { x: cx + 60, y: cy + 22, label: 'Dashboard' },
             { x: cx - 65, y: cy, label: 'Hospital' },
         ];
-        targets.forEach(tgt => {
+        targets.forEach((tgt, ti) => {
             ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
             ctx.setLineDash([2, 3]);
             ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(tgt.x, tgt.y); ctx.stroke();
             ctx.setLineDash([]);
             ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = `400 7px ${MONO}`;
             ctx.textAlign = 'center'; ctx.fillText(tgt.label, tgt.x, tgt.y + 12);
-            // Flying dot
-            const t = ((frame * 0.01) + targets.indexOf(tgt) * 0.3) % 1;
+            const t = ((frame * 0.01) + ti * 0.3) % 1;
             const fx = cx + (tgt.x - cx) * t;
             const fy = cy + (tgt.y - cy) * t;
             ctx.fillStyle = ACCENT; ctx.globalAlpha = 1 - t * 0.5;
@@ -1657,10 +1680,275 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         });
     }
 
+    // ═══════════════════════════════════════════
+    // NOSOTRACK ENGINE — 3D Three.js mini-scene
+    // ═══════════════════════════════════════════
+    const engineCanvas = document.getElementById('engine-canvas');
+    let engineScene, engineCamera, engineRenderer, engineNodes = [], engineEdges = [];
+    let engineDataParticles = [], engineFrame = 0;
+
+    function initEngine() {
+        if (!engineCanvas || typeof THREE === 'undefined') return;
+        const rect = engineCanvas.getBoundingClientRect();
+        const W = rect.width, H = rect.height;
+
+        engineScene = new THREE.Scene();
+        engineScene.background = new THREE.Color(0x080810);
+        engineScene.fog = new THREE.FogExp2(0x080810, 0.006);
+
+        engineCamera = new THREE.PerspectiveCamera(50, W / H, 0.5, 600);
+        engineCamera.position.set(0, 30, 120);
+        engineCamera.lookAt(0, 0, 0);
+
+        engineRenderer = new THREE.WebGLRenderer({ canvas: engineCanvas, antialias: true, alpha: false });
+        engineRenderer.setSize(W, H);
+        engineRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Ambient + point lighting
+        engineScene.add(new THREE.AmbientLight(0x334466, 0.6));
+        const pLight1 = new THREE.PointLight(0xe63946, 1.2, 200);
+        pLight1.position.set(40, 50, 40);
+        engineScene.add(pLight1);
+        const pLight2 = new THREE.PointLight(0x5b9bd5, 0.8, 200);
+        pLight2.position.set(-50, -20, 50);
+        engineScene.add(pLight2);
+
+        // Ground grid
+        const gridHelper = new THREE.GridHelper(200, 30, 0x1a1a2e, 0x111122);
+        gridHelper.position.y = -35;
+        engineScene.add(gridHelper);
+
+        // Central platform (glowing disc)
+        const platformGeo = new THREE.CylinderGeometry(18, 20, 3, 32);
+        const platformMat = new THREE.MeshPhongMaterial({
+            color: 0x1a1a2e, emissive: 0xe63946, emissiveIntensity: 0.08,
+            transparent: true, opacity: 0.7
+        });
+        const platform = new THREE.Mesh(platformGeo, platformMat);
+        platform.position.y = -33;
+        engineScene.add(platform);
+
+        // Central core — rotating icosahedron
+        const coreGeo = new THREE.IcosahedronGeometry(6, 1);
+        const coreMat = new THREE.MeshPhongMaterial({
+            color: 0xe63946, emissive: 0xe63946, emissiveIntensity: 0.3,
+            wireframe: true, transparent: true, opacity: 0.6
+        });
+        const core = new THREE.Mesh(coreGeo, coreMat);
+        core.position.y = 0;
+        engineScene.add(core);
+        engineNodes.push({ mesh: core, type: 'core' });
+
+        // Inner solid core
+        const innerGeo = new THREE.IcosahedronGeometry(3.5, 1);
+        const innerMat = new THREE.MeshPhongMaterial({
+            color: 0xff4455, emissive: 0xe63946, emissiveIntensity: 0.5,
+            transparent: true, opacity: 0.4
+        });
+        const innerCore = new THREE.Mesh(innerGeo, innerMat);
+        engineScene.add(innerCore);
+        engineNodes.push({ mesh: innerCore, type: 'inner' });
+
+        // NT label sprite
+        const labelCanvas = document.createElement('canvas');
+        labelCanvas.width = 128; labelCanvas.height = 48;
+        const lctx = labelCanvas.getContext('2d');
+        lctx.fillStyle = '#fff'; lctx.font = 'bold 28px Syne, sans-serif';
+        lctx.textAlign = 'center'; lctx.textBaseline = 'middle';
+        lctx.fillText('NosoTrack', 64, 24);
+        const labelTex = new THREE.CanvasTexture(labelCanvas);
+        const labelMat = new THREE.SpriteMaterial({ map: labelTex, transparent: true, opacity: 0.5 });
+        const labelSprite = new THREE.Sprite(labelMat);
+        labelSprite.position.set(0, -22, 0);
+        labelSprite.scale.set(24, 9, 1);
+        engineScene.add(labelSprite);
+
+        // Orbital rings
+        const ringColors = [0x5b9bd5, 0x70ad47, 0xffc000];
+        const ringRadii = [30, 42, 55];
+        const ringTilts = [0.3, -0.2, 0.5];
+        ringRadii.forEach((r, i) => {
+            const ringGeo = new THREE.RingGeometry(r - 0.3, r + 0.3, 64);
+            const ringMat = new THREE.MeshBasicMaterial({
+                color: ringColors[i], transparent: true, opacity: 0.12,
+                side: THREE.DoubleSide
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2 + ringTilts[i];
+            ring.rotation.z = i * 0.7;
+            engineScene.add(ring);
+            engineNodes.push({ mesh: ring, type: 'ring', idx: i });
+        });
+
+        // Data nodes orbiting on rings — represent patients/samples
+        const nodeTypes = [
+            { color: 0x5b9bd5, ring: 0, count: 5, label: 'GEN' },
+            { color: 0x70ad47, ring: 1, count: 6, label: 'CON' },
+            { color: 0xffc000, ring: 2, count: 4, label: 'EHR' },
+        ];
+        nodeTypes.forEach(nt => {
+            for (let i = 0; i < nt.count; i++) {
+                const angle = (i / nt.count) * Math.PI * 2;
+                const geo = new THREE.SphereGeometry(1.5, 12, 12);
+                const mat = new THREE.MeshPhongMaterial({
+                    color: nt.color, emissive: nt.color, emissiveIntensity: 0.15,
+                    transparent: true, opacity: 0.7
+                });
+                const mesh = new THREE.Mesh(geo, mat);
+                engineScene.add(mesh);
+                engineNodes.push({
+                    mesh, type: 'dataNode', ring: nt.ring,
+                    angle: angle, speed: 0.003 + Math.random() * 0.002,
+                    radius: ringRadii[nt.ring],
+                    tilt: ringTilts[nt.ring], zRot: nt.ring * 0.7,
+                    color: nt.color
+                });
+            }
+        });
+
+        // Connection lines between nearby data nodes (network edges)
+        const edgeMat = new THREE.LineBasicMaterial({
+            color: 0xe63946, transparent: true, opacity: 0.08
+        });
+        for (let i = 0; i < 12; i++) {
+            const geo = new THREE.BufferGeometry();
+            const positions = new Float32Array(6);
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const line = new THREE.Line(geo, edgeMat);
+            engineScene.add(line);
+            engineEdges.push(line);
+        }
+
+        // Data stream particles — flowing from edges toward center
+        for (let i = 0; i < 30; i++) {
+            const pGeo = new THREE.SphereGeometry(0.4, 6, 6);
+            const pMat = new THREE.MeshBasicMaterial({
+                color: [0x5b9bd5, 0x70ad47, 0xffc000, 0xe63946][i % 4],
+                transparent: true, opacity: 0.6
+            });
+            const pMesh = new THREE.Mesh(pGeo, pMat);
+            engineScene.add(pMesh);
+            engineDataParticles.push({
+                mesh: pMesh,
+                t: Math.random(),
+                speed: 0.002 + Math.random() * 0.003,
+                fromAngle: Math.random() * Math.PI * 2,
+                fromRadius: 60 + Math.random() * 30,
+                fromY: (Math.random() - 0.5) * 40,
+            });
+        }
+
+        // Processing pulse rings (horizontal)
+        for (let i = 0; i < 3; i++) {
+            const pulseGeo = new THREE.RingGeometry(8 + i * 12, 8.5 + i * 12, 48);
+            const pulseMat = new THREE.MeshBasicMaterial({
+                color: 0xe63946, transparent: true, opacity: 0.04,
+                side: THREE.DoubleSide
+            });
+            const pulseMesh = new THREE.Mesh(pulseGeo, pulseMat);
+            pulseMesh.rotation.x = Math.PI / 2;
+            pulseMesh.position.y = -32;
+            engineScene.add(pulseMesh);
+            engineNodes.push({ mesh: pulseMesh, type: 'pulse', idx: i });
+        }
+    }
+
+    function animateEngine() {
+        if (!engineRenderer) return;
+        engineFrame++;
+        const t = engineFrame * 0.01;
+
+        // Rotate core
+        engineNodes.forEach(n => {
+            if (n.type === 'core') {
+                n.mesh.rotation.x = t * 0.3;
+                n.mesh.rotation.y = t * 0.5;
+            }
+            if (n.type === 'inner') {
+                n.mesh.rotation.x = -t * 0.4;
+                n.mesh.rotation.z = t * 0.6;
+            }
+            // Orbit data nodes
+            if (n.type === 'dataNode') {
+                n.angle += n.speed;
+                const cosT = Math.cos(n.tilt);
+                const sinT = Math.sin(n.tilt);
+                const cosZ = Math.cos(n.zRot);
+                const sinZ = Math.sin(n.zRot);
+                let x = Math.cos(n.angle) * n.radius;
+                let z = Math.sin(n.angle) * n.radius;
+                let y = z * sinT;
+                z = z * cosT;
+                const rx = x * cosZ - z * sinZ;
+                const rz = x * sinZ + z * cosZ;
+                n.mesh.position.set(rx, y, rz);
+            }
+            // Pulse rings
+            if (n.type === 'pulse') {
+                const scale = 1 + Math.sin(t * 2 + n.idx * 2) * 0.15;
+                n.mesh.scale.set(scale, scale, 1);
+                n.mesh.material.opacity = 0.03 + Math.sin(t * 2 + n.idx * 2) * 0.02;
+            }
+        });
+
+        // Update edges — connect nearby data nodes
+        const dataN = engineNodes.filter(n => n.type === 'dataNode');
+        let edgeIdx = 0;
+        for (let i = 0; i < dataN.length && edgeIdx < engineEdges.length; i++) {
+            for (let j = i + 1; j < dataN.length && edgeIdx < engineEdges.length; j++) {
+                const dx = dataN[i].mesh.position.x - dataN[j].mesh.position.x;
+                const dy = dataN[i].mesh.position.y - dataN[j].mesh.position.y;
+                const dz = dataN[i].mesh.position.z - dataN[j].mesh.position.z;
+                const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                if (dist < 35) {
+                    const pos = engineEdges[edgeIdx].geometry.attributes.position.array;
+                    pos[0] = dataN[i].mesh.position.x; pos[1] = dataN[i].mesh.position.y; pos[2] = dataN[i].mesh.position.z;
+                    pos[3] = dataN[j].mesh.position.x; pos[4] = dataN[j].mesh.position.y; pos[5] = dataN[j].mesh.position.z;
+                    engineEdges[edgeIdx].geometry.attributes.position.needsUpdate = true;
+                    engineEdges[edgeIdx].visible = true;
+                    engineEdges[edgeIdx].material.opacity = 0.08 * (1 - dist / 35);
+                    edgeIdx++;
+                }
+            }
+        }
+        for (; edgeIdx < engineEdges.length; edgeIdx++) {
+            engineEdges[edgeIdx].visible = false;
+        }
+
+        // Animate data stream particles flowing toward center
+        engineDataParticles.forEach(p => {
+            p.t += p.speed;
+            if (p.t > 1) {
+                p.t = 0;
+                p.fromAngle = Math.random() * Math.PI * 2;
+                p.fromRadius = 60 + Math.random() * 30;
+                p.fromY = (Math.random() - 0.5) * 40;
+            }
+            const ease = p.t * p.t * (3 - 2 * p.t); // smoothstep
+            const r = p.fromRadius * (1 - ease);
+            p.mesh.position.x = Math.cos(p.fromAngle) * r;
+            p.mesh.position.z = Math.sin(p.fromAngle) * r;
+            p.mesh.position.y = p.fromY * (1 - ease);
+            p.mesh.material.opacity = 0.5 * (1 - ease * 0.7);
+            const s = 0.3 + (1 - ease) * 0.7;
+            p.mesh.scale.set(s, s, s);
+        });
+
+        // Slow orbit camera
+        engineCamera.position.x = Math.sin(t * 0.15) * 110;
+        engineCamera.position.z = Math.cos(t * 0.15) * 110;
+        engineCamera.position.y = 25 + Math.sin(t * 0.1) * 10;
+        engineCamera.lookAt(0, -5, 0);
+
+        engineRenderer.render(engineScene, engineCamera);
+    }
+
     // ═══════════════════
     // MAIN LOOP
     // ═══════════════════
     initBg();
+    initEngine();
+
     window.addEventListener('resize', () => {
         initBg();
         Object.keys(vizCanvases).forEach(k => {
@@ -1668,23 +1956,31 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             const info = initCanvas(c.el);
             if (info) { c.ctx = info.ctx; c.w = info.w; c.h = info.h; }
         });
-        if (connTop) { const i = initCanvas(connTop.el || document.getElementById('connector-top')); if (i) Object.assign(connTop, i); }
-        if (connBot) { const i = initCanvas(connBot.el || document.getElementById('connector-bot')); if (i) Object.assign(connBot, i); }
+        connectors.forEach(c => {
+            const info = initCanvas(c.el);
+            if (info) { c.ctx = info.ctx; c.w = info.w; c.h = info.h; }
+        });
+        // Resize engine
+        if (engineRenderer && engineCanvas) {
+            const rect = engineCanvas.getBoundingClientRect();
+            engineRenderer.setSize(rect.width, rect.height);
+            engineCamera.aspect = rect.width / rect.height;
+            engineCamera.updateProjectionMatrix();
+        }
     });
 
     function animate() {
         requestAnimationFrame(animate);
         frame++;
         drawBg();
-        animateConnector(connTop);
-        animateConnector(connBot);
+        connectors.forEach(animateConnector);
         vizDNA();
         vizContact();
         vizEHR();
         vizAnon();
-        vizMerge();
         vizTree();
         vizAlert();
+        animateEngine();
     }
     setTimeout(() => { requestAnimationFrame(animate); }, 150);
 })();
