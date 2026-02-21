@@ -322,6 +322,13 @@
             border: 1px solid rgba(255,255,255,0.03);
             background: rgba(0,0,0,0.4);
         }
+        .engine-logo-wrap {
+            display: flex; align-items: center; justify-content: center;
+            margin: 18px auto 8px; width: 100%; position: relative;
+        }
+        .engine-logo-canvas {
+            width: 100px; height: 100px; display: block;
+        }
         .engine-features {
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 10px; margin-top: 14px;
@@ -666,6 +673,9 @@
                         <div class="p-card-tag">Analytics Engine</div>
                         <div class="p-card-title">NosoTrack Engine</div>
                         <div class="p-card-desc">Anonymised data streams are fused into a unified temporal contact network. The engine runs Bayesian phylodynamic models in near real-time, combining genomic distances, contact matrices, and ward movements to infer transmission probabilities and reconstruct who infected whom.</div>
+                        <div class="engine-logo-wrap">
+                            <canvas class="engine-logo-canvas" id="engine-logo"></canvas>
+                        </div>
                         <div class="engine-features">
                             <div class="engine-feat"><strong>Data Fusion</strong>Genomic + contact + EHR integration</div>
                             <div class="engine-feat"><strong>Bayesian Models</strong>Phylodynamic transmission inference</div>
@@ -1199,8 +1209,8 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             const ex = from.x + (to.x - from.x) * edgeBuild;
             const ey = from.y + (to.y - from.y) * edgeBuild;
 
-            // Base edge
-            ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1.5;
+            // Base edge (lighter grey for better visibility)
+            ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 1.5;
             ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(ex, ey); ctx.stroke();
 
             // Infection propagation along edge
@@ -1211,22 +1221,44 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
                 const edgeProgress = Math.max(0, Math.min(1, (infectFrac - edgeInfectStart) / edgeInfectDuration));
 
                 if (edgeProgress > 0 && ENGINE_NODES[e.from].infected) {
-                    // Red infection traveling along edge
-                    const ix = from.x + (to.x - from.x) * edgeProgress;
-                    const iy = from.y + (to.y - from.y) * edgeProgress;
+                    const dx = to.x - from.x, dy = to.y - from.y;
+                    const edgeLen = Math.sqrt(dx*dx + dy*dy);
+                    const nx = -dy/edgeLen, ny = dx/edgeLen; // perpendicular
 
-                    // Infected portion of edge
-                    ctx.strokeStyle = ACCENT; ctx.lineWidth = 2; ctx.globalAlpha = 0.7;
+                    // Infected portion of edge — glowing red
+                    const ix = from.x + dx * edgeProgress;
+                    const iy = from.y + dy * edgeProgress;
+                    ctx.strokeStyle = ACCENT; ctx.lineWidth = 2; ctx.globalAlpha = 0.6;
                     ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(ix, iy); ctx.stroke();
                     ctx.globalAlpha = 1;
 
-                    // Glowing red dot at infection front
-                    const grad = ctx.createRadialGradient(ix, iy, 0, ix, iy, 10);
-                    grad.addColorStop(0, 'rgba(230,57,70,0.6)'); grad.addColorStop(1, 'transparent');
-                    ctx.fillStyle = grad;
-                    ctx.beginPath(); ctx.arc(ix, iy, 10, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = '#fff';
-                    ctx.beginPath(); ctx.arc(ix, iy, 2, 0, Math.PI * 2); ctx.fill();
+                    // Particle swarm traveling along edge
+                    const particleCount = 12;
+                    for (let pi = 0; pi < particleCount; pi++) {
+                        const seed = i * 100 + pi * 7.3;
+                        const pDelay = pi * 0.03;
+                        const pProgress = Math.max(0, Math.min(1, (edgeProgress - pDelay) * 1.2));
+                        if (pProgress <= 0) continue;
+                        const px = from.x + dx * pProgress;
+                        const py = from.y + dy * pProgress;
+                        // Perpendicular drift with sine variation
+                        const drift = Math.sin(pProgress * Math.PI * 3 + seed) * (4 + (seed % 3));
+                        const fx = px + nx * drift;
+                        const fy = py + ny * drift;
+                        // Fade: bright in middle, fade at edges
+                        const fadeIn = Math.min(1, pProgress * 5);
+                        const fadeOut = pProgress > 0.7 ? 1 - (pProgress - 0.7) / 0.3 : 1;
+                        const alpha = 0.4 * fadeIn * fadeOut + Math.sin(engineTimer * 0.12 + seed) * 0.1;
+                        const size = 0.8 + (seed % 3) * 0.4;
+                        ctx.fillStyle = ACCENT; ctx.globalAlpha = Math.max(0, alpha);
+                        ctx.beginPath(); ctx.arc(fx, fy, size, 0, Math.PI * 2); ctx.fill();
+                    }
+
+                    // Soft leading glow
+                    const leadGrad = ctx.createRadialGradient(ix, iy, 0, ix, iy, 8);
+                    leadGrad.addColorStop(0, 'rgba(230,57,70,0.35)'); leadGrad.addColorStop(1, 'transparent');
+                    ctx.globalAlpha = 1; ctx.fillStyle = leadGrad;
+                    ctx.beginPath(); ctx.arc(ix, iy, 8, 0, Math.PI * 2); ctx.fill();
 
                     // Mark target as infected when complete
                     if (edgeProgress >= 1 && !ENGINE_NODES[e.to].infected) {
@@ -1236,7 +1268,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
                     // Full infected edge glow
                     if (edgeProgress >= 1) {
-                        ctx.strokeStyle = ACCENT; ctx.lineWidth = 2; ctx.globalAlpha = 0.5;
+                        ctx.strokeStyle = ACCENT; ctx.lineWidth = 2; ctx.globalAlpha = 0.4;
                         ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(to.x, to.y); ctx.stroke();
                         ctx.globalAlpha = 1;
                     }
@@ -1278,19 +1310,19 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             // Node body
             if (n.type === 'staff') {
                 // Diamond shape for staff
-                ctx.fillStyle = n.infected ? ACCENT : 'rgba(200,200,200,0.5)';
+                ctx.fillStyle = n.infected ? ACCENT : 'rgba(200,200,200,0.7)';
                 ctx.beginPath();
                 ctx.moveTo(n.x, n.y - r); ctx.lineTo(n.x + r, n.y);
                 ctx.lineTo(n.x, n.y + r); ctx.lineTo(n.x - r, n.y);
                 ctx.closePath(); ctx.fill();
             } else {
                 // Circle for patients
-                ctx.fillStyle = n.infected ? ACCENT : 'rgba(200,200,200,0.4)';
+                ctx.fillStyle = n.infected ? ACCENT : 'rgba(200,200,200,0.6)';
                 ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2); ctx.fill();
             }
 
             // Label
-            ctx.fillStyle = n.infected ? '#fff' : 'rgba(255,255,255,0.35)';
+            ctx.fillStyle = n.infected ? '#fff' : 'rgba(255,255,255,0.55)';
             ctx.font = `400 7px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             ctx.fillText(n.label, n.x, n.y); ctx.textBaseline = 'alphabetic';
         });
@@ -1334,15 +1366,113 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         }
     }
 
+    // ═══════════════════════════════════════════
+    // SPINNING VIRUS LOGO (Canvas 2D)
+    // ═══════════════════════════════════════════
+    const logoCanvas = document.getElementById('engine-logo');
+    let logoCtx, logoW, logoH;
+    function initLogo() {
+        if (!logoCanvas) return;
+        const dpr = Math.min(window.devicePixelRatio, 2);
+        const r = logoCanvas.getBoundingClientRect();
+        logoCanvas.width = r.width * dpr; logoCanvas.height = r.height * dpr;
+        logoCtx = logoCanvas.getContext('2d');
+        logoCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        logoW = r.width; logoH = r.height;
+    }
+    function drawLogo() {
+        if (!logoCtx) return;
+        const ctx = logoCtx, w = logoW, h = logoH;
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2, cy = h / 2;
+        const rotation = frame * 0.006; // slow elegant rotation
+        const coreR = 16;
+        const spikeCount = 12;
+        const spikeLen = 13;
+        const bulbR = 3.5;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rotation);
+
+        // Outer subtle glow
+        const outerGlow = ctx.createRadialGradient(0, 0, coreR + spikeLen, 0, 0, coreR + spikeLen + 12);
+        outerGlow.addColorStop(0, 'rgba(230,57,70,0.06)');
+        outerGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = outerGlow;
+        ctx.beginPath(); ctx.arc(0, 0, coreR + spikeLen + 12, 0, Math.PI * 2); ctx.fill();
+
+        // Spike proteins
+        for (let i = 0; i < spikeCount; i++) {
+            const angle = (i / spikeCount) * Math.PI * 2;
+            const wobble = Math.sin(frame * 0.03 + i * 1.7) * 1.5;
+            const sx = Math.cos(angle) * coreR;
+            const sy = Math.sin(angle) * coreR;
+            const ex = Math.cos(angle) * (coreR + spikeLen + wobble);
+            const ey = Math.sin(angle) * (coreR + spikeLen + wobble);
+
+            // Spike stem
+            ctx.strokeStyle = 'rgba(230,57,70,0.35)';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+
+            // Spike bulb (crown protein)
+            const bulbGrad = ctx.createRadialGradient(ex, ey, 0, ex, ey, bulbR);
+            bulbGrad.addColorStop(0, 'rgba(230,57,70,0.7)');
+            bulbGrad.addColorStop(1, 'rgba(230,57,70,0.15)');
+            ctx.fillStyle = bulbGrad;
+            ctx.beginPath(); ctx.arc(ex, ey, bulbR, 0, Math.PI * 2); ctx.fill();
+        }
+
+        // Core body — layered for depth
+        const bodyGrad = ctx.createRadialGradient(-3, -3, 0, 0, 0, coreR);
+        bodyGrad.addColorStop(0, 'rgba(230,57,70,0.5)');
+        bodyGrad.addColorStop(0.6, 'rgba(230,57,70,0.25)');
+        bodyGrad.addColorStop(1, 'rgba(180,40,50,0.12)');
+        ctx.fillStyle = bodyGrad;
+        ctx.beginPath(); ctx.arc(0, 0, coreR, 0, Math.PI * 2); ctx.fill();
+
+        // Core outline
+        ctx.strokeStyle = 'rgba(230,57,70,0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(0, 0, coreR, 0, Math.PI * 2); ctx.stroke();
+
+        // Inner detail: subtle membrane pattern
+        ctx.strokeStyle = 'rgba(230,57,70,0.1)';
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < 3; i++) {
+            const ir = 5 + i * 4;
+            ctx.beginPath(); ctx.arc(0, 0, ir, 0, Math.PI * 2); ctx.stroke();
+        }
+
+        // Highlight
+        const highlight = ctx.createRadialGradient(-5, -5, 0, -3, -3, 8);
+        highlight.addColorStop(0, 'rgba(255,255,255,0.15)');
+        highlight.addColorStop(1, 'transparent');
+        ctx.fillStyle = highlight;
+        ctx.beginPath(); ctx.arc(-3, -3, 8, 0, Math.PI * 2); ctx.fill();
+
+        ctx.restore();
+
+        // Subtle pulsing ring outside (non-rotating)
+        const pulseAlpha = 0.08 + Math.sin(frame * 0.04) * 0.04;
+        ctx.strokeStyle = `rgba(230,57,70,${pulseAlpha})`;
+        ctx.lineWidth = 0.5;
+        const pulseR = coreR + spikeLen + 8 + Math.sin(frame * 0.04) * 2;
+        ctx.beginPath(); ctx.arc(cx, cy, pulseR, 0, Math.PI * 2); ctx.stroke();
+    }
+
     // Init
     initBg();
     initEngineViz();
+    initLogo();
 
     window.addEventListener('resize', () => {
         initBg();
         Object.keys(vizCanvases).forEach(k => { const c = vizCanvases[k]; const info = initCanvas(c.el); if (info) { c.ctx = info.ctx; c.w = info.w; c.h = info.h; } });
         connectors.forEach(c => { const info = initCanvas(c.el); if (info) { c.ctx = info.ctx; c.w = info.w; c.h = info.h; } });
         initEngineViz();
+        initLogo();
     });
 
     function animate() {
@@ -1352,6 +1482,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         connectors.forEach(animateConnector);
         vizDNA(); vizContact(); vizEHR(); vizAnon(); vizAlert();
         drawEngineViz();
+        drawLogo();
     }
     setTimeout(() => { requestAnimationFrame(animate); }, 150);
 })();
@@ -1385,7 +1516,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     pointLight.position.set(100, 200, 200);
     scene.add(pointLight);
 
-    const COLORS = { healthy: 0x555555, infected: 0xe63946, wardA: 0x6496ff, wardB: 0xff9664, wardC: 0x96ff64, edge: 0x333333, edgeInfected: 0xe63946, particle: 0xe63946 };
+    const COLORS = { healthy: 0x8a8a8a, infected: 0xe63946, wardA: 0x6496ff, wardB: 0xff9664, wardC: 0x96ff64, edge: 0x555555, edgeInfected: 0xe63946, particle: 0xe63946 };
 
     const nodeData = [
         { id: 1, label: 'P0', ward: 'A', type: 'patient' }, { id: 2, label: 'S1', ward: 'A', type: 'staff' },
@@ -1455,7 +1586,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     Object.values(nodeMap).forEach(n => {
         const wardColor = COLORS['ward' + n.ward]; const isStaff = n.type === 'staff'; const size = n.id === 10 ? 7 : (isStaff ? 4.5 : 5);
         const geometry = isStaff ? new THREE.OctahedronGeometry(size, 0) : new THREE.SphereGeometry(size, 16, 16);
-        const material = new THREE.MeshPhongMaterial({ color: COLORS.healthy, emissive: 0x000000, shininess: 60, transparent: true, opacity: 0.9 });
+        const material = new THREE.MeshPhongMaterial({ color: COLORS.healthy, emissive: 0x111111, shininess: 60, transparent: true, opacity: 0.9 });
         const mesh = new THREE.Mesh(geometry, material); mesh.position.set(n.x, n.y, n.z);
         mesh.userData = { nodeId: n.id, label: n.label, ward: n.ward, type: n.type, wardColor }; scene.add(mesh); n.mesh = mesh; nodeMeshes.push(mesh);
         const glowGeo = new THREE.SphereGeometry(size * 2.5, 12, 12);
@@ -1468,21 +1599,35 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         const a = nodeMap[e.from], b = nodeMap[e.to];
         const points = [new THREE.Vector3(a.x, a.y, a.z), new THREE.Vector3(b.x, b.y, b.z)];
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({ color: COLORS.edge, transparent: true, opacity: 0.25 });
+        const material = new THREE.LineBasicMaterial({ color: COLORS.edge, transparent: true, opacity: 0.4 });
         const line = new THREE.Line(geometry, material); line.userData = { from: e.from, to: e.to }; scene.add(line); edgeMeshes.push(line);
     });
 
     const transmissionParticles = [];
+    const SWARM_COUNT = 18; // particles per transmission
     function createTransmissionParticle(fromId, toId) {
         const a = nodeMap[fromId], b = nodeMap[toId];
-        const geo = new THREE.SphereGeometry(2, 8, 8);
-        const mat = new THREE.MeshBasicMaterial({ color: COLORS.particle, transparent: true, opacity: 1 });
-        const mesh = new THREE.Mesh(geo, mat); mesh.position.set(a.x, a.y, a.z); scene.add(mesh);
-        const trailPositions = []; for (let i = 0; i < 8; i++) trailPositions.push(a.x, a.y, a.z);
-        const trailGeo = new THREE.BufferGeometry(); trailGeo.setAttribute('position', new THREE.Float32BufferAttribute(trailPositions, 3));
-        const trailMat = new THREE.LineBasicMaterial({ color: COLORS.particle, transparent: true, opacity: 0.3 });
-        const trail = new THREE.Line(trailGeo, trailMat); scene.add(trail);
-        transmissionParticles.push({ mesh, trail, trailGeo, from: new THREE.Vector3(a.x, a.y, a.z), to: new THREE.Vector3(b.x, b.y, b.z), progress: 0, targetId: toId, speed: 0.012 + Math.random() * 0.008, trailPositions: trailPositions.slice() });
+        const from = new THREE.Vector3(a.x, a.y, a.z);
+        const to = new THREE.Vector3(b.x, b.y, b.z);
+        const swarm = [];
+        for (let i = 0; i < SWARM_COUNT; i++) {
+            const size = 0.4 + Math.random() * 0.8;
+            const geo = new THREE.SphereGeometry(size, 4, 4);
+            const mat = new THREE.MeshBasicMaterial({ color: COLORS.particle, transparent: true, opacity: 0.8 + Math.random() * 0.2 });
+            const mesh = new THREE.Mesh(geo, mat); mesh.position.copy(from); scene.add(mesh);
+            // Each particle has its own offset, speed variation, and drift
+            swarm.push({
+                mesh, delay: i * 0.012 + Math.random() * 0.04,
+                drift: new THREE.Vector3((Math.random()-0.5)*12, (Math.random()-0.5)*12, (Math.random()-0.5)*12),
+                speedVar: 0.85 + Math.random() * 0.3,
+                baseOpacity: 0.5 + Math.random() * 0.5
+            });
+        }
+        // Add a faint glow line along the edge that builds up
+        const edgeGlowGeo = new THREE.BufferGeometry().setFromPoints([from.clone(), from.clone()]);
+        const edgeGlowMat = new THREE.LineBasicMaterial({ color: COLORS.particle, transparent: true, opacity: 0.15 });
+        const edgeGlow = new THREE.Line(edgeGlowGeo, edgeGlowMat); scene.add(edgeGlow);
+        transmissionParticles.push({ swarm, edgeGlow, edgeGlowGeo, from: from.clone(), to: to.clone(), progress: 0, targetId: toId, speed: 0.01 + Math.random() * 0.006 });
     }
 
     const infectedSet = new Set();
@@ -1491,9 +1636,9 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     function resetSimulation() {
         infectedSet.clear();
-        transmissionParticles.forEach(p => { scene.remove(p.mesh); scene.remove(p.trail); }); transmissionParticles.length = 0;
+        transmissionParticles.forEach(p => { p.swarm.forEach(s => scene.remove(s.mesh)); scene.remove(p.edgeGlow); }); transmissionParticles.length = 0;
         Object.values(nodeMap).forEach(n => { n.infected = false; n.mesh.material.color.setHex(COLORS.healthy); n.mesh.material.emissive.setHex(0x000000); n.glow.material.opacity = 0; });
-        edgeMeshes.forEach(e => { e.material.color.setHex(COLORS.edge); e.material.opacity = 0.25; });
+        edgeMeshes.forEach(e => { e.material.color.setHex(COLORS.edge); e.material.opacity = 0.4; });
         simQueue = [];
         const visited = new Set(); const queue = [1]; visited.add(1); infectNode(1);
         while (queue.length > 0) { const current = queue.shift(); const downstream = edgeData.filter(e => e.from === current && !visited.has(e.to)); downstream.forEach(e => { visited.add(e.to); simQueue.push({ from: current, to: e.to }); queue.push(e.to); }); }
@@ -1531,7 +1676,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     function resetHighlight() {
         nodeMeshes.forEach(m => { m.material.opacity = 0.9; });
-        edgeMeshes.forEach(e => { const fi = nodeMap[e.userData.from].infected, ti = nodeMap[e.userData.to].infected; if (fi && ti) { e.material.color.setHex(COLORS.edgeInfected); e.material.opacity = 0.5; } else { e.material.color.setHex(COLORS.edge); e.material.opacity = 0.25; } });
+        edgeMeshes.forEach(e => { const fi = nodeMap[e.userData.from].infected, ti = nodeMap[e.userData.to].infected; if (fi && ti) { e.material.color.setHex(COLORS.edgeInfected); e.material.opacity = 0.5; } else { e.material.color.setHex(COLORS.edge); e.material.opacity = 0.4; } });
     }
 
     let time = 0, orbitAngle = 0;
@@ -1554,18 +1699,43 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         if (simQueue.length === 0 && transmissionParticles.length === 0 && infectedSet.size > 1) { simTimer = -200; if (simTimer === -200) { setTimeout(() => resetSimulation(), 4000); simQueue.push({}); } }
         for (let i = transmissionParticles.length - 1; i >= 0; i--) {
             const p = transmissionParticles[i]; p.progress += p.speed;
-            if (p.progress >= 1) {
+            // Check if all particles have arrived
+            const allArrived = p.progress >= 1.15;
+            if (allArrived) {
                 infectNode(p.targetId);
                 edgeData.forEach((ed, idx) => { if ((ed.from === p.targetId || ed.to === p.targetId) && nodeMap[ed.from].infected && nodeMap[ed.to].infected) { edgeMeshes[idx].material.color.setHex(COLORS.edgeInfected); edgeMeshes[idx].material.opacity = 0.5; } });
-                scene.remove(p.mesh); scene.remove(p.trail); transmissionParticles.splice(i, 1); continue;
+                p.swarm.forEach(s => scene.remove(s.mesh));
+                scene.remove(p.edgeGlow); transmissionParticles.splice(i, 1); continue;
             }
-            const pos = new THREE.Vector3().lerpVectors(p.from, p.to, p.progress);
-            pos.y += Math.sin(p.progress * Math.PI) * 15;
-            p.mesh.position.copy(pos); p.mesh.material.opacity = 1 - p.progress * 0.3;
-            const positions = p.trailGeo.attributes.position.array;
-            for (let t = positions.length - 3; t >= 3; t -= 3) { positions[t] = positions[t-3]; positions[t+1] = positions[t-2]; positions[t+2] = positions[t-1]; }
-            positions[0] = pos.x; positions[1] = pos.y; positions[2] = pos.z;
-            p.trailGeo.attributes.position.needsUpdate = true;
+            // Update edge glow line to show progress
+            const glowEnd = new THREE.Vector3().lerpVectors(p.from, p.to, Math.min(p.progress * 1.1, 1));
+            const glowPositions = p.edgeGlowGeo.attributes.position.array;
+            glowPositions[3] = glowEnd.x; glowPositions[4] = glowEnd.y; glowPositions[5] = glowEnd.z;
+            p.edgeGlowGeo.attributes.position.needsUpdate = true;
+            p.edgeGlow.material.opacity = 0.2 + Math.sin(time * 0.1) * 0.05;
+            // Animate each swarm particle
+            p.swarm.forEach(s => {
+                const particleProgress = Math.max(0, Math.min(1, (p.progress - s.delay) * s.speedVar));
+                if (particleProgress <= 0) { s.mesh.visible = false; return; }
+                s.mesh.visible = true;
+                const basePos = new THREE.Vector3().lerpVectors(p.from, p.to, particleProgress);
+                // Add arc and drift
+                const arcHeight = Math.sin(particleProgress * Math.PI) * 12;
+                basePos.y += arcHeight;
+                // Drift diminishes as particle approaches target
+                const driftScale = Math.sin(particleProgress * Math.PI) * 0.8;
+                basePos.x += s.drift.x * driftScale;
+                basePos.y += s.drift.y * driftScale;
+                basePos.z += s.drift.z * driftScale;
+                s.mesh.position.copy(basePos);
+                // Fade: bright in middle, fade at arrival
+                const fadeIn = Math.min(1, particleProgress * 4);
+                const fadeOut = particleProgress > 0.8 ? 1 - (particleProgress - 0.8) / 0.2 : 1;
+                s.mesh.material.opacity = s.baseOpacity * fadeIn * fadeOut;
+                // Slight pulse
+                const pulse = 1 + Math.sin(time * 0.15 + s.delay * 20) * 0.15;
+                s.mesh.scale.setScalar(pulse);
+            });
         }
         renderer.render(scene, camera);
     }
