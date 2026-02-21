@@ -1,14 +1,14 @@
 {
   "meta": {
-    "title": "NosoTrack — Real-Time Nosocomial Outbreak Analytics",
-    "description": "NosoTrack infers who infected whom in near real-time, empowering hospital infection prevention teams to stop outbreaks before they escalate."
+    "title": "NosoTrack",
+    "description": ""
   },
 
   "nav": {
     "logo": "NosoTrack",
     "links": [
       { "label": "About", "href": "#about" },
-      { "label": "Process", "href": "#how-it-works" },
+      { "label": "Platform", "href": "#how-it-works" },
       { "label": "Research", "href": "#research" },
       { "label": "Team", "href": "#team" }
     ],
@@ -17,29 +17,28 @@
 
   "hero": {
     "eyebrow": "Real-Time Outbreak Analytics",
-    "title": ["Track. Trace.", "Intervene."],
-    "subtitle": "NosoTrack infers who infected whom in near real-time, empowering hospital infection prevention teams to stop outbreaks before they escalate.",
+    "title": ["Track.", "Intervene.", "Protect."],
+    "subtitle": "NosoTrack infers who infected whom in real-time, empowering hospital Infection Prevention Teams to stop outbreaks before they escalate.",
     "primaryCta": { "label": "Learn More", "href": "#about" },
     "secondaryCta": { "label": "Collaborate", "href": "#contact" }
   },
 
   "marquee": [
-    "Outbreak Reconstruction",
     "Contact Tracing",
     "Genomic Surveillance",
-    "Transmission Trees",
-    "Real-Time Analytics",
-    "Infection Prevention",
-    "Hospital Epidemiology",
-    "Superspreader Detection"
+    "Outbreak Reconstruction",
+    "Case Detection",
+    "Superspreader Detection",
+    "Importation Events Detection",
+    "Infection Prevention & Control"
   ],
 
   "about": {
-    "tag": "01 — About",
-    "title": ["The Problem", "& The Solution"],
+    "tag": "About",
+    "title": ["Nosocomial Outbreaks"],
     "paragraphs": [
-      "<strong>Healthcare-associated infections (HAIs)</strong> affect approximately 1 in 10 patients worldwide, causing significant morbidity, mortality, and economic strain on healthcare systems. <strong>Nosocomial outbreaks</strong> driven by person-to-person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides difficile</em>, <em>Klebsiella pneumoniae</em>, and MRSA generate the most acute clinical and operational crises: triggering staff shortages, ward closures, and delayed procedures. Current control measures rely on broad testing and isolation protocols, but <strong>effective intervention requires identifying the specific drivers of an outbreak</strong>: such as patient zero, superspreaders, transmission routes, and undetected or imported cases.",
-      "<span class=\"nosotrack-highlight\">NosoTrack</span> <strong>is an outbreak analytics platform that infers who infected whom in near real-time</strong> by integrating data from hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings and actionable reports, enabling hospital infection prevention teams to target interventions promptly before an outbreak escalates."
+      "<strong>Healthcare-associated infections (HAIs)</strong> affect approximately 1 in 10 patients worldwide, causing significant morbidity, mortality, and economic strain on healthcare systems. <strong>Nosocomial outbreaks</strong> driven by person-to-person transmitted pathogens such as <strong>SARS-CoV-2</strong>, <strong>Clostridioides difficile</strong>, <strong>Klebsiella pneumoniae</strong>, and <strong>MRSA</strong> generate the most acute clinical and operational crises: triggering staff shortages, ward closures, and delayed procedures. Current control measures rely on broad testing and isolation protocols, but <strong>effective intervention requires identifying the specific drivers of an outbreak</strong>: such as patient zero, superspreaders, transmission routes, and undetected or imported cases.",
+      "<span class=\"nosotrack-noso\">Noso</span><span class=\"nosotrack-highlight\">Track</span> <strong>is an outbreak analytics platform that infers who infected whom in near real-time</strong> by integrating data from hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings and actionable reports, enabling hospital Infection Prevention Teams to <strong> devise targeted interventions promptly before an outbreak escalates.</strong>"
     ],
     "stats": [
       { "label": "Cases", "value": "2.0M", "detail": "US per year" },
@@ -63,10 +62,10 @@
     }
   },
 
-  "process": {
-    "tag": "02 — Process",
+  "platform": {
+    "tag": "Platform",
     "title": "How It Works",
-    "subtitle": "Three data streams converge into the NosoTrack pipeline — anonymised, merged, and analysed to reconstruct transmission chains and trigger real-time alerts.",
+    "subtitle": "NosoTrack integrates various data streams into a unified Bayesian analytics engine that infers transmission chains in near real-time.",
     "steps": {
       "inputs": {
         "stepNum": "01",
@@ -74,20 +73,20 @@
         "cards": [
           {
             "tag": "Genomic",
-            "title": "DNA Sequencing",
-            "desc": "Pathogen genomes are sequenced, providing phylogenetic signal for transmission linkage.",
+            "title": "DNA/RNA Sequencing",
+            "desc": "Pathogen genomes provide phylogenetic signal for transmission inference.",
             "viz": "dna"
           },
           {
             "tag": "Proximity",
             "title": "Contact Tracing",
-            "desc": "Bluetooth-enabled devices record proximity events between patients and staff.",
+            "desc": "Bluetooth-enabled sensors record contacts between patients and staff.",
             "viz": "contact"
           },
           {
             "tag": "Clinical",
-            "title": "Health Records",
-            "desc": "Electronic Health Records provide ward movements, test results, and clinical timelines.",
+            "title": "Electronic Health Records",
+            "desc": "EHR provide information on admission & discharge dates, ward assignements, and test results.",
             "viz": "ehr"
           }
         ]
@@ -97,15 +96,15 @@
         "stepLabel": "Anonymisation",
         "tag": "GDPR Compliance",
         "title": "Data Anonymisation",
-        "desc": "Patient identifiers are stripped, hashed, and encrypted before any analysis — ensuring full GDPR compliance. All three data streams are processed through a secure anonymisation layer.",
+        "desc": "Patient identifiers are stripped, hashed, and encrypted before analysis, ensuring full GDPR compliance.",
         "viz": "anon"
       },
       "engine": {
         "stepNum": "03",
         "stepLabel": "Core Platform",
-        "tag": "Analytics Engine",
-        "title": "NosoTrack Engine",
-        "desc": "Anonymised data streams are fused into a unified temporal contact network. The engine runs Bayesian phylodynamic models in near real-time, combining genomic distances, contact matrices, and ward movements to infer transmission probabilities and reconstruct who infected whom.",
+        "tag": "NosoTrack Engine",
+        "title": "Transmission Tree Inference",
+        "desc": "NosoTrack uses Bayesian inference to probabilistically reconstruct transmission trees.",
         "features": [
           { "title": "Data Fusion", "desc": "Genomic + contact + EHR integration" },
           { "title": "Bayesian Models", "desc": "Phylodynamic transmission inference" },
@@ -114,19 +113,19 @@
       },
       "earlyWarning": {
         "stepNum": "04",
-        "stepLabel": "Action",
+        "stepLabel": "Intervention",
         "tag": "Alerts",
         "title": "Early Warning System",
-        "desc": "Real-time alerts and reports are dispatched to infection prevention teams before outbreaks escalate — enabling rapid containment and ward-level interventions.",
+        "desc": "Real-time alerts and reports are dispatched to Infection Prevention Teams with suggested intervention stragegies based on current transmission dynamics.",
         "viz": "alert"
       }
     }
   },
 
   "research": {
-    "tag": "03 — Research",
-    "title": ["Publications", "& Software"],
-    "intro": "Novel computational methods that reconstruct who infected whom from clinical, contact, and genetic data have proven effective in guiding outbreak control across pathogens such as SARS-CoV-2, influenza, Ebola, and antimicrobial-resistant bacteria. Yet, they remain largely retrospective, with no integration into routine hospital surveillance. What is lacking is an automated system capable of deploying these models in near real-time: this is the aim of <span class=\"nosotrack-highlight\">NosoTrack</span>.",
+    "tag": "Research",
+    "title": ["Publications & Software"],
+    "intro": "<span class=\"nosotrack-noso\">Noso</span><span class=\"nosotrack-highlight\">Track</span> builds on over a decade of research in outbreak reconstruction methods, with a focus on integrating genomic and contact data to infer transmission trees. Our team and collaborators have published extensively on methodological advances and real-world applications, including the development of the <em>outbreaker2</em> R package and the <em>linktree</em> method for inferring staff-patient transmission patterns. We are committed to open science, with all our software freely available and our publications accessible to the public.",
     "publications": [
       {
         "tag": "Paper",
@@ -170,8 +169,8 @@
   },
 
   "team": {
-    "tag": "04 — Team",
-    "title": ["The People", "Behind NosoTrack"],
+    "tag": "Team",
+    "title": [""],
     "members": [
       {
         "name": "Dr Cyril Geismar",
@@ -201,7 +200,7 @@
   },
 
   "contact": {
-    "tag": "05 — Contact",
+    "tag": "Contact",
     "title": ["Let's Work", "Together"],
     "subtitle": "We are actively seeking collaborations and funding. Please reach out!",
     "github": { "label": "github.com/CyGei", "url": "https://github.com/CyGei" },

@@ -33,8 +33,8 @@
             --bg-card: rgba(255, 255, 255, 0.075);
             --bg-card-hover: rgba(255, 255, 255, 0.12);
             --text-primary: #ffffff;
-            --text-secondary: #aaaaaa;
-            --text-dim: #888888;
+            --text-secondary: #ecececff;
+            --text-dim: #dededeff;
             --border: rgba(255,255,255,0.1);
             --mono: 'JetBrains Mono', monospace;
             --display: 'Source Sans Pro', sans-serif;
@@ -182,8 +182,12 @@
         }
         .about-text strong { color: var(--text-primary); font-weight: 500; }
         .about-text em { color: var(--text-secondary); font-style: italic; }
+        .nosotrack-noso {
+            color: var(--text-primary); font-weight: 700;
+            font-family: var(--mono); font-size: 1rem;
+        }
         .nosotrack-highlight {
-            color: var(--accent); font-weight: 600;
+            color: var(--accent); font-weight: 700;
             font-family: var(--mono); font-size: 1rem;
         }
 
@@ -482,7 +486,7 @@
         <a href="#" class="nav-logo">Noso<span>Track</span></a>
         <ul class="nav-links" id="navLinks">
             <li><a href="#about">About</a></li>
-            <li><a href="#how-it-works">Process</a></li>
+            <li><a href="#how-it-works">Platform</a></li>
             <li><a href="#research">Research</a></li>
             <li><a href="#team">Team</a></li>
             <li><a href="#contact" class="nav-cta">Get in Touch</a></li>
@@ -502,7 +506,6 @@
             Track. Trace.<br><span class="accent">Intervene.</span>
         </h1>
         <p class="hero-subtitle">
-            NosoTrack infers who infected whom in near real-time, empowering hospital infection prevention teams to stop outbreaks before they escalate.
         </p>
         <div class="hero-buttons">
             <a href="#about" class="btn-primary">Learn More &darr;</a>
@@ -539,32 +542,35 @@
         <div class="about-text reveal">
             <span class="section-tag">01 — About</span>
             <h2 class="section-title">The Problem<br>& The Solution</h2>
+
+            <!-- Burden stats (moved here) -->
+            <div class="about-stats reveal">
+                <div class="about-stat">
+                    <div class="about-stat-label">Cases</div>
+                    <div class="about-stat-value">2.0M</div>
+                    <div class="about-stat-detail">US per year</div>
+                </div>
+                <div class="about-stat">
+                    <div class="about-stat-label">Deaths</div>
+                    <div class="about-stat-value">100K</div>
+                    <div class="about-stat-detail">US per year</div>
+                </div>
+                <div class="about-stat">
+                    <div class="about-stat-label">Cost</div>
+                    <div class="about-stat-value">$40B+</div>
+                    <div class="about-stat-detail">US per year</div>
+                </div>
+            </div>
+
             <p>
                 <strong>Healthcare-associated infections (HAIs)</strong> affect approximately 1 in 10 patients worldwide, causing significant morbidity, mortality, and economic strain on healthcare systems. <strong>Nosocomial outbreaks</strong> driven by person-to-person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides difficile</em>, <em>Klebsiella pneumoniae</em>, and MRSA generate the most acute clinical and operational crises: triggering staff shortages, ward closures, and delayed procedures. Current control measures rely on broad testing and isolation protocols, but <strong>effective intervention requires identifying the specific drivers of an outbreak</strong>: such as patient zero, superspreaders, transmission routes, and undetected or imported cases.
             </p>
             <p>
-                <span class="nosotrack-highlight">NosoTrack</span> <strong>is an outbreak analytics platform that infers who infected whom in near real-time</strong> by integrating data from hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings and actionable reports, enabling hospital infection prevention teams to target interventions promptly before an outbreak escalates.
+                <span class="nosotrack-noso">Noso</span><span class="nosotrack-highlight">Track</span> <strong>is an outbreak analytics platform that infers who infected whom in near real-time</strong> by integrating data from hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings and actionable reports, enabling hospital infection prevention teams to target interventions promptly before an outbreak escalates.
             </p>
         </div>
 
-        <!-- Burden stats -->
-        <div class="about-stats reveal">
-            <div class="about-stat">
-                <div class="about-stat-label">Cases</div>
-                <div class="about-stat-value">2.0M</div>
-                <div class="about-stat-detail">US per year</div>
-            </div>
-            <div class="about-stat">
-                <div class="about-stat-label">Deaths</div>
-                <div class="about-stat-value">100K</div>
-                <div class="about-stat-detail">US per year</div>
-            </div>
-            <div class="about-stat">
-                <div class="about-stat-label">Cost</div>
-                <div class="about-stat-value">$40B+</div>
-                <div class="about-stat-detail">US per year</div>
-            </div>
-        </div>
+        
 
         <!-- 3D Transmission Network -->
         <div class="reveal">
@@ -593,7 +599,7 @@
 <section id="how-it-works" class="section-padding">
     <canvas id="pipeline-bg"></canvas>
     <div class="container pipeline-wrap">
-        <span class="section-tag reveal">02 — Process</span>
+        <span class="section-tag reveal">Platform</span>
         <h2 class="section-title reveal">How It Works</h2>
         <p class="pipeline-subtitle reveal">Three data streams converge into the NosoTrack pipeline — anonymised, merged, and analysed to reconstruct transmission chains and trigger real-time alerts.</p>
 
@@ -657,20 +663,15 @@
             <div class="pipeline-step reveal">
                 <div class="pipeline-step-badge">
                     <div class="pipeline-step-num">03</div>
-                    <div class="pipeline-step-label">Core Platform</div>
+                    <div class="pipeline-step-label">Intelligence Platform</div>
                 </div>
                 <div class="pipeline-single">
                     <div class="p-card p-card--engine" data-pipeline="engine">
                         <div class="p-card-glow"></div>
                         <canvas class="p-card-canvas" data-viz="engine" id="engine-canvas"></canvas>
-                        <div class="p-card-tag">Analytics Engine</div>
-                        <div class="p-card-title">NosoTrack Engine</div>
-                        <div class="p-card-desc">Anonymised data streams are fused into a unified temporal contact network. The engine runs Bayesian phylodynamic models in near real-time, combining genomic distances, contact matrices, and ward movements to infer transmission probabilities and reconstruct who infected whom.</div>
-                        <div class="engine-features">
-                            <div class="engine-feat"><strong>Data Fusion</strong>Genomic + contact + EHR integration</div>
-                            <div class="engine-feat"><strong>Bayesian Models</strong>Phylodynamic transmission inference</div>
-                            <div class="engine-feat"><strong>Real-Time</strong>Near real-time pipeline processing</div>
-                        </div>
+                        <div class="p-card-tag"></div>
+                        <div class="p-card-title"></div>
+                        <div class="p-card-desc"></div>
                     </div>
                 </div>
             </div>
@@ -705,7 +706,6 @@
         <span class="section-tag reveal">03 — Research</span>
         <h2 class="section-title reveal">Publications<br>& Software</h2>
         <p class="research-intro reveal">
-            Novel computational methods that reconstruct who infected whom from clinical, contact, and genetic data have proven effective in guiding outbreak control across pathogens such as SARS-CoV-2, influenza, Ebola, and antimicrobial-resistant bacteria. Yet, they remain largely retrospective, with no integration into routine hospital surveillance. What is lacking is an automated system capable of deploying these models in near real-time: this is the aim of <span class="nosotrack-highlight">NosoTrack</span>.
         </p>
 
         <h3 class="research-sub reveal">Selected Publications</h3>
@@ -757,8 +757,8 @@
 <!-- ========== TEAM ========== -->
 <section id="team" class="section-padding">
     <div class="container">
-        <span class="section-tag reveal">04 — Team</span>
-        <h2 class="section-title reveal">The People<br>Behind NosoTrack</h2>
+        <span class="section-tag reveal">Team</span>
+        <h2 class="section-title reveal">Meet the Team</h2>
         <div class="team-grid">
             <div class="team-card reveal">
                 <img src="images/cyril.jpg" alt="Dr Cyril Geismar" class="team-photo">
@@ -834,10 +834,10 @@
             <div class="footer-logo">Noso<span>Track</span></div>
             <ul class="footer-links">
                 <li><a href="#about">About</a></li>
+                <li><a href="#how-it-works">Platform</a></li>
                 <li><a href="#research">Research</a></li>
                 <li><a href="#team">Team</a></li>
                 <li><a href="#contact">Contact</a></li>
-                <li><a href="https://github.com/CyGei" target="_blank">GitHub</a></li>
             </ul>
             <div class="footer-copy">&copy; Cyril Geismar.</div>
         </div>
@@ -933,6 +933,7 @@ const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
 }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+window.__revealObserver = observer;
 
 // ==========================================
 // PIPELINE — 4-step flow with mini-canvas
@@ -1079,15 +1080,89 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     function vizAnon() {
         const v = vizCanvases.anon; if (!v) return;
         const { ctx, w, h } = v; ctx.clearRect(0, 0, w, h);
-        const cx = w/2, cy = h/2, sw = 32, sh = 38;
-        ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.moveTo(cx, cy - sh); ctx.quadraticCurveTo(cx + sw, cy - sh*0.6, cx + sw, cy); ctx.quadraticCurveTo(cx + sw*0.6, cy + sh*0.6, cx, cy + sh); ctx.quadraticCurveTo(cx - sw*0.6, cy + sh*0.6, cx - sw, cy); ctx.quadraticCurveTo(cx - sw, cy - sh*0.6, cx, cy - sh); ctx.stroke();
-        const rows = ['John Smith','DOB: 1985-03','MRN: 47291','Ward: B'], redactPhase = (frame * 0.008) % 1;
-        rows.forEach((text, i) => { const x = cx - sw - 50, y = cy - 22 + i * 14; ctx.font = `300 7px ${MONO}`; const fade = Math.max(0, 1 - redactPhase * 3 + i * 0.3); ctx.fillStyle = `rgba(255,255,255,${fade*0.25})`; ctx.textAlign = 'left'; ctx.fillText(text, x, y); const barW = Math.min(1, Math.max(0, redactPhase * 3 - i * 0.3)) * ctx.measureText(text).width; if (barW > 0) { ctx.fillStyle = 'rgba(255,7,58,0.2)'; ctx.fillRect(x-1, y-7, barW+2, 10); } });
-        const anon = ['HASH_7f3a','****-**','ID: \u2588\u2588\u2588\u2588','Ward: B'];
-        anon.forEach((text, i) => { const x = cx + sw + 12, y = cy - 22 + i * 14; const appear = Math.max(0, Math.min(1, redactPhase * 3 - 1 - i * 0.2)); ctx.font = `300 7px ${MONO}`; ctx.fillStyle = `rgba(100,255,100,${appear*0.35})`; ctx.textAlign = 'left'; ctx.fillText(text, x, y); });
-        const scanY = cy - sh + ((frame * 0.7) % (sh * 2));
-        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = 0.25; ctx.beginPath(); ctx.moveTo(cx - sw, scanY); ctx.lineTo(cx + sw, scanY); ctx.stroke(); ctx.globalAlpha = 1;
+
+        // Full cycle: 0-60% transform rows one by one, 60-85% hold, 85-100% fade out
+        const cycle = (frame * 0.007) % 1;
+        const TRANSFORM_END = 0.60, HOLD_END = 0.85;
+        const globalFade = cycle > HOLD_END ? 1 - (cycle - HOLD_END) / (1 - HOLD_END) : 1;
+
+        const fields = [
+            { raw: 'Smith, John',   anon: 'ID_7f3a9b'                        },
+            { raw: 'DOB 1985-03',   anon: '****-**'                           },
+            { raw: 'MRN 47291',     anon: 'REF \u2588\u2588\u2588\u2588\u2588' },
+            { raw: 'Room 14-B',     anon: 'LOC_\u2588\u2588\u2588'            },
+            { raw: 'Ward: B',       anon: 'Zone: B'                           },
+            { raw: 'Nurse: Evans',  anon: 'STAFF_A3'                          },
+            { raw: 'PCR+',          anon: 'CASE_POS'                          },
+        ];
+        const nRows = fields.length;
+        const headerH = 13, statusH = 8, topPad = 2;
+        const rowH = Math.floor((h - headerH - statusH - topPad) / nRows);
+        const tableH = nRows * rowH;
+        const topY = topPad;
+        const headerY = topY + headerH - 3;
+        const startY = topY + headerH + 1;
+        const midX = w / 2;
+        const leftX = 8, rightX = midX + 8;
+
+        // Column labels
+        ctx.font = `400 5.5px ${MONO}`; ctx.textAlign = 'left';
+        ctx.fillStyle = `rgba(255,255,255,${0.22 * globalFade})`;
+        ctx.fillText('IDENTIFIABLE', leftX, headerY);
+        ctx.fillStyle = `rgba(120,255,120,${0.28 * globalFade})`;
+        ctx.fillText('ANONYMISED', rightX, headerY);
+
+        // Centre divider
+        ctx.strokeStyle = `rgba(255,7,58,${0.15 * globalFade})`; ctx.lineWidth = 1;
+        ctx.setLineDash([2, 4]);
+        ctx.beginPath(); ctx.moveTo(midX, topY + 2); ctx.lineTo(midX, topY + headerH + tableH); ctx.stroke();
+        ctx.setLineDash([]);
+
+        fields.forEach((f, i) => {
+            const y = startY + i * rowH;
+            // Each row transforms in a 0.14-wide window, staggered across TRANSFORM_END
+            const rowStart = (i / nRows) * TRANSFORM_END;
+            const t = Math.max(0, Math.min(1, (cycle - rowStart) / 0.14));
+
+            // Left: raw text — clear before transform, dim after
+            const rawAlpha = t < 0.5 ? 0.38 : Math.max(0.06, 0.38 - (t - 0.5) * 0.64);
+            ctx.font = `300 7px ${MONO}`; ctx.textAlign = 'left';
+            ctx.fillStyle = `rgba(255,255,255,${rawAlpha * globalFade})`;
+            ctx.fillText(f.raw, leftX, y);
+
+            // Red redaction bar sweeping over raw text
+            if (t > 0.2) {
+                const barT = Math.min(1, (t - 0.2) / 0.4);
+                const fullW = ctx.measureText(f.raw).width;
+                ctx.fillStyle = `rgba(255,7,58,${barT * 0.25 * globalFade})`;
+                ctx.fillRect(leftX - 1, y - 8, fullW * barT + 2, 10);
+            }
+
+            // Centre: arrow pulses during the transform window
+            if (t > 0.15 && t < 0.9) {
+                const arrowAlpha = Math.sin(((t - 0.15) / 0.75) * Math.PI) * 0.45;
+                ctx.font = `400 7px ${MONO}`; ctx.textAlign = 'center';
+                ctx.fillStyle = `rgba(255,7,58,${arrowAlpha * globalFade})`;
+                ctx.fillText('\u2192', midX, y);
+            }
+
+            // Right: anonymised value fades in after redaction starts
+            const anonAlpha = t > 0.45 ? Math.min(0.55, (t - 0.45) / 0.4) : 0;
+            ctx.font = `300 7px ${MONO}`; ctx.textAlign = 'left';
+            ctx.fillStyle = `rgba(120,255,120,${anonAlpha * globalFade})`;
+            ctx.fillText(f.anon, rightX, y);
+        });
+
+        // Status label
+        const statusY = topY + headerH + tableH + 6;
+        ctx.font = `400 5.5px ${MONO}`; ctx.textAlign = 'left';
+        if (cycle < TRANSFORM_END) {
+            ctx.fillStyle = `rgba(255,7,58,${(0.3 + Math.sin(frame * 0.06) * 0.08) * globalFade})`;
+            ctx.fillText('ANONYMISING...', leftX, statusY);
+        } else if (cycle < HOLD_END) {
+            ctx.fillStyle = `rgba(120,255,120,${0.35 * globalFade})`;
+            ctx.fillText('GDPR COMPLIANT \u2713', leftX, statusY);
+        }
     }
 
     // Alert dispatch
@@ -1415,11 +1490,11 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         ctx.restore();
 
         // "NosoTrack" label to the right of virus
-        ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.6;
+        ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.5;
         ctx.font = `600 11px "Source Sans Pro", sans-serif`;
         ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
         ctx.fillText('Noso', logoCx + coreR + spikeLen + 6, logoCy - 1);
-        ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.5;
+        ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.6;
         ctx.fillText('Track', logoCx + coreR + spikeLen + 6 + ctx.measureText('Noso').width, logoCy - 1);
         ctx.globalAlpha = 1; ctx.textBaseline = 'alphabetic';
     }
@@ -1707,5 +1782,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 })();
 </script>
 
+<script src="content-loader.js"></script>
 </body>
 </html>
