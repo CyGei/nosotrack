@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "title": "NosoTrack — Real-Time Nosocomial Outbreak Analytics",
+    "description": "NosoTrack infers who infected whom in near real-time, empowering hospital infection prevention teams to stop outbreaks before they escalate."
+  },
+
+  "nav": {
+    "logo": "NosoTrack",
+    "links": [
+      { "label": "About", "href": "#about" },
+      { "label": "Process", "href": "#how-it-works" },
+      { "label": "Research", "href": "#research" },
+      { "label": "Team", "href": "#team" }
+    ],
+    "cta": { "label": "Get in Touch", "href": "#contact" }
+  },
+
+  "hero": {
+    "eyebrow": "Real-Time Outbreak Analytics",
+    "title": ["Track. Trace.", "Intervene."],
+    "subtitle": "NosoTrack infers who infected whom in near real-time, empowering hospital infection prevention teams to stop outbreaks before they escalate.",
+    "primaryCta": { "label": "Learn More", "href": "#about" },
+    "secondaryCta": { "label": "Collaborate", "href": "#contact" }
+  },
+
+  "marquee": [
+    "Outbreak Reconstruction",
+    "Contact Tracing",
+    "Genomic Surveillance",
+    "Transmission Trees",
+    "Real-Time Analytics",
+    "Infection Prevention",
+    "Hospital Epidemiology",
+    "Superspreader Detection"
+  ],
+
+  "about": {
+    "tag": "01 — About",
+    "title": ["The Problem", "& The Solution"],
+    "paragraphs": [
+      "<strong>Healthcare-associated infections (HAIs)</strong> affect approximately 1 in 10 patients worldwide, causing significant morbidity, mortality, and economic strain on healthcare systems. <strong>Nosocomial outbreaks</strong> driven by person-to-person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides difficile</em>, <em>Klebsiella pneumoniae</em>, and MRSA generate the most acute clinical and operational crises: triggering staff shortages, ward closures, and delayed procedures. Current control measures rely on broad testing and isolation protocols, but <strong>effective intervention requires identifying the specific drivers of an outbreak</strong>: such as patient zero, superspreaders, transmission routes, and undetected or imported cases.",
+      "<span class=\"nosotrack-highlight\">NosoTrack</span> <strong>is an outbreak analytics platform that infers who infected whom in near real-time</strong> by integrating data from hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings and actionable reports, enabling hospital infection prevention teams to target interventions promptly before an outbreak escalates."
+    ],
+    "stats": [
+      { "label": "Cases", "value": "2.0M", "detail": "US per year" },
+      { "label": "Deaths", "value": "100K", "detail": "US per year" },
+      { "label": "Cost", "value": "$40B+", "detail": "US per year" }
+    ],
+    "vizLegend": {
+      "types": [
+        { "label": "Patient", "shape": "dot", "color": "#888" },
+        { "label": "Staff", "shape": "triangle", "color": "#888" }
+      ],
+      "wards": [
+        { "label": "Ward A", "color": "rgba(100,150,255,0.7)" },
+        { "label": "Ward B", "color": "rgba(255,150,100,0.7)" },
+        { "label": "Ward C", "color": "rgba(150,255,100,0.7)" }
+      ],
+      "status": [
+        { "label": "Susceptible", "color": "#555" },
+        { "label": "Infected", "color": "#e63946" }
+      ]
+    }
+  },
+
+  "process": {
+    "tag": "02 — Process",
+    "title": "How It Works",
+    "subtitle": "Three data streams converge into the NosoTrack pipeline — anonymised, merged, and analysed to reconstruct transmission chains and trigger real-time alerts.",
+    "steps": {
+      "inputs": {
+        "stepNum": "01",
+        "stepLabel": "Data Inputs",
+        "cards": [
+          {
+            "tag": "Genomic",
+            "title": "DNA Sequencing",
+            "desc": "Pathogen genomes are sequenced, providing phylogenetic signal for transmission linkage.",
+            "viz": "dna"
+          },
+          {
+            "tag": "Proximity",
+            "title": "Contact Tracing",
+            "desc": "Bluetooth-enabled devices record proximity events between patients and staff.",
+            "viz": "contact"
+          },
+          {
+            "tag": "Clinical",
+            "title": "Health Records",
+            "desc": "Electronic Health Records provide ward movements, test results, and clinical timelines.",
+            "viz": "ehr"
+          }
+        ]
+      },
+      "anonymisation": {
+        "stepNum": "02",
+        "stepLabel": "Anonymisation",
+        "tag": "GDPR Compliance",
+        "title": "Data Anonymisation",
+        "desc": "Patient identifiers are stripped, hashed, and encrypted before any analysis — ensuring full GDPR compliance. All three data streams are processed through a secure anonymisation layer.",
+        "viz": "anon"
+      },
+      "engine": {
+        "stepNum": "03",
+        "stepLabel": "Core Platform",
+        "tag": "Analytics Engine",
+        "title": "NosoTrack Engine",
+        "desc": "Anonymised data streams are fused into a unified temporal contact network. The engine runs Bayesian phylodynamic models in near real-time, combining genomic distances, contact matrices, and ward movements to infer transmission probabilities and reconstruct who infected whom.",
+        "features": [
+          { "title": "Data Fusion", "desc": "Genomic + contact + EHR integration" },
+          { "title": "Bayesian Models", "desc": "Phylodynamic transmission inference" },
+          { "title": "Real-Time", "desc": "Near real-time pipeline processing" }
+        ]
+      },
+      "earlyWarning": {
+        "stepNum": "04",
+        "stepLabel": "Action",
+        "tag": "Alerts",
+        "title": "Early Warning System",
+        "desc": "Real-time alerts and reports are dispatched to infection prevention teams before outbreaks escalate — enabling rapid containment and ward-level interventions.",
+        "viz": "alert"
+      }
+    }
+  },
+
+  "research": {
+    "tag": "03 — Research",
+    "title": ["Publications", "& Software"],
+    "intro": "Novel computational methods that reconstruct who infected whom from clinical, contact, and genetic data have proven effective in guiding outbreak control across pathogens such as SARS-CoV-2, influenza, Ebola, and antimicrobial-resistant bacteria. Yet, they remain largely retrospective, with no integration into routine hospital surveillance. What is lacking is an automated system capable of deploying these models in near real-time: this is the aim of <span class=\"nosotrack-highlight\">NosoTrack</span>.",
+    "publications": [
+      {
+        "tag": "Paper",
+        "title": "Literature review",
+        "desc": "A systematic review of outbreak reconstruction methods.",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/35215195/"
+      },
+      {
+        "tag": "Paper",
+        "title": "A modular platform for outbreak reconstruction",
+        "desc": "The paper for outbreaker2.",
+        "url": "https://link.springer.com/article/10.1186/s12859-018-2330-z"
+      },
+      {
+        "tag": "Paper",
+        "title": "linktree",
+        "desc": "A method to infer transmission patterns between staff and patients.",
+        "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037"
+      },
+      {
+        "tag": "Paper",
+        "title": "Real time genomic surveillance for nosocomial outbreaks",
+        "desc": "Proof of concept for near real time surveillance.",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/40302215/"
+      }
+    ],
+    "software": [
+      {
+        "tag": "Software",
+        "title": "outbreaker2",
+        "desc": "Software to reconstruct transmission trees.",
+        "url": "https://github.com/reconhub/outbreaker2"
+      },
+      {
+        "tag": "Software",
+        "title": "o2ools",
+        "desc": "Software to analyse transmission trees.",
+        "url": "https://cygei.github.io/o2ools/index.html"
+      }
+    ]
+  },
+
+  "team": {
+    "tag": "04 — Team",
+    "title": ["The People", "Behind NosoTrack"],
+    "members": [
+      {
+        "name": "Dr Cyril Geismar",
+        "role": "Johns Hopkins University",
+        "photo": "images/cyril.jpg",
+        "bio": "Postdoctoral research fellow. PhD in mathematical modelling of infectious diseases at Imperial College London, focused on SARS-CoV-2 outbreak reconstruction. Executive board member and developer for the <a href=\"https://www.repidemicsconsortium.org/\" target=\"_blank\">R Epidemics Consortium</a>. Teaches outbreak analytics at <a href=\"https://sismid.sph.emory.edu/online-modules/recon-tools/index.html\" target=\"_blank\">Emory University</a> and <a href=\"https://data.org/our-work/epiverse/training-africa/course/\" target=\"_blank\">LSHTM</a>."
+      },
+      {
+        "name": "Dr Thibaut Jombart",
+        "role": "Imperial College London",
+        "photo": "images/thibaut.jpg",
+        "bio": "Senior Lecturer specialising in outbreak response analytics, biostatistics, population genetics, and R programming. Lead author of <a href=\"https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457\" target=\"_blank\">outbreaker</a> and founder of the <a href=\"https://www.repidemicsconsortium.org/\" target=\"_blank\">R Epidemics Consortium</a>. Field experience in Ebola deployments in the Democratic Republic of the Congo."
+      },
+      {
+        "name": "Dr Anne Cori",
+        "role": "Imperial College London",
+        "photo": "images/anne.jpg",
+        "bio": "Senior Lecturer specialising in real-time outbreak analysis and epidemiological parameters. Lead author of <a href=\"https://academic.oup.com/aje/article/178/9/1505/89262\" target=\"_blank\">EpiEstim</a> and co-author of <a href=\"https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457\" target=\"_blank\">outbreaker</a>. Develops statistical methods for outbreak reconstruction and rapid transmissibility assessment."
+      },
+      {
+        "name": "Dr Shaun Truelove",
+        "role": "Johns Hopkins University",
+        "photo": "images/shaun.jpg",
+        "bio": "Associate Professor focused on infectious disease dynamics and modelling for public health response and policy (COVID-19, influenza, vaccine-preventable diseases). Co-leads the <a href=\"https://scenariomodelinghub.org/\" target=\"_blank\">US Scenario Modeling Hubs</a> and <a href=\"https://insightnet.us/centers/accidda/\" target=\"_blank\">ACCIDA</a>, a consortium producing epidemic scenario projections and forecasts."
+      }
+    ]
+  },
+
+  "contact": {
+    "tag": "05 — Contact",
+    "title": ["Let's Work", "Together"],
+    "subtitle": "We are actively seeking collaborations and funding. Please reach out!",
+    "github": { "label": "github.com/CyGei", "url": "https://github.com/CyGei" },
+    "formAction": "https://formspree.io/f/maqdqzqw"
+  },
+
+  "footer": {
+    "logo": "NosoTrack",
+    "links": [
+      { "label": "About", "href": "#about" },
+      { "label": "Research", "href": "#research" },
+      { "label": "Team", "href": "#team" },
+      { "label": "Contact", "href": "#contact" },
+      { "label": "GitHub", "href": "https://github.com/CyGei", "external": true }
+    ],
+    "copy": "Cyril Geismar"
+  }
+}
