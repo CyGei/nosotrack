@@ -6,18 +6,20 @@
     <title>NosoTrack — Real-Time Nosocomial Outbreak Analytics</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         /* ========== RESET & BASE ========== */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'IBM Plex Sans', sans-serif;
             background: #0a0a0a;
             color: #e0e0e0;
             overflow-x: hidden;
             font-weight: 300;
             line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         a { color: inherit; text-decoration: none; }
         img { max-width: 100%; display: block; }
@@ -31,12 +33,12 @@
             --bg-card: #111111;
             --bg-card-hover: #1a1a1a;
             --text-primary: #f0f0f0;
-            --text-secondary: #888888;
+            --text-secondary: #999999;
             --text-dim: #555555;
             --border: rgba(255,255,255,0.06);
             --mono: 'JetBrains Mono', monospace;
-            --display: 'Syne', sans-serif;
-            --body: 'Inter', sans-serif;
+            --display: 'Plus Jakarta Sans', sans-serif;
+            --body: 'IBM Plex Sans', sans-serif;
             --container: 1200px;
         }
 
@@ -44,28 +46,30 @@
         .container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
         .section-tag {
             font-family: var(--mono);
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--accent);
             letter-spacing: 3px;
             text-transform: uppercase;
             margin-bottom: 16px;
             display: block;
+            font-weight: 400;
         }
         .section-title {
             font-family: var(--display);
             font-weight: 800;
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-size: clamp(2.2rem, 5vw, 4rem);
             color: var(--text-primary);
             line-height: 1.1;
             margin-bottom: 24px;
+            letter-spacing: -0.02em;
         }
         .section-padding { padding: 120px 0; }
 
         /* ========== SCROLL ANIMATIONS ========== */
         .reveal {
             opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .reveal.visible {
             opacity: 1;
@@ -74,268 +78,170 @@
 
         /* ========== NAV ========== */
         nav.main-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(10,10,10,0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background: rgba(10,10,10,0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border-bottom: 1px solid var(--border);
         }
         .nav-inner {
-            max-width: var(--container);
-            margin: 0 auto;
-            padding: 0 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 72px;
+            max-width: var(--container); margin: 0 auto; padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between; height: 64px;
         }
         .nav-logo {
-            font-family: var(--display);
-            font-weight: 800;
-            font-size: 1.3rem;
-            color: var(--text-primary);
-            letter-spacing: -0.5px;
+            font-family: var(--display); font-weight: 800; font-size: 1.2rem;
+            color: var(--text-primary); letter-spacing: -0.5px;
         }
         .nav-logo span { color: var(--accent); }
         .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            list-style: none;
+            display: flex; align-items: center; gap: 28px; list-style: none;
         }
         .nav-links a {
-            font-family: var(--mono);
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            transition: color 0.3s;
+            font-family: var(--mono); font-size: 0.7rem; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--text-secondary); transition: color 0.3s;
         }
         .nav-links a:hover { color: var(--text-primary); }
         .nav-cta {
-            background: var(--accent);
-            color: #fff !important;
-            padding: 10px 24px;
-            border-radius: 4px;
-            font-weight: 500;
-            transition: background 0.3s, transform 0.2s;
+            background: var(--accent); color: #fff !important;
+            padding: 8px 20px; border-radius: 6px;
+            font-weight: 500; transition: background 0.3s, transform 0.2s;
         }
         .nav-cta:hover { background: #c1303c; transform: translateY(-1px); }
         .nav-hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 4px;
+            display: none; flex-direction: column; gap: 5px;
+            cursor: pointer; background: none; border: none; padding: 4px;
         }
-        .nav-hamburger span {
-            width: 24px;
-            height: 2px;
-            background: var(--text-primary);
-            transition: transform 0.3s, opacity 0.3s;
-        }
+        .nav-hamburger span { width: 22px; height: 1.5px; background: var(--text-primary); transition: transform 0.3s, opacity 0.3s; }
 
         /* ========== HERO ========== */
         #hero {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
+            position: relative; min-height: 100vh;
+            display: flex; align-items: center; overflow: hidden;
         }
         #network-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
         }
         .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: var(--container);
-            margin: 0 auto;
-            padding: 0 24px;
-            padding-top: 100px;
+            position: relative; z-index: 2;
+            max-width: var(--container); margin: 0 auto; padding: 0 24px; padding-top: 100px;
         }
         .hero-eyebrow {
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 24px;
+            font-family: var(--mono); font-size: 0.75rem; letter-spacing: 4px;
+            text-transform: uppercase; color: var(--accent); margin-bottom: 24px; font-weight: 400;
         }
         .hero-title {
-            font-family: var(--display);
-            font-weight: 800;
-            font-size: clamp(3rem, 7vw, 7rem);
-            line-height: 1.05;
-            color: var(--text-primary);
-            margin-bottom: 28px;
+            font-family: var(--display); font-weight: 800;
+            font-size: clamp(3rem, 7vw, 6.5rem); line-height: 1.05;
+            color: var(--text-primary); margin-bottom: 28px; letter-spacing: -0.03em;
         }
         .hero-title .accent { color: var(--accent); }
         .hero-subtitle {
-            font-size: 1.15rem;
-            color: var(--text-secondary);
-            max-width: 580px;
-            line-height: 1.8;
-            margin-bottom: 40px;
+            font-size: 1.1rem; color: var(--text-secondary);
+            max-width: 560px; line-height: 1.8; margin-bottom: 40px;
         }
-        .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+        .hero-buttons { display: flex; gap: 14px; flex-wrap: wrap; }
         .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--accent);
-            color: #fff;
-            padding: 14px 32px;
-            border-radius: 4px;
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: background 0.3s, transform 0.2s;
-            border: none;
-            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--accent); color: #fff; padding: 12px 28px;
+            border-radius: 6px; font-family: var(--mono); font-size: 0.8rem;
+            letter-spacing: 1px; text-transform: uppercase;
+            transition: background 0.3s, transform 0.2s; border: none; cursor: pointer;
         }
         .btn-primary:hover { background: #c1303c; transform: translateY(-2px); }
         .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: transparent;
-            color: var(--text-primary);
-            padding: 14px 32px;
-            border-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.15);
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: border-color 0.3s, transform 0.2s;
-            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+            background: transparent; color: var(--text-primary); padding: 12px 28px;
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.12);
+            font-family: var(--mono); font-size: 0.8rem; letter-spacing: 1px;
+            text-transform: uppercase; transition: border-color 0.3s, transform 0.2s; cursor: pointer;
         }
         .btn-secondary:hover { border-color: var(--accent); transform: translateY(-2px); }
 
         /* ========== MARQUEE ========== */
         .marquee-section {
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 20px 0;
-            overflow: hidden;
-            background: var(--bg);
+            border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+            padding: 18px 0; overflow: hidden; background: var(--bg);
         }
         .marquee-track {
-            display: flex;
-            gap: 60px;
-            animation: marquee 30s linear infinite;
-            width: max-content;
+            display: flex; gap: 56px;
+            animation: marquee 30s linear infinite; width: max-content;
         }
         .marquee-track span {
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            white-space: nowrap;
+            font-family: var(--mono); font-size: 0.72rem; letter-spacing: 3px;
+            text-transform: uppercase; color: var(--text-dim); white-space: nowrap;
         }
-        .marquee-track span::after {
-            content: '//';
-            margin-left: 60px;
-            color: var(--accent);
-            opacity: 0.5;
-        }
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        /* ========== STATS ========== */
-        #stats {
-            padding: 80px 0;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2px;
-        }
-        .stat-card {
-            background: var(--bg-card);
-            padding: 48px 32px;
-            text-align: center;
-            border: 1px solid var(--border);
-            transition: background 0.3s;
-        }
-        .stat-card:hover { background: var(--bg-card-hover); }
-        .stat-label {
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-        .stat-value {
-            font-family: var(--display);
-            font-weight: 800;
-            font-size: clamp(2.5rem, 4vw, 3.5rem);
-            color: var(--text-primary);
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-        .stat-sub {
-            font-family: var(--mono);
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--text-dim);
-        }
-        .stat-accent-line {
-            width: 40px;
-            height: 2px;
-            background: var(--accent);
-            margin: 16px auto 0;
-        }
+        .marquee-track span::after { content: '//'; margin-left: 56px; color: var(--accent); opacity: 0.4; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
         /* ========== ABOUT ========== */
-        #about .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: start;
-        }
+        #about { background: var(--bg); }
+        .about-text { max-width: 780px; }
         .about-text p {
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            text-align: justify;
-            font-size: 1.02rem;
+            color: var(--text-secondary); margin-bottom: 24px;
+            text-align: justify; font-size: 1rem; line-height: 1.8;
         }
         .about-text strong { color: var(--text-primary); font-weight: 500; }
         .about-text em { color: var(--text-secondary); font-style: italic; }
         .nosotrack-highlight {
-            color: var(--accent);
-            font-weight: 700;
-            font-family: var(--mono);
-            font-size: 1.1rem;
+            color: var(--accent); font-weight: 600;
+            font-family: var(--mono); font-size: 1rem;
         }
-        .about-visual {
-            position: relative;
+
+        /* Burden stats within about */
+        .about-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 1px; margin-top: 48px; margin-bottom: 56px;
+            background: var(--border); border-radius: 10px; overflow: hidden;
         }
-        #viz-container {
-            width: 100%;
-            aspect-ratio: 4/3;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
+        .about-stat {
+            background: var(--bg-card); padding: 36px 28px; text-align: center;
+            transition: background 0.3s;
+        }
+        .about-stat:hover { background: var(--bg-card-hover); }
+        .about-stat-label {
+            font-family: var(--mono); font-size: 0.65rem; letter-spacing: 3px;
+            text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px;
+        }
+        .about-stat-value {
+            font-family: var(--display); font-weight: 800;
+            font-size: clamp(2rem, 3.5vw, 2.8rem); color: var(--text-primary);
+            line-height: 1; margin-bottom: 6px;
+        }
+        .about-stat-detail {
+            font-family: var(--mono); font-size: 0.6rem; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--text-dim);
+        }
+
+        /* 3D Network viz container in About */
+        #three-container {
+            width: 100%; height: 550px; position: relative;
+            border: 1px solid var(--border); border-radius: 10px;
+            overflow: hidden; background: rgba(0,0,0,0.3);
+        }
+        #three-container canvas { display: block; }
+        .viz-legend {
+            position: absolute; top: 16px; left: 16px;
+            background: rgba(10,10,10,0.85); backdrop-filter: blur(10px);
+            border: 1px solid var(--border); border-radius: 8px;
+            padding: 14px 16px; font-family: var(--mono); font-size: 0.65rem;
+            letter-spacing: 1px; color: var(--text-secondary); z-index: 10;
+        }
+        .viz-legend-title {
+            font-weight: 500; color: var(--text-dim); font-size: 0.55rem;
+            margin-bottom: 6px; letter-spacing: 2px;
+        }
+        .viz-legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .viz-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .viz-legend-tri {
+            width: 0; height: 0;
+            border-left: 4px solid transparent; border-right: 4px solid transparent;
+            border-bottom: 7px solid #888;
+        }
+        .viz-tooltip {
+            position: absolute; background: rgba(10,10,10,0.9);
+            border: 1px solid var(--accent); border-radius: 6px;
+            padding: 8px 12px; font-family: var(--mono); font-size: 0.7rem;
+            color: var(--text-primary); pointer-events: none; z-index: 20; display: none;
         }
 
         /* ========== HOW IT WORKS / PIPELINE ========== */
@@ -343,445 +249,228 @@
         #pipeline-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         .pipeline-wrap { position: relative; z-index: 1; }
         .pipeline-subtitle {
-            color: var(--text-secondary); font-size: 1.05rem; max-width: 650px;
-            margin-bottom: 56px; line-height: 1.7;
+            color: var(--text-secondary); font-size: 1rem; max-width: 620px;
+            margin-bottom: 56px; line-height: 1.8;
         }
 
-        /* ── 5-Step vertical flow ── */
+        /* 4-Step vertical flow */
         .pipeline-flow {
             display: flex; flex-direction: column; align-items: center;
             gap: 0; max-width: 900px; margin: 0 auto;
         }
-
-        /* Step wrapper */
-        .pipeline-step {
-            width: 100%; position: relative;
-        }
-
-        /* Step number badge */
-        .pipeline-step-badge {
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 16px;
-        }
+        .pipeline-step { width: 100%; position: relative; }
+        .pipeline-step-badge { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
         .pipeline-step-num {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: rgba(230,57,70,0.12); border: 1px solid rgba(230,57,70,0.3);
+            width: 30px; height: 30px; border-radius: 50%;
+            background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.25);
             display: flex; align-items: center; justify-content: center;
-            font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+            font-family: var(--mono); font-size: 0.65rem; font-weight: 500;
             color: var(--accent); flex-shrink: 0;
         }
         .pipeline-step-label {
-            font-family: var(--mono); font-size: 0.6rem;
-            letter-spacing: 2px; text-transform: uppercase;
-            color: var(--text-dim);
+            font-family: var(--mono); font-size: 0.58rem;
+            letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim);
         }
 
-        /* Sources row — 3 columns inside step 1 */
         .pipeline-sources {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
         }
-
-        /* Full-width single card steps */
         .pipeline-single { width: 100%; }
 
-        /* Connector between steps — vertical line with particles */
+        /* Connector */
         .pipeline-connector {
             display: flex; align-items: center; justify-content: center;
-            flex-direction: column; height: 64px; position: relative;
-            width: 100%;
+            flex-direction: column; height: 56px; position: relative; width: 100%;
         }
         .pipeline-connector canvas { width: 100%; height: 100%; display: block; }
-        .pipeline-connector-label {
-            font-family: var(--mono); font-size: 0.55rem;
-            letter-spacing: 2px; text-transform: uppercase;
-            color: var(--text-dim); margin-top: 2px;
-        }
 
         /* Glassmorphism card */
         .p-card {
-            position: relative;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 14px;
-            padding: 24px;
-            overflow: hidden;
+            position: relative; background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
+            padding: 22px; overflow: hidden;
             transition: border-color 0.4s, transform 0.4s, box-shadow 0.4s;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         }
         .p-card:hover {
-            border-color: rgba(230,57,70,0.25);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 32px rgba(230,57,70,0.06);
+            border-color: rgba(230,57,70,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(230,57,70,0.04);
         }
-        .p-card.active { border-color: rgba(230,57,70,0.35); }
         .p-card-glow {
             position: absolute; top: -40px; right: -40px;
-            width: 120px; height: 120px;
-            background: radial-gradient(circle, rgba(230,57,70,0.08) 0%, transparent 70%);
-            border-radius: 50%; pointer-events: none;
-            opacity: 0; transition: opacity 0.6s;
+            width: 100px; height: 100px;
+            background: radial-gradient(circle, rgba(230,57,70,0.06) 0%, transparent 70%);
+            border-radius: 50%; pointer-events: none; opacity: 0; transition: opacity 0.6s;
         }
-        .p-card.active .p-card-glow, .p-card:hover .p-card-glow { opacity: 1; }
+        .p-card:hover .p-card-glow { opacity: 1; }
 
-        /* Card canvas for mini-animations */
+        /* Card canvas */
         .p-card-canvas {
-            width: 100%; height: 110px; display: block;
-            border-radius: 8px; margin-bottom: 16px;
-            background: rgba(0,0,0,0.3);
+            width: 100%; height: 100px; display: block;
+            border-radius: 8px; margin-bottom: 14px;
+            background: rgba(0,0,0,0.25);
         }
 
-        /* NosoTrack Engine — hero card with large 3D canvas */
+        /* Engine hero card */
         .p-card--engine {
-            border-color: rgba(230,57,70,0.15);
-            background: rgba(230,57,70,0.02);
+            border-color: rgba(230,57,70,0.12);
+            background: rgba(230,57,70,0.015);
         }
         .p-card--engine .p-card-canvas {
-            height: 280px;
-            border: 1px solid rgba(255,255,255,0.04);
+            height: 340px;
+            border: 1px solid rgba(255,255,255,0.03);
+            background: rgba(0,0,0,0.4);
         }
         .engine-features {
             display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 12px; margin-top: 16px;
+            gap: 10px; margin-top: 14px;
         }
         .engine-feat {
             background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.04);
             border-radius: 8px; padding: 10px 12px;
-            font-family: var(--mono); font-size: 0.65rem;
-            color: var(--text-secondary); letter-spacing: 0.5px;
+            font-family: var(--mono); font-size: 0.6rem;
+            color: var(--text-secondary); letter-spacing: 0.3px;
         }
         .engine-feat strong {
             display: block; color: var(--text-primary);
-            font-family: var(--display); font-size: 0.8rem;
-            margin-bottom: 3px; font-weight: 600;
+            font-family: var(--display); font-size: 0.75rem;
+            margin-bottom: 2px; font-weight: 600;
         }
 
         .p-card-tag {
-            font-family: var(--mono); font-size: 0.6rem;
+            font-family: var(--mono); font-size: 0.55rem;
             letter-spacing: 2px; text-transform: uppercase;
-            color: var(--accent); margin-bottom: 8px;
-            opacity: 0.7;
+            color: var(--accent); margin-bottom: 6px; opacity: 0.8;
         }
         .p-card-title {
             font-family: var(--display); font-weight: 700;
-            font-size: 1.05rem; color: var(--text-primary);
-            margin-bottom: 6px; line-height: 1.3;
+            font-size: 1rem; color: var(--text-primary);
+            margin-bottom: 5px; line-height: 1.3;
         }
-        .p-card--engine .p-card-title {
-            font-size: 1.3rem; margin-bottom: 8px;
-        }
+        .p-card--engine .p-card-title { font-size: 1.25rem; margin-bottom: 8px; }
         .p-card-desc {
-            font-size: 0.82rem; color: var(--text-secondary);
-            line-height: 1.6;
+            font-size: 0.8rem; color: var(--text-secondary); line-height: 1.7;
         }
 
         @media (max-width: 768px) {
             .pipeline-sources { grid-template-columns: 1fr; }
             .engine-features { grid-template-columns: 1fr; }
-            .p-card-canvas { height: 90px; }
-            .p-card--engine .p-card-canvas { height: 220px; }
+            .p-card-canvas { height: 80px; }
+            .p-card--engine .p-card-canvas { height: 240px; }
         }
 
         /* ========== RESEARCH ========== */
         .research-intro {
-            max-width: 700px;
-            color: var(--text-secondary);
-            margin-bottom: 48px;
-            font-size: 1.05rem;
-            text-align: justify;
+            max-width: 700px; color: var(--text-secondary);
+            margin-bottom: 48px; font-size: 1rem; text-align: justify; line-height: 1.8;
         }
         .research-sub {
-            font-family: var(--mono);
-            font-size: 0.75rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            margin-bottom: 24px;
+            font-family: var(--mono); font-size: 0.7rem; letter-spacing: 3px;
+            text-transform: uppercase; color: var(--text-dim); margin-bottom: 20px;
         }
-        .pub-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
+        .pub-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
         .pub-card {
-            display: block;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 28px;
+            display: block; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 10px; padding: 24px;
             transition: border-color 0.3s, transform 0.3s, background 0.3s;
         }
         .pub-card:hover {
-            border-color: rgba(230,57,70,0.3);
-            background: var(--bg-card-hover);
+            border-color: rgba(230,57,70,0.25); background: var(--bg-card-hover);
             transform: translateY(-2px);
         }
         .pub-tag {
-            font-family: var(--mono);
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--accent);
-            background: var(--accent-dim);
-            padding: 4px 10px;
-            border-radius: 3px;
-            display: inline-block;
-            margin-bottom: 12px;
+            font-family: var(--mono); font-size: 0.6rem; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--accent); background: var(--accent-dim);
+            padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px;
         }
         .pub-title {
-            font-family: var(--display);
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--text-primary);
-            margin-bottom: 8px;
+            font-family: var(--display); font-weight: 700; font-size: 1.05rem;
+            color: var(--text-primary); margin-bottom: 6px;
         }
-        .pub-desc {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
+        .pub-desc { color: var(--text-secondary); font-size: 0.85rem; }
         .pub-arrow {
-            display: inline-block;
-            margin-top: 12px;
-            color: var(--accent);
-            font-size: 0.85rem;
-            transition: transform 0.3s;
+            display: inline-block; margin-top: 10px; color: var(--accent);
+            font-size: 0.85rem; transition: transform 0.3s;
         }
         .pub-card:hover .pub-arrow { transform: translateX(4px); }
 
         /* ========== TEAM ========== */
         #team { background: var(--bg-card); }
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            margin-top: 48px;
-        }
+        .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 48px; }
         .team-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-            transition: border-color 0.3s, transform 0.3s;
+            background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+            overflow: hidden; transition: border-color 0.3s, transform 0.3s;
         }
-        .team-card:hover {
-            border-color: rgba(230,57,70,0.3);
-            transform: translateY(-4px);
-        }
-        .team-photo {
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            filter: grayscale(30%);
-            transition: filter 0.3s;
-        }
+        .team-card:hover { border-color: rgba(230,57,70,0.25); transform: translateY(-3px); }
+        .team-photo { width: 100%; aspect-ratio: 1; object-fit: cover; filter: grayscale(30%); transition: filter 0.3s; }
         .team-card:hover .team-photo { filter: grayscale(0%); }
-        .team-info { padding: 20px; }
-        .team-name {
-            font-family: var(--display);
-            font-weight: 700;
-            font-size: 1.05rem;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-        .team-role {
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 1px;
-            color: var(--accent);
-            margin-bottom: 12px;
-        }
-        .team-bio {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            line-height: 1.6;
-        }
-        .team-bio a {
-            color: var(--accent);
-            text-decoration: underline;
-            text-underline-offset: 2px;
-        }
+        .team-info { padding: 18px; }
+        .team-name { font-family: var(--display); font-weight: 700; font-size: 1rem; color: var(--text-primary); margin-bottom: 3px; }
+        .team-role { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 1px; color: var(--accent); margin-bottom: 10px; }
+        .team-bio { color: var(--text-secondary); font-size: 0.82rem; line-height: 1.65; }
+        .team-bio a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
         .team-bio a:hover { color: var(--text-primary); }
 
         /* ========== CONTACT ========== */
-        #contact .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: start;
-        }
+        #contact .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
         .contact-heading {
-            font-family: var(--display);
-            font-weight: 800;
-            font-size: clamp(2rem, 4vw, 3.5rem);
-            color: var(--text-primary);
-            line-height: 1.1;
-            margin-bottom: 20px;
+            font-family: var(--display); font-weight: 800;
+            font-size: clamp(2rem, 4vw, 3.2rem); color: var(--text-primary);
+            line-height: 1.1; margin-bottom: 20px; letter-spacing: -0.02em;
         }
-        .contact-sub {
-            color: var(--text-secondary);
-            font-size: 1.05rem;
-            margin-bottom: 32px;
-        }
+        .contact-sub { color: var(--text-secondary); font-size: 1rem; margin-bottom: 32px; }
         .contact-form label {
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            display: block;
-            margin-bottom: 8px;
+            font-family: var(--mono); font-size: 0.65rem; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--text-secondary);
+            display: block; margin-bottom: 6px;
         }
-        .contact-form input,
-        .contact-form textarea {
-            width: 100%;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 14px 16px;
-            color: var(--text-primary);
-            font-family: var(--body);
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
-            outline: none;
+        .contact-form input, .contact-form textarea {
+            width: 100%; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 6px;
+            padding: 12px 16px; color: var(--text-primary);
+            font-family: var(--body); font-size: 0.9rem;
+            margin-bottom: 18px; transition: border-color 0.3s; outline: none;
         }
-        .contact-form input:focus,
-        .contact-form textarea:focus { border-color: var(--accent); }
-        .contact-form textarea { resize: vertical; min-height: 120px; }
-        .form-buttons { display: flex; gap: 12px; }
+        .contact-form input:focus, .contact-form textarea:focus { border-color: var(--accent); }
+        .contact-form textarea { resize: vertical; min-height: 110px; }
+        .form-buttons { display: flex; gap: 10px; }
 
         /* ========== FOOTER ========== */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 48px 0;
-        }
-        .footer-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .footer-logo {
-            font-family: var(--display);
-            font-weight: 800;
-            font-size: 1.1rem;
-            color: var(--text-primary);
-        }
+        footer { border-top: 1px solid var(--border); padding: 40px 0; }
+        .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        .footer-logo { font-family: var(--display); font-weight: 800; font-size: 1rem; color: var(--text-primary); }
         .footer-logo span { color: var(--accent); }
-        .footer-links {
-            display: flex;
-            gap: 24px;
-            list-style: none;
-        }
+        .footer-links { display: flex; gap: 20px; list-style: none; }
         .footer-links a {
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            transition: color 0.3s;
+            font-family: var(--mono); font-size: 0.65rem; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--text-dim); transition: color 0.3s;
         }
         .footer-links a:hover { color: var(--text-primary); }
-        .footer-copy {
-            font-size: 0.8rem;
-            color: var(--text-dim);
-        }
+        .footer-copy { font-size: 0.75rem; color: var(--text-dim); }
 
         /* ========== RESPONSIVE ========== */
         @media (max-width: 1024px) {
-            .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 48px; }
-            .steps-grid { grid-template-columns: 1fr; }
+            .contact-grid { grid-template-columns: 1fr; gap: 48px; }
             .team-grid { grid-template-columns: repeat(2, 1fr); }
+            #three-container { height: 450px; }
         }
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .nav-links.open {
-                display: flex;
-                flex-direction: column;
-                position: fixed;
-                top: 72px;
-                left: 0;
-                width: 100%;
-                background: rgba(10,10,10,0.98);
-                backdrop-filter: blur(20px);
-                padding: 32px 24px;
-                gap: 24px;
-                border-bottom: 1px solid var(--border);
+                display: flex; flex-direction: column; position: fixed;
+                top: 64px; left: 0; width: 100%;
+                background: rgba(10,10,10,0.98); backdrop-filter: blur(20px);
+                padding: 28px 24px; gap: 20px; border-bottom: 1px solid var(--border);
             }
             .nav-hamburger { display: flex; }
-            .stats-grid { grid-template-columns: 1fr; }
+            .about-stats { grid-template-columns: 1fr; }
             .pub-grid { grid-template-columns: 1fr; }
             .team-grid { grid-template-columns: 1fr; }
             .hero-title { font-size: clamp(2.5rem, 10vw, 4rem); }
             .section-padding { padding: 80px 0; }
-        }
-
-        /* ========== 3D VIZ ========== */
-        #three-container {
-            width: 100%;
-            height: 650px;
-            position: relative;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 48px;
-        }
-        #three-container canvas { display: block; }
-        .viz-legend {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            background: rgba(10,10,10,0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 16px;
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            z-index: 10;
-        }
-        .viz-legend-title {
-            font-weight: 600;
-            color: var(--text-dim);
-            font-size: 0.6rem;
-            margin-bottom: 8px;
-            letter-spacing: 2px;
-        }
-        .viz-legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 6px;
-        }
-        .viz-legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-        .viz-legend-tri {
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-bottom: 9px solid #888;
-        }
-        .viz-tooltip {
-            position: absolute;
-            background: rgba(10,10,10,0.9);
-            border: 1px solid var(--accent);
-            border-radius: 4px;
-            padding: 8px 12px;
-            font-family: var(--mono);
-            font-size: 0.75rem;
-            color: var(--text-primary);
-            pointer-events: none;
-            z-index: 20;
-            display: none;
+            #three-container { height: 350px; }
         }
     </style>
 </head>
@@ -844,64 +533,57 @@
     </div>
 </div>
 
-<!-- ========== STATS ========== -->
-<section id="stats">
-    <div class="container">
-        <div class="stats-grid reveal">
-            <div class="stat-card">
-                <div class="stat-label">Cases</div>
-                <div class="stat-value">2.0M</div>
-                <div class="stat-sub">US per year</div>
-                <div class="stat-accent-line"></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Deaths</div>
-                <div class="stat-value">100K</div>
-                <div class="stat-sub">US per year</div>
-                <div class="stat-accent-line"></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Cost</div>
-                <div class="stat-value">$40B+</div>
-                <div class="stat-sub">US per year</div>
-                <div class="stat-accent-line"></div>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- ========== ABOUT ========== -->
 <section id="about" class="section-padding">
     <div class="container">
-        <div class="about-grid">
-            <div class="about-text reveal">
-                <span class="section-tag">01 — About</span>
-                <h2 class="section-title">The Problem<br>& The Solution</h2>
-                <p>
-                    <strong>Healthcare-associated infections (HAIs)</strong> affect approximately 1 in 10 patients worldwide, causing significant morbidity, mortality, and economic strain on healthcare systems. <strong>Nosocomial outbreaks</strong> driven by person-to-person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides difficile</em>, <em>Klebsiella pneumoniae</em>, and MRSA generate the most acute clinical and operational crises: triggering staff shortages, ward closures, and delayed procedures. Current control measures rely on broad testing and isolation protocols, but <strong>effective intervention requires identifying the specific drivers of an outbreak</strong>: such as patient zero, superspreaders, transmission routes, and undetected or imported cases.
-                </p>
-                <p>
-                    <span class="nosotrack-highlight">NosoTrack</span> <strong>is an outbreak analytics platform that infers who infected whom in near real-time</strong> by integrating data from hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings and actionable reports, enabling hospital infection prevention teams to target interventions promptly before an outbreak escalates.
-                </p>
+        <div class="about-text reveal">
+            <span class="section-tag">01 — About</span>
+            <h2 class="section-title">The Problem<br>& The Solution</h2>
+            <p>
+                <strong>Healthcare-associated infections (HAIs)</strong> affect approximately 1 in 10 patients worldwide, causing significant morbidity, mortality, and economic strain on healthcare systems. <strong>Nosocomial outbreaks</strong> driven by person-to-person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides difficile</em>, <em>Klebsiella pneumoniae</em>, and MRSA generate the most acute clinical and operational crises: triggering staff shortages, ward closures, and delayed procedures. Current control measures rely on broad testing and isolation protocols, but <strong>effective intervention requires identifying the specific drivers of an outbreak</strong>: such as patient zero, superspreaders, transmission routes, and undetected or imported cases.
+            </p>
+            <p>
+                <span class="nosotrack-highlight">NosoTrack</span> <strong>is an outbreak analytics platform that infers who infected whom in near real-time</strong> by integrating data from hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings and actionable reports, enabling hospital infection prevention teams to target interventions promptly before an outbreak escalates.
+            </p>
+        </div>
+
+        <!-- Burden stats -->
+        <div class="about-stats reveal">
+            <div class="about-stat">
+                <div class="about-stat-label">Cases</div>
+                <div class="about-stat-value">2.0M</div>
+                <div class="about-stat-detail">US per year</div>
             </div>
-            <div class="about-visual reveal" style="transition-delay: 0.2s;">
-                <div id="three-container">
-                    <div class="viz-legend">
-                        <div class="viz-legend-title">TYPE</div>
-                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#888;"></div> Patient</div>
-                        <div class="viz-legend-item"><div class="viz-legend-tri"></div> Staff</div>
-                        <div style="margin-top:12px;"></div>
-                        <div class="viz-legend-title">WARD</div>
-                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(100,150,255,0.7);"></div> Ward A</div>
-                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(255,150,100,0.7);"></div> Ward B</div>
-                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(150,255,100,0.7);"></div> Ward C</div>
-                        <div style="margin-top:12px;"></div>
-                        <div class="viz-legend-title">STATUS</div>
-                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#555;"></div> Susceptible</div>
-                        <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#e63946; box-shadow: 0 0 6px rgba(230,57,70,0.6);"></div> Infected</div>
-                    </div>
-                    <div class="viz-tooltip" id="vizTooltip"></div>
+            <div class="about-stat">
+                <div class="about-stat-label">Deaths</div>
+                <div class="about-stat-value">100K</div>
+                <div class="about-stat-detail">US per year</div>
+            </div>
+            <div class="about-stat">
+                <div class="about-stat-label">Cost</div>
+                <div class="about-stat-value">$40B+</div>
+                <div class="about-stat-detail">US per year</div>
+            </div>
+        </div>
+
+        <!-- 3D Transmission Network -->
+        <div class="reveal">
+            <div id="three-container">
+                <div class="viz-legend">
+                    <div class="viz-legend-title">TYPE</div>
+                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#888;"></div> Patient</div>
+                    <div class="viz-legend-item"><div class="viz-legend-tri"></div> Staff</div>
+                    <div style="margin-top:10px;"></div>
+                    <div class="viz-legend-title">WARD</div>
+                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(100,150,255,0.7);"></div> Ward A</div>
+                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(255,150,100,0.7);"></div> Ward B</div>
+                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(150,255,100,0.7);"></div> Ward C</div>
+                    <div style="margin-top:10px;"></div>
+                    <div class="viz-legend-title">STATUS</div>
+                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#555;"></div> Susceptible</div>
+                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#e63946; box-shadow: 0 0 6px rgba(230,57,70,0.6);"></div> Infected</div>
                 </div>
+                <div class="viz-tooltip" id="vizTooltip"></div>
             </div>
         </div>
     </div>
@@ -948,10 +630,8 @@
                 </div>
             </div>
 
-            <!-- Connector 1→2 -->
-            <div class="pipeline-connector reveal">
-                <canvas id="connector-1"></canvas>
-            </div>
+            <!-- Connector 1-2 -->
+            <div class="pipeline-connector reveal"><canvas id="connector-1"></canvas></div>
 
             <!-- STEP 2: Anonymisation -->
             <div class="pipeline-step reveal">
@@ -970,12 +650,10 @@
                 </div>
             </div>
 
-            <!-- Connector 2→3 -->
-            <div class="pipeline-connector reveal">
-                <canvas id="connector-2"></canvas>
-            </div>
+            <!-- Connector 2-3 -->
+            <div class="pipeline-connector reveal"><canvas id="connector-2"></canvas></div>
 
-            <!-- STEP 3: NosoTrack Engine (hero card) -->
+            <!-- STEP 3: NosoTrack Engine -->
             <div class="pipeline-step reveal">
                 <div class="pipeline-step-badge">
                     <div class="pipeline-step-num">03</div>
@@ -987,7 +665,7 @@
                         <canvas class="p-card-canvas" data-viz="engine" id="engine-canvas"></canvas>
                         <div class="p-card-tag">Analytics Engine</div>
                         <div class="p-card-title">NosoTrack Engine</div>
-                        <div class="p-card-desc">Anonymised data streams are fused into a unified temporal contact network. The engine runs Bayesian phylodynamic models in near real-time, combining genomic distances, contact matrices, and ward movements to infer transmission probabilities.</div>
+                        <div class="p-card-desc">Anonymised data streams are fused into a unified temporal contact network. The engine runs Bayesian phylodynamic models in near real-time, combining genomic distances, contact matrices, and ward movements to infer transmission probabilities and reconstruct who infected whom.</div>
                         <div class="engine-features">
                             <div class="engine-feat"><strong>Data Fusion</strong>Genomic + contact + EHR integration</div>
                             <div class="engine-feat"><strong>Bayesian Models</strong>Phylodynamic transmission inference</div>
@@ -997,37 +675,13 @@
                 </div>
             </div>
 
-            <!-- Connector 3→4 -->
-            <div class="pipeline-connector reveal">
-                <canvas id="connector-3"></canvas>
-            </div>
+            <!-- Connector 3-4 -->
+            <div class="pipeline-connector reveal"><canvas id="connector-3"></canvas></div>
 
-            <!-- STEP 4: Transmission Tree -->
+            <!-- STEP 4: Early Warning -->
             <div class="pipeline-step reveal">
                 <div class="pipeline-step-badge">
                     <div class="pipeline-step-num">04</div>
-                    <div class="pipeline-step-label">Output</div>
-                </div>
-                <div class="pipeline-single">
-                    <div class="p-card" data-pipeline="tree">
-                        <div class="p-card-glow"></div>
-                        <canvas class="p-card-canvas" data-viz="tree"></canvas>
-                        <div class="p-card-tag">Reconstruction</div>
-                        <div class="p-card-title">Transmission Tree</div>
-                        <div class="p-card-desc">Statistical models reconstruct who infected whom — revealing patient zero, superspreaders, and hidden chains of nosocomial transmission.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Connector 4→5 -->
-            <div class="pipeline-connector reveal">
-                <canvas id="connector-4"></canvas>
-            </div>
-
-            <!-- STEP 5: Early Warning -->
-            <div class="pipeline-step reveal">
-                <div class="pipeline-step-badge">
-                    <div class="pipeline-step-num">05</div>
                     <div class="pipeline-step-label">Action</div>
                 </div>
                 <div class="pipeline-single">
@@ -1150,8 +804,8 @@
                 <span class="section-tag">05 — Contact</span>
                 <h2 class="contact-heading">Let's Work<br>Together</h2>
                 <p class="contact-sub">We are actively seeking collaborations and funding. Please reach out!</p>
-                <a href="https://github.com/CyGei" target="_blank" style="display:inline-flex; align-items:center; gap:8px; color:var(--text-secondary); font-family:var(--mono); font-size:0.8rem; transition:color 0.3s;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                <a href="https://github.com/CyGei" target="_blank" style="display:inline-flex; align-items:center; gap:8px; color:var(--text-secondary); font-family:var(--mono); font-size:0.75rem; transition:color 0.3s;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                     github.com/CyGei
                 </a>
             </div>
@@ -1202,95 +856,62 @@
     let width, height;
     let particles = [];
 
-    const particleCount = 120;
-    const connectionDistance = 140;
-    const particleSpeed = 0.4;
-    const infectionChance = 0.015;
+    const particleCount = 100;
+    const connectionDistance = 130;
+    const particleSpeed = 0.35;
+    const infectionChance = 0.012;
     const recoveryTime = 700;
 
-    function resize() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-    }
+    function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
     window.addEventListener('resize', resize);
     resize();
 
     class Particle {
         constructor() {
-            this.x = Math.random() * width;
-            this.y = Math.random() * height;
+            this.x = Math.random() * width; this.y = Math.random() * height;
             this.vx = (Math.random() - 0.5) * particleSpeed;
             this.vy = (Math.random() - 0.5) * particleSpeed;
             this.size = Math.random() * 1.5 + 0.5;
-            this.isInfected = false;
-            this.infectionTimer = 0;
+            this.isInfected = false; this.infectionTimer = 0;
         }
-        infect() {
-            if (!this.isInfected) {
-                this.isInfected = true;
-                this.infectionTimer = recoveryTime;
-            }
-        }
+        infect() { if (!this.isInfected) { this.isInfected = true; this.infectionTimer = recoveryTime; } }
         update() {
-            this.x += this.vx;
-            this.y += this.vy;
+            this.x += this.vx; this.y += this.vy;
             if (this.x < 0 || this.x > width) this.vx *= -1;
             if (this.y < 0 || this.y > height) this.vy *= -1;
-            if (this.isInfected) {
-                this.infectionTimer--;
-                if (this.infectionTimer <= 0) this.isInfected = false;
-            }
+            if (this.isInfected) { this.infectionTimer--; if (this.infectionTimer <= 0) this.isInfected = false; }
         }
         draw() {
-            ctx.fillStyle = this.isInfected ? 'rgba(230, 57, 70, 0.8)' : 'rgba(150, 150, 150, 0.4)';
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.fillStyle = this.isInfected ? 'rgba(230, 57, 70, 0.7)' : 'rgba(150, 150, 150, 0.3)';
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
             if (this.isInfected) {
-                ctx.fillStyle = 'rgba(230, 57, 70, 0.15)';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size + 4, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.fillStyle = 'rgba(230, 57, 70, 0.12)';
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size + 4, 0, Math.PI * 2); ctx.fill();
             }
         }
     }
 
     function initParticles() {
         particles = [];
-        for (let i = 0; i < particleCount; i++) {
-            const p = new Particle();
-            if (Math.random() < 0.04) p.infect();
-            particles.push(p);
-        }
+        for (let i = 0; i < particleCount; i++) { const p = new Particle(); if (Math.random() < 0.04) p.infect(); particles.push(p); }
     }
     initParticles();
 
     function animate() {
         ctx.clearRect(0, 0, width, height);
-        if (!particles.some(p => p.isInfected)) {
-            particles[Math.floor(Math.random() * particles.length)].infect();
-        }
+        if (!particles.some(p => p.isInfected)) particles[Math.floor(Math.random() * particles.length)].infect();
         for (let i = 0; i < particles.length; i++) {
-            particles[i].update();
-            particles[i].draw();
+            particles[i].update(); particles[i].draw();
             for (let j = i + 1; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
+                const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 if (dist < connectionDistance) {
                     if (particles[i].isInfected && !particles[j].isInfected && Math.random() < infectionChance) particles[j].infect();
                     else if (!particles[i].isInfected && particles[j].isInfected && Math.random() < infectionChance) particles[i].infect();
                     const opacity = 1 - (dist / connectionDistance);
-                    if (particles[i].isInfected || particles[j].isInfected) {
-                        ctx.strokeStyle = `rgba(230, 57, 70, ${opacity * 0.4})`;
-                    } else {
-                        ctx.strokeStyle = `rgba(150, 150, 150, ${opacity * 0.12})`;
-                    }
+                    ctx.strokeStyle = (particles[i].isInfected || particles[j].isInfected) ? `rgba(230, 57, 70, ${opacity * 0.35})` : `rgba(150, 150, 150, ${opacity * 0.1})`;
                     ctx.lineWidth = 0.5;
-                    ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
                 }
             }
         }
@@ -1302,39 +923,28 @@
 // ==========================================
 // NAV TOGGLE
 // ==========================================
-document.getElementById('navToggle').addEventListener('click', function() {
-    document.getElementById('navLinks').classList.toggle('open');
-});
-document.querySelectorAll('.nav-links a').forEach(a => {
-    a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
-});
+document.getElementById('navToggle').addEventListener('click', function() { document.getElementById('navLinks').classList.toggle('open'); });
+document.querySelectorAll('.nav-links a').forEach(a => { a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open')); });
 
 // ==========================================
 // SCROLL REVEAL
 // ==========================================
 const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 // ==========================================
-// PIPELINE — 5-step vertical flow with
-// mini-canvas animations, 3D engine viz,
+// PIPELINE — 4-step flow with mini-canvas
+// animations, engine transmission tree viz,
 // background particles + connectors
 // ==========================================
 (function() {
     const ACCENT = '#e63946';
-    const DIM = '#2a2a2a';
     const ACTIVE = '#f0f0f0';
     const MONO = '"JetBrains Mono", monospace';
-    const SYNE = '"Syne", sans-serif';
     let frame = 0;
 
-    // ── Helper: init a canvas with DPR ──
     function initCanvas(c) {
         if (!c) return null;
         const dpr = Math.min(window.devicePixelRatio, 2);
@@ -1345,7 +955,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         return { ctx, w: r.width, h: r.height };
     }
 
-    // ── Background particle flow for the section ──
+    // Background
     const bgCanvas = document.getElementById('pipeline-bg');
     let bgCtx, bgW, bgH;
     const bgParticles = [];
@@ -1355,618 +965,384 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         const section = bgCanvas.parentElement;
         bgW = section.clientWidth; bgH = section.clientHeight;
         bgCanvas.width = bgW * dpr; bgCanvas.height = bgH * dpr;
-        bgCtx = bgCanvas.getContext('2d');
-        bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        bgCtx = bgCanvas.getContext('2d'); bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         bgParticles.length = 0;
-        for (let i = 0; i < 40; i++) {
-            bgParticles.push({
-                x: Math.random() * bgW, y: Math.random() * bgH,
-                vy: 0.15 + Math.random() * 0.3, size: Math.random() * 1.2 + 0.3,
-                opacity: Math.random() * 0.15 + 0.03,
-            });
+        for (let i = 0; i < 35; i++) {
+            bgParticles.push({ x: Math.random() * bgW, y: Math.random() * bgH, vy: 0.12 + Math.random() * 0.25, size: Math.random() * 1 + 0.3, opacity: Math.random() * 0.12 + 0.02 });
         }
     }
     function drawBg() {
         if (!bgCtx) return;
         bgCtx.clearRect(0, 0, bgW, bgH);
         bgParticles.forEach(p => {
-            p.y += p.vy;
-            if (p.y > bgH + 4) { p.y = -4; p.x = Math.random() * bgW; }
+            p.y += p.vy; if (p.y > bgH + 4) { p.y = -4; p.x = Math.random() * bgW; }
             bgCtx.fillStyle = `rgba(230,57,70,${p.opacity})`;
             bgCtx.beginPath(); bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2); bgCtx.fill();
         });
-        bgCtx.strokeStyle = 'rgba(255,255,255,0.015)'; bgCtx.lineWidth = 1;
-        for (let i = 1; i < 4; i++) {
-            const x = bgW * i / 4;
-            bgCtx.beginPath(); bgCtx.moveTo(x, 0); bgCtx.lineTo(x, bgH); bgCtx.stroke();
-        }
     }
 
-    // ── 4 Connector canvases between steps ──
+    // 3 Connectors
     function makeConnector(c, count) {
-        const info = initCanvas(c);
-        if (!info) return null;
+        const info = initCanvas(c); if (!info) return null;
         const { ctx, w, h } = info;
         const particles = [];
-        for (let i = 0; i < count; i++) {
-            particles.push({
-                x: w * (0.3 + Math.random() * 0.4),
-                y: Math.random() * h,
-                vy: 0.3 + Math.random() * 0.5,
-                size: Math.random() * 1.5 + 0.5,
-                phase: Math.random() * Math.PI * 2,
-            });
-        }
+        for (let i = 0; i < count; i++) particles.push({ x: w * (0.35 + Math.random() * 0.3), y: Math.random() * h, vy: 0.3 + Math.random() * 0.4, size: Math.random() * 1.5 + 0.5, phase: Math.random() * Math.PI * 2 });
         return { ctx, w, h, particles, el: c };
     }
     const connectors = [];
-    for (let i = 1; i <= 4; i++) {
-        const c = makeConnector(document.getElementById('connector-' + i), 8);
-        if (c) connectors.push(c);
-    }
+    for (let i = 1; i <= 3; i++) { const c = makeConnector(document.getElementById('connector-' + i), 7); if (c) connectors.push(c); }
 
     function animateConnector(c) {
         if (!c) return;
         c.ctx.clearRect(0, 0, c.w, c.h);
-        c.ctx.strokeStyle = 'rgba(255,255,255,0.04)'; c.ctx.lineWidth = 1;
-        c.ctx.setLineDash([2, 6]);
-        const cx = c.w / 2;
-        c.ctx.beginPath(); c.ctx.moveTo(cx, 0); c.ctx.lineTo(cx, c.h); c.ctx.stroke();
+        c.ctx.strokeStyle = 'rgba(255,255,255,0.03)'; c.ctx.lineWidth = 1; c.ctx.setLineDash([2, 6]);
+        c.ctx.beginPath(); c.ctx.moveTo(c.w / 2, 0); c.ctx.lineTo(c.w / 2, c.h); c.ctx.stroke();
         c.ctx.setLineDash([]);
         c.particles.forEach(p => {
-            p.y += p.vy;
-            p.x += Math.sin(frame * 0.02 + p.phase) * 0.3;
-            if (p.y > c.h + 4) { p.y = -4; p.x = c.w * (0.35 + Math.random() * 0.3); }
-            const grad = c.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 4);
-            grad.addColorStop(0, 'rgba(230,57,70,0.6)');
-            grad.addColorStop(1, 'transparent');
+            p.y += p.vy; p.x += Math.sin(frame * 0.02 + p.phase) * 0.25;
+            if (p.y > c.h + 4) { p.y = -4; p.x = c.w * (0.4 + Math.random() * 0.2); }
+            const grad = c.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3.5);
+            grad.addColorStop(0, 'rgba(230,57,70,0.5)'); grad.addColorStop(1, 'transparent');
             c.ctx.fillStyle = grad;
-            c.ctx.beginPath(); c.ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI * 2); c.ctx.fill();
+            c.ctx.beginPath(); c.ctx.arc(p.x, p.y, p.size * 3.5, 0, Math.PI * 2); c.ctx.fill();
             c.ctx.fillStyle = '#fff';
-            c.ctx.beginPath(); c.ctx.arc(p.x, p.y, p.size * 0.6, 0, Math.PI * 2); c.ctx.fill();
+            c.ctx.beginPath(); c.ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2); c.ctx.fill();
         });
     }
 
-    // ═══════════════════════════════════════════
-    // MINI-CANVAS ANIMATIONS (2D cards)
-    // ═══════════════════════════════════════════
+    // Mini-canvas animations (2D)
     const vizCanvases = {};
     document.querySelectorAll('.p-card-canvas[data-viz]').forEach(c => {
-        if (c.dataset.viz === 'engine') return; // engine uses Three.js
+        if (c.dataset.viz === 'engine') return;
         const info = initCanvas(c);
         if (info) vizCanvases[c.dataset.viz] = { el: c, ...info };
     });
 
-    // ── DNA: animated double helix ──
+    // DNA helix
     function vizDNA() {
         const v = vizCanvases.dna; if (!v) return;
-        const { ctx, w, h } = v;
-        ctx.clearRect(0, 0, w, h);
-        const cx = w / 2, cy = h / 2, amp = 28, len = h * 0.8;
+        const { ctx, w, h } = v; ctx.clearRect(0, 0, w, h);
+        const cx = w / 2, cy = h / 2, amp = 26, len = h * 0.8;
         for (let strand = -1; strand <= 1; strand += 2) {
             ctx.strokeStyle = strand === 1 ? ACCENT : ACTIVE;
-            ctx.lineWidth = 1.8; ctx.globalAlpha = strand === 1 ? 0.7 : 0.35;
+            ctx.lineWidth = 1.5; ctx.globalAlpha = strand === 1 ? 0.7 : 0.3;
             ctx.beginPath();
-            for (let i = 0; i <= 40; i++) {
-                const t = i / 40;
-                const y = cy - len/2 + t * len;
-                const x = cx + Math.sin(t * Math.PI * 3 + frame * 0.025) * amp * strand;
-                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-            }
+            for (let i = 0; i <= 40; i++) { const t = i / 40; const y = cy - len/2 + t * len; const x = cx + Math.sin(t * Math.PI * 3 + frame * 0.025) * amp * strand; i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }
             ctx.stroke();
         }
         ctx.globalAlpha = 1;
         const baseCols = ['#5b9bd5','#70ad47','#e63946','#ffc000'];
-        for (let i = 0; i < 7; i++) {
-            const t = (i + 0.3) / 7;
-            const y = cy - len/2 + t * len;
-            const off = Math.sin(t * Math.PI * 3 + frame * 0.025) * amp;
-            ctx.strokeStyle = baseCols[i % 4]; ctx.lineWidth = 2; ctx.globalAlpha = 0.5;
-            ctx.beginPath(); ctx.moveTo(cx + off, y); ctx.lineTo(cx - off, y); ctx.stroke();
-        }
+        for (let i = 0; i < 7; i++) { const t = (i + 0.3) / 7; const y = cy - len/2 + t * len; const off = Math.sin(t * Math.PI * 3 + frame * 0.025) * amp; ctx.strokeStyle = baseCols[i % 4]; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.4; ctx.beginPath(); ctx.moveTo(cx + off, y); ctx.lineTo(cx - off, y); ctx.stroke(); }
         ctx.globalAlpha = 1;
         const scanY = cy - len/2 + ((frame * 1.2) % len);
-        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = 0.4;
-        ctx.beginPath(); ctx.moveTo(cx - amp - 10, scanY); ctx.lineTo(cx + amp + 10, scanY); ctx.stroke();
-        ctx.globalAlpha = 1;
+        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = 0.3;
+        ctx.beginPath(); ctx.moveTo(cx - amp - 8, scanY); ctx.lineTo(cx + amp + 8, scanY); ctx.stroke(); ctx.globalAlpha = 1;
     }
 
-    // ── Contact: network with bluetooth pulses ──
+    // Contact network
     function vizContact() {
         const v = vizCanvases.contact; if (!v) return;
-        const { ctx, w, h } = v;
-        ctx.clearRect(0, 0, w, h);
+        const { ctx, w, h } = v; ctx.clearRect(0, 0, w, h);
         const cx = w/2, cy = h/2;
-        const nodes = [
-            { x: cx, y: cy, r: 6, staff: true },
-            { x: cx-50, y: cy-25, r: 4 }, { x: cx+55, y: cy-20, r: 4 },
-            { x: cx-40, y: cy+30, r: 4 }, { x: cx+45, y: cy+28, r: 4 },
-            { x: cx-10, y: cy-38, r: 3.5 }, { x: cx+15, y: cy+40, r: 3.5 },
-        ];
+        const nodes = [ {x:cx,y:cy,r:5,staff:true}, {x:cx-45,y:cy-22,r:3.5}, {x:cx+50,y:cy-18,r:3.5}, {x:cx-35,y:cy+26,r:3.5}, {x:cx+40,y:cy+24,r:3.5}, {x:cx-8,y:cy-34,r:3}, {x:cx+12,y:cy+36,r:3} ];
         const edges = [[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,5],[2,4],[3,6]];
-        edges.forEach(([a,b]) => {
-            ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(nodes[a].x, nodes[a].y); ctx.lineTo(nodes[b].x, nodes[b].y); ctx.stroke();
-        });
-        const pulseR = 15 + ((frame * 0.5) % 40);
-        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1;
-        ctx.globalAlpha = Math.max(0, 0.3 - (pulseR - 15) / 55);
-        ctx.beginPath(); ctx.arc(cx, cy, pulseR, 0, Math.PI * 2); ctx.stroke();
-        ctx.globalAlpha = 1;
-        nodes.forEach((n, i) => {
-            ctx.fillStyle = n.staff ? ACCENT : 'rgba(255,255,255,0.5)';
-            ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill();
-            if (n.staff) {
-                ctx.fillStyle = '#fff'; ctx.font = `700 7px ${MONO}`;
-                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText('B', n.x, n.y); ctx.textBaseline = 'alphabetic';
-            }
-        });
+        edges.forEach(([a,b]) => { ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(nodes[a].x, nodes[a].y); ctx.lineTo(nodes[b].x, nodes[b].y); ctx.stroke(); });
+        const pulseR = 14 + ((frame * 0.5) % 36);
+        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = Math.max(0, 0.25 - (pulseR - 14) / 50);
+        ctx.beginPath(); ctx.arc(cx, cy, pulseR, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
+        nodes.forEach(n => { ctx.fillStyle = n.staff ? ACCENT : 'rgba(255,255,255,0.45)'; ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill(); });
         const edgeIdx = Math.floor((frame * 0.01) % edges.length);
-        const [a, b] = edges[edgeIdx];
-        const t = (frame * 0.015) % 1;
-        const px = nodes[a].x + (nodes[b].x - nodes[a].x) * t;
-        const py = nodes[a].y + (nodes[b].y - nodes[a].y) * t;
-        ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.8;
-        ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha = 1;
+        const [a, b] = edges[edgeIdx]; const t = (frame * 0.015) % 1;
+        ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.7;
+        ctx.beginPath(); ctx.arc(nodes[a].x + (nodes[b].x - nodes[a].x) * t, nodes[a].y + (nodes[b].y - nodes[a].y) * t, 2, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
     }
 
-    // ── EHR: scrolling clinical records ──
+    // EHR scrolling
     function vizEHR() {
         const v = vizCanvases.ehr; if (!v) return;
-        const { ctx, w, h } = v;
-        ctx.clearRect(0, 0, w, h);
-        const rowH = 18, cols = [w*0.08, w*0.28, w*0.55, w*0.78];
-        const scrollY = (frame * 0.4) % (rowH * 8);
+        const { ctx, w, h } = v; ctx.clearRect(0, 0, w, h);
+        const rowH = 16, cols = [w*0.08, w*0.28, w*0.55, w*0.78], scrollY = (frame * 0.35) % (rowH * 8);
         ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, h); ctx.clip();
         for (let r = -1; r < 8; r++) {
-            const y = r * rowH - scrollY + h/2;
-            if (y < -rowH || y > h + rowH) continue;
+            const y = r * rowH - scrollY + h/2; if (y < -rowH || y > h + rowH) continue;
             const rowAlpha = 1 - Math.abs(y - h/2) / (h * 0.6);
-            ctx.globalAlpha = Math.max(0.05, Math.min(0.5, rowAlpha));
-            if (r === 0) {
-                ctx.font = `600 8px ${MONO}`; ctx.fillStyle = ACCENT;
-                ['ID', 'WARD', 'DATE', 'STATUS'].forEach((t, i) => {
-                    ctx.textAlign = 'left'; ctx.fillText(t, cols[i], y);
-                });
-            } else {
-                ctx.font = `400 8px ${MONO}`; ctx.fillStyle = '#666';
-                const ids = ['P001','P002','S003','P004','S005','P006','P007'];
-                const wards = ['A','B','C','A','B','C','A'];
-                const stati = ['POS','NEG','POS','NEG','POS','NEG','POS'];
-                const ri = ((r - 1) + Math.floor(frame * 0.01)) % 7;
-                ctx.textAlign = 'left';
-                ctx.fillText(ids[ri], cols[0], y);
-                ctx.fillText(wards[ri], cols[1], y);
-                ctx.fillText('2025-0' + (ri+1), cols[2], y);
-                ctx.fillStyle = stati[ri] === 'POS' ? ACCENT : '#555';
-                ctx.fillText(stati[ri], cols[3], y);
-            }
+            ctx.globalAlpha = Math.max(0.04, Math.min(0.45, rowAlpha));
+            if (r === 0) { ctx.font = `500 7px ${MONO}`; ctx.fillStyle = ACCENT; ['ID','WARD','DATE','STATUS'].forEach((t,i) => { ctx.textAlign = 'left'; ctx.fillText(t, cols[i], y); }); }
+            else { ctx.font = `300 7px ${MONO}`; ctx.fillStyle = '#666'; const ids = ['P001','P002','S003','P004','S005','P006','P007'], wards = ['A','B','C','A','B','C','A'], stati = ['POS','NEG','POS','NEG','POS','NEG','POS']; const ri = ((r-1)+Math.floor(frame*0.01))%7; ctx.textAlign = 'left'; ctx.fillText(ids[ri], cols[0], y); ctx.fillText(wards[ri], cols[1], y); ctx.fillText('2025-0'+(ri+1), cols[2], y); ctx.fillStyle = stati[ri] === 'POS' ? ACCENT : '#555'; ctx.fillText(stati[ri], cols[3], y); }
         }
         ctx.restore(); ctx.globalAlpha = 1;
-        const fadeH = 20;
-        const gradTop = ctx.createLinearGradient(0, 0, 0, fadeH);
-        gradTop.addColorStop(0, 'rgba(0,0,0,0.8)'); gradTop.addColorStop(1, 'transparent');
-        ctx.fillStyle = gradTop; ctx.fillRect(0, 0, w, fadeH);
-        const gradBot = ctx.createLinearGradient(0, h - fadeH, 0, h);
-        gradBot.addColorStop(0, 'transparent'); gradBot.addColorStop(1, 'rgba(0,0,0,0.8)');
-        ctx.fillStyle = gradBot; ctx.fillRect(0, h - fadeH, w, fadeH);
+        const fadeH = 18; let gradTop = ctx.createLinearGradient(0,0,0,fadeH); gradTop.addColorStop(0,'rgba(0,0,0,0.7)'); gradTop.addColorStop(1,'transparent'); ctx.fillStyle = gradTop; ctx.fillRect(0,0,w,fadeH);
+        let gradBot = ctx.createLinearGradient(0,h-fadeH,0,h); gradBot.addColorStop(0,'transparent'); gradBot.addColorStop(1,'rgba(0,0,0,0.7)'); ctx.fillStyle = gradBot; ctx.fillRect(0,h-fadeH,w,fadeH);
     }
 
-    // ── Anonymisation: data being redacted ──
+    // Anonymisation
     function vizAnon() {
         const v = vizCanvases.anon; if (!v) return;
-        const { ctx, w, h } = v;
-        ctx.clearRect(0, 0, w, h);
-        const cx = w/2, cy = h/2;
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1.5;
-        const sw = 35, sh = 42;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy - sh);
-        ctx.quadraticCurveTo(cx + sw, cy - sh * 0.6, cx + sw, cy);
-        ctx.quadraticCurveTo(cx + sw * 0.6, cy + sh * 0.6, cx, cy + sh);
-        ctx.quadraticCurveTo(cx - sw * 0.6, cy + sh * 0.6, cx - sw, cy);
-        ctx.quadraticCurveTo(cx - sw, cy - sh * 0.6, cx, cy - sh);
-        ctx.stroke();
-        const rows = ['John Smith', 'DOB: 1985-03', 'MRN: 47291', 'Ward: B'];
-        const redactPhase = (frame * 0.008) % 1;
-        rows.forEach((text, i) => {
-            const x = cx - sw - 55, y = cy - 25 + i * 16;
-            ctx.font = `400 8px ${MONO}`;
-            const fade = Math.max(0, 1 - redactPhase * 3 + i * 0.3);
-            ctx.fillStyle = `rgba(255,255,255,${fade * 0.3})`; ctx.textAlign = 'left';
-            ctx.fillText(text, x, y);
-            const barW = Math.min(1, Math.max(0, redactPhase * 3 - i * 0.3)) * ctx.measureText(text).width;
-            if (barW > 0) {
-                ctx.fillStyle = 'rgba(230,57,70,0.25)';
-                ctx.fillRect(x - 1, y - 8, barW + 2, 11);
-            }
-        });
-        const anon = ['HASH_7f3a', '****-**', 'ID: \u2588\u2588\u2588\u2588', 'Ward: B'];
-        anon.forEach((text, i) => {
-            const x = cx + sw + 15, y = cy - 25 + i * 16;
-            const appear = Math.max(0, Math.min(1, redactPhase * 3 - 1 - i * 0.2));
-            ctx.font = `400 8px ${MONO}`;
-            ctx.fillStyle = `rgba(100,255,100,${appear * 0.4})`; ctx.textAlign = 'left';
-            ctx.fillText(text, x, y);
-        });
-        const scanY = cy - sh + ((frame * 0.8) % (sh * 2));
-        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = 0.3;
-        ctx.beginPath(); ctx.moveTo(cx - sw, scanY); ctx.lineTo(cx + sw, scanY); ctx.stroke();
-        ctx.globalAlpha = 1;
+        const { ctx, w, h } = v; ctx.clearRect(0, 0, w, h);
+        const cx = w/2, cy = h/2, sw = 32, sh = 38;
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(cx, cy - sh); ctx.quadraticCurveTo(cx + sw, cy - sh*0.6, cx + sw, cy); ctx.quadraticCurveTo(cx + sw*0.6, cy + sh*0.6, cx, cy + sh); ctx.quadraticCurveTo(cx - sw*0.6, cy + sh*0.6, cx - sw, cy); ctx.quadraticCurveTo(cx - sw, cy - sh*0.6, cx, cy - sh); ctx.stroke();
+        const rows = ['John Smith','DOB: 1985-03','MRN: 47291','Ward: B'], redactPhase = (frame * 0.008) % 1;
+        rows.forEach((text, i) => { const x = cx - sw - 50, y = cy - 22 + i * 14; ctx.font = `300 7px ${MONO}`; const fade = Math.max(0, 1 - redactPhase * 3 + i * 0.3); ctx.fillStyle = `rgba(255,255,255,${fade*0.25})`; ctx.textAlign = 'left'; ctx.fillText(text, x, y); const barW = Math.min(1, Math.max(0, redactPhase * 3 - i * 0.3)) * ctx.measureText(text).width; if (barW > 0) { ctx.fillStyle = 'rgba(230,57,70,0.2)'; ctx.fillRect(x-1, y-7, barW+2, 10); } });
+        const anon = ['HASH_7f3a','****-**','ID: \u2588\u2588\u2588\u2588','Ward: B'];
+        anon.forEach((text, i) => { const x = cx + sw + 12, y = cy - 22 + i * 14; const appear = Math.max(0, Math.min(1, redactPhase * 3 - 1 - i * 0.2)); ctx.font = `300 7px ${MONO}`; ctx.fillStyle = `rgba(100,255,100,${appear*0.35})`; ctx.textAlign = 'left'; ctx.fillText(text, x, y); });
+        const scanY = cy - sh + ((frame * 0.7) % (sh * 2));
+        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = 0.25; ctx.beginPath(); ctx.moveTo(cx - sw, scanY); ctx.lineTo(cx + sw, scanY); ctx.stroke(); ctx.globalAlpha = 1;
     }
 
-    // ── Transmission tree: growing animated tree ──
-    function vizTree() {
-        const v = vizCanvases.tree; if (!v) return;
-        const { ctx, w, h } = v;
-        ctx.clearRect(0, 0, w, h);
-        const cx = w/2, top = 16;
-        const treeNodes = [
-            { x: cx, y: top, r: 5, infected: true },
-            { x: cx - 50, y: top + 30, r: 4 }, { x: cx + 50, y: top + 30, r: 4 },
-            { x: cx - 70, y: top + 60, r: 3.5 }, { x: cx - 30, y: top + 60, r: 3.5 },
-            { x: cx + 30, y: top + 60, r: 3.5 }, { x: cx + 70, y: top + 60, r: 3.5 },
-            { x: cx - 80, y: top + 85, r: 3 }, { x: cx - 55, y: top + 85, r: 3 },
-        ];
-        const treeEdges = [[0,1],[0,2],[1,3],[1,4],[2,5],[2,6],[3,7],[3,8]];
-        const reveal = ((frame * 0.006) % 1.5);
-        treeEdges.forEach(([a,b], i) => {
-            const t = Math.max(0, Math.min(1, reveal * treeEdges.length - i));
-            if (t <= 0) return;
-            const na = treeNodes[a], nb = treeNodes[b];
-            const bx = na.x + (nb.x - na.x) * t;
-            const by = na.y + (nb.y - na.y) * t;
-            ctx.strokeStyle = 'rgba(230,57,70,0.3)'; ctx.lineWidth = 1.2;
-            ctx.beginPath(); ctx.moveTo(na.x, na.y); ctx.lineTo(bx, by); ctx.stroke();
-        });
-        treeNodes.forEach((n, i) => {
-            const t = Math.max(0, Math.min(1, reveal * treeEdges.length - Math.max(0, i - 1)));
-            if (t <= 0 && i > 0) return;
-            ctx.fillStyle = n.infected ? ACCENT : `rgba(255,255,255,${0.4 + t * 0.3})`;
-            ctx.beginPath(); ctx.arc(n.x, n.y, n.r * t, 0, Math.PI * 2); ctx.fill();
-            if (n.infected) {
-                ctx.fillStyle = 'rgba(230,57,70,0.15)';
-                ctx.beginPath(); ctx.arc(n.x, n.y, n.r * 2.5, 0, Math.PI * 2); ctx.fill();
-            }
-        });
-        ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.font = `400 8px ${MONO}`;
-        ctx.textAlign = 'center'; ctx.fillText('who infected whom', cx, h - 6);
-    }
-
-    // ── Alert: notification dispatch ──
+    // Alert dispatch
     function vizAlert() {
         const v = vizCanvases.alert; if (!v) return;
-        const { ctx, w, h } = v;
-        ctx.clearRect(0, 0, w, h);
-        const cx = w/2, cy = h/2;
-        const ew = 36, eh = 24;
-        ctx.strokeStyle = ACTIVE; ctx.lineWidth = 1.3; ctx.globalAlpha = 0.4;
-        ctx.strokeRect(cx - ew/2, cy - eh/2, ew, eh);
-        ctx.beginPath(); ctx.moveTo(cx - ew/2, cy - eh/2); ctx.lineTo(cx, cy + 2); ctx.lineTo(cx + ew/2, cy - eh/2); ctx.stroke();
+        const { ctx, w, h } = v; ctx.clearRect(0, 0, w, h);
+        const cx = w/2, cy = h/2, ew = 32, eh = 22;
+        ctx.strokeStyle = ACTIVE; ctx.lineWidth = 1.2; ctx.globalAlpha = 0.35;
+        ctx.strokeRect(cx-ew/2, cy-eh/2, ew, eh);
+        ctx.beginPath(); ctx.moveTo(cx-ew/2, cy-eh/2); ctx.lineTo(cx, cy+2); ctx.lineTo(cx+ew/2, cy-eh/2); ctx.stroke();
         ctx.globalAlpha = 1;
         const pulse = 0.7 + Math.sin(frame * 0.08) * 0.3;
         ctx.fillStyle = ACCENT; ctx.globalAlpha = pulse;
-        ctx.beginPath(); ctx.arc(cx + ew/2 + 2, cy - eh/2 - 2, 6, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.globalAlpha = 1; ctx.font = `700 7px ${MONO}`;
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('!', cx + ew/2 + 2, cy - eh/2 - 2); ctx.textBaseline = 'alphabetic';
-        for (let i = 0; i < 3; i++) {
-            const r = 30 + ((frame * 0.4 + i * 18) % 50);
-            const alpha = Math.max(0, 0.2 - (r - 30) / 70);
-            ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = alpha;
-            ctx.beginPath(); ctx.arc(cx, cy - 5, r, -0.8, 0.8); ctx.stroke();
-        }
+        ctx.beginPath(); ctx.arc(cx+ew/2+2, cy-eh/2-2, 5, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.globalAlpha = 1; ctx.font = `500 6px ${MONO}`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('!', cx+ew/2+2, cy-eh/2-2); ctx.textBaseline = 'alphabetic';
+        for (let i = 0; i < 3; i++) { const r = 26 + ((frame*0.35 + i*16)%45); const alpha = Math.max(0, 0.18 - (r-26)/60); ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = alpha; ctx.beginPath(); ctx.arc(cx, cy-4, r, -0.7, 0.7); ctx.stroke(); }
         ctx.globalAlpha = 1;
-        const targets = [
-            { x: cx + 65, y: cy - 20, label: 'IPC Team' },
-            { x: cx + 60, y: cy + 22, label: 'Dashboard' },
-            { x: cx - 65, y: cy, label: 'Hospital' },
-        ];
+        const targets = [{x:cx+60,y:cy-18,label:'IPC Team'},{x:cx+55,y:cy+20,label:'Dashboard'},{x:cx-60,y:cy,label:'Hospital'}];
         targets.forEach((tgt, ti) => {
-            ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
-            ctx.setLineDash([2, 3]);
-            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(tgt.x, tgt.y); ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = `400 7px ${MONO}`;
-            ctx.textAlign = 'center'; ctx.fillText(tgt.label, tgt.x, tgt.y + 12);
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1; ctx.setLineDash([2,3]);
+            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(tgt.x, tgt.y); ctx.stroke(); ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.font = `300 6px ${MONO}`; ctx.textAlign = 'center'; ctx.fillText(tgt.label, tgt.x, tgt.y + 10);
             const t = ((frame * 0.01) + ti * 0.3) % 1;
-            const fx = cx + (tgt.x - cx) * t;
-            const fy = cy + (tgt.y - cy) * t;
             ctx.fillStyle = ACCENT; ctx.globalAlpha = 1 - t * 0.5;
-            ctx.beginPath(); ctx.arc(fx, fy, 2, 0, Math.PI * 2); ctx.fill();
-            ctx.globalAlpha = 1;
+            ctx.beginPath(); ctx.arc(cx + (tgt.x-cx)*t, cy + (tgt.y-cy)*t, 1.8, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
         });
     }
 
     // ═══════════════════════════════════════════
-    // NOSOTRACK ENGINE — 3D Three.js mini-scene
+    // ENGINE — Transmission tree with infection
+    // propagation animation (Canvas 2D)
     // ═══════════════════════════════════════════
     const engineCanvas = document.getElementById('engine-canvas');
-    let engineScene, engineCamera, engineRenderer, engineNodes = [], engineEdges = [];
-    let engineDataParticles = [], engineFrame = 0;
+    let engineCtx, engineW, engineH;
+    const ENGINE_NODES = [];
+    const ENGINE_EDGES = [];
+    let enginePhase = 0; // 0=building, 1=computing, 2=infecting
+    let engineTimer = 0;
+    const ENGINE_CYCLE = 900; // total frames per cycle
+    const WARD_COLORS = { A: 'rgba(100,150,255,0.8)', B: 'rgba(255,150,100,0.8)', C: 'rgba(150,255,100,0.8)' };
 
-    function initEngine() {
-        if (!engineCanvas || typeof THREE === 'undefined') return;
-        const rect = engineCanvas.getBoundingClientRect();
-        const W = rect.width, H = rect.height;
+    function initEngineViz() {
+        if (!engineCanvas) return;
+        const info = initCanvas(engineCanvas);
+        if (!info) return;
+        engineCtx = info.ctx; engineW = info.w; engineH = info.h;
 
-        engineScene = new THREE.Scene();
-        engineScene.background = new THREE.Color(0x080810);
-        engineScene.fog = new THREE.FogExp2(0x080810, 0.006);
+        // Build transmission tree structure
+        ENGINE_NODES.length = 0; ENGINE_EDGES.length = 0;
+        const cx = engineW / 2, topY = 40;
+        const levelH = Math.min(55, (engineH - 80) / 4);
 
-        engineCamera = new THREE.PerspectiveCamera(50, W / H, 0.5, 600);
-        engineCamera.position.set(0, 30, 120);
-        engineCamera.lookAt(0, 0, 0);
-
-        engineRenderer = new THREE.WebGLRenderer({ canvas: engineCanvas, antialias: true, alpha: false });
-        engineRenderer.setSize(W, H);
-        engineRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // Ambient + point lighting
-        engineScene.add(new THREE.AmbientLight(0x334466, 0.6));
-        const pLight1 = new THREE.PointLight(0xe63946, 1.2, 200);
-        pLight1.position.set(40, 50, 40);
-        engineScene.add(pLight1);
-        const pLight2 = new THREE.PointLight(0x5b9bd5, 0.8, 200);
-        pLight2.position.set(-50, -20, 50);
-        engineScene.add(pLight2);
-
-        // Ground grid
-        const gridHelper = new THREE.GridHelper(200, 30, 0x1a1a2e, 0x111122);
-        gridHelper.position.y = -35;
-        engineScene.add(gridHelper);
-
-        // Central platform (glowing disc)
-        const platformGeo = new THREE.CylinderGeometry(18, 20, 3, 32);
-        const platformMat = new THREE.MeshPhongMaterial({
-            color: 0x1a1a2e, emissive: 0xe63946, emissiveIntensity: 0.08,
-            transparent: true, opacity: 0.7
-        });
-        const platform = new THREE.Mesh(platformGeo, platformMat);
-        platform.position.y = -33;
-        engineScene.add(platform);
-
-        // Central core — rotating icosahedron
-        const coreGeo = new THREE.IcosahedronGeometry(6, 1);
-        const coreMat = new THREE.MeshPhongMaterial({
-            color: 0xe63946, emissive: 0xe63946, emissiveIntensity: 0.3,
-            wireframe: true, transparent: true, opacity: 0.6
-        });
-        const core = new THREE.Mesh(coreGeo, coreMat);
-        core.position.y = 0;
-        engineScene.add(core);
-        engineNodes.push({ mesh: core, type: 'core' });
-
-        // Inner solid core
-        const innerGeo = new THREE.IcosahedronGeometry(3.5, 1);
-        const innerMat = new THREE.MeshPhongMaterial({
-            color: 0xff4455, emissive: 0xe63946, emissiveIntensity: 0.5,
-            transparent: true, opacity: 0.4
-        });
-        const innerCore = new THREE.Mesh(innerGeo, innerMat);
-        engineScene.add(innerCore);
-        engineNodes.push({ mesh: innerCore, type: 'inner' });
-
-        // NT label sprite
-        const labelCanvas = document.createElement('canvas');
-        labelCanvas.width = 128; labelCanvas.height = 48;
-        const lctx = labelCanvas.getContext('2d');
-        lctx.fillStyle = '#fff'; lctx.font = 'bold 28px Syne, sans-serif';
-        lctx.textAlign = 'center'; lctx.textBaseline = 'middle';
-        lctx.fillText('NosoTrack', 64, 24);
-        const labelTex = new THREE.CanvasTexture(labelCanvas);
-        const labelMat = new THREE.SpriteMaterial({ map: labelTex, transparent: true, opacity: 0.5 });
-        const labelSprite = new THREE.Sprite(labelMat);
-        labelSprite.position.set(0, -22, 0);
-        labelSprite.scale.set(24, 9, 1);
-        engineScene.add(labelSprite);
-
-        // Orbital rings
-        const ringColors = [0x5b9bd5, 0x70ad47, 0xffc000];
-        const ringRadii = [30, 42, 55];
-        const ringTilts = [0.3, -0.2, 0.5];
-        ringRadii.forEach((r, i) => {
-            const ringGeo = new THREE.RingGeometry(r - 0.3, r + 0.3, 64);
-            const ringMat = new THREE.MeshBasicMaterial({
-                color: ringColors[i], transparent: true, opacity: 0.12,
-                side: THREE.DoubleSide
-            });
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.rotation.x = Math.PI / 2 + ringTilts[i];
-            ring.rotation.z = i * 0.7;
-            engineScene.add(ring);
-            engineNodes.push({ mesh: ring, type: 'ring', idx: i });
-        });
-
-        // Data nodes orbiting on rings — represent patients/samples
-        const nodeTypes = [
-            { color: 0x5b9bd5, ring: 0, count: 5, label: 'GEN' },
-            { color: 0x70ad47, ring: 1, count: 6, label: 'CON' },
-            { color: 0xffc000, ring: 2, count: 4, label: 'EHR' },
+        // Tree layout: P0 → S1, S2 → P3,P4,P5,P6 → S3 → P7,P8,P9 etc
+        const tree = [
+            { id: 0, label: 'P0', x: cx, y: topY, ward: 'A', type: 'patient' },
+            { id: 1, label: 'S1', x: cx - 120, y: topY + levelH, ward: 'A', type: 'staff' },
+            { id: 2, label: 'S2', x: cx + 120, y: topY + levelH, ward: 'B', type: 'staff' },
+            { id: 3, label: 'P3', x: cx - 180, y: topY + levelH * 2, ward: 'A', type: 'patient' },
+            { id: 4, label: 'P4', x: cx - 80, y: topY + levelH * 2, ward: 'A', type: 'patient' },
+            { id: 5, label: 'P5', x: cx + 60, y: topY + levelH * 2, ward: 'B', type: 'patient' },
+            { id: 6, label: 'P6', x: cx + 160, y: topY + levelH * 2, ward: 'B', type: 'patient' },
+            { id: 7, label: 'S3', x: cx + 60, y: topY + levelH * 3, ward: 'B', type: 'staff' },
+            { id: 8, label: 'P7', x: cx - 30, y: topY + levelH * 4, ward: 'C', type: 'patient' },
+            { id: 9, label: 'P8', x: cx + 60, y: topY + levelH * 4, ward: 'C', type: 'patient' },
+            { id: 10, label: 'P9', x: cx + 150, y: topY + levelH * 4, ward: 'B', type: 'patient' },
         ];
-        nodeTypes.forEach(nt => {
-            for (let i = 0; i < nt.count; i++) {
-                const angle = (i / nt.count) * Math.PI * 2;
-                const geo = new THREE.SphereGeometry(1.5, 12, 12);
-                const mat = new THREE.MeshPhongMaterial({
-                    color: nt.color, emissive: nt.color, emissiveIntensity: 0.15,
-                    transparent: true, opacity: 0.7
-                });
-                const mesh = new THREE.Mesh(geo, mat);
-                engineScene.add(mesh);
-                engineNodes.push({
-                    mesh, type: 'dataNode', ring: nt.ring,
-                    angle: angle, speed: 0.003 + Math.random() * 0.002,
-                    radius: ringRadii[nt.ring],
-                    tilt: ringTilts[nt.ring], zRot: nt.ring * 0.7,
-                    color: nt.color
-                });
-            }
-        });
+        tree.forEach(n => ENGINE_NODES.push({ ...n, infected: false, infectionTime: -1, r: n.type === 'staff' ? 5 : 6, glowAlpha: 0 }));
 
-        // Connection lines between nearby data nodes (network edges)
-        const edgeMat = new THREE.LineBasicMaterial({
-            color: 0xe63946, transparent: true, opacity: 0.08
-        });
-        for (let i = 0; i < 12; i++) {
-            const geo = new THREE.BufferGeometry();
-            const positions = new Float32Array(6);
-            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            const line = new THREE.Line(geo, edgeMat);
-            engineScene.add(line);
-            engineEdges.push(line);
-        }
-
-        // Data stream particles — flowing from edges toward center
-        for (let i = 0; i < 30; i++) {
-            const pGeo = new THREE.SphereGeometry(0.4, 6, 6);
-            const pMat = new THREE.MeshBasicMaterial({
-                color: [0x5b9bd5, 0x70ad47, 0xffc000, 0xe63946][i % 4],
-                transparent: true, opacity: 0.6
-            });
-            const pMesh = new THREE.Mesh(pGeo, pMat);
-            engineScene.add(pMesh);
-            engineDataParticles.push({
-                mesh: pMesh,
-                t: Math.random(),
-                speed: 0.002 + Math.random() * 0.003,
-                fromAngle: Math.random() * Math.PI * 2,
-                fromRadius: 60 + Math.random() * 30,
-                fromY: (Math.random() - 0.5) * 40,
-            });
-        }
-
-        // Processing pulse rings (horizontal)
-        for (let i = 0; i < 3; i++) {
-            const pulseGeo = new THREE.RingGeometry(8 + i * 12, 8.5 + i * 12, 48);
-            const pulseMat = new THREE.MeshBasicMaterial({
-                color: 0xe63946, transparent: true, opacity: 0.04,
-                side: THREE.DoubleSide
-            });
-            const pulseMesh = new THREE.Mesh(pulseGeo, pulseMat);
-            pulseMesh.rotation.x = Math.PI / 2;
-            pulseMesh.position.y = -32;
-            engineScene.add(pulseMesh);
-            engineNodes.push({ mesh: pulseMesh, type: 'pulse', idx: i });
-        }
+        const edges = [[0,1],[0,2],[1,3],[1,4],[2,5],[2,6],[5,7],[7,8],[7,9],[6,10]];
+        edges.forEach(([from, to], i) => ENGINE_EDGES.push({ from, to, progress: 0, infectionProgress: 0, order: i }));
     }
 
-    function animateEngine() {
-        if (!engineRenderer) return;
-        engineFrame++;
-        const t = engineFrame * 0.01;
+    function drawEngineViz() {
+        if (!engineCtx) return;
+        const ctx = engineCtx, w = engineW, h = engineH;
+        ctx.clearRect(0, 0, w, h);
 
-        // Rotate core
-        engineNodes.forEach(n => {
-            if (n.type === 'core') {
-                n.mesh.rotation.x = t * 0.3;
-                n.mesh.rotation.y = t * 0.5;
-            }
-            if (n.type === 'inner') {
-                n.mesh.rotation.x = -t * 0.4;
-                n.mesh.rotation.z = t * 0.6;
-            }
-            // Orbit data nodes
-            if (n.type === 'dataNode') {
-                n.angle += n.speed;
-                const cosT = Math.cos(n.tilt);
-                const sinT = Math.sin(n.tilt);
-                const cosZ = Math.cos(n.zRot);
-                const sinZ = Math.sin(n.zRot);
-                let x = Math.cos(n.angle) * n.radius;
-                let z = Math.sin(n.angle) * n.radius;
-                let y = z * sinT;
-                z = z * cosT;
-                const rx = x * cosZ - z * sinZ;
-                const rz = x * sinZ + z * cosZ;
-                n.mesh.position.set(rx, y, rz);
-            }
-            // Pulse rings
-            if (n.type === 'pulse') {
-                const scale = 1 + Math.sin(t * 2 + n.idx * 2) * 0.15;
-                n.mesh.scale.set(scale, scale, 1);
-                n.mesh.material.opacity = 0.03 + Math.sin(t * 2 + n.idx * 2) * 0.02;
-            }
-        });
+        engineTimer = (engineTimer + 1) % ENGINE_CYCLE;
+        const cycleFrac = engineTimer / ENGINE_CYCLE;
 
-        // Update edges — connect nearby data nodes
-        const dataN = engineNodes.filter(n => n.type === 'dataNode');
-        let edgeIdx = 0;
-        for (let i = 0; i < dataN.length && edgeIdx < engineEdges.length; i++) {
-            for (let j = i + 1; j < dataN.length && edgeIdx < engineEdges.length; j++) {
-                const dx = dataN[i].mesh.position.x - dataN[j].mesh.position.x;
-                const dy = dataN[i].mesh.position.y - dataN[j].mesh.position.y;
-                const dz = dataN[i].mesh.position.z - dataN[j].mesh.position.z;
-                const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
-                if (dist < 35) {
-                    const pos = engineEdges[edgeIdx].geometry.attributes.position.array;
-                    pos[0] = dataN[i].mesh.position.x; pos[1] = dataN[i].mesh.position.y; pos[2] = dataN[i].mesh.position.z;
-                    pos[3] = dataN[j].mesh.position.x; pos[4] = dataN[j].mesh.position.y; pos[5] = dataN[j].mesh.position.z;
-                    engineEdges[edgeIdx].geometry.attributes.position.needsUpdate = true;
-                    engineEdges[edgeIdx].visible = true;
-                    engineEdges[edgeIdx].material.opacity = 0.08 * (1 - dist / 35);
-                    edgeIdx++;
+        // Phase 0: tree structure appears (0-15%)
+        // Phase 1: computing pulse (15-25%)
+        // Phase 2: infection propagates (25-90%)
+        // Phase 3: hold + fade (90-100%)
+
+        const buildEnd = 0.15;
+        const computeEnd = 0.25;
+        const infectEnd = 0.88;
+
+        // Background grid
+        ctx.strokeStyle = 'rgba(255,255,255,0.015)'; ctx.lineWidth = 0.5;
+        for (let x = 0; x < w; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+        for (let y = 0; y < h; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+        // Draw edges
+        ENGINE_EDGES.forEach((e, i) => {
+            const from = ENGINE_NODES[e.from], to = ENGINE_NODES[e.to];
+
+            // Tree building phase
+            let edgeBuild = 0;
+            if (cycleFrac < buildEnd) {
+                edgeBuild = Math.max(0, Math.min(1, (cycleFrac / buildEnd) * ENGINE_EDGES.length - i));
+            } else {
+                edgeBuild = 1;
+            }
+            if (edgeBuild <= 0) return;
+
+            const ex = from.x + (to.x - from.x) * edgeBuild;
+            const ey = from.y + (to.y - from.y) * edgeBuild;
+
+            // Base edge
+            ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(ex, ey); ctx.stroke();
+
+            // Infection propagation along edge
+            if (cycleFrac > computeEnd && cycleFrac < infectEnd) {
+                const infectFrac = (cycleFrac - computeEnd) / (infectEnd - computeEnd);
+                const edgeInfectStart = i / ENGINE_EDGES.length;
+                const edgeInfectDuration = 0.15;
+                const edgeProgress = Math.max(0, Math.min(1, (infectFrac - edgeInfectStart) / edgeInfectDuration));
+
+                if (edgeProgress > 0 && ENGINE_NODES[e.from].infected) {
+                    // Red infection traveling along edge
+                    const ix = from.x + (to.x - from.x) * edgeProgress;
+                    const iy = from.y + (to.y - from.y) * edgeProgress;
+
+                    // Infected portion of edge
+                    ctx.strokeStyle = ACCENT; ctx.lineWidth = 2; ctx.globalAlpha = 0.7;
+                    ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(ix, iy); ctx.stroke();
+                    ctx.globalAlpha = 1;
+
+                    // Glowing red dot at infection front
+                    const grad = ctx.createRadialGradient(ix, iy, 0, ix, iy, 10);
+                    grad.addColorStop(0, 'rgba(230,57,70,0.6)'); grad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath(); ctx.arc(ix, iy, 10, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath(); ctx.arc(ix, iy, 2, 0, Math.PI * 2); ctx.fill();
+
+                    // Mark target as infected when complete
+                    if (edgeProgress >= 1 && !ENGINE_NODES[e.to].infected) {
+                        ENGINE_NODES[e.to].infected = true;
+                        ENGINE_NODES[e.to].infectionTime = engineTimer;
+                    }
+
+                    // Full infected edge glow
+                    if (edgeProgress >= 1) {
+                        ctx.strokeStyle = ACCENT; ctx.lineWidth = 2; ctx.globalAlpha = 0.5;
+                        ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(to.x, to.y); ctx.stroke();
+                        ctx.globalAlpha = 1;
+                    }
                 }
             }
-        }
-        for (; edgeIdx < engineEdges.length; edgeIdx++) {
-            engineEdges[edgeIdx].visible = false;
-        }
-
-        // Animate data stream particles flowing toward center
-        engineDataParticles.forEach(p => {
-            p.t += p.speed;
-            if (p.t > 1) {
-                p.t = 0;
-                p.fromAngle = Math.random() * Math.PI * 2;
-                p.fromRadius = 60 + Math.random() * 30;
-                p.fromY = (Math.random() - 0.5) * 40;
-            }
-            const ease = p.t * p.t * (3 - 2 * p.t); // smoothstep
-            const r = p.fromRadius * (1 - ease);
-            p.mesh.position.x = Math.cos(p.fromAngle) * r;
-            p.mesh.position.z = Math.sin(p.fromAngle) * r;
-            p.mesh.position.y = p.fromY * (1 - ease);
-            p.mesh.material.opacity = 0.5 * (1 - ease * 0.7);
-            const s = 0.3 + (1 - ease) * 0.7;
-            p.mesh.scale.set(s, s, s);
         });
 
-        // Slow orbit camera
-        engineCamera.position.x = Math.sin(t * 0.15) * 110;
-        engineCamera.position.z = Math.cos(t * 0.15) * 110;
-        engineCamera.position.y = 25 + Math.sin(t * 0.1) * 10;
-        engineCamera.lookAt(0, -5, 0);
+        // Draw nodes
+        ENGINE_NODES.forEach((n, i) => {
+            let nodeBuild = 0;
+            if (cycleFrac < buildEnd) {
+                nodeBuild = Math.max(0, Math.min(1, (cycleFrac / buildEnd) * (ENGINE_NODES.length + 2) - i));
+            } else {
+                nodeBuild = 1;
+            }
+            if (nodeBuild <= 0) return;
 
-        engineRenderer.render(engineScene, engineCamera);
+            const r = n.r * nodeBuild;
+
+            // Infect P0 at start of infection phase
+            if (i === 0 && cycleFrac > computeEnd && !n.infected) {
+                n.infected = true;
+                n.infectionTime = engineTimer;
+            }
+
+            // Node glow for infected
+            if (n.infected) {
+                const timeSince = engineTimer - n.infectionTime;
+                const glowPulse = 0.15 + Math.sin(timeSince * 0.08) * 0.08;
+                ctx.fillStyle = `rgba(230,57,70,${glowPulse})`;
+                ctx.beginPath(); ctx.arc(n.x, n.y, r * 3, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // Ward color ring
+            ctx.strokeStyle = WARD_COLORS[n.ward]; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.5;
+            ctx.beginPath(); ctx.arc(n.x, n.y, r + 3, 0, Math.PI * 2); ctx.stroke();
+            ctx.globalAlpha = 1;
+
+            // Node body
+            if (n.type === 'staff') {
+                // Diamond shape for staff
+                ctx.fillStyle = n.infected ? ACCENT : 'rgba(200,200,200,0.5)';
+                ctx.beginPath();
+                ctx.moveTo(n.x, n.y - r); ctx.lineTo(n.x + r, n.y);
+                ctx.lineTo(n.x, n.y + r); ctx.lineTo(n.x - r, n.y);
+                ctx.closePath(); ctx.fill();
+            } else {
+                // Circle for patients
+                ctx.fillStyle = n.infected ? ACCENT : 'rgba(200,200,200,0.4)';
+                ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // Label
+            ctx.fillStyle = n.infected ? '#fff' : 'rgba(255,255,255,0.35)';
+            ctx.font = `400 7px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(n.label, n.x, n.y); ctx.textBaseline = 'alphabetic';
+        });
+
+        // Computing phase — scanning beam
+        if (cycleFrac > buildEnd && cycleFrac < computeEnd) {
+            const computeFrac = (cycleFrac - buildEnd) / (computeEnd - buildEnd);
+            const scanX = w * computeFrac;
+            ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = 0.4;
+            ctx.beginPath(); ctx.moveTo(scanX, 0); ctx.lineTo(scanX, h); ctx.stroke();
+            // Scan glow
+            const scanGrad = ctx.createLinearGradient(scanX - 40, 0, scanX, 0);
+            scanGrad.addColorStop(0, 'transparent'); scanGrad.addColorStop(1, 'rgba(230,57,70,0.08)');
+            ctx.fillStyle = scanGrad; ctx.fillRect(scanX - 40, 0, 40, h);
+            ctx.globalAlpha = 1;
+            // Status text
+            ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.5;
+            ctx.font = `400 9px ${MONO}`; ctx.textAlign = 'left';
+            ctx.fillText('COMPUTING TRANSMISSION PROBABILITIES...', 12, h - 12);
+            ctx.globalAlpha = 1;
+        }
+
+        // Infection phase status
+        if (cycleFrac > computeEnd && cycleFrac < infectEnd) {
+            ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.4 + Math.sin(frame * 0.08) * 0.1;
+            ctx.font = `400 9px ${MONO}`; ctx.textAlign = 'left';
+            ctx.fillText('RECONSTRUCTING TRANSMISSION TREE...', 12, h - 12);
+            ctx.globalAlpha = 1;
+        }
+
+        // Hold phase — all infected, display result
+        if (cycleFrac > infectEnd) {
+            ctx.fillStyle = 'rgba(100,255,100,0.4)';
+            ctx.font = `500 9px ${MONO}`; ctx.textAlign = 'left';
+            ctx.fillText('TRANSMISSION TREE COMPLETE', 12, h - 12);
+        }
+
+        // Reset at cycle end
+        if (engineTimer === ENGINE_CYCLE - 1) {
+            ENGINE_NODES.forEach(n => { n.infected = false; n.infectionTime = -1; });
+        }
     }
 
-    // ═══════════════════
-    // MAIN LOOP
-    // ═══════════════════
+    // Init
     initBg();
-    initEngine();
+    initEngineViz();
 
     window.addEventListener('resize', () => {
         initBg();
-        Object.keys(vizCanvases).forEach(k => {
-            const c = vizCanvases[k];
-            const info = initCanvas(c.el);
-            if (info) { c.ctx = info.ctx; c.w = info.w; c.h = info.h; }
-        });
-        connectors.forEach(c => {
-            const info = initCanvas(c.el);
-            if (info) { c.ctx = info.ctx; c.w = info.w; c.h = info.h; }
-        });
-        // Resize engine
-        if (engineRenderer && engineCanvas) {
-            const rect = engineCanvas.getBoundingClientRect();
-            engineRenderer.setSize(rect.width, rect.height);
-            engineCamera.aspect = rect.width / rect.height;
-            engineCamera.updateProjectionMatrix();
-        }
+        Object.keys(vizCanvases).forEach(k => { const c = vizCanvases[k]; const info = initCanvas(c.el); if (info) { c.ctx = info.ctx; c.w = info.w; c.h = info.h; } });
+        connectors.forEach(c => { const info = initCanvas(c.el); if (info) { c.ctx = info.ctx; c.w = info.w; c.h = info.h; } });
+        initEngineViz();
     });
 
     function animate() {
@@ -1974,13 +1350,8 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         frame++;
         drawBg();
         connectors.forEach(animateConnector);
-        vizDNA();
-        vizContact();
-        vizEHR();
-        vizAnon();
-        vizTree();
-        vizAlert();
-        animateEngine();
+        vizDNA(); vizContact(); vizEHR(); vizAnon(); vizAlert();
+        drawEngineViz();
     }
     setTimeout(() => { requestAnimationFrame(animate); }, 150);
 })();
@@ -1994,9 +1365,8 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     if (!container) return;
 
     const W = container.clientWidth;
-    const H = container.clientHeight || 600;
+    const H = container.clientHeight || 550;
 
-    // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0a0a);
     scene.fog = new THREE.FogExp2(0x0a0a0a, 0.0012);
@@ -2009,330 +1379,129 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    // Lights
     const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
     scene.add(ambientLight);
     const pointLight = new THREE.PointLight(0xffffff, 0.6, 800);
     pointLight.position.set(100, 200, 200);
     scene.add(pointLight);
 
-    // Colors
-    const COLORS = {
-        healthy: 0x555555,
-        infected: 0xe63946,
-        wardA: 0x6496ff,
-        wardB: 0xff9664,
-        wardC: 0x96ff64,
-        edge: 0x333333,
-        edgeInfected: 0xe63946,
-        particle: 0xe63946,
-    };
+    const COLORS = { healthy: 0x555555, infected: 0xe63946, wardA: 0x6496ff, wardB: 0xff9664, wardC: 0x96ff64, edge: 0x333333, edgeInfected: 0xe63946, particle: 0xe63946 };
 
-    // Node data
     const nodeData = [
-        { id: 1, label: 'P0', ward: 'A', type: 'patient' },
-        { id: 2, label: 'S1', ward: 'A', type: 'staff' },
-        { id: 3, label: 'S2', ward: 'B', type: 'staff' },
-        { id: 4, label: 'P3', ward: 'A', type: 'patient' },
-        { id: 5, label: 'P4', ward: 'A', type: 'patient' },
-        { id: 6, label: 'P5', ward: 'B', type: 'patient' },
-        { id: 7, label: 'P6', ward: 'B', type: 'patient' },
-        { id: 8, label: 'P7', ward: 'C', type: 'patient' },
-        { id: 10, label: 'S3', ward: 'B', type: 'staff' },
-        { id: 9, label: 'P2', ward: 'A', type: 'patient' },
-        { id: 11, label: 'S4', ward: 'A', type: 'staff' },
-        { id: 12, label: 'P10', ward: 'B', type: 'patient' },
-        { id: 13, label: 'S5', ward: 'B', type: 'staff' },
-        { id: 14, label: 'P12', ward: 'B', type: 'patient' },
-        { id: 15, label: 'P13', ward: 'B', type: 'patient' },
-        { id: 16, label: 'S6', ward: 'C', type: 'staff' },
-        { id: 18, label: 'S7', ward: 'C', type: 'staff' },
-        { id: 19, label: 'P17', ward: 'C', type: 'patient' },
-        { id: 20, label: 'P18', ward: 'C', type: 'patient' },
-        { id: 21, label: 'S8', ward: 'A', type: 'staff' },
-        { id: 17, label: 'P15', ward: 'C', type: 'patient' },
-        { id: 22, label: 'P20', ward: 'A', type: 'patient' },
+        { id: 1, label: 'P0', ward: 'A', type: 'patient' }, { id: 2, label: 'S1', ward: 'A', type: 'staff' },
+        { id: 3, label: 'S2', ward: 'B', type: 'staff' }, { id: 4, label: 'P3', ward: 'A', type: 'patient' },
+        { id: 5, label: 'P4', ward: 'A', type: 'patient' }, { id: 6, label: 'P5', ward: 'B', type: 'patient' },
+        { id: 7, label: 'P6', ward: 'B', type: 'patient' }, { id: 8, label: 'P7', ward: 'C', type: 'patient' },
+        { id: 10, label: 'S3', ward: 'B', type: 'staff' }, { id: 9, label: 'P2', ward: 'A', type: 'patient' },
+        { id: 11, label: 'S4', ward: 'A', type: 'staff' }, { id: 12, label: 'P10', ward: 'B', type: 'patient' },
+        { id: 13, label: 'S5', ward: 'B', type: 'staff' }, { id: 14, label: 'P12', ward: 'B', type: 'patient' },
+        { id: 15, label: 'P13', ward: 'B', type: 'patient' }, { id: 16, label: 'S6', ward: 'C', type: 'staff' },
+        { id: 18, label: 'S7', ward: 'C', type: 'staff' }, { id: 19, label: 'P17', ward: 'C', type: 'patient' },
+        { id: 20, label: 'P18', ward: 'C', type: 'patient' }, { id: 21, label: 'S8', ward: 'A', type: 'staff' },
+        { id: 17, label: 'P15', ward: 'C', type: 'patient' }, { id: 22, label: 'P20', ward: 'A', type: 'patient' },
         { id: 23, label: 'P21', ward: 'A', type: 'patient' },
     ];
 
     const edgeData = [
-        { from: 1, to: 2 }, { from: 1, to: 3 },
-        { from: 2, to: 4 }, { from: 2, to: 5 },
-        { from: 3, to: 6 }, { from: 3, to: 7 }, { from: 3, to: 8 },
-        { from: 6, to: 10 },
-        { from: 10, to: 9 }, { from: 10, to: 11 }, { from: 10, to: 12 },
-        { from: 10, to: 13 }, { from: 10, to: 14 }, { from: 10, to: 15 },
-        { from: 10, to: 16 }, { from: 10, to: 18 },
-        { from: 18, to: 19 }, { from: 18, to: 20 },
-        { from: 9, to: 21 },
-        { from: 21, to: 22 }, { from: 21, to: 23 },
-        { from: 16, to: 17 },
+        { from: 1, to: 2 }, { from: 1, to: 3 }, { from: 2, to: 4 }, { from: 2, to: 5 },
+        { from: 3, to: 6 }, { from: 3, to: 7 }, { from: 3, to: 8 }, { from: 6, to: 10 },
+        { from: 10, to: 9 }, { from: 10, to: 11 }, { from: 10, to: 12 }, { from: 10, to: 13 },
+        { from: 10, to: 14 }, { from: 10, to: 15 }, { from: 10, to: 16 }, { from: 10, to: 18 },
+        { from: 18, to: 19 }, { from: 18, to: 20 }, { from: 9, to: 21 }, { from: 21, to: 22 },
+        { from: 21, to: 23 }, { from: 16, to: 17 },
     ];
 
-    // Force-directed layout
     const nodeMap = {};
     const wardCenters = { A: { x: -180, z: -80 }, B: { x: 0, z: 90 }, C: { x: 180, z: -40 } };
 
     nodeData.forEach(n => {
         const wc = wardCenters[n.ward];
-        nodeMap[n.id] = {
-            ...n,
-            x: wc.x + (Math.random() - 0.5) * 100,
-            y: (Math.random() - 0.5) * 80,
-            z: wc.z + (Math.random() - 0.5) * 100,
-            vx: 0, vy: 0, vz: 0,
-            infected: false,
-            mesh: null,
-            glow: null,
-        };
+        nodeMap[n.id] = { ...n, x: wc.x + (Math.random()-0.5)*100, y: (Math.random()-0.5)*80, z: wc.z + (Math.random()-0.5)*100, vx:0, vy:0, vz:0, infected: false, mesh: null, glow: null };
     });
 
-    // Run force simulation
     function simulateForces(iterations) {
         const nodes = Object.values(nodeMap);
         for (let iter = 0; iter < iterations; iter++) {
-            // Repulsion
-            for (let i = 0; i < nodes.length; i++) {
-                for (let j = i + 1; j < nodes.length; j++) {
-                    const dx = nodes[i].x - nodes[j].x;
-                    const dy = nodes[i].y - nodes[j].y;
-                    const dz = nodes[i].z - nodes[j].z;
-                    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) + 0.1;
-                    const force = 800 / (dist * dist);
-                    const fx = (dx/dist) * force;
-                    const fy = (dy/dist) * force;
-                    const fz = (dz/dist) * force;
-                    nodes[i].vx += fx; nodes[i].vy += fy; nodes[i].vz += fz;
-                    nodes[j].vx -= fx; nodes[j].vy -= fy; nodes[j].vz -= fz;
-                }
-            }
-            // Attraction along edges
-            edgeData.forEach(e => {
-                const a = nodeMap[e.from], b = nodeMap[e.to];
-                const dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z;
-                const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) + 0.1;
-                const force = (dist - 50) * 0.04;
-                const fx = (dx/dist)*force, fy = (dy/dist)*force, fz = (dz/dist)*force;
-                a.vx += fx; a.vy += fy; a.vz += fz;
-                b.vx -= fx; b.vy -= fy; b.vz -= fz;
-            });
-            // Ward gravity
-            nodes.forEach(n => {
-                const wc = wardCenters[n.ward];
-                n.vx += (wc.x - n.x) * 0.025;
-                n.vz += (wc.z - n.z) * 0.025;
-                n.vy += (0 - n.y) * 0.012;
-            });
-            // Damping & update
-            const damping = 0.85;
-            nodes.forEach(n => {
-                n.vx *= damping; n.vy *= damping; n.vz *= damping;
-                n.x += n.vx; n.y += n.vy; n.z += n.vz;
-            });
+            for (let i = 0; i < nodes.length; i++) { for (let j = i+1; j < nodes.length; j++) { const dx = nodes[i].x-nodes[j].x, dy = nodes[i].y-nodes[j].y, dz = nodes[i].z-nodes[j].z; const dist = Math.sqrt(dx*dx+dy*dy+dz*dz)+0.1; const force = 800/(dist*dist); nodes[i].vx += (dx/dist)*force; nodes[i].vy += (dy/dist)*force; nodes[i].vz += (dz/dist)*force; nodes[j].vx -= (dx/dist)*force; nodes[j].vy -= (dy/dist)*force; nodes[j].vz -= (dz/dist)*force; } }
+            edgeData.forEach(e => { const a = nodeMap[e.from], b = nodeMap[e.to]; const dx = b.x-a.x, dy = b.y-a.y, dz = b.z-a.z; const dist = Math.sqrt(dx*dx+dy*dy+dz*dz)+0.1; const force = (dist-50)*0.04; a.vx += (dx/dist)*force; a.vy += (dy/dist)*force; a.vz += (dz/dist)*force; b.vx -= (dx/dist)*force; b.vy -= (dy/dist)*force; b.vz -= (dz/dist)*force; });
+            nodes.forEach(n => { const wc = wardCenters[n.ward]; n.vx += (wc.x-n.x)*0.025; n.vz += (wc.z-n.z)*0.025; n.vy += (0-n.y)*0.012; });
+            nodes.forEach(n => { n.vx *= 0.85; n.vy *= 0.85; n.vz *= 0.85; n.x += n.vx; n.y += n.vy; n.z += n.vz; });
         }
     }
     simulateForces(200);
 
-    // Ward ground planes & labels
-    const wardConfig = {
-        A: { color: COLORS.wardA, radius: 80 },
-        B: { color: COLORS.wardB, radius: 90 },
-        C: { color: COLORS.wardC, radius: 75 },
-    };
+    const wardConfig = { A: { color: COLORS.wardA, radius: 80 }, B: { color: COLORS.wardB, radius: 90 }, C: { color: COLORS.wardC, radius: 75 } };
     Object.entries(wardCenters).forEach(([ward, center]) => {
         const cfg = wardConfig[ward];
-        // Semi-transparent disc
         const discGeo = new THREE.CircleGeometry(cfg.radius, 64);
-        const discMat = new THREE.MeshBasicMaterial({
-            color: cfg.color, transparent: true, opacity: 0.07,
-            side: THREE.DoubleSide, depthWrite: false,
-        });
-        const disc = new THREE.Mesh(discGeo, discMat);
-        disc.rotation.x = -Math.PI / 2;
-        disc.position.set(center.x, -45, center.z);
-        scene.add(disc);
-
-        // Ring border
-        const ringGeo = new THREE.RingGeometry(cfg.radius - 1.5, cfg.radius, 64);
-        const ringMat = new THREE.MeshBasicMaterial({
-            color: cfg.color, transparent: true, opacity: 0.15,
-            side: THREE.DoubleSide, depthWrite: false,
-        });
-        const ring = new THREE.Mesh(ringGeo, ringMat);
-        ring.rotation.x = -Math.PI / 2;
-        ring.position.set(center.x, -44.5, center.z);
-        scene.add(ring);
+        const discMat = new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: 0.07, side: THREE.DoubleSide, depthWrite: false });
+        const disc = new THREE.Mesh(discGeo, discMat); disc.rotation.x = -Math.PI/2; disc.position.set(center.x, -45, center.z); scene.add(disc);
+        const ringGeo = new THREE.RingGeometry(cfg.radius-1.5, cfg.radius, 64);
+        const ringMat = new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: 0.15, side: THREE.DoubleSide, depthWrite: false });
+        const ring = new THREE.Mesh(ringGeo, ringMat); ring.rotation.x = -Math.PI/2; ring.position.set(center.x, -44.5, center.z); scene.add(ring);
     });
 
-    // Ward label sprites
     function createWardLabel(text, color) {
-        const c = document.createElement('canvas');
-        c.width = 256; c.height = 64;
-        const cx = c.getContext('2d');
-        cx.font = '500 28px "JetBrains Mono", monospace';
-        cx.textAlign = 'center'; cx.textBaseline = 'middle';
-        cx.fillStyle = '#' + new THREE.Color(color).getHexString();
-        cx.globalAlpha = 0.7;
-        cx.fillText(text, 128, 32);
+        const c = document.createElement('canvas'); c.width = 256; c.height = 64;
+        const cx = c.getContext('2d'); cx.font = '500 28px "JetBrains Mono", monospace'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+        cx.fillStyle = '#' + new THREE.Color(color).getHexString(); cx.globalAlpha = 0.7; cx.fillText(text, 128, 32);
         const texture = new THREE.CanvasTexture(c);
         const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false });
-        const sprite = new THREE.Sprite(mat);
-        sprite.scale.set(80, 20, 1);
-        return sprite;
+        const sprite = new THREE.Sprite(mat); sprite.scale.set(80, 20, 1); return sprite;
     }
-    Object.entries(wardCenters).forEach(([ward, center]) => {
-        const label = createWardLabel('Ward ' + ward, wardConfig[ward].color);
-        label.position.set(center.x, 55, center.z);
-        scene.add(label);
-    });
+    Object.entries(wardCenters).forEach(([ward, center]) => { const label = createWardLabel('Ward ' + ward, wardConfig[ward].color); label.position.set(center.x, 55, center.z); scene.add(label); });
 
-    // Create 3D nodes
-    const nodeMeshes = [];
-    const glowMeshes = [];
+    const nodeMeshes = [], glowMeshes = [];
     Object.values(nodeMap).forEach(n => {
-        const wardColor = COLORS['ward' + n.ward];
-        const isStaff = n.type === 'staff';
-        const size = n.id === 10 ? 7 : (isStaff ? 4.5 : 5);
-
-        let geometry;
-        if (isStaff) {
-            geometry = new THREE.OctahedronGeometry(size, 0);
-        } else {
-            geometry = new THREE.SphereGeometry(size, 16, 16);
-        }
-
-        const material = new THREE.MeshPhongMaterial({
-            color: COLORS.healthy,
-            emissive: 0x000000,
-            shininess: 60,
-            transparent: true,
-            opacity: 0.9,
-        });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(n.x, n.y, n.z);
-        mesh.userData = { nodeId: n.id, label: n.label, ward: n.ward, type: n.type, wardColor };
-        scene.add(mesh);
-        n.mesh = mesh;
-        nodeMeshes.push(mesh);
-
-        // Glow sphere
+        const wardColor = COLORS['ward' + n.ward]; const isStaff = n.type === 'staff'; const size = n.id === 10 ? 7 : (isStaff ? 4.5 : 5);
+        const geometry = isStaff ? new THREE.OctahedronGeometry(size, 0) : new THREE.SphereGeometry(size, 16, 16);
+        const material = new THREE.MeshPhongMaterial({ color: COLORS.healthy, emissive: 0x000000, shininess: 60, transparent: true, opacity: 0.9 });
+        const mesh = new THREE.Mesh(geometry, material); mesh.position.set(n.x, n.y, n.z);
+        mesh.userData = { nodeId: n.id, label: n.label, ward: n.ward, type: n.type, wardColor }; scene.add(mesh); n.mesh = mesh; nodeMeshes.push(mesh);
         const glowGeo = new THREE.SphereGeometry(size * 2.5, 12, 12);
-        const glowMat = new THREE.MeshBasicMaterial({
-            color: COLORS.infected,
-            transparent: true,
-            opacity: 0,
-        });
-        const glow = new THREE.Mesh(glowGeo, glowMat);
-        glow.position.copy(mesh.position);
-        scene.add(glow);
-        n.glow = glow;
-        glowMeshes.push(glow);
+        const glowMat = new THREE.MeshBasicMaterial({ color: COLORS.infected, transparent: true, opacity: 0 });
+        const glow = new THREE.Mesh(glowGeo, glowMat); glow.position.copy(mesh.position); scene.add(glow); n.glow = glow; glowMeshes.push(glow);
     });
 
-    // Create edges
     const edgeMeshes = [];
     edgeData.forEach(e => {
         const a = nodeMap[e.from], b = nodeMap[e.to];
         const points = [new THREE.Vector3(a.x, a.y, a.z), new THREE.Vector3(b.x, b.y, b.z)];
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial({ color: COLORS.edge, transparent: true, opacity: 0.25 });
-        const line = new THREE.Line(geometry, material);
-        line.userData = { from: e.from, to: e.to };
-        scene.add(line);
-        edgeMeshes.push(line);
+        const line = new THREE.Line(geometry, material); line.userData = { from: e.from, to: e.to }; scene.add(line); edgeMeshes.push(line);
     });
 
-    // Transmission particles
     const transmissionParticles = [];
     function createTransmissionParticle(fromId, toId) {
         const a = nodeMap[fromId], b = nodeMap[toId];
         const geo = new THREE.SphereGeometry(2, 8, 8);
         const mat = new THREE.MeshBasicMaterial({ color: COLORS.particle, transparent: true, opacity: 1 });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.set(a.x, a.y, a.z);
-        scene.add(mesh);
-
-        // Trail
-        const trailPositions = [];
-        for (let i = 0; i < 8; i++) trailPositions.push(a.x, a.y, a.z);
-        const trailGeo = new THREE.BufferGeometry();
-        trailGeo.setAttribute('position', new THREE.Float32BufferAttribute(trailPositions, 3));
+        const mesh = new THREE.Mesh(geo, mat); mesh.position.set(a.x, a.y, a.z); scene.add(mesh);
+        const trailPositions = []; for (let i = 0; i < 8; i++) trailPositions.push(a.x, a.y, a.z);
+        const trailGeo = new THREE.BufferGeometry(); trailGeo.setAttribute('position', new THREE.Float32BufferAttribute(trailPositions, 3));
         const trailMat = new THREE.LineBasicMaterial({ color: COLORS.particle, transparent: true, opacity: 0.3 });
-        const trail = new THREE.Line(trailGeo, trailMat);
-        scene.add(trail);
-
-        transmissionParticles.push({
-            mesh, trail, trailGeo,
-            from: new THREE.Vector3(a.x, a.y, a.z),
-            to: new THREE.Vector3(b.x, b.y, b.z),
-            progress: 0,
-            targetId: toId,
-            speed: 0.012 + Math.random() * 0.008,
-            trailPositions: trailPositions.slice(),
-        });
+        const trail = new THREE.Line(trailGeo, trailMat); scene.add(trail);
+        transmissionParticles.push({ mesh, trail, trailGeo, from: new THREE.Vector3(a.x, a.y, a.z), to: new THREE.Vector3(b.x, b.y, b.z), progress: 0, targetId: toId, speed: 0.012 + Math.random() * 0.008, trailPositions: trailPositions.slice() });
     }
 
-    // Infection simulation
     const infectedSet = new Set();
-    let simQueue = [];
-    let simTimer = 0;
+    let simQueue = [], simTimer = 0;
     const SIM_INTERVAL = 80;
 
     function resetSimulation() {
         infectedSet.clear();
-        transmissionParticles.forEach(p => { scene.remove(p.mesh); scene.remove(p.trail); });
-        transmissionParticles.length = 0;
-
-        Object.values(nodeMap).forEach(n => {
-            n.infected = false;
-            n.mesh.material.color.setHex(COLORS.healthy);
-            n.mesh.material.emissive.setHex(0x000000);
-            n.glow.material.opacity = 0;
-        });
-        edgeMeshes.forEach(e => {
-            e.material.color.setHex(COLORS.edge);
-            e.material.opacity = 0.25;
-        });
-
-        // Build infection order from edges (BFS)
+        transmissionParticles.forEach(p => { scene.remove(p.mesh); scene.remove(p.trail); }); transmissionParticles.length = 0;
+        Object.values(nodeMap).forEach(n => { n.infected = false; n.mesh.material.color.setHex(COLORS.healthy); n.mesh.material.emissive.setHex(0x000000); n.glow.material.opacity = 0; });
+        edgeMeshes.forEach(e => { e.material.color.setHex(COLORS.edge); e.material.opacity = 0.25; });
         simQueue = [];
-        const visited = new Set();
-        const queue = [1]; // Start from P0
-        visited.add(1);
-        infectNode(1);
-
-        while (queue.length > 0) {
-            const current = queue.shift();
-            const downstream = edgeData.filter(e => e.from === current && !visited.has(e.to));
-            // Superspreader (id=10) infects all at once
-            if (current === 10) {
-                downstream.forEach(e => {
-                    visited.add(e.to);
-                    simQueue.push({ from: current, to: e.to });
-                    queue.push(e.to);
-                });
-            } else {
-                downstream.forEach(e => {
-                    visited.add(e.to);
-                    simQueue.push({ from: current, to: e.to });
-                    queue.push(e.to);
-                });
-            }
-        }
+        const visited = new Set(); const queue = [1]; visited.add(1); infectNode(1);
+        while (queue.length > 0) { const current = queue.shift(); const downstream = edgeData.filter(e => e.from === current && !visited.has(e.to)); downstream.forEach(e => { visited.add(e.to); simQueue.push({ from: current, to: e.to }); queue.push(e.to); }); }
     }
 
-    function infectNode(id) {
-        const n = nodeMap[id];
-        if (!n) return;
-        n.infected = true;
-        infectedSet.add(id);
-        n.mesh.material.color.setHex(COLORS.infected);
-        n.mesh.material.emissive.setHex(0x661118);
-    }
-
+    function infectNode(id) { const n = nodeMap[id]; if (!n) return; n.infected = true; infectedSet.add(id); n.mesh.material.color.setHex(COLORS.infected); n.mesh.material.emissive.setHex(0x661118); }
     resetSimulation();
 
-    // Raycaster for interaction
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let hoveredNode = null;
@@ -2341,188 +1510,70 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         const rect = container.getBoundingClientRect();
         mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(nodeMeshes);
-
         if (intersects.length > 0) {
             const obj = intersects[0].object;
-            if (hoveredNode !== obj) {
-                if (hoveredNode) resetHighlight();
-                hoveredNode = obj;
-                highlightConnections(obj.userData.nodeId);
-                tooltip.style.display = 'block';
-                tooltip.textContent = `${obj.userData.label} (${obj.userData.type}) — Ward ${obj.userData.ward}`;
-            }
+            if (hoveredNode !== obj) { if (hoveredNode) resetHighlight(); hoveredNode = obj; highlightConnections(obj.userData.nodeId); tooltip.style.display = 'block'; tooltip.textContent = `${obj.userData.label} (${obj.userData.type}) — Ward ${obj.userData.ward}`; }
             tooltip.style.left = (event.clientX - container.getBoundingClientRect().left + 12) + 'px';
             tooltip.style.top = (event.clientY - container.getBoundingClientRect().top - 12) + 'px';
             container.style.cursor = 'pointer';
-        } else {
-            if (hoveredNode) {
-                resetHighlight();
-                hoveredNode = null;
-            }
-            tooltip.style.display = 'none';
-            container.style.cursor = 'default';
-        }
+        } else { if (hoveredNode) { resetHighlight(); hoveredNode = null; } tooltip.style.display = 'none'; container.style.cursor = 'default'; }
     });
-
-    container.addEventListener('mouseleave', () => {
-        if (hoveredNode) { resetHighlight(); hoveredNode = null; }
-        tooltip.style.display = 'none';
-    });
+    container.addEventListener('mouseleave', () => { if (hoveredNode) { resetHighlight(); hoveredNode = null; } tooltip.style.display = 'none'; });
 
     function highlightConnections(nodeId) {
-        // Dim all
-        nodeMeshes.forEach(m => { m.material.opacity = 0.2; });
-        edgeMeshes.forEach(e => { e.material.opacity = 0.05; });
-        // Highlight connected
-        const connectedIds = new Set([nodeId]);
-        edgeData.forEach(e => {
-            if (e.from === nodeId) connectedIds.add(e.to);
-            if (e.to === nodeId) connectedIds.add(e.from);
-        });
-        nodeMeshes.forEach(m => {
-            if (connectedIds.has(m.userData.nodeId)) m.material.opacity = 1;
-        });
-        edgeMeshes.forEach(e => {
-            if (e.userData.from === nodeId || e.userData.to === nodeId) {
-                e.material.opacity = 0.8;
-                e.material.color.setHex(0xffffff);
-            }
-        });
+        nodeMeshes.forEach(m => { m.material.opacity = 0.2; }); edgeMeshes.forEach(e => { e.material.opacity = 0.05; });
+        const connectedIds = new Set([nodeId]); edgeData.forEach(e => { if (e.from === nodeId) connectedIds.add(e.to); if (e.to === nodeId) connectedIds.add(e.from); });
+        nodeMeshes.forEach(m => { if (connectedIds.has(m.userData.nodeId)) m.material.opacity = 1; });
+        edgeMeshes.forEach(e => { if (e.userData.from === nodeId || e.userData.to === nodeId) { e.material.opacity = 0.8; e.material.color.setHex(0xffffff); } });
     }
 
     function resetHighlight() {
         nodeMeshes.forEach(m => { m.material.opacity = 0.9; });
-        edgeMeshes.forEach(e => {
-            const fromInfected = nodeMap[e.userData.from].infected;
-            const toInfected = nodeMap[e.userData.to].infected;
-            if (fromInfected && toInfected) {
-                e.material.color.setHex(COLORS.edgeInfected);
-                e.material.opacity = 0.5;
-            } else {
-                e.material.color.setHex(COLORS.edge);
-                e.material.opacity = 0.25;
-            }
-        });
+        edgeMeshes.forEach(e => { const fi = nodeMap[e.userData.from].infected, ti = nodeMap[e.userData.to].infected; if (fi && ti) { e.material.color.setHex(COLORS.edgeInfected); e.material.opacity = 0.5; } else { e.material.color.setHex(COLORS.edge); e.material.opacity = 0.25; } });
     }
 
-    // Animation loop
-    let time = 0;
-    let orbitAngle = 0;
-
+    let time = 0, orbitAngle = 0;
     function animateViz() {
         requestAnimationFrame(animateViz);
-        time++;
-        orbitAngle += 0.002;
-
-        // Camera orbit
+        time++; orbitAngle += 0.002;
         camera.position.x = Math.sin(orbitAngle) * 420;
         camera.position.z = Math.cos(orbitAngle) * 420;
         camera.position.y = 90 + Math.sin(orbitAngle * 0.5) * 40;
         camera.lookAt(0, 0, 0);
-
-        // Node breathing
-        nodeMeshes.forEach(m => {
-            const s = 1 + Math.sin(time * 0.03 + m.userData.nodeId) * 0.05;
-            m.scale.set(s, s, s);
-        });
-
-        // Glow animation for infected
-        glowMeshes.forEach((g, i) => {
-            const n = Object.values(nodeMap)[i];
-            if (n.infected) {
-                g.material.opacity = 0.12 + Math.sin(time * 0.05 + n.id) * 0.06;
-                g.position.copy(n.mesh.position);
-            } else {
-                g.material.opacity = 0;
-            }
-        });
-
-        // Transmission simulation
+        nodeMeshes.forEach(m => { const s = 1 + Math.sin(time * 0.03 + m.userData.nodeId) * 0.05; m.scale.set(s, s, s); });
+        glowMeshes.forEach((g, i) => { const n = Object.values(nodeMap)[i]; if (n.infected) { g.material.opacity = 0.12 + Math.sin(time * 0.05 + n.id) * 0.06; g.position.copy(n.mesh.position); } else { g.material.opacity = 0; } });
         simTimer++;
         if (simTimer > SIM_INTERVAL && simQueue.length > 0) {
             simTimer = 0;
-            // Check if the current front has a superspreader
             const next = simQueue[0];
-            if (next.from === 10) {
-                // Fire all superspreader edges at once
-                const batch = [];
-                while (simQueue.length > 0 && simQueue[0].from === 10) {
-                    batch.push(simQueue.shift());
-                }
-                batch.forEach(t => createTransmissionParticle(t.from, t.to));
-            } else {
-                simQueue.shift();
-                createTransmissionParticle(next.from, next.to);
-            }
+            if (next.from === 10) { const batch = []; while (simQueue.length > 0 && simQueue[0].from === 10) batch.push(simQueue.shift()); batch.forEach(t => createTransmissionParticle(t.from, t.to)); }
+            else { simQueue.shift(); createTransmissionParticle(next.from, next.to); }
         }
-
-        // All done? Reset after pause
-        if (simQueue.length === 0 && transmissionParticles.length === 0 && infectedSet.size > 1) {
-            simTimer = -200; // pause
-            if (simTimer === -200) {
-                setTimeout(() => resetSimulation(), 4000);
-                simQueue.push({}); // prevent re-trigger
-            }
-        }
-
-        // Update transmission particles
+        if (simQueue.length === 0 && transmissionParticles.length === 0 && infectedSet.size > 1) { simTimer = -200; if (simTimer === -200) { setTimeout(() => resetSimulation(), 4000); simQueue.push({}); } }
         for (let i = transmissionParticles.length - 1; i >= 0; i--) {
-            const p = transmissionParticles[i];
-            p.progress += p.speed;
-
+            const p = transmissionParticles[i]; p.progress += p.speed;
             if (p.progress >= 1) {
                 infectNode(p.targetId);
-                // Update edge color
-                edgeMeshes.forEach(e => {
-                    if ((e.userData.from === nodeMap[p.targetId] || e.userData.to === nodeMap[p.targetId])) {
-                        // check both directions
-                    }
-                });
-                edgeData.forEach((ed, idx) => {
-                    if ((ed.from === p.targetId || ed.to === p.targetId) &&
-                        nodeMap[ed.from].infected && nodeMap[ed.to].infected) {
-                        edgeMeshes[idx].material.color.setHex(COLORS.edgeInfected);
-                        edgeMeshes[idx].material.opacity = 0.5;
-                    }
-                });
-
-                scene.remove(p.mesh);
-                scene.remove(p.trail);
-                transmissionParticles.splice(i, 1);
-                continue;
+                edgeData.forEach((ed, idx) => { if ((ed.from === p.targetId || ed.to === p.targetId) && nodeMap[ed.from].infected && nodeMap[ed.to].infected) { edgeMeshes[idx].material.color.setHex(COLORS.edgeInfected); edgeMeshes[idx].material.opacity = 0.5; } });
+                scene.remove(p.mesh); scene.remove(p.trail); transmissionParticles.splice(i, 1); continue;
             }
-
             const pos = new THREE.Vector3().lerpVectors(p.from, p.to, p.progress);
-            // Arc
             pos.y += Math.sin(p.progress * Math.PI) * 15;
-            p.mesh.position.copy(pos);
-            p.mesh.material.opacity = 1 - p.progress * 0.3;
-
-            // Update trail
+            p.mesh.position.copy(pos); p.mesh.material.opacity = 1 - p.progress * 0.3;
             const positions = p.trailGeo.attributes.position.array;
-            for (let t = positions.length - 3; t >= 3; t -= 3) {
-                positions[t] = positions[t-3];
-                positions[t+1] = positions[t-2];
-                positions[t+2] = positions[t-1];
-            }
+            for (let t = positions.length - 3; t >= 3; t -= 3) { positions[t] = positions[t-3]; positions[t+1] = positions[t-2]; positions[t+2] = positions[t-1]; }
             positions[0] = pos.x; positions[1] = pos.y; positions[2] = pos.z;
             p.trailGeo.attributes.position.needsUpdate = true;
         }
-
         renderer.render(scene, camera);
     }
     animateViz();
 
-    // Resize handling
     window.addEventListener('resize', () => {
-        const w = container.clientWidth;
-        const h = container.clientHeight;
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
+        const w = container.clientWidth, h = container.clientHeight;
+        camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
     });
 })();
 </script>
