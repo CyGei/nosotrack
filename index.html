@@ -338,88 +338,105 @@
             overflow: hidden;
         }
 
-        /* ========== HOW IT WORKS ========== */
-        #how-it-works { background: var(--bg-card); }
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 32px;
-            margin-top: 64px;
-        }
-        .step-card {
-            position: relative;
-            padding: 48px 32px 40px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg);
-            transition: border-color 0.3s, transform 0.3s;
-            overflow: hidden;
-        }
-        .step-card:hover {
-            border-color: rgba(230,57,70,0.3);
-            transform: translateY(-4px);
-        }
-        .step-number {
-            font-family: var(--display);
-            font-weight: 800;
-            font-size: 6rem;
-            line-height: 1;
-            color: transparent;
-            -webkit-text-stroke: 1px rgba(255,255,255,0.06);
-            position: absolute;
-            top: -10px;
-            right: 16px;
-        }
-        .step-label {
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 16px;
-        }
-        .step-title {
-            font-family: var(--display);
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--text-primary);
-            margin-bottom: 16px;
-        }
-        .step-desc {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.7;
+        /* ========== HOW IT WORKS / PIPELINE ========== */
+        #how-it-works { background: var(--bg); position: relative; overflow: hidden; }
+        #pipeline-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .pipeline-wrap { position: relative; z-index: 1; }
+        .pipeline-subtitle {
+            color: var(--text-secondary); font-size: 1.05rem; max-width: 650px;
+            margin-bottom: 56px; line-height: 1.7;
         }
 
-        /* ========== PIPELINE ========== */
-        #pipeline-canvas {
-            width: 100%;
-            height: 340px;
-            display: block;
-            margin-top: 48px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
+        /* Sources row — 3 columns */
+        .pipeline-sources {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 20px; margin-bottom: 8px;
         }
-        .pipeline-fallback {
-            margin-top: 48px;
+
+        /* Connector zone */
+        .pipeline-connector {
+            display: flex; align-items: center; justify-content: center;
+            height: 80px; position: relative;
         }
-        .pipeline-fallback ol {
-            list-style: none;
-            counter-reset: pipeline-step;
+        .pipeline-connector canvas { width: 100%; height: 100%; display: block; }
+
+        /* Processing row — 2 columns */
+        .pipeline-process {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 20px; margin-bottom: 8px;
         }
-        .pipeline-fallback li {
-            counter-increment: pipeline-step;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border);
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            color: var(--text-secondary);
+
+        /* Output row — 2 columns */
+        .pipeline-output {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
-        .pipeline-fallback li::before {
-            content: counter(pipeline-step, decimal-leading-zero) ' ';
-            color: var(--accent);
-            font-weight: 600;
-            margin-right: 12px;
+
+        /* Glassmorphism card */
+        .p-card {
+            position: relative;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 24px;
+            overflow: hidden;
+            transition: border-color 0.4s, transform 0.4s, box-shadow 0.4s;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .p-card:hover {
+            border-color: rgba(230,57,70,0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(230,57,70,0.06);
+        }
+        .p-card.active { border-color: rgba(230,57,70,0.35); }
+        .p-card-glow {
+            position: absolute; top: -40px; right: -40px;
+            width: 120px; height: 120px;
+            background: radial-gradient(circle, rgba(230,57,70,0.08) 0%, transparent 70%);
+            border-radius: 50%; pointer-events: none;
+            opacity: 0; transition: opacity 0.6s;
+        }
+        .p-card.active .p-card-glow, .p-card:hover .p-card-glow { opacity: 1; }
+
+        /* Card canvas for mini-animations */
+        .p-card-canvas {
+            width: 100%; height: 110px; display: block;
+            border-radius: 8px; margin-bottom: 16px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .p-card-tag {
+            font-family: var(--mono); font-size: 0.6rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 8px;
+            opacity: 0.7;
+        }
+        .p-card-title {
+            font-family: var(--display); font-weight: 700;
+            font-size: 1.05rem; color: var(--text-primary);
+            margin-bottom: 6px; line-height: 1.3;
+        }
+        .p-card-desc {
+            font-size: 0.82rem; color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Arrow labels between rows */
+        .pipeline-arrow-label {
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; padding: 6px 0;
+            font-family: var(--mono); font-size: 0.65rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--text-dim);
+        }
+        .pipeline-arrow-label svg { opacity: 0.3; }
+
+        @media (max-width: 768px) {
+            .pipeline-sources { grid-template-columns: 1fr; }
+            .pipeline-process { grid-template-columns: 1fr; }
+            .pipeline-output { grid-template-columns: 1fr; }
+            .p-card-canvas { height: 90px; }
         }
 
         /* ========== RESEARCH ========== */
@@ -655,7 +672,6 @@
             .team-grid { grid-template-columns: 1fr; }
             .hero-title { font-size: clamp(2.5rem, 10vw, 4rem); }
             .section-padding { padding: 80px 0; }
-            #pipeline-canvas { height: 700px; }
         }
 
         /* ========== 3D VIZ ========== */
@@ -848,23 +864,96 @@
 
 <!-- ========== HOW IT WORKS ========== -->
 <section id="how-it-works" class="section-padding">
-    <div class="container">
+    <canvas id="pipeline-bg"></canvas>
+    <div class="container pipeline-wrap">
         <span class="section-tag reveal">02 — Process</span>
         <h2 class="section-title reveal">How It Works</h2>
-        <canvas id="pipeline-canvas" class="reveal"></canvas>
-        <noscript>
-            <div class="pipeline-fallback">
-                <ol>
-                    <li><strong>DNA Sequencing</strong> — Pathogen genomes are sequenced and read</li>
-                    <li><strong>Contact Tracing</strong> — Bluetooth devices detect proximity between individuals</li>
-                    <li><strong>Electronic Health Records</strong> — Clinical data is extracted from hospital systems</li>
-                    <li><strong>Data Anonymisation</strong> — Patient identifiers are masked and encrypted</li>
-                    <li><strong>Data Merging</strong> — Multiple data streams converge into NosoTrack</li>
-                    <li><strong>Transmission Tree Reconstruction</strong> — Statistical models infer who infected whom</li>
-                    <li><strong>Warning System</strong> — Alert notifications are dispatched to IPC teams</li>
-                </ol>
+        <p class="pipeline-subtitle reveal">Three data streams enter the NosoTrack pipeline, are anonymised and merged, then analysed to reconstruct transmission chains and trigger real-time alerts.</p>
+
+        <!-- ROW 1: Data Sources -->
+        <div class="pipeline-sources">
+            <div class="p-card reveal" data-pipeline="dna">
+                <div class="p-card-glow"></div>
+                <canvas class="p-card-canvas" data-viz="dna"></canvas>
+                <div class="p-card-tag">Input 01</div>
+                <div class="p-card-title">Genomic Sequencing</div>
+                <div class="p-card-desc">Pathogen genomes are sequenced, providing phylogenetic signal for transmission linkage.</div>
             </div>
-        </noscript>
+            <div class="p-card reveal" data-pipeline="contact" style="transition-delay:0.1s">
+                <div class="p-card-glow"></div>
+                <canvas class="p-card-canvas" data-viz="contact"></canvas>
+                <div class="p-card-tag">Input 02</div>
+                <div class="p-card-title">Contact Tracing</div>
+                <div class="p-card-desc">Bluetooth-enabled devices record proximity events between patients and staff.</div>
+            </div>
+            <div class="p-card reveal" data-pipeline="ehr" style="transition-delay:0.2s">
+                <div class="p-card-glow"></div>
+                <canvas class="p-card-canvas" data-viz="ehr"></canvas>
+                <div class="p-card-tag">Input 03</div>
+                <div class="p-card-title">Health Records</div>
+                <div class="p-card-desc">Electronic Health Records provide ward movements, test results, and clinical timelines.</div>
+            </div>
+        </div>
+
+        <!-- Arrow down -->
+        <div class="pipeline-arrow-label reveal">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>converge &amp; anonymise</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+
+        <!-- Connector canvas — particles flowing down -->
+        <div class="pipeline-connector reveal">
+            <canvas id="connector-top"></canvas>
+        </div>
+
+        <!-- ROW 2: Processing -->
+        <div class="pipeline-process">
+            <div class="p-card reveal" data-pipeline="anon">
+                <div class="p-card-glow"></div>
+                <canvas class="p-card-canvas" data-viz="anon"></canvas>
+                <div class="p-card-tag">Process</div>
+                <div class="p-card-title">Data Anonymisation</div>
+                <div class="p-card-desc">Patient identifiers are stripped, hashed, and encrypted before any analysis — ensuring full GDPR compliance.</div>
+            </div>
+            <div class="p-card reveal" data-pipeline="merge" style="transition-delay:0.1s">
+                <div class="p-card-glow"></div>
+                <canvas class="p-card-canvas" data-viz="merge"></canvas>
+                <div class="p-card-tag">Integrate</div>
+                <div class="p-card-title">NosoTrack Engine</div>
+                <div class="p-card-desc">Anonymised streams are fused into a unified temporal contact network within the NosoTrack platform.</div>
+            </div>
+        </div>
+
+        <!-- Arrow down -->
+        <div class="pipeline-arrow-label reveal">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>analyse &amp; act</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+
+        <!-- Connector canvas -->
+        <div class="pipeline-connector reveal">
+            <canvas id="connector-bot"></canvas>
+        </div>
+
+        <!-- ROW 3: Outputs -->
+        <div class="pipeline-output">
+            <div class="p-card reveal" data-pipeline="tree">
+                <div class="p-card-glow"></div>
+                <canvas class="p-card-canvas" data-viz="tree"></canvas>
+                <div class="p-card-tag">Output</div>
+                <div class="p-card-title">Transmission Tree</div>
+                <div class="p-card-desc">Statistical models reconstruct who infected whom — revealing patient zero, superspreaders, and hidden chains.</div>
+            </div>
+            <div class="p-card reveal" data-pipeline="alert" style="transition-delay:0.1s">
+                <div class="p-card-glow"></div>
+                <canvas class="p-card-canvas" data-viz="alert"></canvas>
+                <div class="p-card-tag">Action</div>
+                <div class="p-card-title">Early Warning System</div>
+                <div class="p-card-desc">Real-time alerts and reports are dispatched to infection prevention teams before outbreaks escalate.</div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -1145,330 +1234,459 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 // ==========================================
-// PIPELINE ANIMATION (Canvas 2D)
+// PIPELINE — Card mini-canvas animations +
+// background particle flow + connectors
 // ==========================================
 (function() {
-    const canvas = document.getElementById('pipeline-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
     const ACCENT = '#e63946';
-    const ACCENT_DIM = 'rgba(230, 57, 70, 0.15)';
-    const DIM = '#333333';
+    const DIM = '#2a2a2a';
     const ACTIVE = '#f0f0f0';
-    const BG = '#111111';
     const MONO = '"JetBrains Mono", monospace';
+    const SYNE = '"Syne", sans-serif';
+    let frame = 0;
 
-    const steps = [
-        { title: 'DNA Sequencing',     desc: 'Pathogen genomes are sequenced',   draw: drawDNA },
-        { title: 'Contact Tracing',    desc: 'Bluetooth proximity detection',     draw: drawContact },
-        { title: 'Health Records',     desc: 'Clinical data from hospital EHR',   draw: drawEHR },
-        { title: 'Anonymisation',      desc: 'Identifiers masked & encrypted',    draw: drawAnon },
-        { title: 'Data Merging',       desc: 'Streams converge into NosoTrack',   draw: drawMerge },
-        { title: 'Transmission Tree',  desc: 'Infer who infected whom',           draw: drawTree },
-        { title: 'Warning System',     desc: 'Alerts dispatched to IPC teams',    draw: drawAlert },
-    ];
-
-    let W, H, vertical, dpr;
-    let activeStep = -1, stepTimer = 0, particleT = -1;
-    const STEP_DUR = 130;
-    const P_SPEED = 0.022;
-    let descFade = new Array(steps.length).fill(0);
-    let stepLit = new Array(steps.length).fill(0);
-
-    function resize() {
-        dpr = Math.min(window.devicePixelRatio, 2);
-        const r = canvas.getBoundingClientRect();
-        W = r.width; H = r.height;
-        canvas.width = W * dpr; canvas.height = H * dpr;
+    // ── Helper: init a canvas with DPR ──
+    function initCanvas(c) {
+        if (!c) return null;
+        const dpr = Math.min(window.devicePixelRatio, 2);
+        const r = c.getBoundingClientRect();
+        c.width = r.width * dpr; c.height = r.height * dpr;
+        const ctx = c.getContext('2d');
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        vertical = W < 600;
+        return { ctx, w: r.width, h: r.height };
     }
-    window.addEventListener('resize', resize);
-    resize();
 
-    function pos(i) {
-        if (vertical) {
-            const m = 70, sp = (H - m * 2) / (steps.length - 1);
-            return { x: W / 2, y: m + i * sp };
+    // ── Background particle flow for the section ──
+    const bgCanvas = document.getElementById('pipeline-bg');
+    let bgCtx, bgW, bgH;
+    const bgParticles = [];
+    function initBg() {
+        if (!bgCanvas) return;
+        const dpr = Math.min(window.devicePixelRatio, 2);
+        const section = bgCanvas.parentElement;
+        bgW = section.clientWidth; bgH = section.clientHeight;
+        bgCanvas.width = bgW * dpr; bgCanvas.height = bgH * dpr;
+        bgCtx = bgCanvas.getContext('2d');
+        bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        bgParticles.length = 0;
+        for (let i = 0; i < 40; i++) {
+            bgParticles.push({
+                x: Math.random() * bgW, y: Math.random() * bgH,
+                vy: 0.15 + Math.random() * 0.3, size: Math.random() * 1.2 + 0.3,
+                opacity: Math.random() * 0.15 + 0.03,
+            });
         }
-        const m = 80, sp = (W - m * 2) / (steps.length - 1);
-        return { x: m + i * sp, y: H * 0.42 };
+    }
+    function drawBg() {
+        if (!bgCtx) return;
+        bgCtx.clearRect(0, 0, bgW, bgH);
+        bgParticles.forEach(p => {
+            p.y += p.vy;
+            if (p.y > bgH + 4) { p.y = -4; p.x = Math.random() * bgW; }
+            bgCtx.fillStyle = `rgba(230,57,70,${p.opacity})`;
+            bgCtx.beginPath(); bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2); bgCtx.fill();
+        });
+        // Faint vertical lines
+        bgCtx.strokeStyle = 'rgba(255,255,255,0.015)'; bgCtx.lineWidth = 1;
+        for (let i = 1; i < 4; i++) {
+            const x = bgW * i / 4;
+            bgCtx.beginPath(); bgCtx.moveTo(x, 0); bgCtx.lineTo(x, bgH); bgCtx.stroke();
+        }
     }
 
-    function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+    // ── Connector canvases — particles flowing between rows ──
+    function drawConnector(c, count) {
+        const info = initCanvas(c);
+        if (!info) return;
+        const { ctx, w, h } = info;
+        const particles = [];
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x: w * (0.15 + Math.random() * 0.7),
+                y: Math.random() * h,
+                vy: 0.3 + Math.random() * 0.5,
+                size: Math.random() * 1.5 + 0.5,
+                phase: Math.random() * Math.PI * 2,
+            });
+        }
+        return { ctx, w, h, particles };
+    }
+    const connTop = drawConnector(document.getElementById('connector-top'), 12);
+    const connBot = drawConnector(document.getElementById('connector-bot'), 10);
 
-    // === ICON FUNCTIONS ===
-    function drawDNA(cx, cy, s, col) {
-        ctx.strokeStyle = col; ctx.lineWidth = 2;
-        const amp = s * 0.4;
-        for (let strand = 0; strand < 2; strand++) {
-            const sign = strand === 0 ? 1 : -1;
+    function animateConnector(c) {
+        if (!c) return;
+        c.ctx.clearRect(0, 0, c.w, c.h);
+        // Dashed guide lines
+        c.ctx.strokeStyle = 'rgba(255,255,255,0.04)'; c.ctx.lineWidth = 1;
+        c.ctx.setLineDash([2, 6]);
+        const cx = c.w / 2;
+        c.ctx.beginPath(); c.ctx.moveTo(cx, 0); c.ctx.lineTo(cx, c.h); c.ctx.stroke();
+        c.ctx.setLineDash([]);
+        // Particles falling
+        c.particles.forEach(p => {
+            p.y += p.vy;
+            p.x += Math.sin(frame * 0.02 + p.phase) * 0.3;
+            if (p.y > c.h + 4) { p.y = -4; p.x = c.w * (0.2 + Math.random() * 0.6); }
+            const grad = c.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 4);
+            grad.addColorStop(0, `rgba(230,57,70,0.6)`);
+            grad.addColorStop(1, 'transparent');
+            c.ctx.fillStyle = grad;
+            c.ctx.beginPath(); c.ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI * 2); c.ctx.fill();
+            c.ctx.fillStyle = '#fff';
+            c.ctx.beginPath(); c.ctx.arc(p.x, p.y, p.size * 0.6, 0, Math.PI * 2); c.ctx.fill();
+        });
+    }
+
+    // ═══════════════════════════════════════════
+    // MINI-CANVAS ANIMATIONS inside each card
+    // ═══════════════════════════════════════════
+    const vizCanvases = {};
+    document.querySelectorAll('.p-card-canvas[data-viz]').forEach(c => {
+        const info = initCanvas(c);
+        if (info) vizCanvases[c.dataset.viz] = { el: c, ...info };
+    });
+
+    // ── DNA: animated double helix ──
+    function vizDNA() {
+        const v = vizCanvases.dna; if (!v) return;
+        const { ctx, w, h } = v;
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2, cy = h / 2, amp = 28, len = h * 0.8;
+        // Helix
+        for (let strand = -1; strand <= 1; strand += 2) {
+            ctx.strokeStyle = strand === 1 ? ACCENT : ACTIVE;
+            ctx.lineWidth = 1.8; ctx.globalAlpha = strand === 1 ? 0.7 : 0.35;
             ctx.beginPath();
-            for (let i = 0; i <= 24; i++) {
-                const t = i / 24;
-                const y = cy - s + t * s * 2;
-                const x = cx + Math.sin(t * Math.PI * 3) * amp * sign;
+            for (let i = 0; i <= 40; i++) {
+                const t = i / 40;
+                const y = cy - len/2 + t * len;
+                const x = cx + Math.sin(t * Math.PI * 3 + frame * 0.025) * amp * strand;
                 i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
             }
             ctx.stroke();
         }
-        ctx.lineWidth = 1; ctx.globalAlpha = 0.5;
-        for (let i = 0; i < 4; i++) {
-            const t = (i + 0.25) / 4;
-            const y = cy - s + t * s * 2;
-            const x1 = cx + Math.sin(t * Math.PI * 3) * amp;
-            const x2 = cx - Math.sin(t * Math.PI * 3) * amp;
-            ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
+        ctx.globalAlpha = 1;
+        // Rungs with colored base pairs
+        const baseCols = ['#5b9bd5','#70ad47','#e63946','#ffc000'];
+        for (let i = 0; i < 7; i++) {
+            const t = (i + 0.3) / 7;
+            const y = cy - len/2 + t * len;
+            const off = Math.sin(t * Math.PI * 3 + frame * 0.025) * amp;
+            ctx.strokeStyle = baseCols[i % 4]; ctx.lineWidth = 2; ctx.globalAlpha = 0.5;
+            ctx.beginPath(); ctx.moveTo(cx + off, y); ctx.lineTo(cx - off, y); ctx.stroke();
         }
+        ctx.globalAlpha = 1;
+        // Scanning highlight
+        const scanY = cy - len/2 + ((frame * 1.2) % len);
+        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = 0.4;
+        ctx.beginPath(); ctx.moveTo(cx - amp - 10, scanY); ctx.lineTo(cx + amp + 10, scanY); ctx.stroke();
         ctx.globalAlpha = 1;
     }
 
-    function drawContact(cx, cy, s, col) {
-        ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.5;
-        // Central device
-        const dw = s * 0.25, dh = s * 0.45;
-        ctx.strokeRect(cx - dw, cy - dh, dw * 2, dh * 2);
-        // Small dot in device center
-        ctx.beginPath(); ctx.arc(cx, cy, 2, 0, Math.PI * 2); ctx.fill();
-        // People dots
-        const angles = [-1.2, -0.4, 0.4, 1.2, Math.PI - 0.4, Math.PI + 0.4];
-        angles.forEach(a => {
-            const px = cx + Math.cos(a) * s * 0.85;
-            const py = cy + Math.sin(a) * s * 0.55;
-            ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI * 2); ctx.fill();
+    // ── Contact: network with bluetooth pulses ──
+    function vizContact() {
+        const v = vizCanvases.contact; if (!v) return;
+        const { ctx, w, h } = v;
+        ctx.clearRect(0, 0, w, h);
+        const cx = w/2, cy = h/2;
+        // Network nodes
+        const nodes = [
+            { x: cx, y: cy, r: 6, staff: true },
+            { x: cx-50, y: cy-25, r: 4 }, { x: cx+55, y: cy-20, r: 4 },
+            { x: cx-40, y: cy+30, r: 4 }, { x: cx+45, y: cy+28, r: 4 },
+            { x: cx-10, y: cy-38, r: 3.5 }, { x: cx+15, y: cy+40, r: 3.5 },
+        ];
+        // Edges
+        const edges = [[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,5],[2,4],[3,6]];
+        edges.forEach(([a,b]) => {
+            ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(nodes[a].x, nodes[a].y); ctx.lineTo(nodes[b].x, nodes[b].y); ctx.stroke();
         });
-        // Signal arcs
-        ctx.globalAlpha = 0.4;
-        for (let r = 1; r <= 2; r++) {
-            ctx.beginPath();
-            ctx.arc(cx, cy, s * 0.35 * r, -0.8, 0.8);
-            ctx.stroke();
-        }
+        // BT pulse rings from center
+        const pulseR = 15 + ((frame * 0.5) % 40);
+        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1;
+        ctx.globalAlpha = Math.max(0, 0.3 - (pulseR - 15) / 55);
+        ctx.beginPath(); ctx.arc(cx, cy, pulseR, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = 1;
+        // Nodes
+        nodes.forEach((n, i) => {
+            ctx.fillStyle = n.staff ? ACCENT : 'rgba(255,255,255,0.5)';
+            ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill();
+            if (n.staff) {
+                ctx.fillStyle = '#fff'; ctx.font = `700 7px ${MONO}`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('B', n.x, n.y); ctx.textBaseline = 'alphabetic';
+            }
+        });
+        // Traveling dot along an edge
+        const edgeIdx = Math.floor((frame * 0.01) % edges.length);
+        const [a, b] = edges[edgeIdx];
+        const t = (frame * 0.015) % 1;
+        const px = nodes[a].x + (nodes[b].x - nodes[a].x) * t;
+        const py = nodes[a].y + (nodes[b].y - nodes[a].y) * t;
+        ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.8;
+        ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI * 2); ctx.fill();
         ctx.globalAlpha = 1;
     }
 
-    function drawEHR(cx, cy, s, col) {
-        ctx.strokeStyle = col; ctx.lineWidth = 1.5;
-        const w = s * 0.65, h = s * 1.1;
-        // Document outline
-        ctx.beginPath();
-        ctx.moveTo(cx - w/2, cy - h/2);
-        ctx.lineTo(cx + w/2 - 6, cy - h/2);
-        ctx.lineTo(cx + w/2, cy - h/2 + 6);
-        ctx.lineTo(cx + w/2, cy + h/2);
-        ctx.lineTo(cx - w/2, cy + h/2);
-        ctx.closePath(); ctx.stroke();
-        // Dog ear
-        ctx.beginPath();
-        ctx.moveTo(cx + w/2 - 6, cy - h/2);
-        ctx.lineTo(cx + w/2 - 6, cy - h/2 + 6);
-        ctx.lineTo(cx + w/2, cy - h/2 + 6);
-        ctx.stroke();
-        // Data lines
-        ctx.globalAlpha = 0.6;
-        for (let i = 0; i < 4; i++) {
-            const y = cy - h/2 + h * 0.25 + i * h * 0.17;
-            const lw = i === 0 ? w * 0.7 : w * 0.5 + (i % 2) * w * 0.1;
-            ctx.beginPath(); ctx.moveTo(cx - w/2 + 6, y); ctx.lineTo(cx - w/2 + 6 + lw, y); ctx.stroke();
+    // ── EHR: scrolling clinical records ──
+    function vizEHR() {
+        const v = vizCanvases.ehr; if (!v) return;
+        const { ctx, w, h } = v;
+        ctx.clearRect(0, 0, w, h);
+        // Scrolling rows of data
+        const rowH = 18, cols = [w*0.08, w*0.28, w*0.55, w*0.78];
+        const scrollY = (frame * 0.4) % (rowH * 8);
+        ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, h); ctx.clip();
+        for (let r = -1; r < 8; r++) {
+            const y = r * rowH - scrollY + h/2;
+            if (y < -rowH || y > h + rowH) continue;
+            const rowAlpha = 1 - Math.abs(y - h/2) / (h * 0.6);
+            ctx.globalAlpha = Math.max(0.05, Math.min(0.5, rowAlpha));
+            // Header row
+            if (r === 0) {
+                ctx.font = `600 8px ${MONO}`; ctx.fillStyle = ACCENT;
+                ['ID', 'WARD', 'DATE', 'STATUS'].forEach((t, i) => {
+                    ctx.textAlign = 'left'; ctx.fillText(t, cols[i], y);
+                });
+            } else {
+                ctx.font = `400 8px ${MONO}`; ctx.fillStyle = '#666';
+                const ids = ['P001','P002','S003','P004','S005','P006','P007'];
+                const wards = ['A','B','C','A','B','C','A'];
+                const stati = ['POS','NEG','POS','NEG','POS','NEG','POS'];
+                const ri = ((r - 1) + Math.floor(frame * 0.01)) % 7;
+                ctx.textAlign = 'left';
+                ctx.fillText(ids[ri], cols[0], y);
+                ctx.fillText(wards[ri], cols[1], y);
+                ctx.fillText('2025-0' + (ri+1), cols[2], y);
+                ctx.fillStyle = stati[ri] === 'POS' ? ACCENT : '#555';
+                ctx.fillText(stati[ri], cols[3], y);
+            }
         }
+        ctx.restore(); ctx.globalAlpha = 1;
+        // Fade edges
+        const fadeH = 20;
+        const gradTop = ctx.createLinearGradient(0, 0, 0, fadeH);
+        gradTop.addColorStop(0, 'rgba(0,0,0,0.8)'); gradTop.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradTop; ctx.fillRect(0, 0, w, fadeH);
+        const gradBot = ctx.createLinearGradient(0, h - fadeH, 0, h);
+        gradBot.addColorStop(0, 'transparent'); gradBot.addColorStop(1, 'rgba(0,0,0,0.8)');
+        ctx.fillStyle = gradBot; ctx.fillRect(0, h - fadeH, w, fadeH);
+    }
+
+    // ── Anonymisation: data being redacted ──
+    function vizAnon() {
+        const v = vizCanvases.anon; if (!v) return;
+        const { ctx, w, h } = v;
+        ctx.clearRect(0, 0, w, h);
+        const cx = w/2, cy = h/2;
+        // Shield outline
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1.5;
+        const sw = 35, sh = 42;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - sh);
+        ctx.quadraticCurveTo(cx + sw, cy - sh * 0.6, cx + sw, cy);
+        ctx.quadraticCurveTo(cx + sw * 0.6, cy + sh * 0.6, cx, cy + sh);
+        ctx.quadraticCurveTo(cx - sw * 0.6, cy + sh * 0.6, cx - sw, cy);
+        ctx.quadraticCurveTo(cx - sw, cy - sh * 0.6, cx, cy - sh);
+        ctx.stroke();
+        // Data rows being redacted — left side
+        const rows = ['John Smith', 'DOB: 1985-03', 'MRN: 47291', 'Ward: B'];
+        const redactPhase = (frame * 0.008) % 1;
+        rows.forEach((text, i) => {
+            const x = cx - sw - 55, y = cy - 25 + i * 16;
+            ctx.font = `400 8px ${MONO}`;
+            // Original text fading
+            const fade = Math.max(0, 1 - redactPhase * 3 + i * 0.3);
+            ctx.fillStyle = `rgba(255,255,255,${fade * 0.3})`; ctx.textAlign = 'left';
+            ctx.fillText(text, x, y);
+            // Redaction bar growing
+            const barW = Math.min(1, Math.max(0, redactPhase * 3 - i * 0.3)) * ctx.measureText(text).width;
+            if (barW > 0) {
+                ctx.fillStyle = `rgba(230,57,70,0.25)`;
+                ctx.fillRect(x - 1, y - 8, barW + 2, 11);
+            }
+        });
+        // Output side — anonymised
+        const anon = ['HASH_7f3a', '****-**', 'ID: ████', 'Ward: B'];
+        anon.forEach((text, i) => {
+            const x = cx + sw + 15, y = cy - 25 + i * 16;
+            const appear = Math.max(0, Math.min(1, redactPhase * 3 - 1 - i * 0.2));
+            ctx.font = `400 8px ${MONO}`;
+            ctx.fillStyle = `rgba(100,255,100,${appear * 0.4})`; ctx.textAlign = 'left';
+            ctx.fillText(text, x, y);
+        });
+        // Scanning line
+        const scanY = cy - sh + ((frame * 0.8) % (sh * 2));
+        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = 0.3;
+        ctx.beginPath(); ctx.moveTo(cx - sw, scanY); ctx.lineTo(cx + sw, scanY); ctx.stroke();
         ctx.globalAlpha = 1;
     }
 
-    function drawAnon(cx, cy, s, col) {
-        ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.5;
-        const bw = s * 0.55, bh = s * 0.5;
-        // Lock body
-        ctx.strokeRect(cx - bw/2, cy - bh/6, bw, bh);
-        // Shackle
-        ctx.beginPath();
-        ctx.arc(cx, cy - bh/6, bw * 0.32, Math.PI, 0);
-        ctx.stroke();
-        // Keyhole
-        ctx.beginPath(); ctx.arc(cx, cy + bh * 0.15, 3, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(cx, cy + bh * 0.15 + 3); ctx.lineTo(cx, cy + bh * 0.15 + 8); ctx.stroke();
-    }
-
-    function drawMerge(cx, cy, s, col) {
-        ctx.strokeStyle = col; ctx.lineWidth = 2;
-        const offsets = [-s * 0.55, 0, s * 0.55];
-        offsets.forEach(yOff => {
-            ctx.beginPath();
-            ctx.moveTo(cx - s * 0.9, cy + yOff);
-            ctx.bezierCurveTo(cx - s * 0.2, cy + yOff, cx - s * 0.2, cy, cx + s * 0.15, cy);
-            ctx.stroke();
-        });
-        // Arrow
-        ctx.fillStyle = col;
-        ctx.beginPath();
-        ctx.moveTo(cx + s * 0.15, cy - 5);
-        ctx.lineTo(cx + s * 0.45, cy);
-        ctx.lineTo(cx + s * 0.15, cy + 5);
-        ctx.closePath(); ctx.fill();
-        // NosoTrack box
-        ctx.strokeRect(cx + s * 0.5, cy - 8, s * 0.4, 16);
-        ctx.font = `500 7px ${MONO}`;
-        ctx.fillStyle = col; ctx.textAlign = 'center';
-        ctx.fillText('NT', cx + s * 0.7, cy + 3);
-    }
-
-    function drawTree(cx, cy, s, col) {
-        ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.5;
-        // Root
-        ctx.beginPath(); ctx.arc(cx, cy - s * 0.65, 4, 0, Math.PI * 2); ctx.fill();
-        // Main branches
-        ctx.beginPath(); ctx.moveTo(cx, cy - s * 0.65); ctx.lineTo(cx - s * 0.45, cy - s * 0.05); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(cx, cy - s * 0.65); ctx.lineTo(cx + s * 0.45, cy - s * 0.05); ctx.stroke();
-        // L2 nodes
-        ctx.beginPath(); ctx.arc(cx - s * 0.45, cy - s * 0.05, 3, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(cx + s * 0.45, cy - s * 0.05, 3, 0, Math.PI * 2); ctx.fill();
-        // Sub-branches
-        const subs = [[-0.45, -0.2], [-0.45, 0.2], [0.45, -0.2], [0.45, 0.2]];
-        subs.forEach(([px, dx]) => {
-            ctx.beginPath(); ctx.moveTo(cx + px * s, cy - s * 0.05);
-            ctx.lineTo(cx + (px + dx) * s, cy + s * 0.5); ctx.stroke();
-            ctx.beginPath(); ctx.arc(cx + (px + dx) * s, cy + s * 0.5, 2.5, 0, Math.PI * 2); ctx.fill();
-        });
-    }
-
-    function drawAlert(cx, cy, s, col) {
-        ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.5;
-        const w = s * 0.85, h = s * 0.55;
-        // Envelope body
-        ctx.strokeRect(cx - w/2, cy - h/2 + 4, w, h);
-        // Flap
-        ctx.beginPath();
-        ctx.moveTo(cx - w/2, cy - h/2 + 4);
-        ctx.lineTo(cx, cy + 6);
-        ctx.lineTo(cx + w/2, cy - h/2 + 4);
-        ctx.stroke();
-        // Notification badge
-        ctx.beginPath(); ctx.arc(cx + w/2 - 2, cy - h/2, 5, 0, Math.PI * 2); ctx.fill();
-        // Exclamation in badge
-        ctx.fillStyle = BG;
-        ctx.font = `700 7px ${MONO}`;
+    // ── Merge: converging streams into NT hub ──
+    function vizMerge() {
+        const v = vizCanvases.merge; if (!v) return;
+        const { ctx, w, h } = v;
+        ctx.clearRect(0, 0, w, h);
+        const cx = w/2, cy = h/2;
+        // Central hub
+        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(cx, cy, 22, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = 0.15;
+        ctx.fillStyle = ACCENT;
+        ctx.beginPath(); ctx.arc(cx, cy, 22, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
+        // NT text
+        ctx.fillStyle = ACTIVE; ctx.font = `800 12px ${SYNE}`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('!', cx + w/2 - 2, cy - h/2);
-        ctx.textBaseline = 'alphabetic';
+        ctx.fillText('NT', cx, cy); ctx.textBaseline = 'alphabetic';
+        // Orbiting data dots
+        for (let i = 0; i < 4; i++) {
+            const a = frame * 0.02 + i * Math.PI / 2;
+            const r = 32 + Math.sin(frame * 0.03 + i) * 4;
+            const dx = Math.cos(a) * r, dy = Math.sin(a) * r;
+            ctx.fillStyle = [ACCENT, '#5b9bd5', '#70ad47', '#ffc000'][i];
+            ctx.globalAlpha = 0.6;
+            ctx.beginPath(); ctx.arc(cx + dx, cy + dy, 3, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        // Converging streams from edges
+        for (let i = 0; i < 3; i++) {
+            const fromX = w * 0.05, fromY = h * (0.2 + i * 0.3);
+            const t = ((frame * 0.012) + i * 0.33) % 1;
+            const px = fromX + (cx - fromX) * t;
+            const py = fromY + (cy - fromY) * t;
+            ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(cx, cy); ctx.stroke();
+            const grad = ctx.createRadialGradient(px, py, 0, px, py, 6);
+            grad.addColorStop(0, ACCENT); grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
+        }
     }
 
-    // === ANIMATION LOOP ===
+    // ── Transmission tree: growing animated tree ──
+    function vizTree() {
+        const v = vizCanvases.tree; if (!v) return;
+        const { ctx, w, h } = v;
+        ctx.clearRect(0, 0, w, h);
+        const cx = w/2, top = 16;
+        // Tree structure
+        const treeNodes = [
+            { x: cx, y: top, r: 5, infected: true },
+            { x: cx - 50, y: top + 30, r: 4 }, { x: cx + 50, y: top + 30, r: 4 },
+            { x: cx - 70, y: top + 60, r: 3.5 }, { x: cx - 30, y: top + 60, r: 3.5 },
+            { x: cx + 30, y: top + 60, r: 3.5 }, { x: cx + 70, y: top + 60, r: 3.5 },
+            { x: cx - 80, y: top + 85, r: 3 }, { x: cx - 55, y: top + 85, r: 3 },
+        ];
+        const treeEdges = [[0,1],[0,2],[1,3],[1,4],[2,5],[2,6],[3,7],[3,8]];
+        // Progressive reveal
+        const reveal = ((frame * 0.006) % 1.5);
+        treeEdges.forEach(([a,b], i) => {
+            const t = Math.max(0, Math.min(1, reveal * treeEdges.length - i));
+            if (t <= 0) return;
+            const na = treeNodes[a], nb = treeNodes[b];
+            const bx = na.x + (nb.x - na.x) * t;
+            const by = na.y + (nb.y - na.y) * t;
+            ctx.strokeStyle = 'rgba(230,57,70,0.3)'; ctx.lineWidth = 1.2;
+            ctx.beginPath(); ctx.moveTo(na.x, na.y); ctx.lineTo(bx, by); ctx.stroke();
+        });
+        treeNodes.forEach((n, i) => {
+            const t = Math.max(0, Math.min(1, reveal * treeEdges.length - Math.max(0, i - 1)));
+            if (t <= 0 && i > 0) return;
+            ctx.fillStyle = n.infected ? ACCENT : `rgba(255,255,255,${0.4 + t * 0.3})`;
+            ctx.beginPath(); ctx.arc(n.x, n.y, n.r * t, 0, Math.PI * 2); ctx.fill();
+            if (n.infected) {
+                ctx.fillStyle = 'rgba(230,57,70,0.15)';
+                ctx.beginPath(); ctx.arc(n.x, n.y, n.r * 2.5, 0, Math.PI * 2); ctx.fill();
+            }
+        });
+        // Arrow showing direction
+        ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.font = `400 8px ${MONO}`;
+        ctx.textAlign = 'center'; ctx.fillText('who infected whom', cx, h - 6);
+    }
+
+    // ── Alert: notification dispatch ──
+    function vizAlert() {
+        const v = vizCanvases.alert; if (!v) return;
+        const { ctx, w, h } = v;
+        ctx.clearRect(0, 0, w, h);
+        const cx = w/2, cy = h/2;
+        // Email envelope
+        const ew = 36, eh = 24;
+        ctx.strokeStyle = ACTIVE; ctx.lineWidth = 1.3; ctx.globalAlpha = 0.4;
+        ctx.strokeRect(cx - ew/2, cy - eh/2, ew, eh);
+        ctx.beginPath(); ctx.moveTo(cx - ew/2, cy - eh/2); ctx.lineTo(cx, cy + 2); ctx.lineTo(cx + ew/2, cy - eh/2); ctx.stroke();
+        ctx.globalAlpha = 1;
+        // Notification badge
+        const pulse = 0.7 + Math.sin(frame * 0.08) * 0.3;
+        ctx.fillStyle = ACCENT; ctx.globalAlpha = pulse;
+        ctx.beginPath(); ctx.arc(cx + ew/2 + 2, cy - eh/2 - 2, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.globalAlpha = 1; ctx.font = `700 7px ${MONO}`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('!', cx + ew/2 + 2, cy - eh/2 - 2); ctx.textBaseline = 'alphabetic';
+        // Emanating alert rings
+        for (let i = 0; i < 3; i++) {
+            const r = 30 + ((frame * 0.4 + i * 18) % 50);
+            const alpha = Math.max(0, 0.2 - (r - 30) / 70);
+            ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = alpha;
+            ctx.beginPath(); ctx.arc(cx, cy - 5, r, -0.8, 0.8); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+        // Dispatching arrows
+        const targets = [
+            { x: cx + 65, y: cy - 20, label: 'IPC Team' },
+            { x: cx + 60, y: cy + 22, label: 'Dashboard' },
+            { x: cx - 65, y: cy, label: 'Hospital' },
+        ];
+        targets.forEach(tgt => {
+            ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
+            ctx.setLineDash([2, 3]);
+            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(tgt.x, tgt.y); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = `400 7px ${MONO}`;
+            ctx.textAlign = 'center'; ctx.fillText(tgt.label, tgt.x, tgt.y + 12);
+            // Flying dot
+            const t = ((frame * 0.01) + targets.indexOf(tgt) * 0.3) % 1;
+            const fx = cx + (tgt.x - cx) * t;
+            const fy = cy + (tgt.y - cy) * t;
+            ctx.fillStyle = ACCENT; ctx.globalAlpha = 1 - t * 0.5;
+            ctx.beginPath(); ctx.arc(fx, fy, 2, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 1;
+        });
+    }
+
+    // ═══════════════════
+    // MAIN LOOP
+    // ═══════════════════
+    initBg();
+    window.addEventListener('resize', () => {
+        initBg();
+        Object.keys(vizCanvases).forEach(k => {
+            const c = vizCanvases[k];
+            const info = initCanvas(c.el);
+            if (info) { c.ctx = info.ctx; c.w = info.w; c.h = info.h; }
+        });
+        if (connTop) { const i = initCanvas(connTop.el || document.getElementById('connector-top')); if (i) Object.assign(connTop, i); }
+        if (connBot) { const i = initCanvas(connBot.el || document.getElementById('connector-bot')); if (i) Object.assign(connBot, i); }
+    });
+
     function animate() {
         requestAnimationFrame(animate);
-        ctx.clearRect(0, 0, W, H);
-        ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
-
-        stepTimer++;
-        if (stepTimer >= STEP_DUR) {
-            stepTimer = 0;
-            activeStep++;
-            if (activeStep >= steps.length) {
-                activeStep = 0;
-                stepLit.fill(0); descFade.fill(0);
-            }
-            stepLit[activeStep] = 1;
-            particleT = 0;
-        }
-
-        // Fade descriptions
-        for (let i = 0; i < steps.length; i++) {
-            descFade[i] = i <= activeStep
-                ? Math.min(1, descFade[i] + 0.04)
-                : Math.max(0, descFade[i] - 0.06);
-        }
-
-        // Connecting lines
-        for (let i = 0; i < steps.length - 1; i++) {
-            const a = pos(i), b = pos(i + 1);
-            const lit = i < activeStep;
-            ctx.strokeStyle = lit ? ACCENT : DIM;
-            ctx.lineWidth = lit ? 2 : 1;
-            ctx.globalAlpha = lit ? 0.5 : 0.2;
-
-            // Dashed line style for unlit
-            if (!lit) { ctx.setLineDash([4, 4]); } else { ctx.setLineDash([]); }
-            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.globalAlpha = 1;
-
-            // Small arrow at midpoint for lit lines
-            if (lit) {
-                const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
-                const ang = Math.atan2(b.y - a.y, b.x - a.x);
-                ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.6;
-                ctx.beginPath();
-                ctx.moveTo(mx + Math.cos(ang) * 6, my + Math.sin(ang) * 6);
-                ctx.lineTo(mx + Math.cos(ang + 2.5) * 5, my + Math.sin(ang + 2.5) * 5);
-                ctx.lineTo(mx + Math.cos(ang - 2.5) * 5, my + Math.sin(ang - 2.5) * 5);
-                ctx.closePath(); ctx.fill();
-                ctx.globalAlpha = 1;
-            }
-        }
-
-        // Traveling particle
-        if (particleT >= 0 && particleT < 1 && activeStep < steps.length - 1) {
-            particleT += P_SPEED;
-            const a = pos(activeStep), b = pos(activeStep + 1);
-            const t = ease(Math.min(particleT, 1));
-            const px = a.x + (b.x - a.x) * t;
-            const py = a.y + (b.y - a.y) * t;
-            const grad = ctx.createRadialGradient(px, py, 0, px, py, 14);
-            grad.addColorStop(0, ACCENT);
-            grad.addColorStop(1, 'transparent');
-            ctx.fillStyle = grad;
-            ctx.beginPath(); ctx.arc(px, py, 14, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI * 2); ctx.fill();
-        }
-
-        // Draw steps
-        const iconSize = vertical ? 18 : 22;
-        for (let i = 0; i < steps.length; i++) {
-            const p = pos(i), step = steps[i];
-            const lit = stepLit[i] > 0;
-            const col = lit ? ACTIVE : DIM;
-
-            // Background circle
-            ctx.fillStyle = lit ? ACCENT_DIM : 'rgba(255,255,255,0.03)';
-            ctx.beginPath(); ctx.arc(p.x, p.y, iconSize + 12, 0, Math.PI * 2); ctx.fill();
-
-            // Accent ring pulse for active
-            if (lit) {
-                ctx.strokeStyle = ACCENT;
-                ctx.lineWidth = 1.5;
-                ctx.globalAlpha = 0.4 + Math.sin(stepTimer * 0.06) * 0.15;
-                ctx.beginPath(); ctx.arc(p.x, p.y, iconSize + 12, 0, Math.PI * 2); ctx.stroke();
-                ctx.globalAlpha = 1;
-            }
-
-            // Icon
-            step.draw(p.x, p.y, iconSize, col);
-
-            // Step number
-            ctx.font = `500 10px ${MONO}`;
-            ctx.fillStyle = lit ? ACCENT : DIM;
-            ctx.textAlign = 'center';
-            ctx.fillText(`0${i + 1}`, p.x, p.y - iconSize - 20);
-
-            // Title
-            ctx.font = `600 ${vertical ? 10 : 11}px ${MONO}`;
-            ctx.fillStyle = lit ? ACTIVE : DIM;
-            const ty = p.y + iconSize + 26;
-            ctx.fillText(step.title, p.x, ty);
-
-            // Description (fades in)
-            if (descFade[i] > 0.01) {
-                ctx.globalAlpha = descFade[i];
-                ctx.font = `300 ${vertical ? 9 : 10}px ${MONO}`;
-                ctx.fillStyle = '#888';
-                ctx.fillText(step.desc, p.x, ty + 16);
-                ctx.globalAlpha = 1;
-            }
-        }
+        frame++;
+        drawBg();
+        animateConnector(connTop);
+        animateConnector(connBot);
+        vizDNA();
+        vizContact();
+        vizEHR();
+        vizAnon();
+        vizMerge();
+        vizTree();
+        vizAlert();
     }
-
-    // Start after a short delay to ensure font is loaded
-    setTimeout(() => { resize(); requestAnimationFrame(animate); }, 100);
+    setTimeout(() => { requestAnimationFrame(animate); }, 150);
 })();
 
 // ==========================================
