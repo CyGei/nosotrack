@@ -118,13 +118,13 @@
         statEls[i].querySelector('.about-stat-detail').textContent = stat.detail;
     });
 
-    // Viz legend (rebuild from content)
+    // Viz legend (rebuild from content — horizontal layout)
     const vizLegend = document.getElementById('vizLegend');
     if (vizLegend && c.about.vizLegend) {
         const legend = c.about.vizLegend;
         const typeItems = legend.types.map(t => {
             const shape = t.shape === 'triangle'
-                ? `<div class="viz-legend-tri"></div>`
+                ? `<div class="viz-legend-diamond" style="background:${t.color};"></div>`
                 : `<div class="viz-legend-dot" style="background:${t.color};"></div>`;
             return `<div class="viz-legend-item">${shape} ${t.label}</div>`;
         }).join('');
@@ -138,11 +138,11 @@
             return `<div class="viz-legend-item"><div class="viz-legend-dot" style="${style}"></div> ${s.label}</div>`;
         }).join('');
         vizLegend.innerHTML =
-            `<div class="viz-legend-title">${legend.sections.type}</div>${typeItems}` +
-            `<div style="margin-top:10px;"></div>` +
-            `<div class="viz-legend-title">${legend.sections.ward}</div>${wardItems}` +
-            `<div style="margin-top:10px;"></div>` +
-            `<div class="viz-legend-title">${legend.sections.status}</div>${statusItems}`;
+            `<div class="viz-legend-group"><div class="viz-legend-title">${legend.sections.type}</div>${typeItems}</div>` +
+            `<div class="viz-legend-sep"></div>` +
+            `<div class="viz-legend-group"><div class="viz-legend-title">${legend.sections.ward}</div>${wardItems}</div>` +
+            `<div class="viz-legend-sep"></div>` +
+            `<div class="viz-legend-group"><div class="viz-legend-title">${legend.sections.status}</div>${statusItems}</div>`;
     }
 
     // ── PROCESS ───────────────────────────────────────────────────────────────
@@ -266,6 +266,20 @@
             textNode.textContent = c.contact.github.label;
         } else {
             ghLink.appendChild(document.createTextNode(c.contact.github.label));
+        }
+    }
+
+    // LinkedIn link
+    const liLink = document.getElementById('contactLinkedin');
+    if (liLink && c.contact.linkedin) {
+        liLink.href = c.contact.linkedin.url;
+        let textNode = Array.from(liLink.childNodes).find(
+            node => node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+        );
+        if (textNode) {
+            textNode.textContent = c.contact.linkedin.label;
+        } else {
+            liLink.appendChild(document.createTextNode(c.contact.linkedin.label));
         }
     }
 

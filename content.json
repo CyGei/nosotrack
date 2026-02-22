@@ -214,6 +214,7 @@
     "title": ["Let's Work", "Together"],
     "subtitle": "We are actively seeking collaborations and funding. Please reach out!",
     "github": { "label": "github.com/CyGei", "url": "https://github.com/CyGei" },
+    "linkedin": { "label": "linkedin.com/in/cyril-geismar", "url": "https://www.linkedin.com/in/cyril-geismar-900926240/" },
     "formAction": "https://formspree.io/f/maqdqzqw",
     "formLabels": {
       "name": "Name",
