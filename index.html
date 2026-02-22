@@ -161,10 +161,12 @@
         .marquee-section {
             border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
             padding: 18px 0; overflow: hidden; background: var(--bg);
+            position: relative; /* Required for iOS Safari to clip transformed children */
         }
         .marquee-track {
             display: flex; gap: 56px;
             animation: marquee 30s linear infinite; width: max-content;
+            will-change: transform; /* GPU compositing for smooth mobile animation */
         }
         .marquee-track span {
             font-family: var(--mono); font-size: 0.72rem; letter-spacing: 3px;
@@ -441,6 +443,11 @@
         .contact-form textarea { resize: vertical; min-height: 110px; }
         .form-buttons { display: flex; gap: 10px; }
 
+        /* ========== VIRUS CANVAS (shared: nav + footer) ========== */
+        .nav-brand { display: flex; align-items: center; gap: 10px; }
+        .footer-brand { display: flex; align-items: center; gap: 8px; }
+        .virus-canvas { display: block; flex-shrink: 0; }
+
         /* ========== FOOTER ========== */
         footer { border-top: 1px solid var(--border); padding: 40px 0; }
         .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
@@ -483,7 +490,10 @@
 <!-- ========== NAV ========== -->
 <nav class="main-nav">
     <div class="nav-inner">
-        <a href="#" class="nav-logo"></a>
+        <div class="nav-brand">
+            <canvas id="nav-virus" class="virus-canvas"></canvas>
+            <a href="#" class="nav-logo"></a>
+        </div>
         <ul class="nav-links" id="navLinks"></ul>
         <button class="nav-hamburger" id="navToggle" aria-label="Toggle navigation">
             <span></span><span></span><span></span>
@@ -707,7 +717,10 @@
 <footer>
     <div class="container">
         <div class="footer-inner">
-            <div class="footer-logo"></div>
+            <div class="footer-brand">
+                <canvas id="footer-virus" class="virus-canvas"></canvas>
+                <div class="footer-logo"></div>
+            </div>
             <ul class="footer-links"></ul>
             <div class="footer-copy"></div>
         </div>
@@ -716,6 +729,63 @@
 
 <!-- ========== SCRIPTS ========== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ==========================================
+// SHARED VIRUS LOGO COMPONENT
+// ==========================================
+window.drawVirusLogo = function(ctx, frame, cx, cy) {
+    var coreR = 12, spikeCount = 10, spikeLen = 9, bulbR = 2.5;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(frame * 0.006);
+
+    // Outer subtle glow
+    var outerGlow = ctx.createRadialGradient(0, 0, coreR + spikeLen, 0, 0, coreR + spikeLen + 8);
+    outerGlow.addColorStop(0, 'rgba(255,7,58,0.06)');
+    outerGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = outerGlow;
+    ctx.beginPath(); ctx.arc(0, 0, coreR + spikeLen + 8, 0, Math.PI * 2); ctx.fill();
+
+    // Spike proteins
+    for (var si = 0; si < spikeCount; si++) {
+        var angle = (si / spikeCount) * Math.PI * 2;
+        var wobble = Math.sin(frame * 0.03 + si * 1.7) * 1;
+        var sx = Math.cos(angle) * coreR, sy = Math.sin(angle) * coreR;
+        var ex = Math.cos(angle) * (coreR + spikeLen + wobble);
+        var ey = Math.sin(angle) * (coreR + spikeLen + wobble);
+        ctx.strokeStyle = 'rgba(255,7,58,0.35)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+        var bGrad = ctx.createRadialGradient(ex, ey, 0, ex, ey, bulbR);
+        bGrad.addColorStop(0, 'rgba(255,7,58,0.7)'); bGrad.addColorStop(1, 'rgba(255,7,58,0.15)');
+        ctx.fillStyle = bGrad;
+        ctx.beginPath(); ctx.arc(ex, ey, bulbR, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Core body
+    var bodyGrad = ctx.createRadialGradient(-2, -2, 0, 0, 0, coreR);
+    bodyGrad.addColorStop(0, 'rgba(255,7,58,0.5)');
+    bodyGrad.addColorStop(0.6, 'rgba(255,7,58,0.25)');
+    bodyGrad.addColorStop(1, 'rgba(180,40,50,0.12)');
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath(); ctx.arc(0, 0, coreR, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,7,58,0.3)'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.arc(0, 0, coreR, 0, Math.PI * 2); ctx.stroke();
+
+    // Membrane rings
+    ctx.strokeStyle = 'rgba(255,7,58,0.1)'; ctx.lineWidth = 0.4;
+    for (var ri = 0; ri < 2; ri++) {
+        ctx.beginPath(); ctx.arc(0, 0, 4 + ri * 4, 0, Math.PI * 2); ctx.stroke();
+    }
+
+    // Highlight
+    var hlGrad = ctx.createRadialGradient(-3, -3, 0, -2, -2, 6);
+    hlGrad.addColorStop(0, 'rgba(255,255,255,0.15)'); hlGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = hlGrad;
+    ctx.beginPath(); ctx.arc(-2, -2, 6, 0, Math.PI * 2); ctx.fill();
+
+    ctx.restore();
+};
+</script>
 <script>
 // ==========================================
 // BACKGROUND NETWORK ANIMATION (Canvas 2D)
@@ -1308,70 +1378,15 @@ window.__revealObserver = observer;
 
         // ── Virus logo (upper-left corner of engine canvas) ──
         const logoCx = 38, logoCy = 34;
-        const rotation = frame * 0.006;
-        const coreR = 12;
-        const spikeCount = 10;
-        const spikeLen = 9;
-        const bulbR = 2.5;
-
-        ctx.save();
-        ctx.translate(logoCx, logoCy);
-        ctx.rotate(rotation);
-
-        // Outer subtle glow
-        const outerGlow = ctx.createRadialGradient(0, 0, coreR + spikeLen, 0, 0, coreR + spikeLen + 8);
-        outerGlow.addColorStop(0, 'rgba(255,7,58,0.06)');
-        outerGlow.addColorStop(1, 'transparent');
-        ctx.fillStyle = outerGlow;
-        ctx.beginPath(); ctx.arc(0, 0, coreR + spikeLen + 8, 0, Math.PI * 2); ctx.fill();
-
-        // Spike proteins
-        for (let si = 0; si < spikeCount; si++) {
-            const angle = (si / spikeCount) * Math.PI * 2;
-            const wobble = Math.sin(frame * 0.03 + si * 1.7) * 1;
-            const sx = Math.cos(angle) * coreR;
-            const sy = Math.sin(angle) * coreR;
-            const ex = Math.cos(angle) * (coreR + spikeLen + wobble);
-            const ey = Math.sin(angle) * (coreR + spikeLen + wobble);
-            ctx.strokeStyle = 'rgba(255,7,58,0.35)'; ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
-            const bGrad = ctx.createRadialGradient(ex, ey, 0, ex, ey, bulbR);
-            bGrad.addColorStop(0, 'rgba(255,7,58,0.7)'); bGrad.addColorStop(1, 'rgba(255,7,58,0.15)');
-            ctx.fillStyle = bGrad;
-            ctx.beginPath(); ctx.arc(ex, ey, bulbR, 0, Math.PI * 2); ctx.fill();
-        }
-
-        // Core body
-        const bodyGrad = ctx.createRadialGradient(-2, -2, 0, 0, 0, coreR);
-        bodyGrad.addColorStop(0, 'rgba(255,7,58,0.5)');
-        bodyGrad.addColorStop(0.6, 'rgba(255,7,58,0.25)');
-        bodyGrad.addColorStop(1, 'rgba(180,40,50,0.12)');
-        ctx.fillStyle = bodyGrad;
-        ctx.beginPath(); ctx.arc(0, 0, coreR, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = 'rgba(255,7,58,0.3)'; ctx.lineWidth = 0.8;
-        ctx.beginPath(); ctx.arc(0, 0, coreR, 0, Math.PI * 2); ctx.stroke();
-
-        // Membrane rings
-        ctx.strokeStyle = 'rgba(255,7,58,0.1)'; ctx.lineWidth = 0.4;
-        for (let ri = 0; ri < 2; ri++) {
-            ctx.beginPath(); ctx.arc(0, 0, 4 + ri * 4, 0, Math.PI * 2); ctx.stroke();
-        }
-
-        // Highlight
-        const hlGrad = ctx.createRadialGradient(-3, -3, 0, -2, -2, 6);
-        hlGrad.addColorStop(0, 'rgba(255,255,255,0.15)'); hlGrad.addColorStop(1, 'transparent');
-        ctx.fillStyle = hlGrad;
-        ctx.beginPath(); ctx.arc(-2, -2, 6, 0, Math.PI * 2); ctx.fill();
-
-        ctx.restore();
+        window.drawVirusLogo(ctx, frame, logoCx, logoCy);
 
         // "NosoTrack" label to the right of virus
         ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.5;
         ctx.font = `600 11px "Source Sans Pro", sans-serif`;
         ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-        ctx.fillText('Noso', logoCx + coreR + spikeLen + 6, logoCy - 1);
+        ctx.fillText('Noso', logoCx + 27, logoCy - 1);
         ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.6;
-        ctx.fillText('Track', logoCx + coreR + spikeLen + 6 + ctx.measureText('Noso').width, logoCy - 1);
+        ctx.fillText('Track', logoCx + 27 + ctx.measureText('Noso').width, logoCy - 1);
         ctx.globalAlpha = 1; ctx.textBaseline = 'alphabetic';
     }
 
@@ -1395,6 +1410,35 @@ window.__revealObserver = observer;
         drawEngineViz();
     }
     setTimeout(() => { requestAnimationFrame(animate); }, 150);
+})();
+
+// ==========================================
+// NAV & FOOTER VIRUS LOGO ANIMATION
+// ==========================================
+(function() {
+    var SIZE = 50;
+    var dpr = window.devicePixelRatio || 1;
+    var ctxList = ['nav-virus', 'footer-virus'].map(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return null;
+        el.width = SIZE * dpr;
+        el.height = SIZE * dpr;
+        el.style.width = SIZE + 'px';
+        el.style.height = SIZE + 'px';
+        var ctx = el.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return ctx;
+    }).filter(Boolean);
+    var f = 0;
+    function tick() {
+        ctxList.forEach(function(ctx) {
+            ctx.clearRect(0, 0, SIZE, SIZE);
+            window.drawVirusLogo(ctx, f, SIZE / 2, SIZE / 2);
+        });
+        f++;
+        requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
 })();
 
 // ==========================================
