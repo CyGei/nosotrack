@@ -918,14 +918,18 @@ window.__revealObserver = observer;
         const nodes = [ {x:cx,y:cy,r:5,staff:true}, {x:cx-45,y:cy-22,r:3.5}, {x:cx+50,y:cy-18,r:3.5}, {x:cx-35,y:cy+26,r:3.5}, {x:cx+40,y:cy+24,r:3.5}, {x:cx-8,y:cy-34,r:3}, {x:cx+12,y:cy+36,r:3} ];
         const edges = [[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,5],[2,4],[3,6]];
         edges.forEach(([a,b]) => { ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(nodes[a].x, nodes[a].y); ctx.lineTo(nodes[b].x, nodes[b].y); ctx.stroke(); });
-        const pulseR = 14 + ((frame * 0.5) % 36);
-        ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = Math.max(0, 0.25 - (pulseR - 14) / 50);
-        ctx.beginPath(); ctx.arc(cx, cy, pulseR, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
+        nodes.forEach((n, i) => {
+            const maxPhase = n.staff ? 30 : 22;
+            const waveColor = n.staff ? ACCENT : 'rgba(255,255,255,0.35)';
+            for (let ring = 0; ring < 2; ring++) {
+                const phase = (frame * 0.5 + i * 13 + ring * 15) % maxPhase;
+                const pulseR = n.r + 5 + phase;
+                ctx.strokeStyle = waveColor; ctx.lineWidth = 1; ctx.globalAlpha = 0.3 * (1 - phase / maxPhase);
+                ctx.beginPath(); ctx.arc(n.x, n.y, pulseR, 0, Math.PI * 2); ctx.stroke();
+            }
+        });
+        ctx.globalAlpha = 1;
         nodes.forEach(n => { ctx.fillStyle = n.staff ? ACCENT : 'rgba(255,255,255,0.45)'; ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill(); });
-        const edgeIdx = Math.floor((frame * 0.01) % edges.length);
-        const [a, b] = edges[edgeIdx]; const t = (frame * 0.015) % 1;
-        ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.7;
-        ctx.beginPath(); ctx.arc(nodes[a].x + (nodes[b].x - nodes[a].x) * t, nodes[a].y + (nodes[b].y - nodes[a].y) * t, 2, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
     }
 
     // EHR scrolling
