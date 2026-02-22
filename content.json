@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "NosoTrack",
-    "description": ""
+    "title": "NosoTrack — Real-Time Nosocomial Outbreak Analytics",
+    "description": "NosoTrack infers who infected whom in real-time, empowering hospital Infection Prevention Teams to stop outbreaks before they escalate."
   },
 
   "nav": {
@@ -46,6 +46,11 @@
       { "label": "Cost", "value": "$40B+", "detail": "US per year" }
     ],
     "vizLegend": {
+      "sections": {
+        "type": "Type",
+        "ward": "Ward",
+        "status": "Status"
+      },
       "types": [
         { "label": "Patient", "shape": "dot", "color": "#888" },
         { "label": "Staff", "shape": "triangle", "color": "#888" }
@@ -126,6 +131,8 @@
     "tag": "Research",
     "title": ["Publications & Software"],
     "intro": "<span class=\"nosotrack-noso\">Noso</span><span class=\"nosotrack-highlight\">Track</span> builds on over a decade of research in outbreak reconstruction methods, with a focus on integrating genomic and contact data to infer transmission trees. Our team and collaborators have published extensively on methodological advances and real-world applications, including the development of the <em>outbreaker2</em> R package and the <em>linktree</em> method for inferring staff-patient transmission patterns. We are committed to open science, with all our software freely available and our publications accessible to the public.",
+    "publicationsLabel": "Selected Publications",
+    "softwareLabel": "Software",
     "publications": [
       {
         "tag": "Paper",
@@ -204,7 +211,16 @@
     "title": ["Let's Work", "Together"],
     "subtitle": "We are actively seeking collaborations and funding. Please reach out!",
     "github": { "label": "github.com/CyGei", "url": "https://github.com/CyGei" },
-    "formAction": "https://formspree.io/f/maqdqzqw"
+    "formAction": "https://formspree.io/f/maqdqzqw",
+    "formLabels": {
+      "name": "Name",
+      "email": "Email",
+      "message": "Message"
+    },
+    "formButtons": {
+      "submit": "Send Message",
+      "reset": "Reset"
+    }
   },
 
   "footer": {
