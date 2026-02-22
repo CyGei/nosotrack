@@ -961,13 +961,15 @@ window.__revealObserver = observer;
         const globalFade = cycle > HOLD_END ? 1 - (cycle - HOLD_END) / (1 - HOLD_END) : 1;
 
         const fields = [
-            { raw: 'Smith, John',   anon: 'ID_7f3a9b'                        },
-            { raw: 'DOB 1985-03',   anon: '****-**'                           },
-            { raw: 'MRN 47291',     anon: 'REF \u2588\u2588\u2588\u2588\u2588' },
-            { raw: 'Room 14-B',     anon: 'LOC_\u2588\u2588\u2588'            },
-            { raw: 'Ward: B',       anon: 'Zone: B'                           },
-            { raw: 'Nurse: Evans',  anon: 'STAFF_A3'                          },
-            { raw: 'PCR+',          anon: 'CASE_POS'                          },
+            { raw: 'Smith, John A.',      anon: 'SUBJ_7f3a9b2c'                                   },
+            { raw: 'DOB: 1985-03-12',     anon: 'AGE_GRP: 35-44'                                  },
+            { raw: 'NHS: 485 777 3291',   anon: 'REF_\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588' },
+            { raw: 'Room 14-B, Wing 3',   anon: 'LOC_\u2588\u2588\u2588\u2588\u2588\u2588'        },
+            { raw: 'Ward: Birch North',   anon: 'ZONE_BN_SECTOR'                                   },
+            { raw: 'Nurse: K. Evans',     anon: 'STAFF_A3'                                         },
+            { raw: 'Admit: 2025-03-01',   anon: 'ADM_Q1_25_\u2588\u2588'                          },
+            { raw: 'PCR+ / MRSA Screen+', anon: 'FLAG_HAI_POS_003'                                 },
+            { raw: 'GP: St. Jude Prac.',  anon: 'PRAC_\u2588\u2588\u2588\u2588'                   },
         ];
         const nRows = fields.length;
         const headerH = 13, statusH = 8, topPad = 2;
