@@ -43,7 +43,7 @@
 
     // ── META ──────────────────────────────────────────────────────────────────
 
-    document.title = c.meta.title + ' — Real-Time Nosocomial Outbreak Analytics';
+    document.title = c.meta.title;
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute('content', c.meta.description);
 
@@ -118,13 +118,40 @@
         statEls[i].querySelector('.about-stat-detail').textContent = stat.detail;
     });
 
+    // Viz legend (rebuild from content)
+    const vizLegend = document.getElementById('vizLegend');
+    if (vizLegend && c.about.vizLegend) {
+        const legend = c.about.vizLegend;
+        const typeItems = legend.types.map(t => {
+            const shape = t.shape === 'triangle'
+                ? `<div class="viz-legend-tri"></div>`
+                : `<div class="viz-legend-dot" style="background:${t.color};"></div>`;
+            return `<div class="viz-legend-item">${shape} ${t.label}</div>`;
+        }).join('');
+        const wardItems = legend.wards.map(w =>
+            `<div class="viz-legend-item"><div class="viz-legend-dot" style="background:${w.color};"></div> ${w.label}</div>`
+        ).join('');
+        const statusItems = legend.status.map((s, i) => {
+            const style = i === legend.status.length - 1
+                ? `background:${s.color}; box-shadow: 0 0 6px rgba(255,7,58,0.6);`
+                : `background:${s.color};`;
+            return `<div class="viz-legend-item"><div class="viz-legend-dot" style="${style}"></div> ${s.label}</div>`;
+        }).join('');
+        vizLegend.innerHTML =
+            `<div class="viz-legend-title">${legend.sections.type}</div>${typeItems}` +
+            `<div style="margin-top:10px;"></div>` +
+            `<div class="viz-legend-title">${legend.sections.ward}</div>${wardItems}` +
+            `<div style="margin-top:10px;"></div>` +
+            `<div class="viz-legend-title">${legend.sections.status}</div>${statusItems}`;
+    }
+
     // ── PROCESS ───────────────────────────────────────────────────────────────
 
-    setText('#how-it-works .section-tag', c.process.tag);
-    setText('#how-it-works .section-title', c.process.title);
-    setText('.pipeline-subtitle', c.process.subtitle);
+    setText('#how-it-works .section-tag', c.platform.tag);
+    setText('#how-it-works .section-title', c.platform.title);
+    setText('.pipeline-subtitle', c.platform.subtitle);
 
-    const steps = c.process.steps;
+    const steps = c.platform.steps;
 
     // Step badges (num + label)
     const stepDefs = [steps.inputs, steps.anonymisation, steps.engine, steps.earlyWarning];
@@ -157,10 +184,17 @@
         engineCard.querySelector('.p-card-tag').textContent = steps.engine.tag;
         engineCard.querySelector('.p-card-title').textContent = steps.engine.title;
         engineCard.querySelector('.p-card-desc').textContent = steps.engine.desc;
-        const feats = engineCard.querySelectorAll('.engine-feat');
-        steps.engine.features.forEach((feat, i) => {
-            if (feats[i]) feats[i].innerHTML = `<strong>${feat.title}</strong>${feat.desc}`;
-        });
+        if (steps.engine.features && steps.engine.features.length) {
+            let featsEl = engineCard.querySelector('.engine-features');
+            if (!featsEl) {
+                featsEl = document.createElement('div');
+                featsEl.className = 'engine-features';
+                engineCard.appendChild(featsEl);
+            }
+            featsEl.innerHTML = steps.engine.features
+                .map(f => `<div class="engine-feat"><strong>${f.title}</strong>${f.desc}</div>`)
+                .join('');
+        }
     }
 
     // Step 4 — early warning card
@@ -176,6 +210,9 @@
     setText('#research .section-tag', c.research.tag);
     setHtml('#research .section-title', c.research.title.join('<br>'));
     setHtml('.research-intro', c.research.intro); // supports <span class="nosotrack-highlight">
+
+    setText('#researchPublicationsLabel', c.research.publicationsLabel);
+    setText('#researchSoftwareLabel', c.research.softwareLabel);
 
     function pubCardHtml(item) {
         return `<a class="pub-card" href="${item.url}" target="_blank">
@@ -219,18 +256,34 @@
     setText('.contact-sub', c.contact.subtitle);
 
     // GitHub link: contains an SVG icon + a text node
-    const ghLink = document.querySelector('#contact a[href*="github"]');
+    const ghLink = document.getElementById('contactGithub');
     if (ghLink && c.contact.github) {
         ghLink.href = c.contact.github.url;
-        ghLink.childNodes.forEach(node => {
-            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
-                node.textContent = c.contact.github.label;
-            }
-        });
+        let textNode = Array.from(ghLink.childNodes).find(
+            node => node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+        );
+        if (textNode) {
+            textNode.textContent = c.contact.github.label;
+        } else {
+            ghLink.appendChild(document.createTextNode(c.contact.github.label));
+        }
     }
 
     const form = document.querySelector('.contact-form');
     if (form && c.contact.formAction) form.action = c.contact.formAction;
+
+    // Form labels
+    if (c.contact.formLabels) {
+        setText('label[for="name"]', c.contact.formLabels.name);
+        setText('label[for="email"]', c.contact.formLabels.email);
+        setText('label[for="message"]', c.contact.formLabels.message);
+    }
+
+    // Form buttons
+    if (c.contact.formButtons) {
+        setText('#btnSubmit', c.contact.formButtons.submit);
+        setText('#btnReset', c.contact.formButtons.reset);
+    }
 
     // ── FOOTER ────────────────────────────────────────────────────────────────
 

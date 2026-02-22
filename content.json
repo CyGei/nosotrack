@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "NosoTrack",
-    "description": ""
+    "title": "NosoTrack — Real-Time Nosocomial Outbreak Analytics",
+    "description": "Near real-time transmission inference for hospital outbreak detection and intervention."
   },
 
   "nav": {
@@ -18,7 +18,7 @@
   "hero": {
     "eyebrow": "Real-Time Outbreak Analytics",
     "title": ["Track.", "Intervene.", "Protect."],
-    "subtitle": "NosoTrack infers who infected whom in real-time, empowering hospital Infection Prevention Teams to stop outbreaks before they escalate.",
+    "subtitle": "NosoTrack infers who infected whom in near real-time, empowering hospital Infection Prevention Teams to stop outbreaks before they escalate.",
     "primaryCta": { "label": "Learn More", "href": "#about" },
     "secondaryCta": { "label": "Collaborate", "href": "#contact" }
   },
@@ -41,11 +41,16 @@
       "<span class=\"nosotrack-noso\">Noso</span><span class=\"nosotrack-highlight\">Track</span> <strong>is an outbreak analytics platform that infers who infected whom in near real-time</strong> by integrating data from hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings and actionable reports, enabling hospital Infection Prevention Teams to <strong> devise targeted interventions promptly before an outbreak escalates.</strong>"
     ],
     "stats": [
-      { "label": "Cases", "value": "2.0M", "detail": "US per year" },
-      { "label": "Deaths", "value": "100K", "detail": "US per year" },
-      { "label": "Cost", "value": "$40B+", "detail": "US per year" }
+      { "label": "Cases", "value": "2.0M", "detail": "per year in the US" },
+      { "label": "Deaths", "value": "100K", "detail": "per year in the US" },
+      { "label": "Cost", "value": "$40B+", "detail": "per year to the US" }
     ],
     "vizLegend": {
+      "sections": {
+        "type": "Type",
+        "ward": "Ward",
+        "status": "Status"
+      },
       "types": [
         { "label": "Patient", "shape": "dot", "color": "#888" },
         { "label": "Staff", "shape": "triangle", "color": "#888" }
@@ -69,7 +74,7 @@
     "steps": {
       "inputs": {
         "stepNum": "01",
-        "stepLabel": "Data Inputs",
+        "stepLabel": "Data",
         "cards": [
           {
             "tag": "Genomic",
@@ -101,14 +106,17 @@
       },
       "engine": {
         "stepNum": "03",
-        "stepLabel": "Core Platform",
+        "stepLabel": "Inference",
         "tag": "NosoTrack Engine",
         "title": "Transmission Tree Inference",
-        "desc": "NosoTrack uses Bayesian inference to probabilistically reconstruct transmission trees.",
+        "desc": "NosoTrack uses Bayesian inference to probabilistically reconstruct transmission trees (who infected whom).",
         "features": [
-          { "title": "Data Fusion", "desc": "Genomic + contact + EHR integration" },
-          { "title": "Bayesian Models", "desc": "Phylodynamic transmission inference" },
-          { "title": "Real-Time", "desc": "Near real-time pipeline processing" }
+          { "title": "Patient 0", "desc": "Identifies the source case."},
+          { "title": "Importation Events", "desc": "Identifies cases imported outside the hospital." },
+          { "title": "Undetected Cases", "desc": "Identifies potential missed cases." },
+          { "title": "Superspreading Events", "desc": "Identifies superspreaders & cross-ward contamination." },
+          { "title": "Transmission Patterns", "desc": "Characterises transmission patterns between wards, staff and patients." },
+          { "title": "Forecasting", "desc": "Projects short-term transmission risk for staff and patients." }
         ]
       },
       "earlyWarning": {
@@ -125,7 +133,9 @@
   "research": {
     "tag": "Research",
     "title": ["Publications & Software"],
-    "intro": "<span class=\"nosotrack-noso\">Noso</span><span class=\"nosotrack-highlight\">Track</span> builds on over a decade of research in outbreak reconstruction methods, with a focus on integrating genomic and contact data to infer transmission trees. Our team and collaborators have published extensively on methodological advances and real-world applications, including the development of the <em>outbreaker2</em> R package and the <em>linktree</em> method for inferring staff-patient transmission patterns. We are committed to open science, with all our software freely available and our publications accessible to the public.",
+    "intro": "<span class=\"nosotrack-noso\">Noso</span><span class=\"nosotrack-highlight\">Track</span> <strong>builds on over a decade of research in outbreak reconstruction, focusing on the integration of epidemiological, genomic and contact data to infer transmission trees</strong>. Our team and collaborators have published extensively on methodological advances, including the <em>outbreaker2</em> R package and the <em>linktree</em> method for inferring transmission patterns between staff and patients. These methods have been applied to real outbreak data, including SARS-CoV-2 nosocomial outbreaks in Switzerland, MRSA in neonatal intensive care units in the UK, <em>Klebsiella pneumoniae</em> in a Nepali neonatal unit, <em>Acinetobacter baumannii</em> in hospitals in North Carolina, and Ebola outbreaks in the DRC. We are committed to open science, with all software freely available and publications accessible to the public.",
+    "publicationsLabel": "Selected Publications",
+    "softwareLabel": "Software",
     "publications": [
       {
         "tag": "Paper",
@@ -204,17 +214,26 @@
     "title": ["Let's Work", "Together"],
     "subtitle": "We are actively seeking collaborations and funding. Please reach out!",
     "github": { "label": "github.com/CyGei", "url": "https://github.com/CyGei" },
-    "formAction": "https://formspree.io/f/maqdqzqw"
+    "formAction": "https://formspree.io/f/maqdqzqw",
+    "formLabels": {
+      "name": "Name",
+      "email": "Email",
+      "message": "Message"
+    },
+    "formButtons": {
+      "submit": "Send Message",
+      "reset": "Reset"
+    }
   },
 
   "footer": {
     "logo": "NosoTrack",
     "links": [
       { "label": "About", "href": "#about" },
+      { "label": "Platform", "href": "#how-it-works" },
       { "label": "Research", "href": "#research" },
       { "label": "Team", "href": "#team" },
-      { "label": "Contact", "href": "#contact" },
-      { "label": "GitHub", "href": "https://github.com/CyGei", "external": true }
+      { "label": "Contact", "href": "#contact" }
     ],
     "copy": "Cyril Geismar"
   }

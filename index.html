@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NosoTrack — Real-Time Nosocomial Outbreak Analytics</title>
+    <title>NosoTrack</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;0,700;0,900;1,300;1,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -483,14 +483,8 @@
 <!-- ========== NAV ========== -->
 <nav class="main-nav">
     <div class="nav-inner">
-        <a href="#" class="nav-logo">Noso<span>Track</span></a>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="#about">About</a></li>
-            <li><a href="#how-it-works">Platform</a></li>
-            <li><a href="#research">Research</a></li>
-            <li><a href="#team">Team</a></li>
-            <li><a href="#contact" class="nav-cta">Get in Touch</a></li>
-        </ul>
+        <a href="#" class="nav-logo"></a>
+        <ul class="nav-links" id="navLinks"></ul>
         <button class="nav-hamburger" id="navToggle" aria-label="Toggle navigation">
             <span></span><span></span><span></span>
         </button>
@@ -501,94 +495,49 @@
 <section id="hero">
     <canvas id="network-canvas"></canvas>
     <div class="hero-content">
-        <div class="hero-eyebrow">Real-Time Outbreak Analytics</div>
-        <h1 class="hero-title">
-            Track. Trace.<br><span class="accent">Intervene.</span>
-        </h1>
-        <p class="hero-subtitle">
-        </p>
-        <div class="hero-buttons">
-            <a href="#about" class="btn-primary">Learn More &darr;</a>
-            <a href="#contact" class="btn-secondary">Collaborate</a>
-        </div>
+        <div class="hero-eyebrow"></div>
+        <h1 class="hero-title"></h1>
+        <p class="hero-subtitle"></p>
+        <div class="hero-buttons"></div>
     </div>
 </section>
 
 <!-- ========== MARQUEE ========== -->
 <div class="marquee-section">
-    <div class="marquee-track">
-        <span>Outbreak Reconstruction</span>
-        <span>Contact Tracing</span>
-        <span>Genomic Surveillance</span>
-        <span>Transmission Trees</span>
-        <span>Real-Time Analytics</span>
-        <span>Infection Prevention</span>
-        <span>Hospital Epidemiology</span>
-        <span>Superspreader Detection</span>
-        <span>Outbreak Reconstruction</span>
-        <span>Contact Tracing</span>
-        <span>Genomic Surveillance</span>
-        <span>Transmission Trees</span>
-        <span>Real-Time Analytics</span>
-        <span>Infection Prevention</span>
-        <span>Hospital Epidemiology</span>
-        <span>Superspreader Detection</span>
-    </div>
+    <div class="marquee-track"></div>
 </div>
 
 <!-- ========== ABOUT ========== -->
 <section id="about" class="section-padding">
     <div class="container">
         <div class="about-text reveal">
-            <span class="section-tag">01 — About</span>
-            <h2 class="section-title">The Problem<br>& The Solution</h2>
+            <span class="section-tag"></span>
+            <h2 class="section-title"></h2>
 
-            <!-- Burden stats (moved here) -->
+            <!-- Burden stats -->
             <div class="about-stats reveal">
                 <div class="about-stat">
-                    <div class="about-stat-label">Cases</div>
-                    <div class="about-stat-value">2.0M</div>
-                    <div class="about-stat-detail">US per year</div>
+                    <div class="about-stat-label"></div>
+                    <div class="about-stat-value"></div>
+                    <div class="about-stat-detail"></div>
                 </div>
                 <div class="about-stat">
-                    <div class="about-stat-label">Deaths</div>
-                    <div class="about-stat-value">100K</div>
-                    <div class="about-stat-detail">US per year</div>
+                    <div class="about-stat-label"></div>
+                    <div class="about-stat-value"></div>
+                    <div class="about-stat-detail"></div>
                 </div>
                 <div class="about-stat">
-                    <div class="about-stat-label">Cost</div>
-                    <div class="about-stat-value">$40B+</div>
-                    <div class="about-stat-detail">US per year</div>
+                    <div class="about-stat-label"></div>
+                    <div class="about-stat-value"></div>
+                    <div class="about-stat-detail"></div>
                 </div>
             </div>
-
-            <p>
-                <strong>Healthcare-associated infections (HAIs)</strong> affect approximately 1 in 10 patients worldwide, causing significant morbidity, mortality, and economic strain on healthcare systems. <strong>Nosocomial outbreaks</strong> driven by person-to-person transmitted pathogens such as SARS-CoV-2, <em>Clostridioides difficile</em>, <em>Klebsiella pneumoniae</em>, and MRSA generate the most acute clinical and operational crises: triggering staff shortages, ward closures, and delayed procedures. Current control measures rely on broad testing and isolation protocols, but <strong>effective intervention requires identifying the specific drivers of an outbreak</strong>: such as patient zero, superspreaders, transmission routes, and undetected or imported cases.
-            </p>
-            <p>
-                <span class="nosotrack-noso">Noso</span><span class="nosotrack-highlight">Track</span> <strong>is an outbreak analytics platform that infers who infected whom in near real-time</strong> by integrating data from hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings and actionable reports, enabling hospital infection prevention teams to target interventions promptly before an outbreak escalates.
-            </p>
         </div>
-
-        
 
         <!-- 3D Transmission Network -->
         <div class="reveal">
             <div id="three-container">
-                <div class="viz-legend">
-                    <div class="viz-legend-title">TYPE</div>
-                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#888;"></div> Patient</div>
-                    <div class="viz-legend-item"><div class="viz-legend-tri"></div> Staff</div>
-                    <div style="margin-top:10px;"></div>
-                    <div class="viz-legend-title">WARD</div>
-                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(100,150,255,0.7);"></div> Ward A</div>
-                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(255,150,100,0.7);"></div> Ward B</div>
-                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:rgba(150,255,100,0.7);"></div> Ward C</div>
-                    <div style="margin-top:10px;"></div>
-                    <div class="viz-legend-title">STATUS</div>
-                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#555;"></div> Susceptible</div>
-                    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#ff073a; box-shadow: 0 0 6px rgba(255,7,58,0.6);"></div> Infected</div>
-                </div>
+                <div class="viz-legend" id="vizLegend"></div>
                 <div class="viz-tooltip" id="vizTooltip"></div>
             </div>
         </div>
@@ -599,39 +548,39 @@
 <section id="how-it-works" class="section-padding">
     <canvas id="pipeline-bg"></canvas>
     <div class="container pipeline-wrap">
-        <span class="section-tag reveal">Platform</span>
-        <h2 class="section-title reveal">How It Works</h2>
-        <p class="pipeline-subtitle reveal">Three data streams converge into the NosoTrack pipeline — anonymised, merged, and analysed to reconstruct transmission chains and trigger real-time alerts.</p>
+        <span class="section-tag reveal"></span>
+        <h2 class="section-title reveal"></h2>
+        <p class="pipeline-subtitle reveal"></p>
 
         <div class="pipeline-flow">
 
             <!-- STEP 1: Data Inputs -->
             <div class="pipeline-step reveal">
                 <div class="pipeline-step-badge">
-                    <div class="pipeline-step-num">01</div>
-                    <div class="pipeline-step-label">Data Inputs</div>
+                    <div class="pipeline-step-num"></div>
+                    <div class="pipeline-step-label"></div>
                 </div>
                 <div class="pipeline-sources">
                     <div class="p-card" data-pipeline="dna">
                         <div class="p-card-glow"></div>
                         <canvas class="p-card-canvas" data-viz="dna"></canvas>
-                        <div class="p-card-tag">Genomic</div>
-                        <div class="p-card-title">DNA Sequencing</div>
-                        <div class="p-card-desc">Pathogen genomes are sequenced, providing phylogenetic signal for transmission linkage.</div>
+                        <div class="p-card-tag"></div>
+                        <div class="p-card-title"></div>
+                        <div class="p-card-desc"></div>
                     </div>
                     <div class="p-card" data-pipeline="contact">
                         <div class="p-card-glow"></div>
                         <canvas class="p-card-canvas" data-viz="contact"></canvas>
-                        <div class="p-card-tag">Proximity</div>
-                        <div class="p-card-title">Contact Tracing</div>
-                        <div class="p-card-desc">Bluetooth-enabled devices record proximity events between patients and staff.</div>
+                        <div class="p-card-tag"></div>
+                        <div class="p-card-title"></div>
+                        <div class="p-card-desc"></div>
                     </div>
                     <div class="p-card" data-pipeline="ehr">
                         <div class="p-card-glow"></div>
                         <canvas class="p-card-canvas" data-viz="ehr"></canvas>
-                        <div class="p-card-tag">Clinical</div>
-                        <div class="p-card-title">Health Records</div>
-                        <div class="p-card-desc">Electronic Health Records provide ward movements, test results, and clinical timelines.</div>
+                        <div class="p-card-tag"></div>
+                        <div class="p-card-title"></div>
+                        <div class="p-card-desc"></div>
                     </div>
                 </div>
             </div>
@@ -642,16 +591,16 @@
             <!-- STEP 2: Anonymisation -->
             <div class="pipeline-step reveal">
                 <div class="pipeline-step-badge">
-                    <div class="pipeline-step-num">02</div>
-                    <div class="pipeline-step-label">Anonymisation</div>
+                    <div class="pipeline-step-num"></div>
+                    <div class="pipeline-step-label"></div>
                 </div>
                 <div class="pipeline-single">
                     <div class="p-card" data-pipeline="anon">
                         <div class="p-card-glow"></div>
                         <canvas class="p-card-canvas" data-viz="anon"></canvas>
-                        <div class="p-card-tag">GDPR Compliance</div>
-                        <div class="p-card-title">Data Anonymisation</div>
-                        <div class="p-card-desc">Patient identifiers are stripped, hashed, and encrypted before any analysis — ensuring full GDPR compliance. All three data streams are processed through a secure anonymisation layer.</div>
+                        <div class="p-card-tag"></div>
+                        <div class="p-card-title"></div>
+                        <div class="p-card-desc"></div>
                     </div>
                 </div>
             </div>
@@ -662,8 +611,8 @@
             <!-- STEP 3: NosoTrack Engine -->
             <div class="pipeline-step reveal">
                 <div class="pipeline-step-badge">
-                    <div class="pipeline-step-num">03</div>
-                    <div class="pipeline-step-label">Intelligence Platform</div>
+                    <div class="pipeline-step-num"></div>
+                    <div class="pipeline-step-label"></div>
                 </div>
                 <div class="pipeline-single">
                     <div class="p-card p-card--engine" data-pipeline="engine">
@@ -682,16 +631,16 @@
             <!-- STEP 4: Early Warning -->
             <div class="pipeline-step reveal">
                 <div class="pipeline-step-badge">
-                    <div class="pipeline-step-num">04</div>
-                    <div class="pipeline-step-label">Action</div>
+                    <div class="pipeline-step-num"></div>
+                    <div class="pipeline-step-label"></div>
                 </div>
                 <div class="pipeline-single">
                     <div class="p-card" data-pipeline="alert">
                         <div class="p-card-glow"></div>
                         <canvas class="p-card-canvas" data-viz="alert"></canvas>
-                        <div class="p-card-tag">Alerts</div>
-                        <div class="p-card-title">Early Warning System</div>
-                        <div class="p-card-desc">Real-time alerts and reports are dispatched to infection prevention teams before outbreaks escalate — enabling rapid containment and ward-level interventions.</div>
+                        <div class="p-card-tag"></div>
+                        <div class="p-card-title"></div>
+                        <div class="p-card-desc"></div>
                     </div>
                 </div>
             </div>
@@ -703,96 +652,24 @@
 <!-- ========== RESEARCH ========== -->
 <section id="research" class="section-padding">
     <div class="container">
-        <span class="section-tag reveal">03 — Research</span>
-        <h2 class="section-title reveal">Publications<br>& Software</h2>
-        <p class="research-intro reveal">
-        </p>
+        <span class="section-tag reveal"></span>
+        <h2 class="section-title reveal"></h2>
+        <p class="research-intro reveal"></p>
 
-        <h3 class="research-sub reveal">Selected Publications</h3>
-        <div class="pub-grid reveal">
-            <a class="pub-card" href="https://pubmed.ncbi.nlm.nih.gov/35215195/" target="_blank">
-                <span class="pub-tag">Paper</span>
-                <div class="pub-title">Literature review</div>
-                <div class="pub-desc">A systematic review of outbreak reconstruction methods.</div>
-                <span class="pub-arrow">&rarr;</span>
-            </a>
-            <a class="pub-card" href="https://link.springer.com/article/10.1186/s12859-018-2330-z" target="_blank">
-                <span class="pub-tag">Paper</span>
-                <div class="pub-title">A modular platform for outbreak reconstruction</div>
-                <div class="pub-desc">The paper for outbreaker2.</div>
-                <span class="pub-arrow">&rarr;</span>
-            </a>
-            <a class="pub-card" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037" target="_blank">
-                <span class="pub-tag">Paper</span>
-                <div class="pub-title">linktree</div>
-                <div class="pub-desc">A method to infer transmission patterns between staff and patients.</div>
-                <span class="pub-arrow">&rarr;</span>
-            </a>
-            <a class="pub-card" href="https://pubmed.ncbi.nlm.nih.gov/40302215/" target="_blank">
-                <span class="pub-tag">Paper</span>
-                <div class="pub-title">Real time genomic surveillance for nosocomial outbreaks</div>
-                <div class="pub-desc">Proof of concept for near real time surveillance.</div>
-                <span class="pub-arrow">&rarr;</span>
-            </a>
-        </div>
+        <h3 class="research-sub reveal" id="researchPublicationsLabel"></h3>
+        <div class="pub-grid reveal"></div>
 
-        <h3 class="research-sub reveal" style="margin-top: 48px;">Software</h3>
-        <div class="pub-grid reveal">
-            <a class="pub-card" href="https://github.com/reconhub/outbreaker2" target="_blank">
-                <span class="pub-tag">Software</span>
-                <div class="pub-title">outbreaker2</div>
-                <div class="pub-desc">Software to reconstruct transmission trees.</div>
-                <span class="pub-arrow">&rarr;</span>
-            </a>
-            <a class="pub-card" href="https://cygei.github.io/o2ools/index.html" target="_blank">
-                <span class="pub-tag">Software</span>
-                <div class="pub-title">o2ools</div>
-                <div class="pub-desc">Software to analyse transmission trees.</div>
-                <span class="pub-arrow">&rarr;</span>
-            </a>
-        </div>
+        <h3 class="research-sub reveal" id="researchSoftwareLabel" style="margin-top: 48px;"></h3>
+        <div class="pub-grid reveal"></div>
     </div>
 </section>
 
 <!-- ========== TEAM ========== -->
 <section id="team" class="section-padding">
     <div class="container">
-        <span class="section-tag reveal">Team</span>
-        <h2 class="section-title reveal">Meet the Team</h2>
-        <div class="team-grid">
-            <div class="team-card reveal">
-                <img src="images/cyril.jpg" alt="Dr Cyril Geismar" class="team-photo">
-                <div class="team-info">
-                    <div class="team-name">Dr Cyril Geismar</div>
-                    <div class="team-role">Johns Hopkins University</div>
-                    <p class="team-bio">Postdoctoral research fellow. PhD in mathematical modelling of infectious diseases at Imperial College London, focused on SARS-CoV-2 outbreak reconstruction. Executive board member and developer for the <a href="https://www.repidemicsconsortium.org/" target="_blank">R Epidemics Consortium</a>. Teaches outbreak analytics at <a href="https://sismid.sph.emory.edu/online-modules/recon-tools/index.html" target="_blank">Emory University</a> and <a href="https://data.org/our-work/epiverse/training-africa/course/" target="_blank">LSHTM</a>.</p>
-                </div>
-            </div>
-            <div class="team-card reveal" style="transition-delay: 0.1s;">
-                <img src="images/thibaut.jpg" alt="Dr Thibaut Jombart" class="team-photo">
-                <div class="team-info">
-                    <div class="team-name">Dr Thibaut Jombart</div>
-                    <div class="team-role">Imperial College London</div>
-                    <p class="team-bio">Senior Lecturer specialising in outbreak response analytics, biostatistics, population genetics, and R programming. Lead author of <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457" target="_blank">outbreaker</a> and founder of the <a href="https://www.repidemicsconsortium.org/" target="_blank">R Epidemics Consortium</a>. Field experience in Ebola deployments in the Democratic Republic of the Congo.</p>
-                </div>
-            </div>
-            <div class="team-card reveal" style="transition-delay: 0.2s;">
-                <img src="images/anne.jpg" alt="Dr Anne Cori" class="team-photo">
-                <div class="team-info">
-                    <div class="team-name">Dr Anne Cori</div>
-                    <div class="team-role">Imperial College London</div>
-                    <p class="team-bio">Senior Lecturer specialising in real-time outbreak analysis and epidemiological parameters. Lead author of <a href="https://academic.oup.com/aje/article/178/9/1505/89262" target="_blank">EpiEstim</a> and co-author of <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457" target="_blank">outbreaker</a>. Develops statistical methods for outbreak reconstruction and rapid transmissibility assessment.</p>
-                </div>
-            </div>
-            <div class="team-card reveal" style="transition-delay: 0.3s;">
-                <img src="images/shaun.jpg" alt="Dr Shaun Truelove" class="team-photo">
-                <div class="team-info">
-                    <div class="team-name">Dr Shaun Truelove</div>
-                    <div class="team-role">Johns Hopkins University</div>
-                    <p class="team-bio">Associate Professor focused on infectious disease dynamics and modelling for public health response and policy (COVID-19, influenza, vaccine-preventable diseases). Co-leads the <a href="https://scenariomodelinghub.org/" target="_blank">US Scenario Modeling Hubs</a> and <a href="https://insightnet.us/centers/accidda/" target="_blank">ACCIDA</a>, a consortium producing epidemic scenario projections and forecasts.</p>
-                </div>
-            </div>
-        </div>
+        <span class="section-tag reveal"></span>
+        <h2 class="section-title reveal"></h2>
+        <div class="team-grid"></div>
     </div>
 </section>
 
@@ -801,25 +678,24 @@
     <div class="container">
         <div class="contact-grid">
             <div class="reveal">
-                <span class="section-tag">05 — Contact</span>
-                <h2 class="contact-heading">Let's Work<br>Together</h2>
-                <p class="contact-sub">We are actively seeking collaborations and funding. Please reach out!</p>
-                <a href="https://github.com/CyGei" target="_blank" style="display:inline-flex; align-items:center; gap:8px; color:var(--text-secondary); font-family:var(--mono); font-size:0.75rem; transition:color 0.3s;">
+                <span class="section-tag"></span>
+                <h2 class="contact-heading"></h2>
+                <p class="contact-sub"></p>
+                <a id="contactGithub" href="#" target="_blank" style="display:inline-flex; align-items:center; gap:8px; color:var(--text-secondary); font-family:var(--mono); font-size:0.75rem; transition:color 0.3s;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                    github.com/CyGei
                 </a>
             </div>
             <div class="reveal" style="transition-delay: 0.2s;">
-                <form class="contact-form" method="POST" action="https://formspree.io/f/maqdqzqw">
-                    <label for="name">Name</label>
+                <form class="contact-form" method="POST">
+                    <label for="name"></label>
                     <input type="text" name="name" id="name" required>
-                    <label for="email">Email</label>
+                    <label for="email"></label>
                     <input type="email" name="email" id="email" required>
-                    <label for="message">Message</label>
+                    <label for="message"></label>
                     <textarea name="message" id="message" rows="5" required></textarea>
                     <div class="form-buttons">
-                        <button type="submit" class="btn-primary">Send Message</button>
-                        <button type="reset" class="btn-secondary">Reset</button>
+                        <button type="submit" id="btnSubmit" class="btn-primary"></button>
+                        <button type="reset" id="btnReset" class="btn-secondary"></button>
                     </div>
                 </form>
             </div>
@@ -831,15 +707,9 @@
 <footer>
     <div class="container">
         <div class="footer-inner">
-            <div class="footer-logo">Noso<span>Track</span></div>
-            <ul class="footer-links">
-                <li><a href="#about">About</a></li>
-                <li><a href="#how-it-works">Platform</a></li>
-                <li><a href="#research">Research</a></li>
-                <li><a href="#team">Team</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-            <div class="footer-copy">&copy; Cyril Geismar.</div>
+            <div class="footer-logo"></div>
+            <ul class="footer-links"></ul>
+            <div class="footer-copy"></div>
         </div>
     </div>
 </footer>
