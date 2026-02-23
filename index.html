@@ -415,6 +415,100 @@
         }
         .pub-card:hover .pub-arrow { transform: translateX(4px); }
 
+        /* ========== TIMELINE ========== */
+        .timeline-wrapper { position: relative; margin: 8px 0 0; }
+        .timeline-scroll {
+            overflow-x: auto; overflow-y: visible;
+            padding-bottom: 12px;
+            scrollbar-width: thin; scrollbar-color: rgba(255,7,58,0.2) transparent;
+            -webkit-overflow-scrolling: touch;
+        }
+        .timeline-scroll::-webkit-scrollbar { height: 3px; }
+        .timeline-scroll::-webkit-scrollbar-thumb { background: rgba(255,7,58,0.2); border-radius: 2px; }
+        .timeline-track {
+            display: flex; align-items: flex-end; position: relative;
+            min-width: max-content; padding: 24px 40px 52px;
+        }
+        .timeline-track::before {
+            content: ''; position: absolute; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border) 4%, var(--border) 96%, transparent);
+            bottom: 58px;
+        }
+        .tl-milestone {
+            display: flex; flex-direction: column; align-items: center;
+            margin: 0 18px; position: relative; cursor: default;
+        }
+        .tl-milestone:focus { outline: none; }
+        .tl-card {
+            display: block; width: 158px; background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 14px 14px 12px;
+            transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+            text-decoration: none; color: inherit; cursor: pointer;
+        }
+        .tl-milestone:hover .tl-card,
+        .tl-milestone:focus-within .tl-card {
+            border-color: rgba(255,7,58,0.4);
+            background: var(--bg-card-hover);
+            box-shadow: 0 4px 20px rgba(255,7,58,0.08);
+        }
+        .tl-year-badge {
+            font-family: var(--mono); font-size: 0.62rem; letter-spacing: 1.5px;
+            color: var(--accent); background: var(--accent-dim); padding: 2px 7px;
+            border-radius: 4px; display: inline-block; margin-bottom: 8px;
+        }
+        .tl-method {
+            font-family: var(--display); font-weight: 700; font-size: 0.84rem;
+            color: var(--text-primary); margin-bottom: 3px; line-height: 1.3;
+        }
+        .tl-authors {
+            font-family: var(--mono); font-size: 0.62rem; color: var(--text-dim);
+            letter-spacing: 0.3px; margin-bottom: 10px;
+        }
+        .tl-pathogens { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tl-pathogen {
+            display: inline-flex; align-items: center; gap: 3px;
+            font-size: 0.58rem; padding: 2px 6px;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 20px; color: var(--text-dim); white-space: nowrap;
+        }
+        .tl-connector { width: 1px; height: 16px; background: var(--border); flex-shrink: 0; }
+        .tl-node {
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--bg); border: 2px solid var(--border);
+            transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+            flex-shrink: 0; position: relative; z-index: 1;
+        }
+        .tl-milestone:hover .tl-node,
+        .tl-milestone:focus-within .tl-node {
+            border-color: var(--accent);
+            background: rgba(255,7,58,0.15);
+            box-shadow: 0 0 10px rgba(255,7,58,0.35);
+        }
+        /* Detail panel */
+        .timeline-detail {
+            min-height: 110px; padding: 18px 22px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; margin-top: 12px;
+            transition: border-color 0.3s;
+            display: flex; align-items: center;
+        }
+        .timeline-detail.active {
+            border-color: rgba(255,7,58,0.2);
+            align-items: flex-start; flex-direction: column;
+        }
+        .tl-detail-hint { color: var(--text-dim); font-size: 0.78rem; font-family: var(--mono); letter-spacing: 1px; }
+        .tl-detail-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+        .tl-detail-method { font-family: var(--display); font-weight: 700; font-size: 1rem; color: var(--text-primary); }
+        .tl-detail-meta { font-family: var(--mono); font-size: 0.62rem; color: var(--accent); letter-spacing: 0.5px; }
+        .tl-detail-desc { color: var(--text-secondary); font-size: 0.83rem; line-height: 1.65; margin-bottom: 12px; max-width: 680px; }
+        .tl-detail-pathogens { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tl-detail-pathogen {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border); border-radius: 20px;
+            font-size: 0.72rem; color: var(--text-secondary);
+        }
+
         /* ========== TEAM ========== */
         #team { background: var(--bg-card); }
         .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 48px; }
@@ -491,6 +585,7 @@
             .nav-hamburger { display: flex; }
             .about-stats { grid-template-columns: 1fr; }
             .pub-grid { grid-template-columns: 1fr; }
+            .tl-card { width: 130px; } .tl-milestone { margin: 0 10px; }
             .team-grid { grid-template-columns: 1fr; }
             .hero-title { font-size: clamp(2.5rem, 10vw, 4rem); }
             .section-padding { padding: 80px 0; }
@@ -787,11 +882,16 @@
         <h2 class="section-title reveal"></h2>
         <p class="research-intro reveal"></p>
 
-        <h3 class="research-sub reveal" id="researchPublicationsLabel"></h3>
-        <div class="pub-grid reveal"></div>
+        <h3 class="research-sub reveal" id="researchTimelineLabel"></h3>
+        <div class="timeline-wrapper reveal">
+            <div class="timeline-scroll">
+                <div class="timeline-track"></div>
+            </div>
+            <div class="timeline-detail" id="timelineDetail">
+                <span class="tl-detail-hint">Hover over a milestone to see details.</span>
+            </div>
+        </div>
 
-        <h3 class="research-sub reveal" id="researchSoftwareLabel" style="margin-top: 48px;"></h3>
-        <div class="pub-grid reveal"></div>
     </div>
 </section>
 

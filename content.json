@@ -132,48 +132,178 @@
 
   "research": {
     "tag": "Research",
-    "title": ["Publications & Software"],
+    "title": ["Methods & Software"],
     "intro": "<span class=\"nosotrack-noso\">Noso</span><span class=\"nosotrack-highlight\">Track</span> <strong>builds on over a decade of research in outbreak reconstruction, focusing on the integration of epidemiological, genomic and contact data to infer transmission trees</strong>. Our team and collaborators have published extensively on methodological advances, including the <em>outbreaker2</em> R package and the <em>linktree</em> method for inferring transmission patterns between staff and patients. These methods have been applied to real outbreak data, including SARS-CoV-2 nosocomial outbreaks in Switzerland, MRSA in neonatal intensive care units in the UK, <em>Klebsiella pneumoniae</em> in a Nepali neonatal unit, <em>Acinetobacter baumannii</em> in hospitals in North Carolina, and Ebola outbreaks in the DRC. We are committed to open science, with all software freely available and publications accessible to the public.",
-    "publicationsLabel": "Selected Publications",
-    "softwareLabel": "Software",
-    "publications": [
+    "timelineLabel": "Evolution of Outbreak Reconstruction Methods",
+    "timeline": [
       {
-        "tag": "Paper",
-        "title": "Literature review",
-        "desc": "A systematic review of outbreak reconstruction methods.",
-        "url": "https://pubmed.ncbi.nlm.nih.gov/35215195/"
+        "year": "2008",
+        "method": "Cottam et al. method",
+        "authors": "Cottam et al.",
+        "description": "Integrates genetic and epidemiological data using an SEIR model for transmission; assumes complete bottleneck and all cases observed/sampled; inference via maximum likelihood.",
+        "pathogens": [
+          {"name": "Foot-and-mouth disease<br>(FMD)", "applicationYear": "2001", "icon": "🐄"}
+        ],
+        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2599933/"
       },
       {
-        "tag": "Paper",
-        "title": "A modular platform for outbreak reconstruction",
-        "desc": "The paper for outbreaker2.",
-        "url": "https://link.springer.com/article/10.1186/s12859-018-2330-z"
+        "year": "2011",
+        "method": "SeqTrack",
+        "authors": "Jombart et al.",
+        "description": "Reconstructs transmission trees from genetic data using a graph approach; minimizes total genetic distance; no explicit transmission model.",
+        "pathogens": [
+          {"name": "H1N1 influenza", "applicationYear": "2009", "icon": "🦠"},
+          {"name": "H3N8 equine influenza", "applicationYear": "N/A", "icon": "🐴"},
+          {"name": "Mycobacterium tuberculosis", "applicationYear": "N/A", "icon": "🦠"},
+          {"name": "Klebsiella pneumoniae", "applicationYear": "N/A", "icon": "🦠"}
+        ],
+        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3183872/"
       },
       {
-        "tag": "Paper",
-        "title": "linktree",
-        "desc": "A method to infer transmission patterns between staff and patients.",
-        "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037"
+        "year": "2012",
+        "method": "Ypma et al. method",
+        "authors": "Ypma et al.",
+        "description": "Bayesian method using mutations; SEIR transmission model with spatial kernel; single introduction.",
+        "pathogens": [
+          {"name": "H7N7 avian influenza", "applicationYear": "N/A", "icon": "🐔"}
+        ],
+        "reference_url": "https://pubmed.ncbi.nlm.nih.gov/23230058/"
       },
       {
-        "tag": "Paper",
-        "title": "Real time genomic surveillance for nosocomial outbreaks",
-        "desc": "Proof of concept for near real time surveillance.",
-        "url": "https://pubmed.ncbi.nlm.nih.gov/40302215/"
-      }
-    ],
-    "software": [
-      {
-        "tag": "Software",
-        "title": "outbreaker2",
-        "desc": "Software to reconstruct transmission trees.",
-        "url": "https://github.com/reconhub/outbreaker2"
+        "year": "2014",
+        "method": "outbreaker",
+        "authors": "Jombart et al.",
+        "description": "Bayesian reconstruction combining epidemiologic and genomic data; SI transmission model; handles multiple introductions and sampled cases.",
+        "pathogens": [
+          {"name": "SARS-CoV-1", "applicationYear": "N/A", "icon": "[Spike]"},
+          {"name": "Bovine viral diarrhea virus", "applicationYear": "N/A", "icon": "🐄"},
+          {"name": "Klebsiella pneumoniae", "applicationYear": "N/A", "icon": "🦠"},
+          {"name": "Acinetobacter baumannii", "applicationYear": "N/A", "icon": "🦠"}
+        ],
+        "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457"
       },
       {
-        "tag": "Software",
-        "title": "o2ools",
-        "desc": "Software to analyse transmission trees.",
-        "url": "https://cygei.github.io/o2ools/index.html"
+        "year": "2015",
+        "method": "beastlier",
+        "authors": "Hall et al.",
+        "description": "Simultaneous inference in BEAST framework; coalescent process; SEIR model with spatial kernel.",
+        "pathogens": [
+          {"name": "H7N7 avian influenza", "applicationYear": "N/A", "icon": "🐔"},
+          {"name": "H5N8 avian influenza", "applicationYear": "N/A", "icon": "🐔"}
+        ],
+        "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004613"
+      },
+      {
+        "year": "2015",
+        "method": "Famulare et al. method",
+        "authors": "Famulare et al.",
+        "description": "Uses likelihood ratio test for time of most recent common ancestor; Poisson mutation model; no explicit transmission model.",
+        "pathogens": [
+          {"name": "Ebola virus", "applicationYear": "2014", "icon": "🦠"},
+          {"name": "H1N1 influenza", "applicationYear": "2009", "icon": "🦠"},
+          {"name": "Polio", "applicationYear": "2005-2008", "icon": "🦠"}
+        ],
+        "reference_url": "https://academic.oup.com/inthealth/article/7/2/130/663364"
+      },
+      {
+        "year": "2017",
+        "method": "TransPhylo",
+        "authors": "Didelot et al.",
+        "description": "Bayesian method in R package; coalescent process; SI model; handles ongoing outbreaks and proportion of sampled cases.",
+        "pathogens": [
+          {"name": "Mycobacterium tuberculosis", "applicationYear": "N/A", "icon": "🦠"},
+          {"name": "Klebsiella pneumoniae", "applicationYear": "N/A", "icon": "🦠"},
+          {"name": "SARS-CoV-2", "applicationYear": "2020", "icon": "[Spike]"},
+          {"name": "Mumps", "applicationYear": "N/A", "icon": "🦠"}
+        ],
+        "reference_url": "https://academic.oup.com/mbe/article/34/4/997/2919386"
+      },
+      {
+        "year": "2017",
+        "method": "phybreak",
+        "authors": "Klinkenberg et al.",
+        "description": "Simultaneous inference in R package; coalescent process; SI model; all cases observed but not always sampled.",
+        "pathogens": [
+          {"name": "Mycobacterium tuberculosis", "applicationYear": "N/A", "icon": "🦠"},
+          {"name": "MRSA", "applicationYear": "N/A", "icon": "🦠"},
+          {"name": "FMD", "applicationYear": "N/A", "icon": "🐄"},
+          {"name": "H7N7 avian influenza", "applicationYear": "N/A", "icon": "🐔"}
+        ],
+        "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005495"
+      },
+      {
+        "year": "2020",
+        "method": "TiTUS",
+        "authors": "Sashittal et al.",
+        "description": "Labels internal nodes in phylogenetic tree; weak bottleneck; no explicit transmission model.",
+        "pathogens": [
+          {"name": "HIV", "applicationYear": "N/A", "icon": "🦠"}
+        ],
+        "reference_url": "https://academic.oup.com/bioinformatics/article/36/Supplement_1/i362/5870507"
+      },
+      {
+        "year": "2020",
+        "method": "Montazeri et al. method",
+        "authors": "Montazeri et al.",
+        "description": "Reconstructs phylogenetic tree from transmission tree; Jukes-Cantor model; all cases observed and sampled.",
+        "pathogens": [
+          {"name": "HIV", "applicationYear": "N/A", "icon": "🦠"},
+          {"name": "Ebola virus", "applicationYear": "2014", "icon": "🦠"}
+        ],
+        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8212962/"
+      },
+      {
+        "year": "2021",
+        "method": "outbreaker2",
+        "authors": "Abbas et al.",
+        "description": "Bayesian framework combining genomic and epidemiological data using outbreaker2 to reconstruct transmission trees in a nosocomial SARS-CoV-2 outbreak; assesses limits of genomics for outbreak reconstruction.",
+        "pathogens": [
+          {"name": "SARS-CoV-2", "applicationYear": "2020", "icon": "[Spike]"}
+        ],
+        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8393517/"
+      },
+      {
+        "year": "2022",
+        "method": "outbreaker2",
+        "authors": "Abbas et al.",
+        "description": "Combined retrospective epidemiological and genomic study using outbreaker2 to reconstruct transmission chains of SARS-CoV-2 amidst multiple outbreaks in a geriatric acute-care hospital.",
+        "pathogens": [
+          {"name": "SARS-CoV-2", "applicationYear": "2020", "icon": "[Spike]"}
+        ],
+        "reference_url": "https://elifesciences.org/articles/76854"
+      },
+      {
+        "year": "2023",
+        "method": "Bayesian SARS-CoV-2 transmissions",
+        "authors": "Geismar et al.",
+        "description": "Uses a Bayesian framework to infer transmission pairs by exploring all compatible transmission trees based on symptom dates, incorporating a wide range of incubation period and generation time distributions; derives serial intervals from reconstructed pairs, stratified by variants, to account for negative serial intervals.",
+        "pathogens": [
+          {"name": "SARS-CoV-2", "applicationYear": "2020–2022", "icon": "[Spike]"}
+        ],
+        "reference_url": "https://pubmed.ncbi.nlm.nih.gov/37579586/"
+      },
+      {
+        "year": "2024",
+        "method": "linktree",
+        "authors": "Geismar et al.",
+        "description": "A framework to estimate group transmission assortativity from transmission chain data, quantifying the extent of within-group vs. between-group transmissions while accounting for group sizes and depletion of susceptibles; implemented in an R package.",
+        "pathogens": [
+          {"name": "SARS-CoV-2", "applicationYear": "2020", "icon": "[Spike]"},
+          {"name": "Influenza", "applicationYear": "N/A", "icon": "🦠"},
+          {"name": "Respiratory syncytial virus", "applicationYear": "N/A", "icon": "🦠"},
+          {"name": "Rhinovirus", "applicationYear": "N/A", "icon": "🦠"}
+        ],
+        "reference_url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037"
+      },
+      {
+        "year": "2025",
+        "method": "mixtree",
+        "authors": "Geismar et al.",
+        "description": "A statistical framework implemented in the R package mixtree to compare epidemic forests (collections of plausible transmission trees) using chi-square test and PERMANOVA for detecting differences in transmission dynamics.",
+        "pathogens": [
+          {"name": "General epidemics", "applicationYear": "N/A", "icon": "🦠"}
+        ],
+        "reference_url": "https://arxiv.org/html/2511.20819v1"
       }
     ]
   },

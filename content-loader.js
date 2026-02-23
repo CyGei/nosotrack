@@ -209,23 +209,76 @@
 
     setText('#research .section-tag', c.research.tag);
     setHtml('#research .section-title', c.research.title.join('<br>'));
-    setHtml('.research-intro', c.research.intro); // supports <span class="nosotrack-highlight">
+    setHtml('.research-intro', c.research.intro);
 
-    setText('#researchPublicationsLabel', c.research.publicationsLabel);
-    setText('#researchSoftwareLabel', c.research.softwareLabel);
+    setText('#researchTimelineLabel', c.research.timelineLabel);
 
-    function pubCardHtml(item) {
-        return `<a class="pub-card" href="${item.url}" target="_blank">
-            <span class="pub-tag">${item.tag}</span>
-            <div class="pub-title">${item.title}</div>
-            <div class="pub-desc">${item.desc}</div>
-            <span class="pub-arrow">&rarr;</span>
-        </a>`;
+    // Spike / coronavirus SVG icon for "[Spike]" pathogens
+    const SPIKE_SVG =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 11" width="11" height="11" style="display:inline-block;vertical-align:middle;flex-shrink:0;">' +
+        '<circle cx="5.5" cy="5.5" r="2.5" fill="#ff073a"/>' +
+        '<line x1="5.5" y1="3" x2="5.5" y2="0.5" stroke="#ff073a" stroke-width="1.3" stroke-linecap="round"/>' +
+        '<line x1="7.27" y1="3.73" x2="9.04" y2="1.96" stroke="#ff073a" stroke-width="1.3" stroke-linecap="round"/>' +
+        '<line x1="8" y1="5.5" x2="10.5" y2="5.5" stroke="#ff073a" stroke-width="1.3" stroke-linecap="round"/>' +
+        '<line x1="7.27" y1="7.27" x2="9.04" y2="9.04" stroke="#ff073a" stroke-width="1.3" stroke-linecap="round"/>' +
+        '<line x1="5.5" y1="8" x2="5.5" y2="10.5" stroke="#ff073a" stroke-width="1.3" stroke-linecap="round"/>' +
+        '<line x1="3.73" y1="7.27" x2="1.96" y2="9.04" stroke="#ff073a" stroke-width="1.3" stroke-linecap="round"/>' +
+        '<line x1="3" y1="5.5" x2="0.5" y2="5.5" stroke="#ff073a" stroke-width="1.3" stroke-linecap="round"/>' +
+        '<line x1="3.73" y1="3.73" x2="1.96" y2="1.96" stroke="#ff073a" stroke-width="1.3" stroke-linecap="round"/>' +
+        '</svg>';
+
+    function pathogenIconHtml(icon) {
+        return icon === '[Spike]'
+            ? SPIKE_SVG
+            : `<span style="font-size:10px;line-height:1;">${icon}</span>`;
     }
 
-    const pubGrids = document.querySelectorAll('.pub-grid');
-    if (pubGrids[0]) pubGrids[0].innerHTML = c.research.publications.map(pubCardHtml).join('');
-    if (pubGrids[1]) pubGrids[1].innerHTML = c.research.software.map(pubCardHtml).join('');
+    function pathogenPillHtml(p, cls) {
+        const yr = (p.applicationYear && p.applicationYear !== 'N/A') ? ` (${p.applicationYear})` : '';
+        return `<span class="${cls}">${pathogenIconHtml(p.icon)}<span>${p.name}${yr}</span></span>`;
+    }
+
+    const timelineTrack = document.querySelector('.timeline-track');
+    const timelineDetail = document.getElementById('timelineDetail');
+
+    if (timelineTrack && c.research.timeline) {
+        timelineTrack.innerHTML = c.research.timeline.map((m, idx) => {
+            const pills = m.pathogens.map(p => pathogenPillHtml(p, 'tl-pathogen')).join('');
+            const cardTag = m.reference_url ? 'a' : 'div';
+            const cardAttrs = m.reference_url
+                ? ` href="${m.reference_url}" target="_blank" rel="noopener"`
+                : '';
+            return `<div class="tl-milestone" tabindex="0" data-idx="${idx}">` +
+                `<${cardTag} class="tl-card"${cardAttrs}>` +
+                    `<div class="tl-year-badge">${m.year}</div>` +
+                    `<div class="tl-method">${m.method}</div>` +
+                    `<div class="tl-authors">${m.authors}</div>` +
+                    `<div class="tl-pathogens">${pills}</div>` +
+                `</${cardTag}>` +
+                `<div class="tl-connector"></div>` +
+                `<div class="tl-node"></div>` +
+            `</div>`;
+        }).join('');
+
+        function showDetail(m) {
+            if (!timelineDetail) return;
+            const pills = m.pathogens.map(p => pathogenPillHtml(p, 'tl-detail-pathogen')).join('');
+            timelineDetail.classList.add('active');
+            timelineDetail.innerHTML =
+                `<div class="tl-detail-header">` +
+                    `<span class="tl-detail-method">${m.method}</span>` +
+                    `<span class="tl-detail-meta">${m.year} &middot; ${m.authors}</span>` +
+                `</div>` +
+                `<p class="tl-detail-desc">${m.description}</p>` +
+                `<div class="tl-detail-pathogens">${pills}</div>`;
+        }
+
+        document.querySelectorAll('.tl-milestone').forEach((el, i) => {
+            const m = c.research.timeline[i];
+            el.addEventListener('mouseenter', () => showDetail(m));
+            el.addEventListener('focus', () => showDetail(m));
+        });
+    }
 
     // ── TEAM ──────────────────────────────────────────────────────────────────
 
