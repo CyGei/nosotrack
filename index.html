@@ -1395,276 +1395,411 @@ window.__revealObserver = observer;
     }
 
     // ═══════════════════════════════════════════
-    // ENGINE — Transmission tree with infection
-    // propagation animation (Canvas 2D)
+    // ENGINE — Outbreak transmission tree (Canvas 2D)
+    // Phases: nodes → confirmed cases → hidden cases
+    //         → superspreader → forecasted risk
     // ═══════════════════════════════════════════
     const engineCanvas = document.getElementById('engine-canvas');
     let engineCtx, engineW, engineH;
-    const ENGINE_NODES = [];
-    const ENGINE_EDGES = [];
-    const ENGINE_PROB_LABELS = ['0.91','0.85','0.78','0.82','0.74','0.69','0.88','0.77','0.71','0.66'];
-    let enginePhase = 0; // 0=building, 1=computing, 2=infecting
+    // Node state constants
+    const E_GREY = 0, E_RED = 1, E_PURPLE = 2, E_ORANGE = 3;
+    const E_COL  = ['rgba(138,138,154,0.78)', '#ff073a', '#9b59b6', '#f97316'];
+    const E_GLOW = ['transparent', 'rgba(255,7,58,0.30)', 'rgba(155,89,182,0.30)', 'rgba(249,115,22,0.32)'];
+    const ENGINE_CYCLE = 960;
     let engineTimer = 0;
-    const ENGINE_CYCLE = 900; // total frames per cycle
-    const WARD_COLORS = { A: 'rgba(100,150,255,0.8)', B: 'rgba(255,150,100,0.8)', C: 'rgba(150,255,100,0.8)' };
+    let ENG_N = [];  // nodes (populated in initEngineViz)
+    // State transitions: { i=nodeIndex, s=newState, f=cycleFrac }
+    const ENG_SC = [
+        // ── Phase 1: Clinical Detection (cf 0.15–0.35) ──
+        // Positive tests return sequentially; NO edges yet — these are isolated confirmed cases
+        {i:0,  s:E_RED,    f:0.17},  // P0  Patient Zero – Ward A
+        {i:1,  s:E_RED,    f:0.21},  // P1  Ward A
+        {i:3,  s:E_RED,    f:0.25},  // P3  Ward A  (orphan – infector unknown)
+        {i:7,  s:E_RED,    f:0.28},  // P6  Ward B  (orphan – infector unknown)
+        {i:14, s:E_RED,    f:0.31},  // P11 Ward C
+        {i:17, s:E_RED,    f:0.35},  // P14 Ward C  (orphan – infector unknown)
+        // ── Phase 2: Discovery via tracing — grey nodes light up as edges arrive ──
+        // Each fires when its incoming edge is ~68% drawn, giving a "touch to reveal" effect
+        {i:6,  s:E_RED,    f:0.464}, // S1  ← P0→S1  (af:0.43 + 68% × dur:0.050)
+        {i:2,  s:E_RED,    f:0.504}, // P2  ← P1→P2  (af:0.47 + 68% × dur:0.050)
+        {i:8,  s:E_RED,    f:0.547}, // S2  ← S1→S2  (af:0.51 + 68% × dur:0.055)
+        {i:13, s:E_RED,    f:0.599}, // S3  ← S2→S3  (af:0.56 + 68% × dur:0.058)
+        {i:15, s:E_RED,    f:0.654}, // P12 ← S3→P12 (af:0.62 + 68% × dur:0.050)
+        // ── Hidden cases revealed (purple) ──
+        {i:4,  s:E_PURPLE, f:0.64},  // P4  → purple (hidden source of P3)
+        {i:16, s:E_PURPLE, f:0.69},  // P13 → purple (hidden source of P14)
+        // ── Superspreader ──
+        {i:8,  s:E_ORANGE, f:0.75},  // S2  → orange (superspreader revealed)
+        {i:9,  s:E_RED,    f:0.79},  // P7  ← S2 superspreader burst
+        {i:10, s:E_RED,    f:0.82},  // P8  ← S2 superspreader burst
+    ];
+    // Annotations: { text, i=nodeIndex, showF, hideF }
+    const ENG_ANNOTS = [
+        {text:'Patient Zero',  i:0,  showF:0.17, hideF:0.30},
+        {text:'Undetected',    i:4,  showF:0.64, hideF:0.76},
+        {text:'Undetected',    i:16, showF:0.69, hideF:0.81},
+        {text:'Superspreader', i:8,  showF:0.75, hideF:0.87},
+        {text:'Forecast Risk', i:5,  showF:0.87, hideF:0.96},
+    ];
+    // Edges: { from, to, type, af=appearFrac, dur=drawDuration }
+    // Transmission tree rule: each node has at most one inbound edge
+    const ENG_ED = [
+        // ── Phase 2: Link Inference — first edge at cf 0.40 (clear pause after clinical detection) ──
+        // Rule: a node must be red BEFORE it emits an outgoing edge
+        {from:0,  to:1,  type:'red',      af:0.40,  dur:0.050}, // P0→P1   both already red — link confirmed
+        {from:0,  to:6,  type:'red',      af:0.43,  dur:0.050}, // P0→S1   S1 grey, lights up at ~68%
+        {from:1,  to:2,  type:'red',      af:0.47,  dur:0.050}, // P1→P2   P2 grey, lights up at ~68%
+        {from:6,  to:8,  type:'red',      af:0.51,  dur:0.055}, // S1→S2   S2 grey, lights up at ~68%
+        {from:8,  to:7,  type:'red',      af:0.555, dur:0.048}, // S2→P6   P6 already red — explains orphan
+        {from:8,  to:13, type:'red',      af:0.56,  dur:0.058}, // S2→S3   S3 grey, lights up at ~68%
+        {from:13, to:14, type:'red',      af:0.60,  dur:0.048}, // S3→P11  P11 already red — explains orphan
+        {from:13, to:15, type:'red',      af:0.62,  dur:0.050}, // S3→P12  P12 grey, lights up at ~68%
+        // ── Phase 3: Hidden cases (purple) — unchanged ──
+        {from:4,  to:3,  type:'purple',   af:0.65,  dur:0.065}, // P4→P3  (explains P3 orphan!)
+        {from:16, to:17, type:'purple',   af:0.70,  dur:0.065}, // P13→P14 (explains P14 orphan!)
+        // ── Phase 4: Superspreader burst (orange) — unchanged ──
+        {from:8,  to:9,  type:'super',    af:0.76,  dur:0.055}, // S2→P7
+        {from:8,  to:10, type:'super',    af:0.79,  dur:0.055}, // S2→P8
+        // ── Phase 5: Forecasted risk (dashed) — unchanged ──
+        {from:2,  to:5,  type:'forecast', af:0.86,  dur:0.060}, // P2→P5
+        {from:14, to:18, type:'forecast', af:0.88,  dur:0.060}, // P11→S4
+        {from:10, to:11, type:'forecast', af:0.90,  dur:0.060}, // P8→P9
+        {from:15, to:19, type:'forecast', af:0.92,  dur:0.060}, // P12→P15
+    ];
+    // Brief red glow pulses on grey nodes — happens BEFORE any edges appear
+    // to convey initial detection signals / false alarms
+    const ENG_PREPULSE = [
+        {nodes:[2,  14,  7], cf:0.107, hw:0.011, mx:0.55},  // Ward A/C/B spread
+        {nodes:[4,  18, 11], cf:0.122, hw:0.011, mx:0.50},  // A/C/B spread
+        {nodes:[1,   8    ], cf:0.136, hw:0.011, mx:0.60},  // A/B
+        {nodes:[5,  16, 12], cf:0.151, hw:0.010, mx:0.48},  // A/C/B spread
+    ];
+    // Bezier control point — perpendicular offset scales with edge length
+    function engCtrl(ax, ay, bx, by) {
+        const mx=(ax+bx)/2, my=(ay+by)/2, dx=bx-ax, dy=by-ay;
+        const l=Math.sqrt(dx*dx+dy*dy)||1, k=Math.max(14, l*0.16);
+        return { x: mx-(dy/l)*k, y: my+(dx/l)*k };
+    }
+    // Point on quadratic bezier at parameter t
+    function engBez(ax, ay, cx, cy, bx, by, t) {
+        const s=1-t; return { x:s*s*ax+2*s*t*cx+t*t*bx, y:s*s*ay+2*s*t*cy+t*t*by };
+    }
+    // Rounded-rect helper (compat shim for older Safari)
+    function engRR(ctx, x, y, w, h, r) {
+        if (ctx.roundRect) { ctx.roundRect(x,y,w,h,r); } else { ctx.rect(x,y,w,h); }
+    }
 
     function initEngineViz() {
         if (!engineCanvas) return;
         const info = initCanvas(engineCanvas);
         if (!info) return;
         engineCtx = info.ctx; engineW = info.w; engineH = info.h;
-
-        // Build transmission tree structure
-        ENGINE_NODES.length = 0; ENGINE_EDGES.length = 0;
-        const cx = engineW / 2, topY = 40;
-        const levelH = Math.min(55, (engineH - 80) / 4);
-
-        // Tree layout: P0 → S1, S2 → P3,P4,P5,P6 → S3 → P7,P8,P9 etc
-        const tree = [
-            { id: 0, label: 'P0', x: cx, y: topY, ward: 'A', type: 'patient' },
-            { id: 1, label: 'S1', x: cx - 120, y: topY + levelH, ward: 'A', type: 'staff' },
-            { id: 2, label: 'S2', x: cx + 120, y: topY + levelH, ward: 'B', type: 'staff' },
-            { id: 3, label: 'P3', x: cx - 180, y: topY + levelH * 2, ward: 'A', type: 'patient' },
-            { id: 4, label: 'P4', x: cx - 80, y: topY + levelH * 2, ward: 'A', type: 'patient' },
-            { id: 5, label: 'P5', x: cx + 60, y: topY + levelH * 2, ward: 'B', type: 'patient' },
-            { id: 6, label: 'P6', x: cx + 160, y: topY + levelH * 2, ward: 'B', type: 'patient' },
-            { id: 7, label: 'S3', x: cx + 60, y: topY + levelH * 3, ward: 'B', type: 'staff' },
-            { id: 8, label: 'P7', x: cx - 30, y: topY + levelH * 4, ward: 'C', type: 'patient' },
-            { id: 9, label: 'P8', x: cx + 60, y: topY + levelH * 4, ward: 'C', type: 'patient' },
-            { id: 10, label: 'P9', x: cx + 150, y: topY + levelH * 4, ward: 'B', type: 'patient' },
+        const W = engineW, H = engineH;
+        // Node specs: label, fractional position, ward, type
+        const spec = [
+            // ── Ward A (left) ──
+            {label:'P0',  fx:0.20, fy:0.13, ward:'A', type:'patient'},  // 0  Patient Zero
+            {label:'P1',  fx:0.09, fy:0.38, ward:'A', type:'patient'},  // 1
+            {label:'P2',  fx:0.28, fy:0.40, ward:'A', type:'patient'},  // 2
+            {label:'P3',  fx:0.08, fy:0.68, ward:'A', type:'patient'},  // 3  (untraced → hidden P4)
+            {label:'P4',  fx:0.25, fy:0.70, ward:'A', type:'patient'},  // 4  → purple (hidden case)
+            {label:'P5',  fx:0.33, fy:0.58, ward:'A', type:'patient'},  // 5  grey (forecast target)
+            // ── Ward B (centre) ──
+            {label:'S1',  fx:0.40, fy:0.21, ward:'A', type:'staff'},    // 6  staff bridge A→B
+            {label:'P6',  fx:0.44, fy:0.50, ward:'B', type:'patient'},  // 7
+            {label:'S2',  fx:0.53, fy:0.25, ward:'B', type:'staff'},    // 8  → orange (superspreader)
+            {label:'P7',  fx:0.47, fy:0.73, ward:'B', type:'patient'},  // 9  superspreader target
+            {label:'P8',  fx:0.62, fy:0.60, ward:'B', type:'patient'},  // 10 superspreader target
+            {label:'P9',  fx:0.58, fy:0.75, ward:'B', type:'patient'},  // 11 grey (forecast target)
+            {label:'P10', fx:0.37, fy:0.77, ward:'B', type:'patient'},  // 12 grey (stays grey)
+            // ── Ward C (right) ──
+            {label:'S3',  fx:0.70, fy:0.29, ward:'B', type:'staff'},    // 13 staff bridge B→C
+            {label:'P11', fx:0.76, fy:0.17, ward:'C', type:'patient'},  // 14
+            {label:'P12', fx:0.82, fy:0.44, ward:'C', type:'patient'},  // 15
+            {label:'P13', fx:0.74, fy:0.61, ward:'C', type:'patient'},  // 16 → purple (hidden case)
+            {label:'P14', fx:0.88, fy:0.61, ward:'C', type:'patient'},  // 17 (untraced → hidden P13)
+            {label:'S4',  fx:0.90, fy:0.29, ward:'C', type:'staff'},    // 18 grey (forecast target)
+            {label:'P15', fx:0.90, fy:0.78, ward:'C', type:'patient'},  // 19 grey (forecast target)
         ];
-        tree.forEach(n => ENGINE_NODES.push({ ...n, infected: false, infectionTime: -1, r: n.type === 'staff' ? 5 : 6, glowAlpha: 0 }));
-
-        const edges = [[0,1],[0,2],[1,3],[1,4],[2,5],[2,6],[5,7],[7,8],[7,9],[6,10]];
-        edges.forEach(([from, to], i) => ENGINE_EDGES.push({ from, to, progress: 0, infectionProgress: 0, order: i }));
+        ENG_N = spec.map(n => ({
+            ...n,
+            x: n.fx * W,
+            y: n.fy * H,
+            r: n.type === 'staff' ? 5.5 : 6.5,
+            state: E_GREY,
+        }));
+        engineTimer = 0;
     }
 
     function drawEngineViz() {
         if (!engineCtx) return;
-        const ctx = engineCtx, w = engineW, h = engineH;
-        ctx.clearRect(0, 0, w, h);
+        const ctx = engineCtx, W = engineW, H = engineH;
+        ctx.clearRect(0, 0, W, H);
 
         engineTimer = (engineTimer + 1) % ENGINE_CYCLE;
-        const cycleFrac = engineTimer / ENGINE_CYCLE;
+        const cf = engineTimer / ENGINE_CYCLE;
 
-        // Phase 0: tree structure appears (0-15%)
-        // Phase 1: computing pulse (15-25%)
-        // Phase 2: infection propagates (25-90%)
-        // Phase 3: hold + fade (90-100%)
+        // ── Subtle background grid ──
+        ctx.lineWidth = 0.35;
+        ctx.strokeStyle = 'rgba(255,255,255,0.022)';
+        for (let gx = 0; gx < W; gx += 28) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+        for (let gy = 0; gy < H; gy += 28) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
 
-        const buildEnd = 0.15;
-        const computeEnd = 0.25;
-        const infectEnd = 0.88;
+        // ── Ward cluster backgrounds ──
+        const wA = Math.min(1, cf / 0.09);
+        const WARDS = [
+            {label:'Ward A', rgb:'100,150,255', x1:0.02, y1:0.06, x2:0.37, y2:(H-56)/H},
+            {label:'Ward B', rgb:'255,150,100', x1:0.35, y1:0.06, x2:0.67, y2:(H-56)/H},
+            {label:'Ward C', rgb:'150,255,100', x1:0.65, y1:0.06, x2:0.97, y2:(H-56)/H},
+        ];
+        WARDS.forEach(w => {
+            const wx=w.x1*W, wy=w.y1*H, ww=(w.x2-w.x1)*W, wh=(w.y2-w.y1)*H;
+            ctx.save();
+            ctx.globalAlpha = wA * 0.05; ctx.fillStyle = `rgb(${w.rgb})`;
+            ctx.beginPath(); engRR(ctx, wx, wy, ww, wh, 8); ctx.fill();
+            ctx.globalAlpha = wA * 0.18;
+            ctx.strokeStyle = `rgba(${w.rgb},0.6)`; ctx.lineWidth = 0.8;
+            ctx.beginPath(); engRR(ctx, wx, wy, ww, wh, 8); ctx.stroke();
+            ctx.globalAlpha = wA * 0.52;
+            ctx.font = `400 7px ${MONO}`; ctx.fillStyle = `rgb(${w.rgb})`;
+            ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+            ctx.fillText(w.label, wx + 6, wy + 5);
+            ctx.restore();
+        });
 
-        // Background grid
-        ctx.lineWidth = 0.5;
-        for (let gx = 0; gx < w; gx += 30) { ctx.strokeStyle = gx % 150 === 0 ? 'rgba(255,255,255,0.045)' : 'rgba(255,255,255,0.025)'; ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke(); }
-        for (let gy = 0; gy < h; gy += 30) { ctx.strokeStyle = gy % 150 === 0 ? 'rgba(255,255,255,0.045)' : 'rgba(255,255,255,0.025)'; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke(); }
+        // ── Compute node states from cf each frame (deterministic) ──
+        ENG_N.forEach((n, idx) => {
+            let st = E_GREY;
+            ENG_SC.forEach(sc => { if (sc.i === idx && cf >= sc.f) st = Math.max(st, sc.s); });
+            n.state = st;
+        });
 
-        // Draw edges
-        ENGINE_EDGES.forEach((e, i) => {
-            const from = ENGINE_NODES[e.from], to = ENGINE_NODES[e.to];
-
-            // Tree building phase
-            let edgeBuild = 0;
-            if (cycleFrac < buildEnd) {
-                edgeBuild = Math.max(0, Math.min(1, (cycleFrac / buildEnd) * ENGINE_EDGES.length - i));
-            } else {
-                edgeBuild = 1;
+        // ── Draw edges ──
+        ENG_ED.forEach(e => {
+            if (cf < e.af) return;
+            const p = Math.min(1, (cf - e.af) / e.dur);
+            if (p <= 0) return;
+            const a = ENG_N[e.from], b = ENG_N[e.to];
+            let col, dash = false;
+            if      (e.type === 'red')    col = '#ff073a';
+            else if (e.type === 'purple') col = '#9b59b6';
+            else if (e.type === 'super')  col = '#f97316';
+            else                        { col = 'rgba(210,210,225,0.65)'; dash = true; }
+            const cv = engCtrl(a.x, a.y, b.x, b.y);
+            ctx.save();
+            ctx.strokeStyle = col; ctx.lineWidth = dash ? 1.2 : 1.5;
+            ctx.globalAlpha = dash ? 0.38 : 0.70;
+            if (dash) ctx.setLineDash([4, 5]);
+            ctx.beginPath(); ctx.moveTo(a.x, a.y);
+            for (let s = 1; s <= 18; s++) {
+                const t = (s / 18) * p;
+                const pt = engBez(a.x, a.y, cv.x, cv.y, b.x, b.y, t);
+                ctx.lineTo(pt.x, pt.y);
             }
-            if (edgeBuild <= 0) return;
+            ctx.stroke(); ctx.setLineDash([]);
+            // Leading glow at drawing tip
+            if (p < 0.97 && p > 0.05) {
+                const lp = engBez(a.x, a.y, cv.x, cv.y, b.x, b.y, p);
+                const gc = e.type==='red'    ? 'rgba(255,7,58,0.8)'
+                         : e.type==='purple' ? 'rgba(155,89,182,0.8)'
+                         : e.type==='super'  ? 'rgba(249,115,22,0.8)'
+                         : 'rgba(200,210,230,0.55)';
+                const grd = ctx.createRadialGradient(lp.x, lp.y, 0, lp.x, lp.y, 6);
+                grd.addColorStop(0, gc); grd.addColorStop(1, 'transparent');
+                ctx.globalAlpha = 0.55; ctx.fillStyle = grd;
+                ctx.beginPath(); ctx.arc(lp.x, lp.y, 6, 0, Math.PI*2); ctx.fill();
+            }
+            // Arrowhead (fades in as edge nears completion)
+            if (p >= 0.80) {
+                const arA = Math.min(1, (p-0.80)/0.20) * (dash ? 0.52 : 0.85);
+                const tp  = engBez(a.x, a.y, cv.x, cv.y, b.x, b.y, 1.0);
+                const np  = engBez(a.x, a.y, cv.x, cv.y, b.x, b.y, 0.98);
+                const ang = Math.atan2(tp.y-np.y, tp.x-np.x);
+                const tx  = tp.x - Math.cos(ang)*(b.r+2);
+                const ty  = tp.y - Math.sin(ang)*(b.r+2);
+                const hL=7, hA=Math.PI/5.5;
+                ctx.globalAlpha = arA; ctx.fillStyle = col;
+                ctx.beginPath();
+                ctx.moveTo(tx, ty);
+                ctx.lineTo(tx-hL*Math.cos(ang-hA), ty-hL*Math.sin(ang-hA));
+                ctx.lineTo(tx-hL*Math.cos(ang+hA), ty-hL*Math.sin(ang+hA));
+                ctx.closePath(); ctx.fill();
+            }
+            ctx.restore();
+        });
 
-            const ex = from.x + (to.x - from.x) * edgeBuild;
-            const ey = from.y + (to.y - from.y) * edgeBuild;
-
-            // Base edge (lighter grey for better visibility)
-            ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 1.5;
-            ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(ex, ey); ctx.stroke();
-
-            // Bayesian probability label (fades in after computing phase)
-            if (edgeBuild >= 1 && cycleFrac > computeEnd) {
-                const mx = (from.x + to.x) / 2, my = (from.y + to.y) / 2;
-                const pAlpha = Math.min(0.68, (cycleFrac - computeEnd) * 5);
-                const edgeInfected = ENGINE_NODES[e.from] && ENGINE_NODES[e.from].infected;
+        // ── Draw nodes ──
+        const NA = 0.10;
+        ENG_N.forEach((n, i) => {
+            const appP = Math.max(0, Math.min(1, (cf - (i/ENG_N.length)*NA*0.88) / 0.038));
+            if (appP <= 0) return;
+            const r = n.r * (0.4 + 0.6*appP);
+            const col = E_COL[n.state];
+            // Glow halo for non-grey nodes
+            if (n.state !== E_GREY) {
+                const pulse = 0.5 + 0.5*Math.sin(engineTimer*0.07 + i*0.85);
+                const gR = r*(2.5 + pulse*0.65);
+                const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, gR);
+                grd.addColorStop(0, E_GLOW[n.state]); grd.addColorStop(1, 'transparent');
                 ctx.save();
-                ctx.fillStyle = 'rgba(20,24,28,0.82)';
-                ctx.fillRect(mx - 12, my - 13, 24, 10);
-                ctx.font = `400 6px ${MONO}`; ctx.textAlign = 'center';
-                ctx.fillStyle = edgeInfected ? `rgba(255,7,58,${pAlpha})` : `rgba(190,190,190,${pAlpha})`;
-                ctx.fillText(ENGINE_PROB_LABELS[i] || '', mx, my - 5);
+                ctx.globalAlpha = appP*(0.42 + pulse*0.32); ctx.fillStyle = grd;
+                ctx.beginPath(); ctx.arc(n.x, n.y, gR, 0, Math.PI*2); ctx.fill();
                 ctx.restore();
             }
-
-            // Infection propagation along edge
-            if (cycleFrac > computeEnd && cycleFrac < infectEnd) {
-                const infectFrac = (cycleFrac - computeEnd) / (infectEnd - computeEnd);
-                const edgeInfectStart = i / ENGINE_EDGES.length;
-                const edgeInfectDuration = 0.15;
-                const edgeProgress = Math.max(0, Math.min(1, (infectFrac - edgeInfectStart) / edgeInfectDuration));
-
-                if (edgeProgress > 0 && ENGINE_NODES[e.from].infected) {
-                    const dx = to.x - from.x, dy = to.y - from.y;
-                    const edgeLen = Math.sqrt(dx*dx + dy*dy);
-                    const nx = -dy/edgeLen, ny = dx/edgeLen; // perpendicular
-
-                    // Infected portion of edge — glowing red
-                    const ix = from.x + dx * edgeProgress;
-                    const iy = from.y + dy * edgeProgress;
-                    ctx.strokeStyle = ACCENT; ctx.lineWidth = 2; ctx.globalAlpha = 0.6;
-                    ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(ix, iy); ctx.stroke();
-                    ctx.globalAlpha = 1;
-
-                    // Particle swarm traveling along edge
-                    const particleCount = 12;
-                    for (let pi = 0; pi < particleCount; pi++) {
-                        const seed = i * 100 + pi * 7.3;
-                        const pDelay = pi * 0.03;
-                        const pProgress = Math.max(0, Math.min(1, (edgeProgress - pDelay) * 1.2));
-                        if (pProgress <= 0) continue;
-                        const px = from.x + dx * pProgress;
-                        const py = from.y + dy * pProgress;
-                        // Perpendicular drift with sine variation
-                        const drift = Math.sin(pProgress * Math.PI * 3 + seed) * (4 + (seed % 3));
-                        const fx = px + nx * drift;
-                        const fy = py + ny * drift;
-                        // Fade: bright in middle, fade at edges
-                        const fadeIn = Math.min(1, pProgress * 5);
-                        const fadeOut = pProgress > 0.7 ? 1 - (pProgress - 0.7) / 0.3 : 1;
-                        const alpha = 0.4 * fadeIn * fadeOut + Math.sin(engineTimer * 0.12 + seed) * 0.1;
-                        const size = 0.8 + (seed % 3) * 0.4;
-                        ctx.fillStyle = ACCENT; ctx.globalAlpha = Math.max(0, alpha);
-                        ctx.beginPath(); ctx.arc(fx, fy, size, 0, Math.PI * 2); ctx.fill();
-                    }
-
-                    // Soft leading glow
-                    const leadGrad = ctx.createRadialGradient(ix, iy, 0, ix, iy, 8);
-                    leadGrad.addColorStop(0, 'rgba(255,7,58,0.35)'); leadGrad.addColorStop(1, 'transparent');
-                    ctx.globalAlpha = 1; ctx.fillStyle = leadGrad;
-                    ctx.beginPath(); ctx.arc(ix, iy, 8, 0, Math.PI * 2); ctx.fill();
-
-                    // Mark target as infected when complete
-                    if (edgeProgress >= 1 && !ENGINE_NODES[e.to].infected) {
-                        ENGINE_NODES[e.to].infected = true;
-                        ENGINE_NODES[e.to].infectionTime = engineTimer;
-                    }
-
-                    // Full infected edge glow
-                    if (edgeProgress >= 1) {
-                        ctx.strokeStyle = ACCENT; ctx.lineWidth = 2; ctx.globalAlpha = 0.4;
-                        ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(to.x, to.y); ctx.stroke();
-                        ctx.globalAlpha = 1;
-                    }
-                }
-            }
-        });
-
-        // Draw nodes
-        ENGINE_NODES.forEach((n, i) => {
-            let nodeBuild = 0;
-            if (cycleFrac < buildEnd) {
-                nodeBuild = Math.max(0, Math.min(1, (cycleFrac / buildEnd) * (ENGINE_NODES.length + 2) - i));
-            } else {
-                nodeBuild = 1;
-            }
-            if (nodeBuild <= 0) return;
-
-            const r = n.r * nodeBuild;
-
-            // Infect P0 at start of infection phase
-            if (i === 0 && cycleFrac > computeEnd && !n.infected) {
-                n.infected = true;
-                n.infectionTime = engineTimer;
-            }
-
-            // Node glow for infected
-            if (n.infected) {
-                const timeSince = engineTimer - n.infectionTime;
-                const glowPulse = 0.15 + Math.sin(timeSince * 0.08) * 0.08;
-                ctx.fillStyle = `rgba(255,7,58,${glowPulse})`;
-                ctx.beginPath(); ctx.arc(n.x, n.y, r * 3, 0, Math.PI * 2); ctx.fill();
-            }
-
-            // Ward color ring
-            ctx.strokeStyle = WARD_COLORS[n.ward]; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.5;
-            ctx.beginPath(); ctx.arc(n.x, n.y, r + 3, 0, Math.PI * 2); ctx.stroke();
-            ctx.globalAlpha = 1;
-
-            // Node body
+            ctx.save(); ctx.globalAlpha = appP;
             if (n.type === 'staff') {
-                // Diamond shape for staff
-                ctx.fillStyle = n.infected ? ACCENT : 'rgba(200,200,200,0.7)';
+                // Diamond
+                ctx.fillStyle = col;
                 ctx.beginPath();
-                ctx.moveTo(n.x, n.y - r); ctx.lineTo(n.x + r, n.y);
-                ctx.lineTo(n.x, n.y + r); ctx.lineTo(n.x - r, n.y);
+                ctx.moveTo(n.x,         n.y - r*1.3);
+                ctx.lineTo(n.x + r*1.3, n.y);
+                ctx.lineTo(n.x,         n.y + r*1.3);
+                ctx.lineTo(n.x - r*1.3, n.y);
                 ctx.closePath(); ctx.fill();
+                ctx.strokeStyle = n.state===E_GREY ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.28)';
+                ctx.lineWidth = 0.8; ctx.stroke();
             } else {
-                // Circle for patients
-                ctx.fillStyle = n.infected ? ACCENT : 'rgba(200,200,200,0.6)';
-                ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2); ctx.fill();
+                // Circle
+                ctx.fillStyle = col;
+                ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = n.state===E_GREY ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.22)';
+                ctx.lineWidth = 0.8; ctx.stroke();
             }
-
-            // Specular hotspot on infected nodes
-            if (n.infected) {
-                ctx.fillStyle = 'rgba(255,255,255,0.22)';
-                ctx.beginPath(); ctx.arc(n.x - r * 0.25, n.y - r * 0.35, r * 0.3, 0, Math.PI * 2); ctx.fill();
+            // Specular highlight on coloured nodes
+            if (n.state !== E_GREY) {
+                ctx.fillStyle = 'rgba(255,255,255,0.17)';
+                ctx.beginPath(); ctx.arc(n.x - r*0.28, n.y - r*0.38, r*0.30, 0, Math.PI*2); ctx.fill();
             }
-            // Label
-            ctx.fillStyle = n.infected ? '#fff' : 'rgba(255,255,255,0.8)';
-            ctx.font = `400 7px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText(n.label, n.x, n.y); ctx.textBaseline = 'alphabetic';
+            ctx.font = `400 6.5px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillStyle = n.state===E_GREY ? 'rgba(255,255,255,0.52)' : '#ffffff';
+            ctx.fillText(n.label, n.x, n.y);
+            ctx.restore();
         });
 
-        // Computing phase — scanning beam
-        if (cycleFrac > buildEnd && cycleFrac < computeEnd) {
-            const computeFrac = (cycleFrac - buildEnd) / (computeEnd - buildEnd);
-            const scanX = w * computeFrac;
-            // Wide soft halo
-            const scanHalo = ctx.createLinearGradient(scanX - 90, 0, scanX + 15, 0);
-            scanHalo.addColorStop(0, 'transparent'); scanHalo.addColorStop(0.7, 'rgba(255,7,58,0.04)'); scanHalo.addColorStop(1, 'rgba(255,7,58,0.12)');
-            ctx.globalAlpha = 1; ctx.fillStyle = scanHalo; ctx.fillRect(scanX - 90, 0, 105, h);
-            // Narrow trailing glow
-            const scanGrad = ctx.createLinearGradient(scanX - 40, 0, scanX, 0);
-            scanGrad.addColorStop(0, 'transparent'); scanGrad.addColorStop(1, 'rgba(255,7,58,0.1)');
-            ctx.fillStyle = scanGrad; ctx.fillRect(scanX - 40, 0, 40, h);
-            // Sharp leading edge
-            ctx.strokeStyle = ACCENT; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.6;
-            ctx.beginPath(); ctx.moveTo(scanX, 0); ctx.lineTo(scanX, h); ctx.stroke();
-            ctx.globalAlpha = 1;
-            // Status text with pill background
-            const statusLabel1 = 'COMPUTING TRANSMISSION PROBABILITIES...';
-            ctx.font = `400 9px ${MONO}`; ctx.textAlign = 'left';
-            ctx.fillStyle = 'rgba(20,24,28,0.82)'; ctx.globalAlpha = 1;
-            ctx.fillRect(8, h - 25, ctx.measureText(statusLabel1).width + 14, 17);
-            ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.65;
-            ctx.fillText(statusLabel1, 12, h - 12);
-            ctx.globalAlpha = 1;
+        // ── Pre-pulse: brief red glows on grey nodes before edges appear ──
+        if (cf < 0.17) {
+            ENG_PREPULSE.forEach(pp => {
+                const g = Math.max(0, 1 - Math.abs(cf - pp.cf) / pp.hw);
+                if (g <= 0) return;
+                pp.nodes.forEach(ni => {
+                    const n = ENG_N[ni];
+                    const r = n.r;
+                    // Radial glow halo
+                    const gR = r * (3.2 + g * 1.2);
+                    const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, gR);
+                    grd.addColorStop(0,   `rgba(255,7,58,${(g * pp.mx * 0.65).toFixed(3)})`);
+                    grd.addColorStop(0.4, `rgba(255,7,58,${(g * pp.mx * 0.20).toFixed(3)})`);
+                    grd.addColorStop(1,   'transparent');
+                    ctx.save(); ctx.globalAlpha = 1; ctx.fillStyle = grd;
+                    ctx.beginPath(); ctx.arc(n.x, n.y, gR, 0, Math.PI*2); ctx.fill();
+                    // Subtle red tint on node body
+                    ctx.globalAlpha = g * pp.mx * 0.42;
+                    ctx.fillStyle = '#ff073a';
+                    if (n.type === 'staff') {
+                        ctx.beginPath();
+                        ctx.moveTo(n.x, n.y-r*1.3); ctx.lineTo(n.x+r*1.3, n.y);
+                        ctx.lineTo(n.x, n.y+r*1.3); ctx.lineTo(n.x-r*1.3, n.y);
+                        ctx.closePath(); ctx.fill();
+                    } else {
+                        ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2); ctx.fill();
+                    }
+                    ctx.restore();
+                });
+            });
         }
 
-        // Infection phase status
-        if (cycleFrac > computeEnd && cycleFrac < infectEnd) {
-            const statusLabel2 = 'RECONSTRUCTING TRANSMISSION TREE...';
-            ctx.font = `400 9px ${MONO}`; ctx.textAlign = 'left';
-            ctx.fillStyle = 'rgba(20,24,28,0.82)'; ctx.globalAlpha = 1;
-            ctx.fillRect(8, h - 25, ctx.measureText(statusLabel2).width + 14, 17);
-            ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.55 + Math.sin(frame * 0.08) * 0.1;
-            ctx.fillText(statusLabel2, 12, h - 12);
-            ctx.globalAlpha = 1;
+        // ── Annotation pills ──
+        ENG_ANNOTS.forEach(an => {
+            if (cf < an.showF || cf > an.hideF) return;
+            const fd = 0.022;
+            const alpha = Math.min(Math.min(1,(cf-an.showF)/fd), Math.min(1,(an.hideF-cf)/fd));
+            if (alpha <= 0) return;
+            const n = ENG_N[an.i];
+            ctx.save();
+            ctx.font = `400 8px ${MONO}`;
+            const tw = ctx.measureText(an.text).width;
+            const pw=tw+14, ph=14, px=n.x-pw/2, py=n.y-ph-12;
+            ctx.globalAlpha = alpha*0.93; ctx.fillStyle = 'rgba(14,16,22,0.95)';
+            ctx.beginPath(); engRR(ctx, px, py, pw, ph, 4); ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,0.13)'; ctx.lineWidth = 0.6; ctx.stroke();
+            ctx.fillStyle = '#ffffff'; ctx.globalAlpha = alpha;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(an.text, n.x, py+ph/2);
+            ctx.restore();
+        });
+
+        // ── Bottom info strip: legend row + status row ──
+        const stripH = 52, stripY = H - stripH;
+        ctx.save();
+        ctx.fillStyle = 'rgba(13,15,21,0.90)';
+        ctx.fillRect(0, stripY, W, stripH);
+        ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 0.6;
+        ctx.beginPath(); ctx.moveTo(0, stripY); ctx.lineTo(W, stripY); ctx.stroke();
+
+        // Legend row
+        const LY = stripY + 17;
+        const legAlpha = Math.min(1, cf / 0.09) * 0.82;
+        if (legAlpha > 0) {
+            const LEG = [
+                {type:'circle',  col:E_COL[E_GREY],            label:'Susceptible'},
+                {type:'circle',  col:E_COL[E_RED],             label:'Confirmed'},
+                {type:'circle',  col:E_COL[E_PURPLE],          label:'Undetected'},
+                {type:'diamond', col:E_COL[E_ORANGE],          label:'Superspreader'},
+                {type:'dash',    col:'rgba(210,210,225,0.65)',  label:'Forecast'},
+            ];
+            const iR=3.5, iGap=5, spacer=11;
+            ctx.font = `400 6.5px ${MONO}`;
+            let tw = 0;
+            LEG.forEach(it => { tw += iR*2 + iGap + ctx.measureText(it.label).width + spacer; });
+            tw -= spacer;
+            let lx = Math.max(6, (W - tw) / 2);
+            ctx.globalAlpha = legAlpha;
+            LEG.forEach(it => {
+                const ix = lx + iR;
+                if (it.type === 'circle') {
+                    ctx.fillStyle = it.col;
+                    ctx.beginPath(); ctx.arc(ix, LY, iR, 0, Math.PI*2); ctx.fill();
+                } else if (it.type === 'diamond') {
+                    ctx.fillStyle = it.col;
+                    ctx.beginPath();
+                    ctx.moveTo(ix, LY-iR*1.3); ctx.lineTo(ix+iR*1.3, LY);
+                    ctx.lineTo(ix, LY+iR*1.3); ctx.lineTo(ix-iR*1.3, LY);
+                    ctx.closePath(); ctx.fill();
+                } else {
+                    // Dashed line + arrowhead
+                    ctx.strokeStyle = it.col; ctx.lineWidth = 1.1; ctx.setLineDash([3,3]);
+                    ctx.beginPath(); ctx.moveTo(lx, LY); ctx.lineTo(lx+iR*2-1, LY); ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = it.col;
+                    ctx.beginPath();
+                    ctx.moveTo(lx+iR*2+2, LY); ctx.lineTo(lx+iR*2-2, LY-2.5); ctx.lineTo(lx+iR*2-2, LY+2.5);
+                    ctx.closePath(); ctx.fill();
+                }
+                lx += iR*2 + iGap;
+                ctx.fillStyle = 'rgba(210,215,225,0.75)';
+                ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                ctx.fillText(it.label, lx, LY);
+                lx += ctx.measureText(it.label).width + spacer;
+            });
         }
 
-        // Hold phase — all infected, display result
-        if (cycleFrac > infectEnd) {
-            const statusLabel3 = '\u2713 TRANSMISSION TREE COMPLETE';
-            ctx.font = `500 9px ${MONO}`; ctx.textAlign = 'left';
-            ctx.fillStyle = 'rgba(20,24,28,0.82)'; ctx.globalAlpha = 1;
-            ctx.fillRect(8, h - 25, ctx.measureText(statusLabel3).width + 14, 17);
-            ctx.fillStyle = 'rgba(100,255,100,0.72)';
-            ctx.fillText(statusLabel3, 12, h - 12);
-        }
-
-        // Reset at cycle end
-        if (engineTimer === ENGINE_CYCLE - 1) {
-            ENGINE_NODES.forEach(n => { n.infected = false; n.infectionTime = -1; });
-        }
+        // Status row
+        const divY = stripY + 31;
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(8, divY); ctx.lineTo(W-8, divY); ctx.stroke();
+        let stTxt='', stCol='rgba(175,175,185,0.72)';
+        if      (cf < 0.16) { stTxt='INITIALISING NETWORK...'; }
+        else if (cf < 0.40) { stTxt='IDENTIFYING CLINICAL CASES...';         stCol='#ff073a'; }
+        else if (cf < 0.63) { stTxt='RECONSTRUCTING TRANSMISSION PATHS...';  stCol='#ff073a'; }
+        else if (cf < 0.74) { stTxt='DETECTING HIDDEN CASES...';             stCol='#9b59b6'; }
+        else if (cf < 0.87) { stTxt='SUPERSPREADER IDENTIFIED';              stCol='#f97316'; }
+        else if (cf < 0.95) { stTxt='FORECASTING TRANSMISSION RISK...'; }
+        else                { stTxt='\u2713 TRANSMISSION TREE COMPLETE';     stCol='rgba(100,220,130,0.88)'; }
+        ctx.font = `400 8px ${MONO}`;
+        ctx.fillStyle = stCol; ctx.globalAlpha = 0.88 + Math.sin(engineTimer*0.10)*0.06;
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText(stTxt, 14, stripY + 42);
+        ctx.restore();
 
         // ── Virus logo (upper-left corner of engine canvas) ──
         const logoCx = 38, logoCy = 34;
