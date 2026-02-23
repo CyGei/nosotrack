@@ -496,6 +496,111 @@
             .section-padding { padding: 80px 0; }
             #three-container { height: 350px; }
         }
+
+        /* ========== ENHANCED VISUAL DESIGN ========== */
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,7,58,0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,7,58,0.55); }
+        html { scrollbar-width: thin; scrollbar-color: rgba(255,7,58,0.3) var(--bg); }
+
+        /* Text selection & focus */
+        ::selection { background: rgba(255,7,58,0.28); color: #fff; }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+        :focus:not(:focus-visible) { outline: none; }
+
+        /* Nav enhancements */
+        nav.main-nav::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px; z-index: 1;
+            background: linear-gradient(90deg, transparent, var(--accent) 30%, rgba(100,150,255,0.4) 70%, transparent);
+            opacity: 0.55;
+        }
+        nav.main-nav.scrolled { background: rgba(13,15,18,0.97); border-bottom-color: rgba(255,7,58,0.12); }
+        .nav-links a:not(.nav-cta) { position: relative; }
+        .nav-links a:not(.nav-cta)::after {
+            content: ''; position: absolute; bottom: -3px; left: 0;
+            width: 0; height: 1px; background: var(--accent);
+            transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .nav-links a:not(.nav-cta):hover::after,
+        .nav-links a:not(.nav-cta).active::after { width: 100%; }
+
+        /* Hero bottom fade */
+        #hero::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 220px;
+            background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+            pointer-events: none; z-index: 1;
+        }
+
+        /* Scroll hint */
+        .hero-scroll-hint {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            z-index: 3; opacity: 0;
+            animation: fadeInHint 1s 2.5s forwards, bounceHint 2s 3.5s ease-in-out infinite;
+            cursor: pointer; color: rgba(255,255,255,0.35); transition: color 0.3s;
+        }
+        .hero-scroll-hint:hover { color: rgba(255,255,255,0.75); }
+        @keyframes fadeInHint { to { opacity: 1; } }
+        @keyframes bounceHint {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* 3D container glow pulse */
+        @keyframes containerGlow {
+            0%, 100% { box-shadow: 0 8px 40px rgba(0,0,0,0.45); }
+            50% { box-shadow: 0 8px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,7,58,0.14), inset 0 0 28px rgba(255,7,58,0.025); }
+        }
+        #three-container { animation: containerGlow 5s ease-in-out infinite; }
+
+        /* Enhanced card hovers */
+        .p-card:hover {
+            box-shadow: 0 8px 32px rgba(255,7,58,0.1), inset 0 1px 0 rgba(255,7,58,0.08);
+        }
+        .pub-card { transition: border-color 0.3s, transform 0.3s, background 0.3s, box-shadow 0.3s; }
+        .pub-card:hover { box-shadow: 0 6px 24px rgba(255,7,58,0.09); }
+        .team-card:hover { box-shadow: 0 10px 32px rgba(0,0,0,0.5); }
+
+        /* Team photo scale on hover */
+        .team-photo { transition: filter 0.4s, transform 0.4s; }
+        .team-card:hover .team-photo { filter: grayscale(0%); transform: scale(1.05); }
+
+        /* Button shimmer */
+        .btn-primary { overflow: hidden; position: relative; }
+        .btn-primary::after {
+            content: ''; position: absolute; top: 0; left: -80%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+            transform: skewX(-20deg); transition: left 0.5s ease; pointer-events: none;
+        }
+        .btn-primary:hover::after { left: 130%; }
+        .btn-secondary { overflow: hidden; position: relative; }
+        .btn-secondary::after {
+            content: ''; position: absolute; top: 0; left: -80%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+            transform: skewX(-20deg); transition: left 0.5s ease; pointer-events: none;
+        }
+        .btn-secondary:hover::after { left: 130%; }
+
+        /* Pub arrow upgrade */
+        .pub-arrow { transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s; }
+        .pub-card:hover .pub-arrow { transform: translateX(6px); color: var(--text-primary); }
+
+        /* Form focus glow */
+        .contact-form input:focus, .contact-form textarea:focus {
+            box-shadow: 0 0 0 3px rgba(255,7,58,0.12);
+            background: rgba(255,255,255,0.06);
+        }
+        #contactGithub:hover, #contactLinkedin:hover { color: var(--text-primary) !important; }
+
+        /* Marquee separator glow */
+        .marquee-track span::after { opacity: 0.6; text-shadow: 0 0 8px rgba(255,7,58,0.35); }
+
+        /* Section tints */
+        #research { background: linear-gradient(180deg, var(--bg) 0%, rgba(255,7,58,0.018) 50%, var(--bg) 100%); }
+
+        /* Virus logo spike upgrade */
     </style>
 </head>
 <body>
@@ -522,6 +627,9 @@
         <h1 class="hero-title"></h1>
         <p class="hero-subtitle"></p>
         <div class="hero-buttons"></div>
+    </div>
+    <div class="hero-scroll-hint" id="heroScrollHint" aria-label="Scroll down">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
     </div>
 </section>
 
@@ -815,6 +923,7 @@ window.drawVirusLogo = function(ctx, frame, cx, cy) {
     let particles = [];
 
     const particleCount = 100;
+    let heroRings = [];
     const connectionDistance = 130;
     const particleSpeed = 0.35;
     const infectionChance = 0.012;
@@ -832,7 +941,7 @@ window.drawVirusLogo = function(ctx, frame, cx, cy) {
             this.size = Math.random() * 1.5 + 0.5;
             this.isInfected = false; this.infectionTimer = 0;
         }
-        infect() { if (!this.isInfected) { this.isInfected = true; this.infectionTimer = recoveryTime; } }
+        infect() { if (!this.isInfected) { this.isInfected = true; this.infectionTimer = recoveryTime; if (Math.random() < 0.2) heroRings.push({ x: this.x, y: this.y, r: this.size, alpha: 0.4 }); } }
         update() {
             this.x += this.vx; this.y += this.vy;
             if (this.x < 0 || this.x > width) this.vx *= -1;
@@ -840,11 +949,14 @@ window.drawVirusLogo = function(ctx, frame, cx, cy) {
             if (this.isInfected) { this.infectionTimer--; if (this.infectionTimer <= 0) this.isInfected = false; }
         }
         draw() {
-            ctx.fillStyle = this.isInfected ? 'rgba(255, 7, 58, 0.7)' : 'rgba(150, 150, 150, 0.3)';
+            ctx.fillStyle = this.isInfected ? 'rgba(255, 7, 58, 0.82)' : 'rgba(160, 160, 160, 0.32)';
             ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
             if (this.isInfected) {
-                ctx.fillStyle = 'rgba(255, 7, 58, 0.12)';
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size + 4, 0, Math.PI * 2); ctx.fill();
+                const pulse = 0.1 + Math.sin(this.infectionTimer * 0.09) * 0.045;
+                ctx.fillStyle = `rgba(255, 7, 58, ${pulse})`;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size + 7, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = 'rgba(255, 7, 58, 0.04)';
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size + 16, 0, Math.PI * 2); ctx.fill();
             }
         }
     }
@@ -857,6 +969,17 @@ window.drawVirusLogo = function(ctx, frame, cx, cy) {
 
     function animate() {
         ctx.clearRect(0, 0, width, height);
+
+        // Expanding infection rings (sparse, subtle)
+        for (let ri = heroRings.length - 1; ri >= 0; ri--) {
+            const ring = heroRings[ri];
+            ring.r += 0.65; ring.alpha -= 0.026;
+            if (ring.alpha <= 0) { heroRings.splice(ri, 1); continue; }
+            ctx.strokeStyle = `rgba(255, 7, 58, ${ring.alpha})`;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath(); ctx.arc(ring.x, ring.y, ring.r, 0, Math.PI * 2); ctx.stroke();
+        }
+
         if (!particles.some(p => p.isInfected)) particles[Math.floor(Math.random() * particles.length)].infect();
         for (let i = 0; i < particles.length; i++) {
             particles[i].update(); particles[i].draw();
@@ -867,8 +990,14 @@ window.drawVirusLogo = function(ctx, frame, cx, cy) {
                     if (particles[i].isInfected && !particles[j].isInfected && Math.random() < infectionChance) particles[j].infect();
                     else if (!particles[i].isInfected && particles[j].isInfected && Math.random() < infectionChance) particles[i].infect();
                     const opacity = 1 - (dist / connectionDistance);
-                    ctx.strokeStyle = (particles[i].isInfected || particles[j].isInfected) ? `rgba(255, 7, 58, ${opacity * 0.35})` : `rgba(150, 150, 150, ${opacity * 0.1})`;
-                    ctx.lineWidth = 0.5;
+                    const bothInfected = particles[i].isInfected && particles[j].isInfected;
+                    const eitherInfected = particles[i].isInfected || particles[j].isInfected;
+                    ctx.strokeStyle = bothInfected
+                        ? `rgba(255, 7, 58, ${opacity * 0.65})`
+                        : eitherInfected
+                        ? `rgba(255, 7, 58, ${opacity * 0.42})`
+                        : `rgba(150, 150, 150, ${opacity * 0.1})`;
+                    ctx.lineWidth = bothInfected ? 0.9 : 0.5;
                     ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
                 }
             }
@@ -883,6 +1012,15 @@ window.drawVirusLogo = function(ctx, frame, cx, cy) {
 // ==========================================
 document.getElementById('navToggle').addEventListener('click', function() { document.getElementById('navLinks').classList.toggle('open'); });
 document.querySelectorAll('.nav-links a').forEach(a => { a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open')); });
+
+// Nav scroll shrink
+window.addEventListener('scroll', () => {
+    document.querySelector('.main-nav').classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+// Scroll hint
+const heroHint = document.getElementById('heroScrollHint');
+if (heroHint) heroHint.addEventListener('click', () => document.getElementById('about').scrollIntoView({ behavior: 'smooth' }));
 
 // ==========================================
 // SCROLL REVEAL
@@ -1164,6 +1302,7 @@ window.__revealObserver = observer;
     let engineCtx, engineW, engineH;
     const ENGINE_NODES = [];
     const ENGINE_EDGES = [];
+    const ENGINE_PROB_LABELS = ['0.91','0.85','0.78','0.82','0.74','0.69','0.88','0.77','0.71','0.66'];
     let enginePhase = 0; // 0=building, 1=computing, 2=infecting
     let engineTimer = 0;
     const ENGINE_CYCLE = 900; // total frames per cycle
@@ -1218,9 +1357,9 @@ window.__revealObserver = observer;
         const infectEnd = 0.88;
 
         // Background grid
-        ctx.strokeStyle = 'rgba(255,255,255,0.015)'; ctx.lineWidth = 0.5;
-        for (let x = 0; x < w; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
-        for (let y = 0; y < h; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+        ctx.lineWidth = 0.5;
+        for (let gx = 0; gx < w; gx += 30) { ctx.strokeStyle = gx % 150 === 0 ? 'rgba(255,255,255,0.045)' : 'rgba(255,255,255,0.025)'; ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke(); }
+        for (let gy = 0; gy < h; gy += 30) { ctx.strokeStyle = gy % 150 === 0 ? 'rgba(255,255,255,0.045)' : 'rgba(255,255,255,0.025)'; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke(); }
 
         // Draw edges
         ENGINE_EDGES.forEach((e, i) => {
@@ -1239,8 +1378,22 @@ window.__revealObserver = observer;
             const ey = from.y + (to.y - from.y) * edgeBuild;
 
             // Base edge (lighter grey for better visibility)
-            ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 1.5;
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 1.5;
             ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(ex, ey); ctx.stroke();
+
+            // Bayesian probability label (fades in after computing phase)
+            if (edgeBuild >= 1 && cycleFrac > computeEnd) {
+                const mx = (from.x + to.x) / 2, my = (from.y + to.y) / 2;
+                const pAlpha = Math.min(0.68, (cycleFrac - computeEnd) * 5);
+                const edgeInfected = ENGINE_NODES[e.from] && ENGINE_NODES[e.from].infected;
+                ctx.save();
+                ctx.fillStyle = 'rgba(20,24,28,0.82)';
+                ctx.fillRect(mx - 12, my - 13, 24, 10);
+                ctx.font = `400 6px ${MONO}`; ctx.textAlign = 'center';
+                ctx.fillStyle = edgeInfected ? `rgba(255,7,58,${pAlpha})` : `rgba(190,190,190,${pAlpha})`;
+                ctx.fillText(ENGINE_PROB_LABELS[i] || '', mx, my - 5);
+                ctx.restore();
+            }
 
             // Infection propagation along edge
             if (cycleFrac > computeEnd && cycleFrac < infectEnd) {
@@ -1350,8 +1503,13 @@ window.__revealObserver = observer;
                 ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2); ctx.fill();
             }
 
+            // Specular hotspot on infected nodes
+            if (n.infected) {
+                ctx.fillStyle = 'rgba(255,255,255,0.22)';
+                ctx.beginPath(); ctx.arc(n.x - r * 0.25, n.y - r * 0.35, r * 0.3, 0, Math.PI * 2); ctx.fill();
+            }
             // Label
-            ctx.fillStyle = n.infected ? '#fff' : 'rgba(255,255,255,0.55)';
+            ctx.fillStyle = n.infected ? '#fff' : 'rgba(255,255,255,0.8)';
             ctx.font = `400 7px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             ctx.fillText(n.label, n.x, n.y); ctx.textBaseline = 'alphabetic';
         });
@@ -1360,33 +1518,47 @@ window.__revealObserver = observer;
         if (cycleFrac > buildEnd && cycleFrac < computeEnd) {
             const computeFrac = (cycleFrac - buildEnd) / (computeEnd - buildEnd);
             const scanX = w * computeFrac;
-            ctx.strokeStyle = ACCENT; ctx.lineWidth = 1; ctx.globalAlpha = 0.4;
-            ctx.beginPath(); ctx.moveTo(scanX, 0); ctx.lineTo(scanX, h); ctx.stroke();
-            // Scan glow
+            // Wide soft halo
+            const scanHalo = ctx.createLinearGradient(scanX - 90, 0, scanX + 15, 0);
+            scanHalo.addColorStop(0, 'transparent'); scanHalo.addColorStop(0.7, 'rgba(255,7,58,0.04)'); scanHalo.addColorStop(1, 'rgba(255,7,58,0.12)');
+            ctx.globalAlpha = 1; ctx.fillStyle = scanHalo; ctx.fillRect(scanX - 90, 0, 105, h);
+            // Narrow trailing glow
             const scanGrad = ctx.createLinearGradient(scanX - 40, 0, scanX, 0);
-            scanGrad.addColorStop(0, 'transparent'); scanGrad.addColorStop(1, 'rgba(255,7,58,0.08)');
+            scanGrad.addColorStop(0, 'transparent'); scanGrad.addColorStop(1, 'rgba(255,7,58,0.1)');
             ctx.fillStyle = scanGrad; ctx.fillRect(scanX - 40, 0, 40, h);
+            // Sharp leading edge
+            ctx.strokeStyle = ACCENT; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.6;
+            ctx.beginPath(); ctx.moveTo(scanX, 0); ctx.lineTo(scanX, h); ctx.stroke();
             ctx.globalAlpha = 1;
-            // Status text
-            ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.5;
+            // Status text with pill background
+            const statusLabel1 = 'COMPUTING TRANSMISSION PROBABILITIES...';
             ctx.font = `400 9px ${MONO}`; ctx.textAlign = 'left';
-            ctx.fillText('COMPUTING TRANSMISSION PROBABILITIES...', 12, h - 12);
+            ctx.fillStyle = 'rgba(20,24,28,0.82)'; ctx.globalAlpha = 1;
+            ctx.fillRect(8, h - 25, ctx.measureText(statusLabel1).width + 14, 17);
+            ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.65;
+            ctx.fillText(statusLabel1, 12, h - 12);
             ctx.globalAlpha = 1;
         }
 
         // Infection phase status
         if (cycleFrac > computeEnd && cycleFrac < infectEnd) {
-            ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.4 + Math.sin(frame * 0.08) * 0.1;
+            const statusLabel2 = 'RECONSTRUCTING TRANSMISSION TREE...';
             ctx.font = `400 9px ${MONO}`; ctx.textAlign = 'left';
-            ctx.fillText('RECONSTRUCTING TRANSMISSION TREE...', 12, h - 12);
+            ctx.fillStyle = 'rgba(20,24,28,0.82)'; ctx.globalAlpha = 1;
+            ctx.fillRect(8, h - 25, ctx.measureText(statusLabel2).width + 14, 17);
+            ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.55 + Math.sin(frame * 0.08) * 0.1;
+            ctx.fillText(statusLabel2, 12, h - 12);
             ctx.globalAlpha = 1;
         }
 
         // Hold phase — all infected, display result
         if (cycleFrac > infectEnd) {
-            ctx.fillStyle = 'rgba(100,255,100,0.4)';
+            const statusLabel3 = '\u2713 TRANSMISSION TREE COMPLETE';
             ctx.font = `500 9px ${MONO}`; ctx.textAlign = 'left';
-            ctx.fillText('TRANSMISSION TREE COMPLETE', 12, h - 12);
+            ctx.fillStyle = 'rgba(20,24,28,0.82)'; ctx.globalAlpha = 1;
+            ctx.fillRect(8, h - 25, ctx.measureText(statusLabel3).width + 14, 17);
+            ctx.fillStyle = 'rgba(100,255,100,0.72)';
+            ctx.fillText(statusLabel3, 12, h - 12);
         }
 
         // Reset at cycle end
