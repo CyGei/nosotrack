@@ -1269,7 +1269,7 @@ window.__revealObserver = observer;
             const rowAlpha = 1 - Math.abs(y - h/2) / (h * 0.6);
             ctx.globalAlpha = Math.max(0.04, Math.min(0.45, rowAlpha));
             if (r === 0) { ctx.font = `500 7px ${MONO}`; ctx.fillStyle = ACCENT; ['ID','WARD','DATE','STATUS'].forEach((t,i) => { ctx.textAlign = 'left'; ctx.fillText(t, cols[i], y); }); }
-            else { ctx.font = `300 7px ${MONO}`; ctx.fillStyle = '#666'; const ids = ['P001','P002','S003','P004','S005','P006','P007'], wards = ['A','B','C','A','B','C','A'], stati = ['POS','NEG','POS','NEG','POS','NEG','POS']; const ri = ((r-1)+Math.floor(frame*0.01))%7; ctx.textAlign = 'left'; ctx.fillText(ids[ri], cols[0], y); ctx.fillText(wards[ri], cols[1], y); ctx.fillText('2025-0'+(ri+1), cols[2], y); ctx.fillStyle = stati[ri] === 'POS' ? ACCENT : '#555'; ctx.fillText(stati[ri], cols[3], y); }
+            else { ctx.font = `300 7px ${MONO}`; ctx.fillStyle = '#ffffffff'; const ids = ['P001','P002','S003','P004','S005','P006','P007'], wards = ['A','B','C','A','B','C','A'], stati = ['POS','NEG','POS','NEG','POS','NEG','POS']; const ri = ((r-1)+Math.floor(frame*0.01))%7; ctx.textAlign = 'left'; ctx.fillText(ids[ri], cols[0], y); ctx.fillText(wards[ri], cols[1], y); ctx.fillText('2025-0'+(ri+1), cols[2], y); ctx.fillStyle = stati[ri] === 'POS' ? ACCENT : '#ffffffff'; ctx.fillText(stati[ri], cols[3], y); }
         }
         ctx.restore(); ctx.globalAlpha = 1;
         const fadeH = 18; let gradTop = ctx.createLinearGradient(0,0,0,fadeH); gradTop.addColorStop(0,'rgba(0,0,0,0.7)'); gradTop.addColorStop(1,'transparent'); ctx.fillStyle = gradTop; ctx.fillRect(0,0,w,fadeH);
