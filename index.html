@@ -547,6 +547,23 @@
             font-size: 0.72rem; color: var(--text-secondary);
         }
 
+        /* ========== LOGO STRIP ========== */
+        .logo-strip {
+            padding: 40px 0;
+        }
+        .logo-strip-inner {
+            max-width: var(--container); margin: 0 auto; padding: 0 24px;
+            display: flex; align-items: center; justify-content: center; gap: 60px;
+            flex-wrap: wrap;
+        }
+        .logo-strip-item {
+            opacity: 0.45;
+            transition: opacity 0.4s ease;
+            display: flex; align-items: center;
+        }
+        .logo-strip-item:hover { opacity: 1; }
+        .logo-strip-item img { height: 32px; width: auto; filter: brightness(0) invert(1); }
+
         /* ========== TEAM ========== */
         #team { background: var(--bg-card); }
         .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 48px; }
@@ -605,6 +622,12 @@
         }
         .footer-links a:hover { color: var(--text-primary); }
         .footer-copy { font-size: 0.75rem; color: var(--text-dim); }
+        .footer-credit {
+            width: 100%; text-align: center; padding-top: 20px; margin-top: 20px;
+            border-top: 1px solid var(--border);
+            font-family: var(--mono); font-size: 0.62rem; letter-spacing: 1px;
+            color: rgba(255,255,255,0.25); line-height: 1.6;
+        }
 
         /* ========== RESPONSIVE ========== */
         @media (max-width: 1024px) {
@@ -776,6 +799,11 @@
 <!-- ========== MARQUEE ========== -->
 <div class="marquee-section">
     <div class="marquee-track"></div>
+</div>
+
+<!-- ========== LOGO STRIP ========== -->
+<div class="logo-strip reveal">
+    <div class="logo-strip-inner"></div>
 </div>
 
 <!-- ========== ABOUT ========== -->
@@ -1008,6 +1036,7 @@
             </div>
             <ul class="footer-links"></ul>
             <div class="footer-copy"></div>
+            <div class="footer-credit"></div>
         </div>
     </div>
 </footer>

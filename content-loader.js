@@ -94,6 +94,17 @@
         track.innerHTML = doubled.map(s => `<span>${s}</span>`).join('');
     }
 
+    // ── LOGO STRIP ────────────────────────────────────────────────────────────
+
+    const logoStripInner = document.querySelector('.logo-strip-inner');
+    if (logoStripInner && c.logoStrip) {
+        logoStripInner.innerHTML = c.logoStrip.map(item =>
+            `<div class="logo-strip-item">` +
+                `<img src="${item.logo}" alt="${item.name}" title="${item.name}">` +
+            `</div>`
+        ).join('');
+    }
+
     // ── ABOUT ─────────────────────────────────────────────────────────────────
 
     setText('#about .section-tag', c.about.tag);
@@ -366,5 +377,8 @@
 
     const footerCopy = document.querySelector('.footer-copy');
     if (footerCopy) footerCopy.innerHTML = `&copy; ${c.footer.copy}.`;
+
+    const footerCredit = document.querySelector('.footer-credit');
+    if (footerCredit && c.footer.credit) footerCredit.textContent = c.footer.credit;
 
 })();

@@ -23,6 +23,11 @@
     "secondaryCta": { "label": "Collaborate", "href": "#contact" }
   },
 
+  "logoStrip": [
+    { "name": "Johns Hopkins University", "logo": "images/logo-jhu.svg" },
+    { "name": "Imperial College London", "logo": "images/logo-imperial.svg" }
+  ],
+
   "marquee": [
     "Contact Tracing",
     "Genomic Surveillance",
@@ -91,7 +96,7 @@
           {
             "tag": "Clinical",
             "title": "Electronic Health Records",
-            "desc": "EHR provide information on admission & discharge dates, ward assignements, and test results.",
+            "desc": "EHR provide information on admission & discharge dates, ward assignments, and test results.",
             "viz": "ehr"
           }
         ]
@@ -124,7 +129,7 @@
         "stepLabel": "Intervention",
         "tag": "Alerts",
         "title": "Early Warning System",
-        "desc": "Real-time alerts and reports are dispatched to Infection Prevention Teams with suggested intervention stragegies based on current transmission dynamics.",
+        "desc": "Real-time alerts and reports are dispatched to Infection Prevention Teams with suggested intervention strategies based on current transmission dynamics.",
         "viz": "alert"
       }
     }
@@ -366,6 +371,7 @@
       { "label": "Team", "href": "#team" },
       { "label": "Contact", "href": "#contact" }
     ],
-    "copy": "Cyril Geismar"
+    "copy": "Cyril Geismar",
+    "credit": "A joint research initiative between Johns Hopkins University and Imperial College London."
   }
 }
