@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "NosoTrack — Real-Time Nosocomial Outbreak Analytics",
-    "description": "Near real-time transmission inference for hospital outbreak detection and intervention."
+    "title": "NosoTrack",
+    "description": "Real-Time Nosocomial Outbreak Analytics."
   },
 
   "nav": {
@@ -18,7 +18,7 @@
   "hero": {
     "eyebrow": "Real-Time Outbreak Analytics",
     "title": ["Track.", "Intervene.", "Protect."],
-    "subtitle": "NosoTrack infers who infected whom in near real-time, empowering hospital Infection Prevention Teams to stop outbreaks before they escalate.",
+    "subtitle": "NosoTrack infers who infected whom in near real-time, enabling hospital Infection Prevention Teams to stop outbreaks before they escalate.",
     "primaryCta": { "label": "Learn More", "href": "#about" },
     "secondaryCta": { "label": "Collaborate", "href": "#contact" }
   },

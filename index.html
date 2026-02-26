@@ -337,10 +337,43 @@
             background: rgba(255,7,58,0.015);
         }
         .p-card--engine .p-card-canvas {
-            height: 340px;
+            height: 420px;
             border: 1px solid rgba(255,255,255,0.03);
             background: rgba(0,0,0,0.4);
+            margin-bottom: 0;
+            border-radius: 8px 8px 0 0;
         }
+        /* Engine timeline controls */
+        .eng-viewport { position: relative; }
+        .eng-replay {
+            font-family: var(--mono); font-size: 0.52rem; letter-spacing: 1px;
+            text-transform: uppercase; padding: 4px 10px; border-radius: 4px;
+            background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1);
+            color: #ececec; cursor: pointer; transition: all .25s; white-space: nowrap;
+        }
+        .eng-replay:hover { background: rgba(255,7,58,.15); border-color: rgba(255,7,58,.4); color: var(--accent); }
+        .eng-spd {
+            font-family: var(--mono); font-size: 0.55rem; letter-spacing: 1px;
+            padding: 3px 9px; border-radius: 4px; white-space: nowrap;
+            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08);
+            color: #9ca3af; cursor: pointer; transition: all .25s;
+        }
+        .eng-spd:hover { background: rgba(255,255,255,.12); color: #ececec; }
+        .eng-tbar {
+            height: 36px; background: rgba(13,15,18,.92);
+            border: 1px solid rgba(255,255,255,0.03); border-top: none;
+            border-radius: 0 0 8px 8px;
+            display: flex; align-items: center; padding: 0 12px; gap: 8px;
+        }
+        .eng-tl { font-family: var(--mono); font-size: .5rem; color: #9ca3af; letter-spacing: 1px; white-space: nowrap; user-select: none; }
+        .eng-track { flex: 1; height: 6px; background: rgba(255,255,255,.06); border-radius: 3px; position: relative; cursor: pointer; }
+        .eng-tfill { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); border-radius: 3px; width: 0; pointer-events: none; }
+        .eng-thandle {
+            position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%;
+            background: var(--accent); border: 2px solid #fff; transform: translate(-50%,-50%);
+            left: 0; cursor: grab; z-index: 2; box-shadow: 0 0 8px rgba(255,7,58,.5);
+        }
+        .eng-thandle:active { cursor: grabbing; transform: translate(-50%,-50%) scale(1.2); }
         .engine-features {
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 10px; margin-top: 14px;
@@ -377,7 +410,7 @@
             .pipeline-sources { grid-template-columns: 1fr; }
             .engine-features { grid-template-columns: 1fr; }
             .p-card-canvas { height: 80px; }
-            .p-card--engine .p-card-canvas { height: 240px; }
+            .p-card--engine .p-card-canvas { height: 280px; }
         }
 
         /* ========== RESEARCH ========== */
@@ -843,7 +876,18 @@
                 <div class="pipeline-single">
                     <div class="p-card p-card--engine" data-pipeline="engine">
                         <div class="p-card-glow"></div>
-                        <canvas class="p-card-canvas" data-viz="engine" id="engine-canvas"></canvas>
+                        <div class="eng-viewport">
+                            <canvas class="p-card-canvas" data-viz="engine" id="engine-canvas"></canvas>
+                            <div class="eng-tbar">
+                                <span class="eng-tl">OUTBREAK</span>
+                                <div class="eng-track" id="engTrack">
+                                    <div class="eng-tfill" id="engFill"></div>
+                                    <div class="eng-thandle" id="engHandle"></div>
+                                </div>
+                                <button class="eng-spd" id="engSpd">2×</button>
+                                <button class="eng-replay" id="engReplay">↺ Replay</button>
+                            </div>
+                        </div>
                         <div class="p-card-tag"></div>
                         <div class="p-card-title"></div>
                         <div class="p-card-desc"></div>
@@ -1394,141 +1438,350 @@ window.__revealObserver = observer;
         });
     }
 
+
     // ═══════════════════════════════════════════
-    // ENGINE — Outbreak transmission tree (Canvas 2D)
-    // Phases: nodes → confirmed cases → hidden cases
-    //         → superspreader → forecasted risk
+    // ENGINE — Full Outbreak Reconstruction
+    // Adapted from Engine.html (event-based, time-driven)
     // ═══════════════════════════════════════════
     const engineCanvas = document.getElementById('engine-canvas');
     let engineCtx, engineW, engineH;
-    // Node state constants
-    const E_GREY = 0, E_RED = 1, E_PURPLE = 2, E_ORANGE = 3;
-    const E_COL  = ['rgba(138,138,154,0.78)', '#ff073a', '#9b59b6', '#f97316'];
-    const E_GLOW = ['transparent', 'rgba(255,7,58,0.30)', 'rgba(155,89,182,0.30)', 'rgba(249,115,22,0.32)'];
-    const ENGINE_CYCLE = 960;
-    let engineTimer = 0;
-    let ENG_N = [];  // nodes (populated in initEngineViz)
-    // State transitions: { i=nodeIndex, s=newState, f=cycleFrac }
-    const ENG_SC = [
-        // ── Phase 1: Clinical Detection (cf 0.15–0.35) ──
-        // Positive tests return sequentially; NO edges yet — these are isolated confirmed cases
-        {i:0,  s:E_RED,    f:0.17},  // P0  Patient Zero – Ward A
-        {i:1,  s:E_RED,    f:0.21},  // P1  Ward A
-        {i:3,  s:E_RED,    f:0.25},  // P3  Ward A  (orphan – infector unknown)
-        {i:7,  s:E_RED,    f:0.28},  // P6  Ward B  (orphan – infector unknown)
-        {i:14, s:E_RED,    f:0.31},  // P11 Ward C
-        {i:17, s:E_RED,    f:0.35},  // P14 Ward C  (orphan – infector unknown)
-        // ── Phase 2: Discovery via tracing — grey nodes light up as edges arrive ──
-        // Each fires when its incoming edge is ~68% drawn, giving a "touch to reveal" effect
-        {i:6,  s:E_RED,    f:0.464}, // S1  ← P0→S1  (af:0.43 + 68% × dur:0.050)
-        {i:2,  s:E_RED,    f:0.504}, // P2  ← P1→P2  (af:0.47 + 68% × dur:0.050)
-        {i:8,  s:E_RED,    f:0.547}, // S2  ← S1→S2  (af:0.51 + 68% × dur:0.055)
-        {i:13, s:E_RED,    f:0.599}, // S3  ← S2→S3  (af:0.56 + 68% × dur:0.058)
-        {i:15, s:E_RED,    f:0.654}, // P12 ← S3→P12 (af:0.62 + 68% × dur:0.050)
-        // ── Hidden cases revealed (purple) ──
-        {i:4,  s:E_PURPLE, f:0.64},  // P4  → purple (hidden source of P3)
-        {i:16, s:E_PURPLE, f:0.69},  // P13 → purple (hidden source of P14)
-        // ── Superspreader ──
-        {i:8,  s:E_ORANGE, f:0.75},  // S2  → orange (superspreader revealed)
-        {i:9,  s:E_RED,    f:0.79},  // P7  ← S2 superspreader burst
-        {i:10, s:E_RED,    f:0.82},  // P8  ← S2 superspreader burst
+    const ENG_SPEEDS = [1, 1.5, 2, 3, 5];
+    let engSpeedIdx = 2; // default 2×
+    let engSpeed = ENG_SPEEDS[engSpeedIdx];
+
+    // Colours
+    const ECL = {
+        grey:'#6b7a8a', red:'#ff073a', orange:'#f59e0b', purple:'#8b5cf6', blue:'#3b82f6',
+        gR:'rgba(255,7,58,.22)', gO:'rgba(245,158,11,.28)', gP:'rgba(139,92,246,.22)', gB:'rgba(59,130,246,.22)',
+        eN:'rgba(255,255,255,.22)', eI:'rgba(139,92,246,.50)'
+    };
+
+    // Nodes (from Engine.html)
+    const ENG_NODES = [
+        // Ward A
+        {id:0,  l:'P1',  sh:'c', w:'A', xf:.11, yf:.16},
+        {id:1,  l:'P2',  sh:'c', w:'A', xf:.23, yf:.13},
+        {id:2,  l:'P3',  sh:'c', w:'A', xf:.08, yf:.32},  // TRUE PATIENT ZERO
+        {id:3,  l:'P4',  sh:'c', w:'A', xf:.21, yf:.30},
+        {id:4,  l:'P5',  sh:'c', w:'A', xf:.15, yf:.44},
+        {id:5,  l:'N1',  sh:'d', w:'A', xf:.30, yf:.22},  // nurse (hidden)
+        // Ward B
+        {id:6,  l:'P6',  sh:'c', w:'B', xf:.70, yf:.13},
+        {id:7,  l:'P7',  sh:'c', w:'B', xf:.84, yf:.15},  // imported
+        {id:8,  l:'P8',  sh:'c', w:'B', xf:.74, yf:.29},
+        {id:9,  l:'P9',  sh:'c', w:'B', xf:.88, yf:.31},
+        {id:10, l:'P10', sh:'c', w:'B', xf:.80, yf:.44},
+        {id:11, l:'N2',  sh:'d', w:'B', xf:.63, yf:.25},
+        {id:12, l:'A1',  sh:'d', w:'B', xf:.92, yf:.23},
+        // Ward C (ICU)
+        {id:13, l:'P11', sh:'c', w:'C', xf:.34, yf:.70},
+        {id:14, l:'P12', sh:'c', w:'C', xf:.50, yf:.68},
+        {id:15, l:'P13', sh:'c', w:'C', xf:.66, yf:.72},
+        {id:16, l:'P14', sh:'c', w:'C', xf:.42, yf:.86},
+        {id:17, l:'P15', sh:'c', w:'C', xf:.58, yf:.86},
+        {id:18, l:'N3',  sh:'d', w:'C', xf:.74, yf:.84},
+        // Cross-ward doctor (superspreader)
+        {id:19, l:'Dr1', sh:'d', w:'X', xf:.46, yf:.48},
+        // External source
+        {id:20, l:'?',   sh:'q', w:'E', xf:.94, yf:.06},
     ];
-    // Annotations: { text, i=nodeIndex, showF, hideF }
-    const ENG_ANNOTS = [
-        {text:'Patient Zero',  i:0,  showF:0.17, hideF:0.30},
-        {text:'Undetected',    i:4,  showF:0.64, hideF:0.76},
-        {text:'Undetected',    i:16, showF:0.69, hideF:0.81},
-        {text:'Superspreader', i:8,  showF:0.75, hideF:0.87},
-        {text:'Forecast Risk', i:5,  showF:0.87, hideF:0.96},
-    ];
-    // Edges: { from, to, type, af=appearFrac, dur=drawDuration }
-    // Transmission tree rule: each node has at most one inbound edge
-    const ENG_ED = [
-        // ── Phase 2: Link Inference — first edge at cf 0.40 (clear pause after clinical detection) ──
-        // Rule: a node must be red BEFORE it emits an outgoing edge
-        {from:0,  to:1,  type:'red',      af:0.40,  dur:0.050}, // P0→P1   both already red — link confirmed
-        {from:0,  to:6,  type:'red',      af:0.43,  dur:0.050}, // P0→S1   S1 grey, lights up at ~68%
-        {from:1,  to:2,  type:'red',      af:0.47,  dur:0.050}, // P1→P2   P2 grey, lights up at ~68%
-        {from:6,  to:8,  type:'red',      af:0.51,  dur:0.055}, // S1→S2   S2 grey, lights up at ~68%
-        {from:8,  to:7,  type:'red',      af:0.555, dur:0.048}, // S2→P6   P6 already red — explains orphan
-        {from:8,  to:13, type:'red',      af:0.56,  dur:0.058}, // S2→S3   S3 grey, lights up at ~68%
-        {from:13, to:14, type:'red',      af:0.60,  dur:0.048}, // S3→P11  P11 already red — explains orphan
-        {from:13, to:15, type:'red',      af:0.62,  dur:0.050}, // S3→P12  P12 grey, lights up at ~68%
-        // ── Phase 3: Hidden cases (purple) — unchanged ──
-        {from:4,  to:3,  type:'purple',   af:0.65,  dur:0.065}, // P4→P3  (explains P3 orphan!)
-        {from:16, to:17, type:'purple',   af:0.70,  dur:0.065}, // P13→P14 (explains P14 orphan!)
-        // ── Phase 4: Superspreader burst (orange) — unchanged ──
-        {from:8,  to:9,  type:'super',    af:0.76,  dur:0.055}, // S2→P7
-        {from:8,  to:10, type:'super',    af:0.79,  dur:0.055}, // S2→P8
-        // ── Phase 5: Forecasted risk (dashed) — unchanged ──
-        {from:2,  to:5,  type:'forecast', af:0.86,  dur:0.060}, // P2→P5
-        {from:14, to:18, type:'forecast', af:0.88,  dur:0.060}, // P11→S4
-        {from:10, to:11, type:'forecast', af:0.90,  dur:0.060}, // P8→P9
-        {from:15, to:19, type:'forecast', af:0.92,  dur:0.060}, // P12→P15
-    ];
-    // Brief red glow pulses on grey nodes — happens BEFORE any edges appear
-    // to convey initial detection signals / false alarms
-    const ENG_PREPULSE = [
-        {nodes:[2,  14,  7], cf:0.107, hw:0.011, mx:0.55},  // Ward A/C/B spread
-        {nodes:[4,  18, 11], cf:0.122, hw:0.011, mx:0.50},  // A/C/B spread
-        {nodes:[1,   8    ], cf:0.136, hw:0.011, mx:0.60},  // A/B
-        {nodes:[5,  16, 12], cf:0.151, hw:0.010, mx:0.48},  // A/C/B spread
-    ];
-    // Bezier control point — perpendicular offset scales with edge length
-    function engCtrl(ax, ay, bx, by) {
-        const mx=(ax+bx)/2, my=(ay+by)/2, dx=bx-ax, dy=by-ay;
-        const l=Math.sqrt(dx*dx+dy*dy)||1, k=Math.max(14, l*0.16);
-        return { x: mx-(dy/l)*k, y: my+(dx/l)*k };
-    }
-    // Point on quadratic bezier at parameter t
-    function engBez(ax, ay, cx, cy, bx, by, t) {
-        const s=1-t; return { x:s*s*ax+2*s*t*cx+t*t*bx, y:s*s*ay+2*s*t*cy+t*t*by };
-    }
-    // Rounded-rect helper (compat shim for older Safari)
-    function engRR(ctx, x, y, w, h, r) {
-        if (ctx.roundRect) { ctx.roundRect(x,y,w,h,r); } else { ctx.rect(x,y,w,h); }
+
+    // Forecast edges
+    const ENG_FC_EDGES = [{from:2,to:3},{from:11,to:8},{from:14,to:16},{from:14,to:17}];
+
+    // Module-level state
+    let engNS = [], engEdges = [], engForecastEdges = [], engNodeAnns = [], engParticles = [];
+    let engSIdx = 0, engElapsed = 0, engFrame2 = 0;
+    let engBannOn = false, engBannLabel = '', engBannText = '', engBannCol = '', engBannEnd = 0;
+    let engBannAlert = false, engLogoActive = false;
+    let engPlaying = true, engDragging = false;
+    let engOutbreakAnim = null;
+    let engScript = [], ENG_TOTAL_T = 60000;
+    // Cached DOM refs (set in initEngineViz)
+    let engFillEl = null, engHandleEl = null, engTrackEl = null;
+
+    function buildEngScript() {
+        engScript = [];
+        let T = 0;
+        function at(dt) { T += dt; return T; }
+        function ev(type, p) { engScript.push({t: T, type, ...p}); }
+        T = 1200;
+        ev('ann', {label:'INITIAL DETECTION',    text:'First confirmed case in Ward A',      col:ECL.red,    dur:2800, alert:false});
+        at(600);  ev('confirm', {id:0, ann:'First Confirmed Case', acol:ECL.red});
+        at(3600); ev('ann', {label:'CASES EMERGING',      text:'New cases confirmed across wards',    col:ECL.red,    dur:2600, alert:false});
+        at(800);  ev('confirm', {id:1,  ann:'Confirmed'});
+        at(1200); ev('confirm', {id:2,  ann:'Confirmed'});
+        at(1200); ev('confirm', {id:6,  ann:'Confirmed'});
+        at(1200); ev('confirm', {id:11});
+        at(1000); ev('confirm', {id:19, ann:'Confirmed'});
+        at(3000); ev('ann', {label:'OUTBREAK DECLARED',   text:'NosoTrack engine deployed',          col:ECL.red,    dur:3500, alert:false, logo:true});
+        at(4200); ev('ann', {label:'SOURCE IDENTIFICATION',text:'Patient Zero identified',           col:'#fff',     dur:3000, alert:false});
+        at(600);  ev('p0', {id:2});
+        at(3500); ev('edge', {from:2,  to:0,  inf:false});
+        at(1200); ev('ann', {label:'ALERT: SUSPECTED CASES',  text:'N1 is a likely undetected case', col:ECL.purple, dur:3000, alert:true});
+        at(800);  ev('hidden', {id:5, ann:'Undetected Case Identified'});
+        at(1000); ev('edge', {from:2,  to:5,  inf:false});
+        at(1200); ev('edge', {from:5,  to:1,  inf:true});
+        at(800);  ev('edge', {from:5,  to:11, inf:true});
+        at(1000); ev('edge', {from:5,  to:19, inf:true});
+        at(1200); ev('edge', {from:19, to:6,  inf:false});
+        at(1500); ev('confirm', {id:13, ann:'Confirmed'});
+        at(900);  ev('confirm', {id:14, ann:'Confirmed'});
+        at(900);  ev('confirm', {id:15, ann:'Confirmed'});
+        at(1200); ev('edge', {from:19, to:13, inf:false});
+        at(800);  ev('edge', {from:19, to:14, inf:false});
+        at(800);  ev('edge', {from:19, to:15, inf:false});
+        at(1200); ev('ann', {label:'ALERT: SUPERSPREADER',    text:'Dr1 linked to 4 cases across wards', col:ECL.orange, dur:3500, alert:true});
+        at(600);  ev('super', {id:19});
+        at(4200); ev('confirm', {id:7, ann:'Confirmed'});
+        at(2000); ev('ann', {label:'ALERT: IMPORTATION EVENT',text:'P7 is an imported case',         col:ECL.blue,   dur:3500, alert:true});
+        at(800);  ev('imported_p7', {id:7});
+        at(1000); ev('show_source', {id:20});
+        at(800);  ev('edge', {from:20, to:7,  inf:false});
+        at(4000); ev('ann', {label:'ALERT: RISK FORECAST',    text:'P[4,8,14,15] at risk',           col:'rgba(255,255,255,.75)', dur:4500, alert:true});
+        at(1200); ev('forecast', {});
+        at(6000);
+        ENG_TOTAL_T = T + 500;
     }
 
+    function engNPos(n) {
+        const nh = engineH - 48;
+        return { x: n.xf * engineW, y: n.yf * nh };
+    }
+    function engNR(n) { return n.sh === 'd' || n.sh === 'q' ? 6 : 7; }
+
+    function initEngState() {
+        engNS = ENG_NODES.map(() => ({
+            col:ECL.grey, glow:'transparent', sc:1, tSc:1, al:0, tAl:0,
+            blue:false, sup:false, pulse:false, rev:false, p0:false, p0ring:0
+        }));
+        engEdges = []; engForecastEdges = []; engNodeAnns = []; engParticles = [];
+        engSIdx = 0; engElapsed = 0;
+        engBannOn = false; engBannAlert = false; engLogoActive = false;
+        engOutbreakAnim = null;
+        engPlaying = true;
+    }
+
+    function processEngEventsUpTo(t) {
+        // Reset all state then replay instantly up to time t
+        engNS.forEach(s => Object.assign(s, {col:ECL.grey,glow:'transparent',sc:1,tSc:1,al:0,tAl:0,
+            blue:false,sup:false,pulse:false,rev:false,p0:false,p0ring:0}));
+        engEdges = []; engForecastEdges = []; engNodeAnns = []; engParticles = [];
+        engBannOn = false; engBannAlert = false; engLogoActive = false; engOutbreakAnim = null; engSIdx = 0;
+        ENG_NODES.forEach((n, i) => { engNS[i].tAl = .55; engNS[i].al = .55; });
+        for (let i = 0; i < engScript.length; i++) {
+            if (engScript[i].t > t) break;
+            engApplyEv(engScript[i], true); engSIdx = i + 1;
+        }
+        engEdges.forEach(e => e.prog = 1);
+        engForecastEdges.forEach(e => e.prog = 1);
+        // Restore active banner
+        let ab = null;
+        for (let i = 0; i < engScript.length; i++) {
+            if (engScript[i].t > t) break;
+            if (engScript[i].type === 'ann') {
+                const end = engScript[i].t + (engScript[i].dur || 2500);
+                ab = (t >= engScript[i].t && t <= end) ? engScript[i] : null;
+            }
+        }
+        if (ab) {
+            engBannLabel = ab.label; engBannText = ab.text; engBannCol = ab.col;
+            engBannOn = true; engBannEnd = ab.t + (ab.dur || 2500);
+            engBannAlert = !!ab.alert;
+        }
+    }
+
+    function engApplyEv(e, instant) {
+        switch (e.type) {
+            case 'confirm': {
+                const s = engNS[e.id]; s.col = ECL.red; s.glow = ECL.gR; s.tAl = 1; s.rev = true;
+                if (instant) { s.al = 1; s.sc = 1; } else { s.tSc = 1.25; setTimeout(() => { s.tSc = 1; }, 420); }
+                if (e.ann) engNodeAnns.push({id:e.id, text:e.ann, col:e.acol||ECL.red, alpha:instant?0:1, born:engElapsed});
+                break;
+            }
+            case 'hidden': {
+                const s = engNS[e.id]; s.col = ECL.purple; s.glow = ECL.gP; s.tAl = 1; s.rev = true;
+                if (instant) { s.al = 1; s.sc = 1; } else { s.tSc = 1.3; setTimeout(() => { s.tSc = 1; }, 500); }
+                if (e.ann) engNodeAnns.push({id:e.id, text:e.ann, col:ECL.purple, alpha:instant?0:1, born:engElapsed});
+                break;
+            }
+            case 'imported_p7': {
+                const s = engNS[e.id]; s.blue = true; s.glow = ECL.gB;
+                if (!instant) { s.tSc = 1.2; setTimeout(() => { s.tSc = 1; }, 400); }
+                break;
+            }
+            case 'show_source': {
+                const s = engNS[e.id]; s.col = ECL.blue; s.tAl = 1; s.rev = true;
+                if (instant) { s.al = 1; s.sc = 1; } else { s.tSc = 1.2; setTimeout(() => { s.tSc = 1; }, 400); }
+                break;
+            }
+            case 'super': {
+                const s = engNS[e.id]; s.col = ECL.orange; s.glow = ECL.gO; s.sup = true;
+                if (instant) { s.sc = 1.05; } else { s.tSc = 1.35; setTimeout(() => { s.tSc = 1.05; }, 520); }
+                engNodeAnns.push({id:e.id, text:'Superspreader Detected', col:ECL.orange, alpha:instant?0:1, born:engElapsed});
+                break;
+            }
+            case 'p0': {
+                const s = engNS[e.id]; s.p0 = true; s.p0ring = instant ? 1 : 0;
+                if (!instant) { s.tSc = 1.4; setTimeout(() => { s.tSc = 1; }, 600); }
+                engNodeAnns.push({id:e.id, text:'Patient Zero Identified', col:'#fff', alpha:instant?0:1, born:engElapsed});
+                break;
+            }
+            case 'edge': {
+                engEdges.push({from:e.from, to:e.to, inf:e.inf, prog:instant?1:0});
+                if (!instant) engSpawnParts(e);
+                break;
+            }
+            case 'forecast': {
+                ENG_FC_EDGES.forEach(fe => {
+                    engForecastEdges.push({from:fe.from, to:fe.to, prog:instant?1:0});
+                    engNS[fe.to].pulse = true; engNS[fe.to].tAl = Math.max(engNS[fe.to].tAl, .65);
+                    if (instant) engNS[fe.to].al = .65;
+                });
+                break;
+            }
+            case 'ann': {
+                if (e.logo) {
+                    engLogoActive = true;
+                    if (!instant) {
+                        engOutbreakAnim = { startT: engElapsed, overlayDur: 3000, slideStartT: 600, slideDur: 2200 };
+                    }
+                }
+                if (!instant) {
+                    engBannLabel = e.label; engBannText = e.text; engBannCol = e.col;
+                    engBannOn = true; engBannEnd = engElapsed + (e.dur || 2500);
+                    engBannAlert = !!e.alert;
+                }
+                break;
+            }
+        }
+    }
+
+    function engSpawnParts(e) {
+        const f = engNPos(ENG_NODES[e.from]), t = engNPos(ENG_NODES[e.to]);
+        const c = e.inf ? ECL.purple : ECL.red;
+        for (let i = 0; i < 4; i++)
+            engParticles.push({x:f.x,y:f.y,tx:t.x,ty:t.y,p:-i*.08,sp:.011+Math.random()*.005,
+                dr:(Math.random()-.5)*7,sz:1+Math.random()*1.5,al:.35+Math.random()*.4,c});
+    }
+
+    function drawEngEdge(ctx, fn, tn, prog, inf) {
+        const f = engNPos(fn), t = engNPos(tn);
+        const mx = f.x+(t.x-f.x)*prog, my = f.y+(t.y-f.y)*prog;
+        ctx.save(); ctx.globalAlpha = Math.min(1, prog*4);
+        ctx.beginPath(); ctx.moveTo(f.x, f.y); ctx.lineTo(mx, my);
+        if (inf) { ctx.setLineDash([5,3]); ctx.strokeStyle = ECL.eI; ctx.lineWidth = 1.5; }
+        else     { ctx.setLineDash([]);    ctx.strokeStyle = ECL.eN; ctx.lineWidth = 1.3; }
+        ctx.stroke(); ctx.setLineDash([]);
+        if (prog > .92) {
+            const a = Math.atan2(t.y-f.y,t.x-f.x), rr=10, sz=4;
+            const ax = t.x-Math.cos(a)*rr, ay = t.y-Math.sin(a)*rr;
+            ctx.globalAlpha = Math.min(1,(prog-.92)/.08);
+            ctx.beginPath(); ctx.moveTo(ax,ay);
+            ctx.lineTo(ax-sz*Math.cos(a-.4), ay-sz*Math.sin(a-.4));
+            ctx.lineTo(ax-sz*Math.cos(a+.4), ay-sz*Math.sin(a+.4));
+            ctx.closePath(); ctx.fillStyle = inf ? ECL.eI : 'rgba(255,255,255,.3)'; ctx.fill();
+        }
+        if (prog < 1) {
+            ctx.globalAlpha = .85; ctx.beginPath(); ctx.arc(mx,my,2,0,Math.PI*2);
+            ctx.fillStyle = inf ? ECL.purple : ECL.red; ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    function drawBiohazardSymbol(ctx, cx, cy, r, alpha) {
+        ctx.save(); ctx.globalAlpha = alpha; ctx.translate(cx, cy);
+        ctx.strokeStyle = '#ff073a'; ctx.lineCap = 'round';
+        const pw = r * 0.26, pr = r * 0.60;
+        ctx.lineWidth = pw;
+        const span = (Math.PI * 2 / 3) * 0.68, gap = (Math.PI * 2 / 3) - span;
+        for (let i = 0; i < 3; i++) {
+            const base = (i / 3) * Math.PI * 2 - Math.PI / 2;
+            ctx.beginPath(); ctx.arc(0, 0, pr, base + gap/2, base + gap/2 + span); ctx.stroke();
+        }
+        ctx.lineWidth = pw * 0.35;
+        const spkIn = r * 0.16, spkOut = r * 0.36;
+        for (let i = 0; i < 3; i++) {
+            const a = (i / 3) * Math.PI * 2 - Math.PI / 2;
+            ctx.beginPath(); ctx.moveTo(Math.cos(a)*spkIn, Math.sin(a)*spkIn);
+            ctx.lineTo(Math.cos(a)*spkOut, Math.sin(a)*spkOut); ctx.stroke();
+        }
+        ctx.lineWidth = pw * 0.45;
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.13, 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+    }
+
+    let engListenersAdded = false;
     function initEngineViz() {
         if (!engineCanvas) return;
         const info = initCanvas(engineCanvas);
         if (!info) return;
         engineCtx = info.ctx; engineW = info.w; engineH = info.h;
-        const W = engineW, H = engineH;
-        // Node specs: label, fractional position, ward, type
-        const spec = [
-            // ── Ward A (left) ──
-            {label:'P0',  fx:0.20, fy:0.13, ward:'A', type:'patient'},  // 0  Patient Zero
-            {label:'P1',  fx:0.09, fy:0.38, ward:'A', type:'patient'},  // 1
-            {label:'P2',  fx:0.28, fy:0.40, ward:'A', type:'patient'},  // 2
-            {label:'P3',  fx:0.08, fy:0.68, ward:'A', type:'patient'},  // 3  (untraced → hidden P4)
-            {label:'P4',  fx:0.25, fy:0.70, ward:'A', type:'patient'},  // 4  → purple (hidden case)
-            {label:'P5',  fx:0.33, fy:0.58, ward:'A', type:'patient'},  // 5  grey (forecast target)
-            // ── Ward B (centre) ──
-            {label:'S1',  fx:0.40, fy:0.21, ward:'A', type:'staff'},    // 6  staff bridge A→B
-            {label:'P6',  fx:0.44, fy:0.50, ward:'B', type:'patient'},  // 7
-            {label:'S2',  fx:0.53, fy:0.25, ward:'B', type:'staff'},    // 8  → orange (superspreader)
-            {label:'P7',  fx:0.47, fy:0.73, ward:'B', type:'patient'},  // 9  superspreader target
-            {label:'P8',  fx:0.62, fy:0.60, ward:'B', type:'patient'},  // 10 superspreader target
-            {label:'P9',  fx:0.58, fy:0.75, ward:'B', type:'patient'},  // 11 grey (forecast target)
-            {label:'P10', fx:0.37, fy:0.77, ward:'B', type:'patient'},  // 12 grey (stays grey)
-            // ── Ward C (right) ──
-            {label:'S3',  fx:0.70, fy:0.29, ward:'B', type:'staff'},    // 13 staff bridge B→C
-            {label:'P11', fx:0.76, fy:0.17, ward:'C', type:'patient'},  // 14
-            {label:'P12', fx:0.82, fy:0.44, ward:'C', type:'patient'},  // 15
-            {label:'P13', fx:0.74, fy:0.61, ward:'C', type:'patient'},  // 16 → purple (hidden case)
-            {label:'P14', fx:0.88, fy:0.61, ward:'C', type:'patient'},  // 17 (untraced → hidden P13)
-            {label:'S4',  fx:0.90, fy:0.29, ward:'C', type:'staff'},    // 18 grey (forecast target)
-            {label:'P15', fx:0.90, fy:0.78, ward:'C', type:'patient'},  // 19 grey (forecast target)
-        ];
-        ENG_N = spec.map(n => ({
-            ...n,
-            x: n.fx * W,
-            y: n.fy * H,
-            r: n.type === 'staff' ? 5.5 : 6.5,
-            state: E_GREY,
-        }));
-        engineTimer = 0;
+        buildEngScript();
+        initEngState();
+        // Cache timeline DOM elements
+        engFillEl   = document.getElementById('engFill');
+        engHandleEl = document.getElementById('engHandle');
+        engTrackEl  = document.getElementById('engTrack');
+        if (!engListenersAdded) {
+            engListenersAdded = true;
+            // Speed button
+            const spdBtn = document.getElementById('engSpd');
+            if (spdBtn) spdBtn.addEventListener('click', () => {
+                engSpeedIdx = (engSpeedIdx + 1) % ENG_SPEEDS.length;
+                engSpeed = ENG_SPEEDS[engSpeedIdx];
+                const lbl = engSpeed === 1 ? '1×' : engSpeed === 1.5 ? '1.5×' : engSpeed === 2 ? '2×' : engSpeed === 3 ? '3×' : '5×';
+                spdBtn.textContent = lbl;
+            });
+            // Replay button
+            const replayBtn = document.getElementById('engReplay');
+            if (replayBtn) replayBtn.addEventListener('click', () => {
+                initEngState(); engPlaying = true;
+            });
+            // Timeline scrubbing — mouse
+            function engGetPct(e) {
+                if (!engTrackEl) return 0;
+                const r = engTrackEl.getBoundingClientRect();
+                return Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+            }
+            if (engTrackEl) {
+                engTrackEl.addEventListener('mousedown', e => {
+                    engDragging = true; engPlaying = false;
+                    const pct = engGetPct(e);
+                    engElapsed = pct * ENG_TOTAL_T;
+                    processEngEventsUpTo(engElapsed);
+                });
+            }
+            window.addEventListener('mousemove', e => {
+                if (!engDragging) return;
+                const pct = engGetPct(e);
+                engElapsed = pct * ENG_TOTAL_T;
+                processEngEventsUpTo(engElapsed);
+            });
+            window.addEventListener('mouseup', () => {
+                if (engDragging) { engDragging = false; engPlaying = true; }
+            });
+            // Touch support
+            if (engTrackEl) {
+                engTrackEl.addEventListener('touchstart', e => {
+                    engDragging = true; engPlaying = false;
+                    const r = engTrackEl.getBoundingClientRect();
+                    const pct = Math.max(0, Math.min(1, (e.touches[0].clientX - r.left) / r.width));
+                    engElapsed = pct * ENG_TOTAL_T;
+                    processEngEventsUpTo(engElapsed);
+                }, {passive:true});
+            }
+            window.addEventListener('touchmove', e => {
+                if (!engDragging || !engTrackEl) return;
+                const r = engTrackEl.getBoundingClientRect();
+                const pct = Math.max(0, Math.min(1, (e.touches[0].clientX - r.left) / r.width));
+                engElapsed = pct * ENG_TOTAL_T;
+                processEngEventsUpTo(engElapsed);
+            }, {passive:true});
+            window.addEventListener('touchend', () => {
+                if (engDragging) { engDragging = false; engPlaying = true; }
+            });
+        }
     }
 
     function drawEngineViz() {
@@ -1536,283 +1789,374 @@ window.__revealObserver = observer;
         const ctx = engineCtx, W = engineW, H = engineH;
         ctx.clearRect(0, 0, W, H);
 
-        engineTimer = (engineTimer + 1) % ENGINE_CYCLE;
-        const cf = engineTimer / ENGINE_CYCLE;
+        // Advance time (only when playing and not scrubbing)
+        const msPerFrame = (1000 / 60) * engSpeed;
+        if (engPlaying && !engDragging) {
+            engElapsed += msPerFrame; engFrame2++;
+            if (engElapsed >= ENG_TOTAL_T) { initEngState(); }
+        } else {
+            engFrame2++;
+        }
 
-        // ── Subtle background grid ──
-        ctx.lineWidth = 0.35;
-        ctx.strokeStyle = 'rgba(255,255,255,0.022)';
-        for (let gx = 0; gx < W; gx += 28) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
-        for (let gy = 0; gy < H; gy += 28) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+        // Apply pending events
+        while (engSIdx < engScript.length && engElapsed >= engScript[engSIdx].t) {
+            engApplyEv(engScript[engSIdx], false); engSIdx++;
+        }
+        if (engBannOn && engElapsed > engBannEnd) { engBannOn = false; }
 
-        // ── Ward cluster backgrounds ──
-        const wA = Math.min(1, cf / 0.09);
-        const WARDS = [
-            {label:'Ward A', rgb:'100,150,255', x1:0.02, y1:0.06, x2:0.37, y2:(H-56)/H},
-            {label:'Ward B', rgb:'255,150,100', x1:0.35, y1:0.06, x2:0.67, y2:(H-56)/H},
-            {label:'Ward C', rgb:'150,255,100', x1:0.65, y1:0.06, x2:0.97, y2:(H-56)/H},
+        // Update progress bar
+        const pct = ENG_TOTAL_T > 0 ? Math.min(1, engElapsed / ENG_TOTAL_T) : 0;
+        if (engFillEl)  engFillEl.style.width  = (pct * 100) + '%';
+        if (engHandleEl) engHandleEl.style.left = (pct * 100) + '%';
+
+        // Update edges
+        engEdges.forEach(e => { if (e.prog < 1) e.prog = Math.min(1, e.prog + .018); });
+        engForecastEdges.forEach(e => { if (e.prog < 1) e.prog = Math.min(1, e.prog + .012); });
+
+        // Update particles
+        for (let i = engParticles.length - 1; i >= 0; i--) {
+            engParticles[i].p += engParticles[i].sp;
+            if (engParticles[i].p > 1.15) engParticles.splice(i, 1);
+        }
+
+        // Annotation fade
+        engNodeAnns.forEach(a => { if (engElapsed - a.born > 3200) a.alpha = Math.max(0, a.alpha - .018); });
+        engNodeAnns = engNodeAnns.filter(a => a.alpha > .005);
+
+        // Node smooth update
+        ENG_NODES.forEach((n, i) => {
+            if (!engNS[i].rev) engNS[i].tAl = .55;
+            const s = engNS[i];
+            s.al += (s.tAl - s.al) * .045;
+            s.sc += (s.tSc - s.sc) * .065;
+            if (s.p0 && s.p0ring < 1) s.p0ring = Math.min(1, s.p0ring + .015);
+        });
+
+        const nodeH = H - 48;
+
+        // ── Ward ellipse backgrounds (coloured) ──
+        const WARD_ELL = [
+            {l:'WARD A',       rgb:'100,150,255', cx:.17, cy:.28, rx:.18, ry:.22},
+            {l:'WARD B',       rgb:'255,150,100', cx:.79, cy:.28, rx:.18, ry:.22},
+            {l:'WARD C (ICU)', rgb:'150,255,100', cx:.53, cy:.76, rx:.22, ry:.17},
         ];
-        WARDS.forEach(w => {
-            const wx=w.x1*W, wy=w.y1*H, ww=(w.x2-w.x1)*W, wh=(w.y2-w.y1)*H;
+        WARD_ELL.forEach(w => {
+            const cx=w.cx*W, cy=w.cy*nodeH, rx=w.rx*W, ry=w.ry*nodeH;
             ctx.save();
-            ctx.globalAlpha = wA * 0.05; ctx.fillStyle = `rgb(${w.rgb})`;
-            ctx.beginPath(); engRR(ctx, wx, wy, ww, wh, 8); ctx.fill();
-            ctx.globalAlpha = wA * 0.18;
-            ctx.strokeStyle = `rgba(${w.rgb},0.6)`; ctx.lineWidth = 0.8;
-            ctx.beginPath(); engRR(ctx, wx, wy, ww, wh, 8); ctx.stroke();
-            ctx.globalAlpha = wA * 0.52;
-            ctx.font = `400 7px ${MONO}`; ctx.fillStyle = `rgb(${w.rgb})`;
-            ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-            ctx.fillText(w.label, wx + 6, wy + 5);
+            ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2);
+            ctx.fillStyle = `rgba(${w.rgb},0.07)`; ctx.fill();
+            ctx.strokeStyle = `rgba(${w.rgb},0.35)`; ctx.lineWidth = 1;
+            ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+            ctx.fillStyle = `rgba(${w.rgb},0.65)`;
+            ctx.font = `400 7px ${MONO}`; ctx.textAlign = 'center';
+            ctx.fillText(w.l, cx, cy - ry + 11);
             ctx.restore();
         });
 
-        // ── Compute node states from cf each frame (deterministic) ──
-        ENG_N.forEach((n, idx) => {
-            let st = E_GREY;
-            ENG_SC.forEach(sc => { if (sc.i === idx && cf >= sc.f) st = Math.max(st, sc.s); });
-            n.state = st;
-        });
+        // ── Edges ──
+        engEdges.forEach(e => drawEngEdge(ctx, ENG_NODES[e.from], ENG_NODES[e.to], e.prog, e.inf));
 
-        // ── Draw edges ──
-        ENG_ED.forEach(e => {
-            if (cf < e.af) return;
-            const p = Math.min(1, (cf - e.af) / e.dur);
-            if (p <= 0) return;
-            const a = ENG_N[e.from], b = ENG_N[e.to];
-            let col, dash = false;
-            if      (e.type === 'red')    col = '#ff073a';
-            else if (e.type === 'purple') col = '#9b59b6';
-            else if (e.type === 'super')  col = '#f97316';
-            else                        { col = 'rgba(210,210,225,0.65)'; dash = true; }
-            const cv = engCtrl(a.x, a.y, b.x, b.y);
-            ctx.save();
-            ctx.strokeStyle = col; ctx.lineWidth = dash ? 1.2 : 1.5;
-            ctx.globalAlpha = dash ? 0.38 : 0.70;
-            if (dash) ctx.setLineDash([4, 5]);
-            ctx.beginPath(); ctx.moveTo(a.x, a.y);
-            for (let s = 1; s <= 18; s++) {
-                const t = (s / 18) * p;
-                const pt = engBez(a.x, a.y, cv.x, cv.y, b.x, b.y, t);
-                ctx.lineTo(pt.x, pt.y);
-            }
-            ctx.stroke(); ctx.setLineDash([]);
-            // Leading glow at drawing tip
-            if (p < 0.97 && p > 0.05) {
-                const lp = engBez(a.x, a.y, cv.x, cv.y, b.x, b.y, p);
-                const gc = e.type==='red'    ? 'rgba(255,7,58,0.8)'
-                         : e.type==='purple' ? 'rgba(155,89,182,0.8)'
-                         : e.type==='super'  ? 'rgba(249,115,22,0.8)'
-                         : 'rgba(200,210,230,0.55)';
-                const grd = ctx.createRadialGradient(lp.x, lp.y, 0, lp.x, lp.y, 6);
-                grd.addColorStop(0, gc); grd.addColorStop(1, 'transparent');
-                ctx.globalAlpha = 0.55; ctx.fillStyle = grd;
-                ctx.beginPath(); ctx.arc(lp.x, lp.y, 6, 0, Math.PI*2); ctx.fill();
-            }
-            // Arrowhead (fades in as edge nears completion)
-            if (p >= 0.80) {
-                const arA = Math.min(1, (p-0.80)/0.20) * (dash ? 0.52 : 0.85);
-                const tp  = engBez(a.x, a.y, cv.x, cv.y, b.x, b.y, 1.0);
-                const np  = engBez(a.x, a.y, cv.x, cv.y, b.x, b.y, 0.98);
-                const ang = Math.atan2(tp.y-np.y, tp.x-np.x);
-                const tx  = tp.x - Math.cos(ang)*(b.r+2);
-                const ty  = tp.y - Math.sin(ang)*(b.r+2);
-                const hL=7, hA=Math.PI/5.5;
-                ctx.globalAlpha = arA; ctx.fillStyle = col;
-                ctx.beginPath();
-                ctx.moveTo(tx, ty);
-                ctx.lineTo(tx-hL*Math.cos(ang-hA), ty-hL*Math.sin(ang-hA));
-                ctx.lineTo(tx-hL*Math.cos(ang+hA), ty-hL*Math.sin(ang+hA));
-                ctx.closePath(); ctx.fill();
+        // Forecast edges
+        engForecastEdges.forEach(e => {
+            const f=engNPos(ENG_NODES[e.from]), t=engNPos(ENG_NODES[e.to]);
+            const prog=e.prog, mx=f.x+(t.x-f.x)*prog, my=f.y+(t.y-f.y)*prog;
+            const pulse=.3+Math.sin(engFrame2*.05)*.15;
+            ctx.save(); ctx.globalAlpha=Math.min(pulse,prog*2);
+            ctx.beginPath(); ctx.moveTo(f.x,f.y); ctx.lineTo(mx,my);
+            ctx.setLineDash([6,4]); ctx.strokeStyle='rgba(255,7,58,.45)'; ctx.lineWidth=1.8; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(f.x,f.y); ctx.lineTo(mx,my);
+            ctx.strokeStyle='rgba(255,7,58,.12)'; ctx.lineWidth=5; ctx.stroke(); ctx.setLineDash([]);
+            if (prog > .9) {
+                const a=Math.atan2(t.y-f.y,t.x-f.x), rr=12, sz=5;
+                const ax=t.x-Math.cos(a)*rr, ay=t.y-Math.sin(a)*rr;
+                ctx.globalAlpha=Math.min(pulse,(prog-.9)/.1);
+                ctx.beginPath(); ctx.moveTo(ax,ay);
+                ctx.lineTo(ax-sz*Math.cos(a-.4),ay-sz*Math.sin(a-.4));
+                ctx.lineTo(ax-sz*Math.cos(a+.4),ay-sz*Math.sin(a+.4));
+                ctx.closePath(); ctx.fillStyle='rgba(255,7,58,.5)'; ctx.fill();
             }
             ctx.restore();
         });
 
-        // ── Draw nodes ──
-        const NA = 0.10;
-        ENG_N.forEach((n, i) => {
-            const appP = Math.max(0, Math.min(1, (cf - (i/ENG_N.length)*NA*0.88) / 0.038));
-            if (appP <= 0) return;
-            const r = n.r * (0.4 + 0.6*appP);
-            const col = E_COL[n.state];
-            // Glow halo for non-grey nodes
-            if (n.state !== E_GREY) {
-                const pulse = 0.5 + 0.5*Math.sin(engineTimer*0.07 + i*0.85);
-                const gR = r*(2.5 + pulse*0.65);
-                const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, gR);
-                grd.addColorStop(0, E_GLOW[n.state]); grd.addColorStop(1, 'transparent');
+        // ── Particles ──
+        engParticles.forEach(p => {
+            if (p.p < 0) return;
+            const t=Math.min(1,p.p), x=p.x+(p.tx-p.x)*t+Math.sin(t*Math.PI)*p.dr;
+            const y=p.y+(p.ty-p.y)*t-Math.sin(t*Math.PI)*5;
+            const fi=Math.min(1,t*5), fo=t>.75?1-(t-.75)/.25:1;
+            ctx.save(); ctx.globalAlpha=p.al*fi*fo;
+            ctx.beginPath(); ctx.arc(x,y,p.sz,0,Math.PI*2); ctx.fillStyle=p.c; ctx.fill();
+            ctx.restore();
+        });
+
+        // ── Nodes ──
+        ENG_NODES.forEach((n, i) => {
+            const s=engNS[i], p=engNPos(n), r=engNR(n);
+            if (s.al < .01) return;
+            ctx.save(); ctx.globalAlpha=s.al;
+            // Glow
+            if (s.glow !== 'transparent') {
+                const g=ctx.createRadialGradient(p.x,p.y,r*.3,p.x,p.y,r*2.8);
+                g.addColorStop(0,s.glow); g.addColorStop(1,'transparent');
+                ctx.fillStyle=g; ctx.fillRect(p.x-r*3,p.y-r*3,r*6,r*6);
+            }
+            // Patient Zero ring
+            if (s.p0 && s.p0ring > 0) {
+                const ra=.15+Math.sin(engFrame2*.033)*.08;
+                ctx.beginPath(); ctx.arc(p.x,p.y,(r+8)*s.sc,0,Math.PI*2);
+                ctx.strokeStyle=`rgba(255,255,255,${ra})`; ctx.lineWidth=2; ctx.stroke();
+                const gr=ctx.createRadialGradient(p.x,p.y,r,p.x,p.y,r*3);
+                gr.addColorStop(0,'rgba(255,255,255,.08)'); gr.addColorStop(1,'transparent');
+                ctx.fillStyle=gr; ctx.fillRect(p.x-r*3,p.y-r*3,r*6,r*6);
+                ctx.globalAlpha=s.al*(.3+Math.sin(engFrame2*.033)*.1);
+                ctx.strokeStyle='rgba(255,255,255,.3)'; ctx.lineWidth=1;
+                ctx.beginPath(); ctx.moveTo(p.x-r*1.6,p.y); ctx.lineTo(p.x+r*1.6,p.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(p.x,p.y-r*1.6); ctx.lineTo(p.x,p.y+r*1.6); ctx.stroke();
+                ctx.globalAlpha=s.al;
+            }
+            // Forecast pulse
+            if (s.pulse) {
+                const pr=r+4+Math.sin(engFrame2*.05)*3;
+                ctx.beginPath(); ctx.arc(p.x,p.y,pr,0,Math.PI*2);
+                ctx.strokeStyle=`rgba(255,7,58,${.15+Math.sin(engFrame2*.042)*.1})`;
+                ctx.lineWidth=1.8; ctx.setLineDash([3,3]); ctx.stroke(); ctx.setLineDash([]);
+                const fg=ctx.createRadialGradient(p.x,p.y,r,p.x,p.y,r*2.5);
+                fg.addColorStop(0,'rgba(255,7,58,.06)'); fg.addColorStop(1,'transparent');
+                ctx.fillStyle=fg; ctx.fillRect(p.x-r*3,p.y-r*3,r*6,r*6);
+            }
+            // Blue ring (imported)
+            if (s.blue) {
+                ctx.beginPath(); ctx.arc(p.x,p.y,r*s.sc+4,0,Math.PI*2);
+                ctx.strokeStyle=ECL.blue; ctx.lineWidth=2.5; ctx.stroke();
+            }
+            // Superspreader ring
+            if (s.sup) {
+                const pr=1+Math.sin(engFrame2*.05)*.1;
+                ctx.beginPath(); ctx.arc(p.x,p.y,(r+6)*pr*s.sc,0,Math.PI*2);
+                ctx.strokeStyle=`rgba(245,158,11,${.25+Math.sin(engFrame2*.042)*.12})`; ctx.lineWidth=2; ctx.stroke();
+            }
+            // Purple dashed ring
+            if (s.col === ECL.purple) {
+                ctx.beginPath(); ctx.arc(p.x,p.y,r*s.sc+4,0,Math.PI*2);
+                ctx.setLineDash([3,3]); ctx.strokeStyle='rgba(139,92,246,.4)'; ctx.lineWidth=1.2; ctx.stroke(); ctx.setLineDash([]);
+            }
+            // Shape
+            const sr=r*s.sc;
+            if (n.sh === 'q') {
+                ctx.beginPath(); ctx.arc(p.x,p.y,sr,0,Math.PI*2);
+                ctx.fillStyle=s.col!==ECL.grey?s.col:ECL.grey; ctx.fill();
+                ctx.fillStyle='#fff'; ctx.font=`bold ${sr*1.3}px "Source Sans Pro",sans-serif`;
+                ctx.textAlign='center'; ctx.textBaseline='middle';
+                ctx.fillText('?',p.x,p.y+1); ctx.textBaseline='alphabetic';
+            } else if (n.sh === 'd') {
+                ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(Math.PI/4);
+                ctx.beginPath(); ctx.rect(-sr*.7,-sr*.7,sr*1.4,sr*1.4);
+                ctx.fillStyle=s.col; ctx.fill(); ctx.restore();
+            } else {
+                ctx.beginPath(); ctx.arc(p.x,p.y,sr,0,Math.PI*2); ctx.fillStyle=s.col; ctx.fill();
+            }
+            // Specular shine
+            if (s.col !== ECL.grey && n.sh !== 'q') {
+                const ig=ctx.createRadialGradient(p.x-sr*.2,p.y-sr*.2,0,p.x,p.y,sr);
+                ig.addColorStop(0,'rgba(255,255,255,.15)'); ig.addColorStop(1,'transparent');
+                if (n.sh==='d') {
+                    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(Math.PI/4);
+                    ctx.beginPath(); ctx.rect(-sr*.7,-sr*.7,sr*1.4,sr*1.4); ctx.fillStyle=ig; ctx.fill(); ctx.restore();
+                } else {
+                    ctx.beginPath(); ctx.arc(p.x,p.y,sr,0,Math.PI*2); ctx.fillStyle=ig; ctx.fill();
+                }
+            }
+            // Label
+            ctx.font=`400 6px ${MONO}`; ctx.fillStyle='rgba(255,255,255,.4)'; ctx.textAlign='center';
+            if (n.sh !== 'q') ctx.fillText(n.l, p.x, p.y+sr+9);
+            ctx.restore();
+        });
+
+        // ── Node annotations ──
+        engNodeAnns.forEach(a => {
+            const n=ENG_NODES[a.id], p=engNPos(n), r=engNR(n), s=engNS[a.id];
+            ctx.save(); ctx.globalAlpha=a.alpha;
+            ctx.font=`500 7px ${MONO}`;
+            const tw=ctx.measureText(a.text).width;
+            const bx=p.x-tw/2-5, by=p.y-r*s.sc-20, bw=tw+10, bh=13;
+            ctx.fillStyle='rgba(13,15,18,.92)';
+            ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(bx,by,bw,bh,2); else ctx.rect(bx,by,bw,bh); ctx.fill();
+            ctx.strokeStyle=a.col; ctx.lineWidth=0.8; ctx.stroke();
+            ctx.fillStyle=a.col; ctx.textAlign='center'; ctx.textBaseline='middle';
+            ctx.fillText(a.text, p.x, by+bh/2);
+            ctx.restore();
+        });
+
+        // ── OUTBREAK DECLARED full-canvas overlay ──
+        let overlayActive = false;
+        if (engOutbreakAnim) {
+            const oa = engOutbreakAnim;
+            const age = engElapsed - oa.startT;
+            if (age < oa.overlayDur) {
+                overlayActive = true;
+                const progress = age / oa.overlayDur;
                 ctx.save();
-                ctx.globalAlpha = appP*(0.42 + pulse*0.32); ctx.fillStyle = grd;
-                ctx.beginPath(); ctx.arc(n.x, n.y, gR, 0, Math.PI*2); ctx.fill();
+                // Dark vignette (fade in, hold, fade out)
+                const vAlpha = progress < 0.1 ? (progress/0.1)*0.65 : progress < 0.72 ? 0.65 : 0.65*(1-(progress-0.72)/0.28);
+                const vg = ctx.createRadialGradient(W/2, nodeH/2, 0, W/2, nodeH/2, Math.max(W,nodeH)*0.75);
+                vg.addColorStop(0, `rgba(0,0,0,${vAlpha*0.35})`);
+                vg.addColorStop(1, `rgba(0,0,0,${vAlpha})`);
+                ctx.fillStyle = vg; ctx.fillRect(0, 0, W, nodeH);
+                // Shockwave rings
+                for (let ri = 0; ri < 3; ri++) {
+                    const rp = (progress * 1.1 + ri * 0.18) % 1;
+                    const rr = rp * Math.max(W, nodeH) * 0.65;
+                    ctx.globalAlpha = (1 - rp) * 0.16;
+                    ctx.strokeStyle = '#ff073a'; ctx.lineWidth = 1.8;
+                    ctx.beginPath(); ctx.arc(W/2, nodeH*0.42, rr, 0, Math.PI*2); ctx.stroke();
+                }
+                // Biohazard: expand then fade
+                const bioIn = progress < 0.22 ? progress/0.22 : 1;
+                const bioFade = progress < 0.45 ? 1 : progress < 0.88 ? 1-(progress-0.45)/0.43 : 0;
+                if (bioFade > 0.01) drawBiohazardSymbol(ctx, W/2, nodeH*0.38, bioIn*W*0.17, bioFade*0.78);
+                // Large centered text
+                const tFade = progress < 0.1 ? progress/0.1 : progress < 0.7 ? 1 : 1-(progress-0.7)/0.3;
+                if (tFade > 0.01) {
+                    const fsBig = Math.round(Math.max(14, W * 0.058));
+                    const fsSub = Math.round(Math.max(9,  W * 0.034));
+                    ctx.globalAlpha = tFade;
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillStyle = '#ff073a';
+                    ctx.font = `800 ${fsBig}px "Source Sans Pro",sans-serif`;
+                    ctx.fillText('OUTBREAK DECLARED', W/2, nodeH*0.66);
+                    ctx.fillStyle = 'rgba(255,255,255,0.88)';
+                    ctx.font = `600 ${fsSub}px "Source Sans Pro",sans-serif`;
+                    ctx.fillText('NOSOTRACK DEPLOYED', W/2, nodeH*0.66 + fsBig*1.45);
+                }
                 ctx.restore();
             }
-            ctx.save(); ctx.globalAlpha = appP;
-            if (n.type === 'staff') {
-                // Diamond
-                ctx.fillStyle = col;
-                ctx.beginPath();
-                ctx.moveTo(n.x,         n.y - r*1.3);
-                ctx.lineTo(n.x + r*1.3, n.y);
-                ctx.lineTo(n.x,         n.y + r*1.3);
-                ctx.lineTo(n.x - r*1.3, n.y);
-                ctx.closePath(); ctx.fill();
-                ctx.strokeStyle = n.state===E_GREY ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.28)';
-                ctx.lineWidth = 0.8; ctx.stroke();
-            } else {
-                // Circle
-                ctx.fillStyle = col;
-                ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = n.state===E_GREY ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.22)';
-                ctx.lineWidth = 0.8; ctx.stroke();
-            }
-            // Specular highlight on coloured nodes
-            if (n.state !== E_GREY) {
-                ctx.fillStyle = 'rgba(255,255,255,0.17)';
-                ctx.beginPath(); ctx.arc(n.x - r*0.28, n.y - r*0.38, r*0.30, 0, Math.PI*2); ctx.fill();
-            }
-            ctx.font = `400 6.5px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillStyle = n.state===E_GREY ? 'rgba(255,255,255,0.52)' : '#ffffff';
-            ctx.fillText(n.label, n.x, n.y);
-            ctx.restore();
-        });
-
-        // ── Pre-pulse: brief red glows on grey nodes before edges appear ──
-        if (cf < 0.17) {
-            ENG_PREPULSE.forEach(pp => {
-                const g = Math.max(0, 1 - Math.abs(cf - pp.cf) / pp.hw);
-                if (g <= 0) return;
-                pp.nodes.forEach(ni => {
-                    const n = ENG_N[ni];
-                    const r = n.r;
-                    // Radial glow halo
-                    const gR = r * (3.2 + g * 1.2);
-                    const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, gR);
-                    grd.addColorStop(0,   `rgba(255,7,58,${(g * pp.mx * 0.65).toFixed(3)})`);
-                    grd.addColorStop(0.4, `rgba(255,7,58,${(g * pp.mx * 0.20).toFixed(3)})`);
-                    grd.addColorStop(1,   'transparent');
-                    ctx.save(); ctx.globalAlpha = 1; ctx.fillStyle = grd;
-                    ctx.beginPath(); ctx.arc(n.x, n.y, gR, 0, Math.PI*2); ctx.fill();
-                    // Subtle red tint on node body
-                    ctx.globalAlpha = g * pp.mx * 0.42;
-                    ctx.fillStyle = '#ff073a';
-                    if (n.type === 'staff') {
-                        ctx.beginPath();
-                        ctx.moveTo(n.x, n.y-r*1.3); ctx.lineTo(n.x+r*1.3, n.y);
-                        ctx.lineTo(n.x, n.y+r*1.3); ctx.lineTo(n.x-r*1.3, n.y);
-                        ctx.closePath(); ctx.fill();
-                    } else {
-                        ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2); ctx.fill();
-                    }
-                    ctx.restore();
-                });
-            });
         }
 
-        // ── Annotation pills ──
-        ENG_ANNOTS.forEach(an => {
-            if (cf < an.showF || cf > an.hideF) return;
-            const fd = 0.022;
-            const alpha = Math.min(Math.min(1,(cf-an.showF)/fd), Math.min(1,(an.hideF-cf)/fd));
-            if (alpha <= 0) return;
-            const n = ENG_N[an.i];
+        // ── Banner overlay (with alert envelope icon) — hidden during OUTBREAK overlay ──
+        if (engBannOn && !overlayActive) {
+            const bw=Math.min(W-20,280), bh=42, bx=(W-bw)/2, by=8;
             ctx.save();
-            ctx.font = `400 8px ${MONO}`;
-            const tw = ctx.measureText(an.text).width;
-            const pw=tw+14, ph=14, px=n.x-pw/2, py=n.y-ph-12;
-            ctx.globalAlpha = alpha*0.93; ctx.fillStyle = 'rgba(14,16,22,0.95)';
-            ctx.beginPath(); engRR(ctx, px, py, pw, ph, 4); ctx.fill();
-            ctx.strokeStyle = 'rgba(255,255,255,0.13)'; ctx.lineWidth = 0.6; ctx.stroke();
-            ctx.fillStyle = '#ffffff'; ctx.globalAlpha = alpha;
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText(an.text, n.x, py+ph/2);
+            ctx.fillStyle='rgba(13,15,20,0.92)';
+            ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(bx,by,bw,bh,6); else ctx.rect(bx,by,bw,bh); ctx.fill();
+            ctx.strokeStyle=engBannCol; ctx.lineWidth=1;
+            ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(bx,by,bw,bh,6); else ctx.rect(bx,by,bw,bh); ctx.stroke();
+            // Alert envelope icon
+            let textShift = 0;
+            if (engBannAlert) {
+                const ix=bx+14, iy=by+bh/2;
+                ctx.strokeStyle=engBannCol; ctx.lineWidth=0.9; ctx.globalAlpha=0.9;
+                ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(ix-7,iy-5,14,10,1); else ctx.rect(ix-7,iy-5,14,10); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(ix-7,iy-5); ctx.lineTo(ix,iy+1); ctx.lineTo(ix+7,iy-5); ctx.stroke();
+                textShift = 7;
+            }
+            const textX = bx + bw/2 + textShift;
+            ctx.globalAlpha = 0.95; ctx.fillStyle = engBannCol;
+            ctx.font = `400 6.5px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(engBannLabel, textX, by+14);
+            ctx.font = `700 10px "Source Sans Pro",sans-serif`;
+            ctx.fillText(engBannText, textX, by+29);
             ctx.restore();
-        });
-
-        // ── Bottom info strip: legend row + status row ──
-        const stripH = 52, stripY = H - stripH;
-        ctx.save();
-        ctx.fillStyle = 'rgba(13,15,21,0.90)';
-        ctx.fillRect(0, stripY, W, stripH);
-        ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 0.6;
-        ctx.beginPath(); ctx.moveTo(0, stripY); ctx.lineTo(W, stripY); ctx.stroke();
-
-        // Legend row
-        const LY = stripY + 17;
-        const legAlpha = Math.min(1, cf / 0.09) * 0.82;
-        if (legAlpha > 0) {
-            const LEG = [
-                {type:'circle',  col:E_COL[E_GREY],            label:'Susceptible'},
-                {type:'circle',  col:E_COL[E_RED],             label:'Confirmed'},
-                {type:'circle',  col:E_COL[E_PURPLE],          label:'Undetected'},
-                {type:'diamond', col:E_COL[E_ORANGE],          label:'Superspreader'},
-                {type:'dash',    col:'rgba(210,210,225,0.65)',  label:'Forecast'},
-            ];
-            const iR=3.5, iGap=5, spacer=11;
-            ctx.font = `400 6.5px ${MONO}`;
-            let tw = 0;
-            LEG.forEach(it => { tw += iR*2 + iGap + ctx.measureText(it.label).width + spacer; });
-            tw -= spacer;
-            let lx = Math.max(6, (W - tw) / 2);
-            ctx.globalAlpha = legAlpha;
-            LEG.forEach(it => {
-                const ix = lx + iR;
-                if (it.type === 'circle') {
-                    ctx.fillStyle = it.col;
-                    ctx.beginPath(); ctx.arc(ix, LY, iR, 0, Math.PI*2); ctx.fill();
-                } else if (it.type === 'diamond') {
-                    ctx.fillStyle = it.col;
-                    ctx.beginPath();
-                    ctx.moveTo(ix, LY-iR*1.3); ctx.lineTo(ix+iR*1.3, LY);
-                    ctx.lineTo(ix, LY+iR*1.3); ctx.lineTo(ix-iR*1.3, LY);
-                    ctx.closePath(); ctx.fill();
-                } else {
-                    // Dashed line + arrowhead
-                    ctx.strokeStyle = it.col; ctx.lineWidth = 1.1; ctx.setLineDash([3,3]);
-                    ctx.beginPath(); ctx.moveTo(lx, LY); ctx.lineTo(lx+iR*2-1, LY); ctx.stroke();
-                    ctx.setLineDash([]);
-                    ctx.fillStyle = it.col;
-                    ctx.beginPath();
-                    ctx.moveTo(lx+iR*2+2, LY); ctx.lineTo(lx+iR*2-2, LY-2.5); ctx.lineTo(lx+iR*2-2, LY+2.5);
-                    ctx.closePath(); ctx.fill();
-                }
-                lx += iR*2 + iGap;
-                ctx.fillStyle = 'rgba(210,215,225,0.75)';
-                ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-                ctx.fillText(it.label, lx, LY);
-                lx += ctx.measureText(it.label).width + spacer;
-            });
         }
 
-        // Status row
-        const divY = stripY + 31;
-        ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 0.5;
-        ctx.beginPath(); ctx.moveTo(8, divY); ctx.lineTo(W-8, divY); ctx.stroke();
-        let stTxt='', stCol='rgba(175,175,185,0.72)';
-        if      (cf < 0.16) { stTxt='INITIALISING NETWORK...'; }
-        else if (cf < 0.40) { stTxt='IDENTIFYING CLINICAL CASES...';         stCol='#ff073a'; }
-        else if (cf < 0.63) { stTxt='RECONSTRUCTING TRANSMISSION PATHS...';  stCol='#ff073a'; }
-        else if (cf < 0.74) { stTxt='DETECTING HIDDEN CASES...';             stCol='#9b59b6'; }
-        else if (cf < 0.87) { stTxt='SUPERSPREADER IDENTIFIED';              stCol='#f97316'; }
-        else if (cf < 0.95) { stTxt='FORECASTING TRANSMISSION RISK...'; }
-        else                { stTxt='\u2713 TRANSMISSION TREE COMPLETE';     stCol='rgba(100,220,130,0.88)'; }
-        ctx.font = `400 8px ${MONO}`;
-        ctx.fillStyle = stCol; ctx.globalAlpha = 0.88 + Math.sin(engineTimer*0.10)*0.06;
-        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-        ctx.fillText(stTxt, 14, stripY + 42);
+        // ── Virus logo: animated slide from center → bottom-left, then stays ──
+        if (engLogoActive) {
+            const destX = 22, destY = nodeH - 20;
+            let logoX = destX, logoY = destY, logoAlpha = 0.88;
+            if (engOutbreakAnim) {
+                const oa = engOutbreakAnim;
+                const age = engElapsed - oa.startT;
+                const slideAge = age - oa.slideStartT;
+                if (slideAge < 0) {
+                    // Logo appearing at center, not yet sliding
+                    const showP = Math.max(0, Math.min(1, age / oa.slideStartT));
+                    logoX = W/2; logoY = nodeH * 0.58;
+                    logoAlpha = showP * 0.9;
+                } else if (slideAge < oa.slideDur) {
+                    // Sliding from center to bottom-left (ease-out cubic)
+                    const t = slideAge / oa.slideDur;
+                    const ease = 1 - Math.pow(1 - t, 3);
+                    logoX = W/2   + (destX - W/2)          * ease;
+                    logoY = nodeH*0.58 + (destY - nodeH*0.58) * ease;
+                    logoAlpha = 0.9;
+                }
+            }
+            ctx.save(); ctx.globalAlpha = logoAlpha;
+            window.drawVirusLogo(ctx, engFrame2, logoX, logoY);
+            ctx.fillStyle = '#ffffff'; ctx.globalAlpha = logoAlpha * 0.62;
+            ctx.font = `600 10px "Source Sans Pro",sans-serif`;
+            ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            ctx.fillText('Noso', logoX + 17, logoY);
+            ctx.fillStyle = ACCENT; ctx.globalAlpha = logoAlpha * 0.74;
+            ctx.fillText('Track', logoX + 17 + ctx.measureText('Noso').width, logoY);
+            ctx.restore();
+        }
+
+        // ── Legend strip ──
+        const stripH=48, stripY=H-stripH;
+        ctx.save();
+        ctx.fillStyle='rgba(13,15,21,0.92)';
+        ctx.fillRect(0,stripY,W,stripH);
+        ctx.strokeStyle='rgba(255,255,255,0.07)'; ctx.lineWidth=0.6;
+        ctx.beginPath(); ctx.moveTo(0,stripY); ctx.lineTo(W,stripY); ctx.stroke();
+
+        // Row 1: node type legend
+        const LY1=stripY+13, iR=3.5, iGap=4, sp=9;
+        const LEG=[
+            {type:'c', col:ECL.grey,                    lbl:'Susceptible'},
+            {type:'c', col:ECL.red,                     lbl:'Confirmed'},
+            {type:'c', col:ECL.purple,                  lbl:'Undetected'},
+            {type:'d', col:ECL.orange,                  lbl:'Superspreader'},
+            {type:'r', col:ECL.blue,                    lbl:'Imported'},
+            {type:'-', col:'rgba(255,7,58,0.65)',        lbl:'Forecast'},
+        ];
+        ctx.font=`400 6px ${MONO}`; ctx.globalAlpha=0.82;
+        let tw2=0;
+        LEG.forEach(it => { tw2 += iR*2+iGap+ctx.measureText(it.lbl).width+sp; }); tw2-=sp;
+        let lx2=Math.max(6,(W-tw2)/2);
+        LEG.forEach(it => {
+            const ix=lx2+iR;
+            if (it.type==='c') {
+                ctx.fillStyle=it.col; ctx.beginPath(); ctx.arc(ix,LY1,iR,0,Math.PI*2); ctx.fill();
+            } else if (it.type==='d') {
+                ctx.fillStyle=it.col; ctx.beginPath();
+                ctx.moveTo(ix,LY1-iR*1.3); ctx.lineTo(ix+iR*1.3,LY1); ctx.lineTo(ix,LY1+iR*1.3); ctx.lineTo(ix-iR*1.3,LY1);
+                ctx.closePath(); ctx.fill();
+            } else if (it.type==='r') {
+                ctx.beginPath(); ctx.arc(ix,LY1,iR,0,Math.PI*2); ctx.strokeStyle=it.col; ctx.lineWidth=1.2; ctx.stroke();
+            } else {
+                ctx.strokeStyle=it.col; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+                ctx.beginPath(); ctx.moveTo(lx2,LY1); ctx.lineTo(lx2+iR*2-1,LY1); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle=it.col; ctx.beginPath();
+                ctx.moveTo(lx2+iR*2+2,LY1); ctx.lineTo(lx2+iR*2-2,LY1-2.5); ctx.lineTo(lx2+iR*2-2,LY1+2.5);
+                ctx.closePath(); ctx.fill();
+            }
+            lx2+=iR*2+iGap;
+            ctx.fillStyle='rgba(210,215,225,0.75)'; ctx.textAlign='left'; ctx.textBaseline='middle';
+            ctx.fillText(it.lbl, lx2, LY1);
+            lx2+=ctx.measureText(it.lbl).width+sp;
+        });
+
+        // Row 2: ward colour bands
+        const LY2=stripY+31;
+        const wardBands=[
+            {lbl:'Ward A',       rgb:'100,150,255'},
+            {lbl:'Ward B',       rgb:'255,150,100'},
+            {lbl:'Ward C (ICU)', rgb:'150,255,100'},
+        ];
+        ctx.font=`400 6px ${MONO}`; ctx.globalAlpha=0.72;
+        let tw3=0;
+        wardBands.forEach(w => { tw3+=16+ctx.measureText(w.lbl).width+sp; }); tw3-=sp;
+        let lx3=Math.max(6,(W-tw3)/2);
+        wardBands.forEach(w => {
+            ctx.fillStyle=`rgba(${w.rgb},0.55)`;
+            ctx.fillRect(lx3,LY2-4,10,8);
+            ctx.strokeStyle=`rgba(${w.rgb},0.6)`; ctx.lineWidth=0.6; ctx.strokeRect(lx3,LY2-4,10,8);
+            lx3+=12;
+            ctx.fillStyle=`rgba(${w.rgb},0.80)`; ctx.textAlign='left'; ctx.textBaseline='middle';
+            ctx.fillText(w.lbl, lx3, LY2);
+            lx3+=ctx.measureText(w.lbl).width+sp;
+        });
         ctx.restore();
-
-        // ── Virus logo (upper-left corner of engine canvas) ──
-        const logoCx = 38, logoCy = 34;
-        window.drawVirusLogo(ctx, frame, logoCx, logoCy);
-
-        // "NosoTrack" label to the right of virus
-        ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.5;
-        ctx.font = `600 11px "Source Sans Pro", sans-serif`;
-        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-        ctx.fillText('Noso', logoCx + 27, logoCy - 1);
-        ctx.fillStyle = ACCENT; ctx.globalAlpha = 0.6;
-        ctx.fillText('Track', logoCx + 27 + ctx.measureText('Noso').width, logoCy - 1);
-        ctx.globalAlpha = 1; ctx.textBaseline = 'alphabetic';
     }
 
     // Init

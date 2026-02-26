@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NosoTrack — Outbreak Reconstruction</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#ff073a;--bg:#1b1f22;--text-primary:#fff;--text-dim:#9ca3af;--border:rgba(255,255,255,0.1);--red:#ff073a;--orange:#f59e0b;--purple:#8b5cf6;--blue:#3b82f6;--grey:#4b5563;--mono:'JetBrains Mono',monospace;--display:'Source Sans Pro',sans-serif}
+body{font-family:var(--display);background:var(--bg);color:var(--text-primary);display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
+.wrap{width:100%;max-width:1100px;padding:20px 24px}
+.hdr{margin-bottom:12px;opacity:0;animation:fi .6s .2s forwards}
+.tag{font-family:var(--mono);font-size:.6rem;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;display:block}
+.ttl{font-weight:800;font-size:clamp(1.1rem,2.8vw,1.6rem);letter-spacing:-.02em}
+.vp{position:relative;width:100%;height:520px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:rgba(0,0,0,.25);opacity:0;animation:fi .6s .4s forwards}
+canvas{display:block}
+.tbar{position:absolute;bottom:0;left:0;right:0;height:38px;background:rgba(13,15,18,.92);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;z-index:10}
+.ttrack{flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:3px;position:relative;margin:0 10px;cursor:pointer}
+.tfill{position:absolute;top:0;left:0;height:100%;background:var(--accent);border-radius:3px;width:0;pointer-events:none}
+.thandle{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid #fff;transform:translate(-50%,-50%);left:0;cursor:grab;z-index:2;box-shadow:0 0 8px rgba(255,7,58,.5)}
+.thandle:active{cursor:grabbing;transform:translate(-50%,-50%) scale(1.2)}
+.tl{font-family:var(--mono);font-size:.5rem;color:var(--text-dim);letter-spacing:1px;white-space:nowrap;user-select:none}
+.ctrls{position:absolute;top:10px;right:12px;z-index:10}
+.btn{font-family:var(--mono);font-size:.55rem;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:4px;background:rgba(255,255,255,.08);border:1px solid var(--border);color:#ececec;cursor:pointer;transition:all .25s}
+.btn:hover{background:rgba(255,7,58,.15);border-color:rgba(255,7,58,.4);color:var(--accent)}
+.tip{position:absolute;background:rgba(19,21,25,.95);border:1px solid var(--accent);border-radius:6px;padding:5px 10px;font-family:var(--mono);font-size:.6rem;color:var(--text-primary);pointer-events:none;z-index:20;display:none;white-space:nowrap}
+.bann{position:absolute;pointer-events:none;z-index:15;text-align:center;opacity:0;transition:opacity .5s}
+.bann.show{opacity:1}
+.bann .bl{font-family:var(--mono);font-size:.55rem;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:3px}
+.bann .bt{font-family:var(--display);font-weight:700;font-size:1rem;line-height:1.3}
+.leg{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;padding:8px 14px;background:rgba(19,21,25,.85);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:.55rem;letter-spacing:1px;color:#ececec;opacity:0;animation:fi .6s .6s forwards}
+.li{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.sw{width:10px;height:10px;flex-shrink:0}
+.sw.ci{border-radius:50%}.sw.di{transform:rotate(45deg);border-radius:1px}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr"><span class="tag">NosoTrack Engine</span><div class="ttl">Real-Time Outbreak Reconstruction</div></div>
+  <div class="vp" id="vp">
+    <canvas id="cv"></canvas>
+    <div class="tip" id="tip"></div>
+    <div class="bann" id="bann" style="top:7%;left:50%;transform:translateX(-50%)"><div class="bl" id="bl"></div><div class="bt" id="bt"></div></div>
+    <div class="ctrls"><button class="btn" id="rb">↺ Replay</button></div>
+    <div class="tbar">
+      <div class="tl">OUTBREAK</div>
+      <div class="ttrack" id="ttrack"><div class="tfill" id="tf"></div><div class="thandle" id="th"></div></div>
+      <div class="tl">TIME →</div>
+    </div>
+  </div>
+  <div class="leg">
+    <div class="li"><div class="sw ci" style="background:var(--grey)"></div>Susceptible</div>
+    <div class="li"><div class="sw ci" style="background:var(--red)"></div>Confirmed case</div>
+    <div class="li"><div class="sw ci" style="background:var(--purple)"></div>Undetected</div>
+    <div class="li"><div class="sw ci" style="background:var(--orange)"></div>Superspreader</div>
+    <div class="li"><div class="sw ci" style="background:var(--grey);border:2px solid var(--blue)"></div>Imported case</div>
+    <div class="li"><div class="sw di" style="background:var(--grey)"></div>Staff</div>
+  </div>
+</div>
+<script>
+(()=>{
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),
+  vp=document.getElementById('vp'),tip=document.getElementById('tip'),
+  tfEl=document.getElementById('tf'),thEl=document.getElementById('th'),
+  ttrkEl=document.getElementById('ttrack'),
+  bann=document.getElementById('bann'),blEl=document.getElementById('bl'),btEl=document.getElementById('bt');
+const dpr=window.devicePixelRatio||1;
+let W,H;
+function resize(){
+  const r=vp.getBoundingClientRect();W=r.width;H=r.height-38;
+  cv.width=W*dpr;cv.height=H*dpr;
+  cv.style.width=W+'px';cv.style.height=H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resize();window.addEventListener('resize',resize);
+
+const CL={
+  grey:'#4b5563',red:'#ff073a',orange:'#f59e0b',purple:'#8b5cf6',blue:'#3b82f6',
+  gR:'rgba(255,7,58,.22)',gO:'rgba(245,158,11,.28)',gP:'rgba(139,92,246,.22)',gB:'rgba(59,130,246,.22)',
+  eN:'rgba(255,255,255,.22)',eI:'rgba(139,92,246,.50)'
+};
+
+/* ═══ NODES ═══ */
+const NODES=[
+  // Ward A
+  {id:0,  l:'P1',  sh:'c', w:'A',  xf:.11,yf:.16, rl:'Patient'},
+  {id:1,  l:'P2',  sh:'c', w:'A',  xf:.23,yf:.13, rl:'Patient'},
+  {id:2,  l:'P3',  sh:'c', w:'A',  xf:.08,yf:.32, rl:'Patient'},   // TRUE PATIENT ZERO
+  {id:3,  l:'P4',  sh:'c', w:'A',  xf:.21,yf:.30, rl:'Patient'},   // GREY forecast
+  {id:4,  l:'P5',  sh:'c', w:'A',  xf:.15,yf:.44, rl:'Patient'},   // GREY forever
+  {id:5,  l:'N1',  sh:'d', w:'A',  xf:.30,yf:.22, rl:'Nurse'},     // hidden
+  // Ward B
+  {id:6,  l:'P6',  sh:'c', w:'B',  xf:.70,yf:.13, rl:'Patient'},
+  {id:7,  l:'P7',  sh:'c', w:'B',  xf:.84,yf:.15, rl:'Patient'},   // imported case (blue ring)
+  {id:8,  l:'P8',  sh:'c', w:'B',  xf:.74,yf:.29, rl:'Patient'},   // GREY forecast
+  {id:9,  l:'P9',  sh:'c', w:'B',  xf:.88,yf:.31, rl:'Patient'},   // GREY forever
+  {id:10, l:'P10', sh:'c', w:'B',  xf:.80,yf:.44, rl:'Patient'},   // GREY forever
+  {id:11, l:'N2',  sh:'d', w:'B',  xf:.63,yf:.25, rl:'Nurse'},     // confirmed, linked from N1
+  {id:12, l:'A1',  sh:'d', w:'B',  xf:.92,yf:.23, rl:'Aide'},      // GREY forever
+  // Ward C (ICU)
+  {id:13, l:'P11', sh:'c', w:'C',  xf:.34,yf:.70, rl:'Patient'},
+  {id:14, l:'P12', sh:'c', w:'C',  xf:.50,yf:.68, rl:'Patient'},
+  {id:15, l:'P13', sh:'c', w:'C',  xf:.66,yf:.72, rl:'Patient'},
+  {id:16, l:'P14', sh:'c', w:'C',  xf:.42,yf:.86, rl:'Patient'},   // GREY forecast
+  {id:17, l:'P15', sh:'c', w:'C',  xf:.58,yf:.86, rl:'Patient'},   // GREY forecast
+  {id:18, l:'N3',  sh:'d', w:'C',  xf:.74,yf:.84, rl:'Nurse'},     // GREY forever
+  // Cross-ward
+  {id:19, l:'Dr1', sh:'d', w:'X',  xf:.46,yf:.48, rl:'Doctor'},    // superspreader
+  // Imported source (rendered as "?" — not a real node shape)
+  {id:20, l:'?',   sh:'q', w:'E',  xf:.94,yf:.06, rl:'Unknown Source'},
+];
+
+const GREY_FOREVER=new Set([3,4,8,9,10,12,16,17,18]);
+const FORECAST_EDGES=[
+  {from:2,to:3},   // P3→P4
+  {from:11,to:8},  // N2→P8
+  {from:14,to:16}, // P12→P14
+  {from:14,to:17}, // P12→P15
+];
+
+function pos(n){return{x:n.xf*W,y:n.yf*H}}
+function nr(n){return n.sh==='d'||n.sh==='q'?9:10}
+
+/* ═══ STATE ═══ */
+let ns,edges,forecastEdges,nodeAnns,particles;
+let sIdx,bannTimer,bannOn;
+let animElapsed=0,playing=true,startTime=0,lastFrameTime=0;
+
+function initState(){
+  ns=NODES.map(()=>({col:CL.grey,glow:'transparent',sc:1,tSc:1,al:0,tAl:0,
+    blue:false,sup:false,pulse:false,rev:false,p0:false,p0ring:0}));
+  edges=[];forecastEdges=[];nodeAnns=[];particles=[];
+  sIdx=0;bannTimer=0;bannOn=false;
+  animElapsed=0;playing=true;startTime=0;lastFrameTime=0;
+}
+initState();
+
+/* ═══ SCRIPT ═══ */
+let script=[],T=0;
+function at(dt){T+=dt;return T}
+function ev(type,p){script.push({t:T,type,...p})}
+
+// ─── STEP 1: First confirmed case (P1) ───
+T=1200;
+ev('ann',{label:'INITIAL DETECTION',text:'First confirmed case in Ward A',col:CL.red,dur:2800});
+at(600);
+ev('confirm',{id:0,ann:'First Confirmed Case',acol:CL.red});
+at(3600);
+
+// ─── STEP 2: More cases trickle in (NO edges) ───
+ev('ann',{label:'CASES EMERGING',text:'New cases confirmed across wards',col:CL.red,dur:2600});
+at(800);
+ev('confirm',{id:1,ann:'Confirmed'});    // P2
+at(1200);
+ev('confirm',{id:2,ann:'Confirmed'});    // P3 (will later be identified as P0)
+at(1200);
+ev('confirm',{id:6,ann:'Confirmed'});    // P6 Ward B
+at(1200);
+ev('confirm',{id:11});                   // N2 Ward B
+at(1000);
+ev('confirm',{id:19,ann:'Confirmed'});   // Dr1
+at(3000);
+
+// ─── STEP 3: Outbreak declared → NosoTrack reconstruction ───
+ev('ann',{label:'OUTBREAK DECLARED',text:'NosoTrack engine deployed',col:CL.red,dur:3500});
+at(4200);
+
+// Patient Zero identified: P3 (id:2)
+ev('ann',{label:'SOURCE IDENTIFICATION',text:'Patient Zero identified',col:'#fff',dur:3000});
+at(600);
+ev('p0',{id:2});  // P3 gets Patient Zero effect
+at(3500);
+
+// Sequential reconstruction from P3:
+// P3→P1 (solid: from confirmed Patient Zero to confirmed)
+ev('edge',{from:2,to:0,inf:false});
+at(1200);
+
+// P3→N1 (solid: from confirmed Patient Zero)
+ev('ann',{label:'ALERT: SUSPECTED CASES',text:'N1 is a likely undetected case',col:CL.purple,dur:3000});
+at(800);
+ev('hidden',{id:5,ann:'Undetected Case Identified'});
+at(1000);
+ev('edge',{from:2,to:5,inf:false});      // P3→N1 SOLID
+at(1200);
+
+// N1→P2 (inferred: hidden to confirmed)
+ev('edge',{from:5,to:1,inf:true});
+at(800);
+
+// N1→N2 (inferred: hidden to confirmed, cross-ward)
+ev('edge',{from:5,to:11,inf:true});
+at(1000);
+
+// N1→Dr1 (inferred: hidden to confirmed)
+ev('edge',{from:5,to:19,inf:true});
+at(1200);
+
+// Dr1→P6 (solid: confirmed to confirmed)
+ev('edge',{from:19,to:6,inf:false});
+at(1500);
+
+// ─── STEP 4: ICU cases + superspreader ───
+ev('confirm',{id:13,ann:'Confirmed'});   // P11
+at(900);
+ev('confirm',{id:14,ann:'Confirmed'});   // P12
+at(900);
+ev('confirm',{id:15,ann:'Confirmed'});   // P13
+at(1200);
+
+ev('edge',{from:19,to:13,inf:false});    // Dr1→P11
+at(800);
+ev('edge',{from:19,to:14,inf:false});    // Dr1→P12
+at(800);
+ev('edge',{from:19,to:15,inf:false});    // Dr1→P13
+at(1200);
+
+ev('ann',{label:'ALERT: SUPERSPREADER',text:'Dr1 linked to 4 cases across wards',col:CL.orange,dur:3500});
+at(600);
+ev('super',{id:19});
+at(4200);
+
+// ─── STEP 5: New case P7 → imported ───
+ev('confirm',{id:7,ann:'Confirmed'});    // P7
+at(2000);
+ev('ann',{label:'ALERT: IMPORTATION EVENT',text:'P7 is an imported case',col:CL.blue,dur:3500});
+at(800);
+ev('imported_p7',{id:7});                // P7 gets blue ring
+at(1000);
+ev('show_source',{id:20});              // "?" source appears
+at(800);
+ev('edge',{from:20,to:7,inf:false});    // ?→P7
+at(4000);
+
+// ─── STEP 6: Forecast ───
+ev('ann',{label:'ALERT: RISK FORECAST',text:'P[4,8,14,15] at risk',col:'rgba(255,255,255,.75)',dur:4500});
+at(1200);
+ev('forecast',{});
+at(6000);
+
+const TOTAL_T=T+500;
+
+/* ═══ APPLY EVENT ═══ */
+function applyEvent(e,elapsed,instant){
+  switch(e.type){
+    case 'confirm':{
+      const s=ns[e.id];s.col=CL.red;s.glow=CL.gR;s.tAl=1;s.rev=true;
+      if(instant){s.al=1;s.sc=1}else{s.tSc=1.25;setTimeout(()=>{s.tSc=1},420)}
+      if(e.ann)nodeAnns.push({id:e.id,text:e.ann,col:e.acol||CL.red,alpha:instant?0:1,born:elapsed});
+      break;}
+    case 'hidden':{
+      const s=ns[e.id];s.col=CL.purple;s.glow=CL.gP;s.tAl=1;s.rev=true;
+      if(instant){s.al=1;s.sc=1}else{s.tSc=1.3;setTimeout(()=>{s.tSc=1},500)}
+      if(e.ann)nodeAnns.push({id:e.id,text:e.ann,col:CL.purple,alpha:instant?0:1,born:elapsed});
+      break;}
+    case 'imported_p7':{
+      const s=ns[e.id];s.blue=true;s.glow=CL.gB;
+      if(!instant){s.tSc=1.2;setTimeout(()=>{s.tSc=1},400)}
+      break;}
+    case 'show_source':{
+      const s=ns[e.id];s.col=CL.blue;s.tAl=1;s.rev=true;
+      if(instant){s.al=1;s.sc=1}else{s.tSc=1.2;setTimeout(()=>{s.tSc=1},400)}
+      break;}
+    case 'super':{
+      const s=ns[e.id];s.col=CL.orange;s.glow=CL.gO;s.sup=true;
+      if(instant){s.sc=1.05}else{s.tSc=1.35;setTimeout(()=>{s.tSc=1.05},520)}
+      nodeAnns.push({id:e.id,text:'Superspreader Detected',col:CL.orange,alpha:instant?0:1,born:elapsed});
+      break;}
+    case 'p0':{
+      const s=ns[e.id];s.p0=true;s.p0ring=instant?1:0;
+      if(!instant){s.tSc=1.4;setTimeout(()=>{s.tSc=1},600)}
+      nodeAnns.push({id:e.id,text:'Patient Zero Identified',col:'#fff',alpha:instant?0:1,born:elapsed});
+      break;}
+    case 'edge':{
+      edges.push({from:e.from,to:e.to,inf:e.inf,prog:instant?1:0});
+      if(!instant)spawnPart(e);
+      break;}
+    case 'forecast':{
+      FORECAST_EDGES.forEach(fe=>{
+        forecastEdges.push({from:fe.from,to:fe.to,prog:instant?1:0});
+        ns[fe.to].pulse=true;ns[fe.to].tAl=Math.max(ns[fe.to].tAl,.65);
+        if(instant)ns[fe.to].al=.65;
+      });
+      break;}
+    case 'ann':{
+      if(!instant){
+        blEl.textContent=e.label;btEl.textContent=e.text;
+        blEl.style.color=e.col;btEl.style.color=e.col;
+        bann.classList.add('show');bannOn=true;bannTimer=elapsed+(e.dur||2500);
+      }
+      break;}
+  }
+}
+
+function processEventsUpTo(targetTime){
+  ns.forEach(s=>Object.assign(s,{col:CL.grey,glow:'transparent',sc:1,tSc:1,al:0,tAl:0,
+    blue:false,sup:false,pulse:false,rev:false,p0:false,p0ring:0}));
+  edges=[];forecastEdges=[];nodeAnns=[];particles=[];
+  bannOn=false;bann.classList.remove('show');sIdx=0;
+  NODES.forEach((n,i)=>{ns[i].tAl=.4;ns[i].al=.4});
+  for(let i=0;i<script.length;i++){
+    if(script[i].t>targetTime)break;
+    applyEvent(script[i],targetTime,true);sIdx=i+1;
+  }
+  edges.forEach(e=>e.prog=1);forecastEdges.forEach(e=>e.prog=1);
+  // Active banner
+  let ab=null;
+  for(let i=0;i<script.length;i++){if(script[i].t>targetTime)break;if(script[i].type==='ann'){const end=script[i].t+script[i].dur;ab=(targetTime>=script[i].t&&targetTime<=end)?script[i]:null}}
+  if(ab){blEl.textContent=ab.label;btEl.textContent=ab.text;blEl.style.color=ab.col;btEl.style.color=ab.col;bann.classList.add('show');bannOn=true;bannTimer=ab.t+ab.dur}
+  else{bann.classList.remove('show');bannOn=false}
+}
+
+function processNext(el){
+  while(sIdx<script.length&&el>=script[sIdx].t){applyEvent(script[sIdx],el,false);sIdx++}
+  if(bannOn&&el>bannTimer){bann.classList.remove('show');bannOn=false}
+}
+
+/* ═══ PARTICLES ═══ */
+function spawnPart(e){
+  const f=pos(NODES[e.from]),t=pos(NODES[e.to]),c=e.inf?CL.purple:CL.red;
+  for(let i=0;i<4;i++)particles.push({x:f.x,y:f.y,tx:t.x,ty:t.y,p:-i*.08,sp:.011+Math.random()*.005,
+    dr:(Math.random()-.5)*7,sz:1+Math.random()*1.5,al:.35+Math.random()*.4,c});
+}
+
+/* ═══ UPDATE ═══ */
+function update(el,time){
+  tfEl.style.width=Math.min(100,(el/TOTAL_T)*100)+'%';
+  thEl.style.left=Math.min(100,(el/TOTAL_T)*100)+'%';
+  NODES.forEach((n,i)=>{if(!ns[i].rev){const t=Math.min(1,(el-200)/800);ns[i].tAl=.28+t*.12}});
+  processNext(el);
+  edges.forEach(e=>{if(e.prog<1)e.prog=Math.min(1,e.prog+.018)});
+  forecastEdges.forEach(e=>{if(e.prog<1)e.prog=Math.min(1,e.prog+.012)});
+  for(let i=particles.length-1;i>=0;i--){particles[i].p+=particles[i].sp;if(particles[i].p>1.15)particles.splice(i,1)}
+  nodeAnns.forEach(a=>{if(el-a.born>3200)a.alpha=Math.max(0,a.alpha-.008)});
+  nodeAnns=nodeAnns.filter(a=>a.alpha>.005);
+  NODES.forEach((n,i)=>{if(ns[i].p0&&ns[i].p0ring<1)ns[i].p0ring=Math.min(1,ns[i].p0ring+.015)});
+}
+
+/* ═══ DRAWING ═══ */
+function drawWards(){
+  [{l:'WARD A',cx:.17,cy:.28,rx:.18,ry:.22},{l:'WARD B',cx:.79,cy:.28,rx:.18,ry:.22},{l:'WARD C (ICU)',cx:.53,cy:.76,rx:.22,ry:.17}].forEach(z=>{
+    const cx=z.cx*W,cy=z.cy*H,rx=z.rx*W,ry=z.ry*H;
+    ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,255,255,.012)';ctx.fill();
+    ctx.font='500 9px "JetBrains Mono",monospace';ctx.fillStyle='rgba(255,255,255,.10)';
+    ctx.textAlign='center';ctx.fillText(z.l,cx,cy-ry+13);ctx.restore();
+  });
+}
+
+function drawAnimEdge(f,t,prog,inf){
+  const mx=f.x+(t.x-f.x)*prog,my=f.y+(t.y-f.y)*prog;
+  ctx.save();ctx.globalAlpha=Math.min(1,prog*4);
+  ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.lineTo(mx,my);
+  if(inf){ctx.setLineDash([5,3]);ctx.strokeStyle=CL.eI;ctx.lineWidth=1.5}
+  else{ctx.setLineDash([]);ctx.strokeStyle=CL.eN;ctx.lineWidth=1.3}
+  ctx.stroke();ctx.setLineDash([]);
+  if(prog>.92){
+    const a=Math.atan2(t.y-f.y,t.x-f.x),rr=12,sz=5;
+    const ax=t.x-Math.cos(a)*rr,ay=t.y-Math.sin(a)*rr;
+    ctx.globalAlpha=Math.min(1,(prog-.92)/.08);
+    ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax-sz*Math.cos(a-.4),ay-sz*Math.sin(a-.4));
+    ctx.lineTo(ax-sz*Math.cos(a+.4),ay-sz*Math.sin(a+.4));
+    ctx.closePath();ctx.fillStyle=inf?CL.eI:'rgba(255,255,255,.3)';ctx.fill();
+  }
+  if(prog<1){ctx.globalAlpha=.85;ctx.beginPath();ctx.arc(mx,my,2.5,0,Math.PI*2);ctx.fillStyle=inf?CL.purple:CL.red;ctx.fill()}
+  ctx.restore();
+}
+
+function drawEdges(){edges.forEach(e=>{drawAnimEdge(pos(NODES[e.from]),pos(NODES[e.to]),e.prog,e.inf)})}
+
+function drawForecastEdges(time){
+  forecastEdges.forEach(e=>{
+    const f=pos(NODES[e.from]),t=pos(NODES[e.to]);
+    const prog=e.prog,mx=f.x+(t.x-f.x)*prog,my=f.y+(t.y-f.y)*prog;
+    const pulse=.3+Math.sin(time*.003)*.15;
+    ctx.save();ctx.globalAlpha=Math.min(pulse,prog*2);
+    ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.lineTo(mx,my);
+    ctx.setLineDash([6,4]);ctx.strokeStyle='rgba(255,7,58,.45)';ctx.lineWidth=1.8;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.lineTo(mx,my);
+    ctx.strokeStyle='rgba(255,7,58,.12)';ctx.lineWidth=5;ctx.stroke();ctx.setLineDash([]);
+    if(prog>.9){
+      const a=Math.atan2(t.y-f.y,t.x-f.x),rr=14,sz=6;
+      const ax=t.x-Math.cos(a)*rr,ay=t.y-Math.sin(a)*rr;
+      ctx.globalAlpha=Math.min(pulse,(prog-.9)/.1);
+      ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax-sz*Math.cos(a-.4),ay-sz*Math.sin(a-.4));
+      ctx.lineTo(ax-sz*Math.cos(a+.4),ay-sz*Math.sin(a+.4));
+      ctx.closePath();ctx.fillStyle='rgba(255,7,58,.5)';ctx.fill();
+    }
+    ctx.restore();
+  });
+}
+
+function drawParticles(){
+  particles.forEach(p=>{
+    if(p.p<0)return;const t=Math.min(1,p.p);
+    const x=p.x+(p.tx-p.x)*t+Math.sin(t*Math.PI)*p.dr;
+    const y=p.y+(p.ty-p.y)*t-Math.sin(t*Math.PI)*5;
+    const fi=Math.min(1,t*5),fo=t>.75?1-(t-.75)/.25:1;
+    ctx.save();ctx.globalAlpha=p.al*fi*fo;ctx.beginPath();ctx.arc(x,y,p.sz,0,Math.PI*2);ctx.fillStyle=p.c;ctx.fill();ctx.restore();
+  });
+}
+
+function drawNodes(time){
+  NODES.forEach((n,i)=>{
+    const s=ns[i],p=pos(n),r=nr(n);
+    s.al+=(s.tAl-s.al)*.045;s.sc+=(s.tSc-s.sc)*.065;
+    if(s.al<.01)return;
+    ctx.save();ctx.globalAlpha=s.al;
+
+    // Glow
+    if(s.glow!=='transparent'){
+      const g=ctx.createRadialGradient(p.x,p.y,r*.3,p.x,p.y,r*2.8);
+      g.addColorStop(0,s.glow);g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;ctx.fillRect(p.x-r*3,p.y-r*3,r*6,r*6);
+    }
+
+    // Patient Zero special effect
+    if(s.p0&&s.p0ring>0){
+      const ra=.15+Math.sin(time*.002)*.08;
+      ctx.beginPath();ctx.arc(p.x,p.y,(r+8)*s.sc,0,Math.PI*2);
+      ctx.strokeStyle='rgba(255,255,255,'+ra+')';ctx.lineWidth=2;ctx.stroke();
+      const gr=ctx.createRadialGradient(p.x,p.y,r,p.x,p.y,r*3);
+      gr.addColorStop(0,'rgba(255,255,255,.08)');gr.addColorStop(1,'transparent');
+      ctx.fillStyle=gr;ctx.fillRect(p.x-r*3,p.y-r*3,r*6,r*6);
+      ctx.globalAlpha=s.al*(.3+Math.sin(time*.002)*.1);
+      ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(p.x-r*1.6,p.y);ctx.lineTo(p.x+r*1.6,p.y);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(p.x,p.y-r*1.6);ctx.lineTo(p.x,p.y+r*1.6);ctx.stroke();
+      ctx.globalAlpha=s.al;
+    }
+
+    // Forecast pulse
+    if(s.pulse){
+      const pr=r+4+Math.sin(time*.003)*3;
+      ctx.beginPath();ctx.arc(p.x,p.y,pr,0,Math.PI*2);
+      ctx.strokeStyle='rgba(255,7,58,'+(0.15+Math.sin(time*.0025)*.1)+')';
+      ctx.lineWidth=1.8;ctx.setLineDash([3,3]);ctx.stroke();ctx.setLineDash([]);
+      const fg=ctx.createRadialGradient(p.x,p.y,r,p.x,p.y,r*2.5);
+      fg.addColorStop(0,'rgba(255,7,58,.06)');fg.addColorStop(1,'transparent');
+      ctx.fillStyle=fg;ctx.fillRect(p.x-r*3,p.y-r*3,r*6,r*6);
+    }
+
+    // Blue ring (imported)
+    if(s.blue){ctx.beginPath();ctx.arc(p.x,p.y,r*s.sc+4,0,Math.PI*2);ctx.strokeStyle=CL.blue;ctx.lineWidth=2.5;ctx.stroke()}
+
+    // Superspreader ring
+    if(s.sup){
+      const pr=1+Math.sin(time*.003)*.1;
+      ctx.beginPath();ctx.arc(p.x,p.y,(r+6)*pr*s.sc,0,Math.PI*2);
+      ctx.strokeStyle='rgba(245,158,11,'+(0.25+Math.sin(time*.0025)*.12)+')';ctx.lineWidth=2;ctx.stroke();
+    }
+
+    // Hidden dashed ring
+    if(s.col===CL.purple){
+      ctx.beginPath();ctx.arc(p.x,p.y,r*s.sc+4,0,Math.PI*2);
+      ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(139,92,246,.4)';ctx.lineWidth=1.2;ctx.stroke();ctx.setLineDash([]);
+    }
+
+    // Shape
+    const sr=r*s.sc;
+    if(n.sh==='q'){
+      // "?" symbol — circle with question mark
+      ctx.beginPath();ctx.arc(p.x,p.y,sr,0,Math.PI*2);
+      ctx.fillStyle=s.col!==CL.grey?s.col:CL.grey;ctx.fill();
+      // Draw "?" text
+      ctx.fillStyle='#fff';ctx.font='bold '+(sr*1.3)+'px "Source Sans Pro",sans-serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('?',p.x,p.y+1);
+      ctx.textBaseline='alphabetic';
+    }else if(n.sh==='d'){
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(Math.PI/4);
+      ctx.beginPath();ctx.rect(-sr*.7,-sr*.7,sr*1.4,sr*1.4);
+      ctx.fillStyle=s.col;ctx.fill();ctx.restore();
+    }else{
+      ctx.beginPath();ctx.arc(p.x,p.y,sr,0,Math.PI*2);ctx.fillStyle=s.col;ctx.fill();
+    }
+
+    // Inner shine
+    if(s.col!==CL.grey&&n.sh!=='q'){
+      const ig=ctx.createRadialGradient(p.x-sr*.2,p.y-sr*.2,0,p.x,p.y,sr);
+      ig.addColorStop(0,'rgba(255,255,255,.15)');ig.addColorStop(1,'transparent');
+      if(n.sh==='d'){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(Math.PI/4);ctx.beginPath();ctx.rect(-sr*.7,-sr*.7,sr*1.4,sr*1.4);ctx.fillStyle=ig;ctx.fill();ctx.restore()}
+      else{ctx.beginPath();ctx.arc(p.x,p.y,sr,0,Math.PI*2);ctx.fillStyle=ig;ctx.fill()}
+    }
+
+    // Label
+    ctx.font='400 7px "JetBrains Mono",monospace';
+    ctx.fillStyle='rgba(255,255,255,.4)';ctx.textAlign='center';
+    if(n.sh!=='q')ctx.fillText(n.l,p.x,p.y+sr+11);
+
+    ctx.restore();
+  });
+
+  // Node annotations
+  nodeAnns.forEach(a=>{
+    const n=NODES[a.id],p=pos(n),r=nr(n),s=ns[a.id];
+    ctx.save();ctx.globalAlpha=a.alpha;
+    ctx.font='500 8px "JetBrains Mono",monospace';
+    const tw=ctx.measureText(a.text).width;
+    const bx=p.x-tw/2-6,by=p.y-r*s.sc-24,bw=tw+12,bh=16,br=3;
+    ctx.fillStyle='rgba(13,15,18,.92)';
+    ctx.beginPath();ctx.moveTo(bx+br,by);ctx.lineTo(bx+bw-br,by);ctx.quadraticCurveTo(bx+bw,by,bx+bw,by+br);ctx.lineTo(bx+bw,by+bh-br);ctx.quadraticCurveTo(bx+bw,by+bh,bx+bw-br,by+bh);ctx.lineTo(bx+br,by+bh);ctx.quadraticCurveTo(bx,by+bh,bx,by+bh-br);ctx.lineTo(bx,by+br);ctx.quadraticCurveTo(bx,by,bx+br,by);ctx.fill();
+    ctx.strokeStyle=a.col;ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle=a.col;ctx.textAlign='center';ctx.fillText(a.text,p.x,by+11.5);
+    ctx.restore();
+  });
+}
+
+/* ═══ HOVER ═══ */
+vp.addEventListener('mousemove',e=>{
+  const rect=vp.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  if(my>H){tip.style.display='none';return}
+  let found=null;
+  for(let i=NODES.length-1;i>=0;i--){const p=pos(NODES[i]),r=nr(NODES[i])+6;if((mx-p.x)**2+(my-p.y)**2<r*r&&ns[i].al>.15){found=NODES[i];break}}
+  if(found){
+    const s=ns[found.id];
+    const sl=s.sup?'Superspreader':s.col===CL.purple?'Undetected':s.blue?'Imported':s.col===CL.red?(s.p0?'Patient Zero':'Confirmed'):found.sh==='q'?'Unknown Source':s.pulse?'At Risk':'Susceptible';
+    const wl=found.w==='E'?'External':found.w==='X'?'Cross-Ward':found.w;
+    tip.textContent=`${found.l} — ${found.rl} — Ward ${wl} — ${sl}`;
+    tip.style.display='block';tip.style.left=Math.min(mx+12,W-220)+'px';tip.style.top=(my-10)+'px';vp.style.cursor='pointer';
+  }else{tip.style.display='none';vp.style.cursor='default'}
+});
+vp.addEventListener('mouseleave',()=>{tip.style.display='none'});
+
+/* ═══ TIMELINE SCRUBBING ═══ */
+let dragging=false;
+function getPct(e){const rect=ttrkEl.getBoundingClientRect();return Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width))}
+function scrubTo(pct){animElapsed=Math.max(0,Math.min(TOTAL_T,pct*TOTAL_T));processEventsUpTo(animElapsed)}
+ttrkEl.addEventListener('mousedown',e=>{dragging=true;playing=false;scrubTo(getPct(e))});
+window.addEventListener('mousemove',e=>{if(dragging)scrubTo(getPct(e))});
+window.addEventListener('mouseup',()=>{if(dragging){dragging=false;playing=true;startTime=0;lastFrameTime=0}});
+ttrkEl.addEventListener('touchstart',e=>{dragging=true;playing=false;const t=e.touches[0];const rect=ttrkEl.getBoundingClientRect();scrubTo(Math.max(0,Math.min(1,(t.clientX-rect.left)/rect.width)))},{passive:true});
+window.addEventListener('touchmove',e=>{if(!dragging)return;const t=e.touches[0];const rect=ttrkEl.getBoundingClientRect();scrubTo(Math.max(0,Math.min(1,(t.clientX-rect.left)/rect.width)))},{passive:true});
+window.addEventListener('touchend',()=>{if(dragging){dragging=false;playing=true;startTime=0;lastFrameTime=0}});
+
+/* ═══ MAIN LOOP ═══ */
+function frame(ts){
+  if(playing){if(!startTime){startTime=ts;lastFrameTime=ts}const d=ts-lastFrameTime;lastFrameTime=ts;animElapsed+=d}
+  ctx.clearRect(0,0,W,H);
+  update(animElapsed,ts);
+  drawWards();drawEdges();drawForecastEdges(ts);drawParticles();drawNodes(ts);
+  requestAnimationFrame(frame);
+}
+
+/* ═══ REPLAY ═══ */
+document.getElementById('rb').addEventListener('click',()=>{
+  initState();tfEl.style.width='0%';thEl.style.left='0%';bann.classList.remove('show');
+  playing=true;startTime=0;lastFrameTime=0;
+});
+
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
