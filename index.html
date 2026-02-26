@@ -177,7 +177,12 @@
 
         /* ========== ABOUT ========== */
         #about { background: var(--bg); }
-        .about-text { max-width: 780px; }
+        .about-layout {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 56px; align-items: start;
+        }
+        .about-text { max-width: none; }
+        .about-viz { position: sticky; top: 88px; }
         .about-text p {
             color: var(--text-secondary); margin-bottom: 24px;
             text-align: justify; font-size: 1rem; line-height: 1.8;
@@ -220,7 +225,7 @@
 
         /* 3D Network viz container in About */
         #three-container {
-            width: 100%; height: 550px; position: relative;
+            width: 100%; height: 480px; position: relative;
             border: 1px solid var(--border); border-radius: 10px;
             overflow: hidden; background: rgba(0,0,0,0.2);
         }
@@ -605,7 +610,14 @@
         @media (max-width: 1024px) {
             .contact-grid { grid-template-columns: 1fr; gap: 48px; }
             .team-grid { grid-template-columns: repeat(2, 1fr); }
-            #three-container { height: 450px; }
+            .about-layout { gap: 36px; }
+            #three-container { height: 420px; }
+        }
+        @media (max-width: 900px) {
+            /* Stack about layout on tablet/phone */
+            .about-layout { grid-template-columns: 1fr; gap: 40px; }
+            .about-viz { position: static; } /* un-stick when stacked */
+            #three-container { height: 400px; }
         }
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -622,7 +634,7 @@
             .team-grid { grid-template-columns: 1fr; }
             .hero-title { font-size: clamp(2.5rem, 10vw, 4rem); }
             .section-padding { padding: 80px 0; }
-            #three-container { height: 350px; }
+            #three-container { height: 320px; }
         }
 
         /* ========== ENHANCED VISUAL DESIGN ========== */
@@ -769,36 +781,39 @@
 <!-- ========== ABOUT ========== -->
 <section id="about" class="section-padding">
     <div class="container">
-        <div class="about-text reveal">
-            <span class="section-tag"></span>
-            <h2 class="section-title"></h2>
+        <div class="about-layout">
+            <!-- Left: text + stats -->
+            <div class="about-text reveal">
+                <span class="section-tag"></span>
+                <h2 class="section-title"></h2>
 
-            <!-- Burden stats -->
-            <div class="about-stats reveal">
-                <div class="about-stat">
-                    <div class="about-stat-label"></div>
-                    <div class="about-stat-value"></div>
-                    <div class="about-stat-detail"></div>
-                </div>
-                <div class="about-stat">
-                    <div class="about-stat-label"></div>
-                    <div class="about-stat-value"></div>
-                    <div class="about-stat-detail"></div>
-                </div>
-                <div class="about-stat">
-                    <div class="about-stat-label"></div>
-                    <div class="about-stat-value"></div>
-                    <div class="about-stat-detail"></div>
+                <!-- Burden stats -->
+                <div class="about-stats reveal">
+                    <div class="about-stat">
+                        <div class="about-stat-label"></div>
+                        <div class="about-stat-value"></div>
+                        <div class="about-stat-detail"></div>
+                    </div>
+                    <div class="about-stat">
+                        <div class="about-stat-label"></div>
+                        <div class="about-stat-value"></div>
+                        <div class="about-stat-detail"></div>
+                    </div>
+                    <div class="about-stat">
+                        <div class="about-stat-label"></div>
+                        <div class="about-stat-value"></div>
+                        <div class="about-stat-detail"></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 3D Transmission Network -->
-        <div class="reveal">
-            <div id="three-container">
-                <div class="viz-tooltip" id="vizTooltip"></div>
+            <!-- Right: 3D Transmission Network -->
+            <div class="about-viz reveal">
+                <div id="three-container">
+                    <div class="viz-tooltip" id="vizTooltip"></div>
+                </div>
+                <div class="viz-legend" id="vizLegend"></div>
             </div>
-            <div class="viz-legend" id="vizLegend"></div>
         </div>
     </div>
 </section>
