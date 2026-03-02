@@ -161,19 +161,31 @@
         .marquee-section {
             border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
             padding: 18px 0; overflow: hidden; background: var(--bg);
-            position: relative; /* Required for iOS Safari to clip transformed children */
+            position: relative;
+            -webkit-overflow-scrolling: auto;
         }
         .marquee-track {
             display: flex; gap: 56px;
-            animation: marquee 30s linear infinite; width: max-content;
-            will-change: transform; /* GPU compositing for smooth mobile animation */
+            animation: marquee 30s linear infinite;
+            width: -moz-max-content; width: max-content;
+            will-change: transform;
+            -webkit-transform: translateZ(0); transform: translateZ(0);
         }
         .marquee-track span {
             font-family: var(--mono); font-size: 0.72rem; letter-spacing: 3px;
             text-transform: uppercase; color: var(--text-dim); white-space: nowrap;
+            flex-shrink: 0;
         }
         .marquee-track span::after { content: '//'; margin-left: 56px; color: var(--accent); opacity: 0.4; }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes marquee {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+        @media (max-width: 768px) {
+            .marquee-track { gap: 32px; animation-duration: 20s; }
+            .marquee-track span { font-size: 0.65rem; letter-spacing: 2px; }
+            .marquee-track span::after { margin-left: 32px; }
+        }
 
         /* ========== ABOUT ========== */
         #about { background: var(--bg); }
@@ -553,17 +565,21 @@
         }
         .logo-strip-inner {
             max-width: var(--container); margin: 0 auto; padding: 0 24px;
-            display: flex; align-items: center; justify-content: center; gap: 32px;
+            display: flex; align-items: center; justify-content: center; gap: 40px;
             flex-wrap: nowrap;
         }
         .logo-strip-item {
             opacity: 0.45;
             transition: opacity 0.4s ease;
-            display: flex; align-items: center; justify-content: center;
-            flex: 1 1 0;
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 0.85rem; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; color: #fff; white-space: nowrap;
         }
         .logo-strip-item:hover { opacity: 1; }
-        .logo-strip-item img { height: 24px; width: auto; filter: brightness(0) invert(1); }
+        @media (max-width: 768px) {
+            .logo-strip-inner { gap: 20px; flex-wrap: wrap; justify-content: center; }
+            .logo-strip-item { font-size: 0.7rem; letter-spacing: 1px; }
+        }
 
         /* ========== TEAM ========== */
         #team { background: var(--bg-card); }

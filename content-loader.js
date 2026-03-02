@@ -99,9 +99,7 @@
     const logoStripInner = document.querySelector('.logo-strip-inner');
     if (logoStripInner && c.logoStrip) {
         logoStripInner.innerHTML = c.logoStrip.map(item =>
-            `<div class="logo-strip-item">` +
-                `<img src="${item.logo}" alt="${item.name}" title="${item.name}">` +
-            `</div>`
+            `<div class="logo-strip-item">${item.name}</div>`
         ).join('');
     }
 
