@@ -549,20 +549,21 @@
 
         /* ========== LOGO STRIP ========== */
         .logo-strip {
-            padding: 40px 0;
+            padding: 28px 0;
         }
         .logo-strip-inner {
             max-width: var(--container); margin: 0 auto; padding: 0 24px;
-            display: flex; align-items: center; justify-content: center; gap: 60px;
-            flex-wrap: wrap;
+            display: flex; align-items: center; justify-content: center; gap: 32px;
+            flex-wrap: nowrap;
         }
         .logo-strip-item {
             opacity: 0.45;
             transition: opacity 0.4s ease;
-            display: flex; align-items: center;
+            display: flex; align-items: center; justify-content: center;
+            flex: 1 1 0;
         }
         .logo-strip-item:hover { opacity: 1; }
-        .logo-strip-item img { height: 32px; width: auto; filter: brightness(0) invert(1); }
+        .logo-strip-item img { height: 24px; width: auto; filter: brightness(0) invert(1); }
 
         /* ========== TEAM ========== */
         #team { background: var(--bg-card); }

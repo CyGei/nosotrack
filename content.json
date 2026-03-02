@@ -25,7 +25,8 @@
 
   "logoStrip": [
     { "name": "Johns Hopkins University", "logo": "images/logo-jhu.svg" },
-    { "name": "Imperial College London", "logo": "images/logo-imperial.svg" }
+    { "name": "Imperial College London", "logo": "images/logo-imperial.svg" },
+    { "name": "R Epidemics Consortium", "logo": "images/logo-recon.svg" }
   ],
 
   "marquee": [
