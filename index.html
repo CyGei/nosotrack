@@ -521,6 +521,27 @@
             background: rgba(255,255,255,0.03); border: 1px solid var(--border);
             border-radius: 20px; color: var(--text-dim); white-space: nowrap;
         }
+        .tl-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 6px; }
+        .tl-card-top .tl-year-badge { margin-bottom: 0; }
+        .tl-type-badge {
+            font-family: var(--mono); font-size: 0.5rem; letter-spacing: 1px;
+            text-transform: uppercase; padding: 2px 6px; border-radius: 3px;
+        }
+        .tl-type-method {
+            color: var(--accent); background: var(--accent-dim);
+        }
+        .tl-type-application {
+            color: #6496ff; background: rgba(100,150,255,0.1);
+        }
+
+        /* Application card styling */
+        .tl-card--application { border-color: rgba(100,150,255,0.15); }
+        .tl-milestone:hover .tl-card--application,
+        .tl-milestone:focus-within .tl-card--application {
+            border-color: rgba(100,150,255,0.4);
+            box-shadow: 0 4px 20px rgba(100,150,255,0.08);
+        }
+
         .tl-connector { width: 1px; height: 16px; background: var(--border); flex-shrink: 0; }
         .tl-node {
             width: 12px; height: 12px; border-radius: 50%;
@@ -533,6 +554,12 @@
             border-color: var(--accent);
             background: rgba(255,7,58,0.15);
             box-shadow: 0 0 10px rgba(255,7,58,0.35);
+        }
+        .tl-milestone:hover .tl-node--application,
+        .tl-milestone:focus-within .tl-node--application {
+            border-color: #6496ff;
+            background: rgba(100,150,255,0.15);
+            box-shadow: 0 0 10px rgba(100,150,255,0.35);
         }
         /* Detail panel */
         .timeline-detail {

@@ -257,15 +257,17 @@
             const cardAttrs = m.reference_url
                 ? ` href="${m.reference_url}" target="_blank" rel="noopener"`
                 : '';
+            const typeClass = m.type === 'application' ? ' tl-card--application' : ' tl-card--method';
+            const typeLabel = m.type === 'application' ? 'Application' : 'Method';
             return `<div class="tl-milestone" tabindex="0" data-idx="${idx}">` +
-                `<${cardTag} class="tl-card"${cardAttrs}>` +
-                    `<div class="tl-year-badge">${m.year}</div>` +
+                `<${cardTag} class="tl-card${typeClass}"${cardAttrs}>` +
+                    `<div class="tl-card-top"><div class="tl-year-badge">${m.year}</div><span class="tl-type-badge tl-type-${m.type || 'method'}">${typeLabel}</span></div>` +
                     `<div class="tl-method">${m.method}</div>` +
                     `<div class="tl-authors">${m.authors}</div>` +
                     `<div class="tl-pathogens">${pills}</div>` +
                 `</${cardTag}>` +
                 `<div class="tl-connector"></div>` +
-                `<div class="tl-node"></div>` +
+                `<div class="tl-node${m.type === 'application' ? ' tl-node--application' : ''}"></div>` +
             `</div>`;
         }).join('');
 
@@ -273,9 +275,12 @@
             if (!timelineDetail) return;
             const pills = m.pathogens.map(p => pathogenPillHtml(p, 'tl-detail-pathogen')).join('');
             timelineDetail.classList.add('active');
+            const detailTypeLabel = m.type === 'application' ? 'Application' : 'Method';
+            const detailTypeCls = m.type === 'application' ? 'tl-type-application' : 'tl-type-method';
             timelineDetail.innerHTML =
                 `<div class="tl-detail-header">` +
                     `<span class="tl-detail-method">${m.method}</span>` +
+                    `<span class="tl-type-badge ${detailTypeCls}">${detailTypeLabel}</span>` +
                     `<span class="tl-detail-meta">${m.year} &middot; ${m.authors}</span>` +
                 `</div>` +
                 `<p class="tl-detail-desc">${m.description}</p>` +
