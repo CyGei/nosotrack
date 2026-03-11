@@ -10,7 +10,8 @@
       { "label": "About", "href": "#about" },
       { "label": "Platform", "href": "#how-it-works" },
       { "label": "Research", "href": "#research" },
-      { "label": "Team", "href": "#team" }
+      { "label": "Team", "href": "#team" },
+      { "label": "Roadmap", "href": "#roadmap" }
     ],
     "cta": { "label": "Get in Touch", "href": "#contact" }
   },
@@ -18,15 +19,15 @@
   "hero": {
     "eyebrow": "Real-Time Outbreak Analytics",
     "title": ["Track.", "Intervene.", "Protect."],
-    "subtitle": "NosoTrack infers who infected whom in near real-time, enabling hospital Infection Prevention Teams to stop outbreaks before they escalate.",
+    "subtitle": "NosoTrack infers who infected whom in near real-time, enabling hospital control teams to stop outbreaks before they escalate.",
     "primaryCta": { "label": "Learn More", "href": "#about" },
     "secondaryCta": { "label": "Collaborate", "href": "#contact" }
   },
 
   "logoStrip": [
-    { "name": "Johns Hopkins University", "logo": "images/logo-jhu.svg" },
-    { "name": "Imperial College London", "logo": "images/logo-imperial.svg" },
-    { "name": "R Epidemics Consortium", "logo": "images/logo-recon.svg" }
+    { "name": "Johns Hopkins University" },
+    { "name": "Imperial College London" },
+    { "name": "R Epidemics Consortium" }
   ],
 
   "marquee": [
@@ -43,7 +44,7 @@
     "tag": "About",
     "title": ["Nosocomial Outbreaks"],
     "paragraphs": [
-      "<strong>Healthcare-associated infections (HAIs)</strong> affect approximately 1 in 10 patients worldwide, causing significant morbidity, mortality, and economic strain on healthcare systems. <strong>Nosocomial outbreaks</strong> driven by person-to-person transmitted pathogens such as <strong>SARS-CoV-2</strong>, <strong>Clostridioides difficile</strong>, <strong>Klebsiella pneumoniae</strong>, and <strong>MRSA</strong> generate the most acute clinical and operational crises: triggering staff shortages, ward closures, and delayed procedures. Current control measures rely on broad testing and isolation protocols, but <strong>effective intervention requires identifying the specific drivers of an outbreak</strong>: such as patient zero, superspreaders, transmission routes, and undetected or imported cases.",
+      "<strong>Healthcare-associated infections (HAIs)</strong> affect approximately 1 in 10 patients worldwide, causing significant morbidity, mortality, and economic strain on healthcare systems. <strong>Nosocomial outbreaks</strong> driven by person-to-person transmitted pathogens such as <strong>SARS-CoV-2</strong>, <strong><em>Clostridioides difficile</em></strong>, <strong><em>Klebsiella pneumoniae</em></strong>, and <strong>MRSA</strong> generate the most acute clinical and operational crises: triggering staff shortages, ward closures, and delayed procedures. Current control measures rely on broad testing and isolation protocols, but <strong>effective intervention requires identifying the specific drivers of an outbreak</strong>: such as patient zero, superspreaders, transmission routes, and undetected or imported cases.",
       "<span class=\"nosotrack-noso\">Noso</span><span class=\"nosotrack-highlight\">Track</span> <strong>is an outbreak analytics platform that infers who infected whom in near real-time</strong> by integrating data from hospital Electronic Health Records with Bluetooth enabled contact tracing. It delivers early warnings and actionable reports, enabling hospital Infection Prevention Teams to <strong> devise targeted interventions promptly before an outbreak escalates.</strong>"
     ],
     "stats": [
@@ -105,9 +106,9 @@
       "anonymisation": {
         "stepNum": "02",
         "stepLabel": "Anonymisation",
-        "tag": "GDPR Compliance",
+        "tag": "GDPR/HIPAA Compliance",
         "title": "Data Anonymisation",
-        "desc": "Patient identifiers are stripped, hashed, and encrypted before analysis, ensuring full GDPR compliance.",
+        "desc": "Patient identifiers are stripped, hashed, and encrypted before analysis.",
         "viz": "anon"
       },
       "engine": {
@@ -139,7 +140,7 @@
   "research": {
     "tag": "Research",
     "title": ["Methods & Software"],
-    "intro": "<span class=\"nosotrack-noso\">Noso</span><span class=\"nosotrack-highlight\">Track</span> <strong>builds on over a decade of research in outbreak reconstruction, focusing on the integration of epidemiological, genomic and contact data to infer transmission trees</strong>. Our team and collaborators have published extensively on methodological advances, including the <em>outbreaker2</em> R package and the <em>linktree</em> method for inferring transmission patterns between staff and patients. These methods have been applied to real outbreak data, including SARS-CoV-2 nosocomial outbreaks in Switzerland, MRSA in neonatal intensive care units in the UK, <em>Klebsiella pneumoniae</em> in a Nepali neonatal unit, <em>Acinetobacter baumannii</em> in hospitals in North Carolina, and Ebola outbreaks in the DRC. We are committed to open science, with all software freely available and publications accessible to the public.",
+    "intro": "<span class=\"nosotrack-noso\">Noso</span><span class=\"nosotrack-highlight\">Track</span> <strong>builds on over a decade of research in outbreak reconstruction, focusing on the integration of epidemiological, genomic and contact data to infer transmission trees</strong>. Our team and collaborators have published extensively on methodological advances, including the <em>outbreaker2</em> R package and the <em>linktree</em> method for inferring transmission patterns between staff and patients. These methods have been applied to real outbreak data, including SARS-CoV-2 nosocomial outbreaks in Switzerland and the UK, MRSA in neonatal intensive care units in the UK, <em>Klebsiella pneumoniae</em> in a Nepali neonatal unit, <em>Acinetobacter baumannii</em> in hospitals in North Carolina, and Ebola outbreaks in the DRC. We are committed to open science, with all software freely available and publications accessible to the public.",
     "timelineLabel": "Evolution of Outbreak Reconstruction: Methods & Applications",
     "timeline": [
       {
@@ -416,6 +417,26 @@
     ]
   },
 
+  "roadmap": {
+    "tag": "Roadmap",
+    "title": ["Next Steps"],
+    "intro": "We are seeking funding to validate and deploy NosoTrack in two stages.",
+    "phases": [
+      {
+        "badge": "Phase 1",
+        "title": "Simulation Study",
+        "desc": "Conduct simulation studies under realistic operational constraints to determine the conditions under which NosoTrack improves outbreak control.<br>This phase will assess NosoTrack's effectiveness across pathogens, hospital settings, and levels of data availability.",
+        "tags": ["Sensitivity Analysis", "Benchmarking"]
+      },
+      {
+        "badge": "Phase 2",
+        "title": "Pilot Study",
+        "desc": "Deploy the platform in a 1\u20132 year pilot, integrating EHR and Bluetooth-enabled contact tracing in a live hospital environment.<br>This phase will generate real-world evidence on reduced infections, cost savings, and improved hospital capacity management.",
+        "tags": ["EHR Integration", "Bluetooth Contact Tracing", "Cost-Effectiveness", "Clinical Impact"]
+      }
+    ]
+  },
+
   "contact": {
     "tag": "Contact",
     "title": ["Let's Work", "Together"],
@@ -441,6 +462,7 @@
       { "label": "Platform", "href": "#how-it-works" },
       { "label": "Research", "href": "#research" },
       { "label": "Team", "href": "#team" },
+      { "label": "Roadmap", "href": "#roadmap" },
       { "label": "Contact", "href": "#contact" }
     ],
     "copy": "Cyril Geismar",

@@ -316,6 +316,28 @@
         if (obs) teamGrid.querySelectorAll('.reveal').forEach(el => obs.observe(el));
     }
 
+    // ── ROADMAP ──────────────────────────────────────────────────────────────
+
+    if (c.roadmap) {
+        setText('#roadmap .section-tag', c.roadmap.tag);
+        setHtml('#roadmap .section-title', c.roadmap.title.join('<br>'));
+        setHtml('.roadmap-intro', c.roadmap.intro);
+
+        const phases = document.querySelectorAll('.roadmap-phase');
+        c.roadmap.phases.forEach((phase, i) => {
+            if (!phases[i]) return;
+            phases[i].querySelector('.roadmap-phase-badge').textContent = phase.badge;
+            phases[i].querySelector('.roadmap-card-title').textContent = phase.title;
+            phases[i].querySelector('.roadmap-card-desc').innerHTML = phase.desc;
+            const tagsEl = phases[i].querySelector('.roadmap-card-tags');
+            if (tagsEl && phase.tags) {
+                tagsEl.innerHTML = phase.tags.map(t =>
+                    `<span class="roadmap-tag">${t}</span>`
+                ).join('');
+            }
+        });
+    }
+
     // ── CONTACT ───────────────────────────────────────────────────────────────
 
     setText('#contact .section-tag', c.contact.tag);
