@@ -330,6 +330,17 @@
       {
         "year": "2022",
         "type": "application",
+        "method": "Within-hospital transmission across two pandemic waves",
+        "authors": "Lindsey, Villabona-Arenas, Campbell et al.",
+        "description": "Combines viral genomic and epidemiological data from 2,181 participants across two pandemic waves at a UK NHS Trust using Bayesian transmission reconstruction; reveals a shift from staff-to-staff to patient-to-patient transmissions between waves, and finds that hospital-onset cases drove most onward transmission.",
+        "pathogens": [
+          {"name": "SARS-CoV-2", "applicationYear": "2020–2021", "icon": "[Spike]"}
+        ],
+        "reference_url": "https://www.nature.com/articles/s41467-022-28291-y"
+      },
+      {
+        "year": "2022",
+        "type": "application",
         "method": "Geriatric acute-care hospital outbreak",
         "authors": "Abbas et al.",
         "description": "Combined retrospective epidemiological and genomic study using outbreaker2 to reconstruct transmission chains of SARS-CoV-2 amidst multiple outbreaks in a geriatric acute-care hospital.",
