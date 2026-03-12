@@ -301,20 +301,43 @@
 
     const teamGrid = document.querySelector('.team-grid');
     if (teamGrid) {
-        teamGrid.innerHTML = c.team.members.map((m, i) => `
-            <div class="team-card reveal" ${i > 0 ? `style="transition-delay:${i * 0.1}s;"` : ''}>
-                <img src="${m.photo}" alt="${m.name}" class="team-photo">
+        const f = c.team.founder;
+        const founderCard = `
+            <div class="team-card reveal">
+                <img src="${f.photo}" alt="${f.name}" class="team-photo">
                 <div class="team-info">
-                    <div class="team-name">${m.name}</div>
-                    <div class="team-role">${m.role}</div>
-                    <p class="team-bio">${m.bio}</p>
+                    <div class="team-name">${f.name}</div>
+                    <div class="team-role">${f.role}</div>
+                    <p class="team-bio">${f.bio}</p>
+                </div>
+            </div>`;
+
+        const advisorCards = c.team.advisors.map((a, i) => `
+            <div class="team-card reveal" ${i > 0 ? `style="transition-delay:${i * 0.1}s;"` : ''}>
+                <img src="${a.photo}" alt="${a.name}" class="team-photo">
+                <div class="team-info">
+                    <div class="team-name">${a.name}</div>
+                    <div class="team-role">${a.role}</div>
+                    <p class="team-bio">${a.bio}</p>
                 </div>
             </div>`).join('');
 
-        // Re-observe new .reveal elements for the scroll animation
-        const obs = window.__revealObserver;
-        if (obs) teamGrid.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+        teamGrid.innerHTML = `
+            <div>
+                <div class="team-group-label">Founder</div>
+                ${founderCard}
+            </div>
+            <div class="team-divider"></div>
+            <div>
+                <div class="team-group-label">${c.team.advisorsLabel || 'Advisors'}</div>
+                <div class="team-advisors-row">${advisorCards}</div>
+            </div>`;
     }
+
+    // Re-observe new .reveal elements for the scroll animation
+    const obs = window.__revealObserver;
+    const teamSection = document.querySelector('#team');
+    if (obs && teamSection) teamSection.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
     // ── ROADMAP ──────────────────────────────────────────────────────────────
 
