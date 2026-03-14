@@ -8,7 +8,7 @@
     "logo": "NosoTrack",
     "links": [
       { "label": "About", "href": "#about" },
-      { "label": "Platform", "href": "#how-it-works" },
+      { "label": "Platform", "href": "#platform" },
       { "label": "Research", "href": "#research" },
       { "label": "Team", "href": "#team" },
       { "label": "Roadmap", "href": "#roadmap" }
@@ -84,20 +84,17 @@
         "stepLabel": "Data",
         "cards": [
           {
-            "tag": "Genomic",
-            "title": "DNA/RNA Sequencing",
+            "tag": "Genomic Sequencing",
             "desc": "Pathogen genomes provide phylogenetic signal for transmission inference.",
             "viz": "dna"
           },
           {
-            "tag": "Proximity",
-            "title": "Contact Tracing",
+            "tag": "Contact Tracing",
             "desc": "Bluetooth-enabled sensors record contacts between patients and staff.",
             "viz": "contact"
           },
           {
-            "tag": "Clinical",
-            "title": "Electronic Health Records",
+            "tag": "Electronic Health Records",
             "desc": "EHR provide information on admission & discharge dates, ward assignments, and test results.",
             "viz": "ehr"
           }
@@ -106,16 +103,14 @@
       "anonymisation": {
         "stepNum": "02",
         "stepLabel": "Anonymisation",
-        "tag": "GDPR/HIPAA Compliance",
-        "title": "Data Anonymisation",
+        "tag": "GDPR/HIPAA Compliant",
         "desc": "Patient identifiers are stripped, hashed, and encrypted before analysis.",
         "viz": "anon"
       },
       "engine": {
         "stepNum": "03",
         "stepLabel": "Inference",
-        "tag": "NosoTrack Engine",
-        "title": "Transmission Tree Inference",
+        "tag": "Transmission Tree Inference",
         "desc": "NosoTrack uses Bayesian inference to probabilistically reconstruct transmission trees (who infected whom).",
         "features": [
           { "title": "Patient 0", "desc": "Identifies the source case."},
@@ -126,13 +121,17 @@
           { "title": "Forecasting", "desc": "Projects short-term transmission risk for staff and patients." }
         ]
       },
-      "earlyWarning": {
+      "alertsReports": {
         "stepNum": "04",
-        "stepLabel": "Intervention",
-        "tag": "Alerts",
-        "title": "Early Warning System",
-        "desc": "Real-time alerts and reports are dispatched to Infection Prevention Teams with suggested intervention strategies based on current transmission dynamics.",
-        "viz": "alert"
+        "stepLabel": "Reporting",
+        "tag": "Real-Time Alerts & Reports",
+        "desc": "Control teams receive notifications when wards or individuals have an increased risk of infection, and when new transmission events or clusters are identified."
+      },
+      "ipcSupport": {
+        "stepNum": "05",
+        "stepLabel": "Intervention Design",
+        "tag": "IPC Co-Pilot",
+        "desc": "Infection Prevention and Control experts interact with an AI assistant to interpret outbreak dynamics and design intervention strategies. These strategies are evaluated by a simulation engine that projects potential outcomes, with iterative feedback to refine and identify the optimal intervention."
       }
     }
   },
@@ -426,14 +425,12 @@
       {
         "badge": "Phase 1",
         "title": "Simulation Study",
-        "desc": "Conduct simulation studies under realistic operational constraints to determine the conditions under which NosoTrack improves outbreak control.<br>This phase will assess NosoTrack's effectiveness across pathogens, hospital settings, and levels of data availability.",
-        "tags": ["Sensitivity Analysis", "Benchmarking"]
+        "desc": "Conduct simulation studies under realistic operational constraints to determine the conditions under which NosoTrack improves outbreak control.<br>This phase will assess NosoTrack's effectiveness across pathogens, hospital settings, and levels of data availability."
       },
       {
         "badge": "Phase 2",
         "title": "Pilot Study",
-        "desc": "Deploy the platform in a 1\u20132 year pilot, integrating EHR and Bluetooth-enabled contact tracing in a live hospital environment.<br>This phase will generate real-world evidence on reduced infections, cost savings, and improved hospital capacity management.",
-        "tags": ["EHR Integration", "Bluetooth Contact Tracing", "Cost-Effectiveness", "Clinical Impact"]
+        "desc": "Deploy the platform in a 1\u20132 year pilot, integrating EHR and Bluetooth-enabled contact tracing in a live hospital environment.<br>This phase will generate real-world evidence on reduced infections, cost savings, and improved hospital capacity management."
       }
     ]
   },
@@ -460,7 +457,7 @@
     "logo": "NosoTrack",
     "links": [
       { "label": "About", "href": "#about" },
-      { "label": "Platform", "href": "#how-it-works" },
+      { "label": "Platform", "href": "#platform" },
       { "label": "Research", "href": "#research" },
       { "label": "Team", "href": "#team" },
       { "label": "Roadmap", "href": "#roadmap" },

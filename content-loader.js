@@ -33,6 +33,20 @@
         if (el) el.innerHTML = val;
     }
 
+    // Populate a .p-card element with tag, optional title, and description
+    function populateCard(cardEl, data) {
+        if (!cardEl || !data) return;
+        const tagEl = cardEl.querySelector('.p-card-tag');
+        if (tagEl) tagEl.textContent = data.tag;
+        const titleEl = cardEl.querySelector('.p-card-title');
+        if (titleEl) {
+            if (data.title) titleEl.textContent = data.title;
+            else titleEl.style.display = 'none';
+        }
+        const descEl = cardEl.querySelector('.p-card-desc');
+        if (descEl) descEl.textContent = data.desc;
+    }
+
     // Split "NosoTrack" into "Noso" + <span>Track</span> for accent styling
     function logoHtml(str) {
         const idx = str.indexOf('Track');
@@ -156,14 +170,14 @@
 
     // ── PROCESS ───────────────────────────────────────────────────────────────
 
-    setText('#how-it-works .section-tag', c.platform.tag);
-    setText('#how-it-works .section-title', c.platform.title);
+    setText('#platform .section-tag', c.platform.tag);
+    setText('#platform .section-title', c.platform.title);
     setText('.pipeline-subtitle', c.platform.subtitle);
 
     const steps = c.platform.steps;
 
     // Step badges (num + label)
-    const stepDefs = [steps.inputs, steps.anonymisation, steps.engine, steps.earlyWarning];
+    const stepDefs = [steps.inputs, steps.anonymisation, steps.engine, steps.alertsReports, steps.ipcSupport];
     document.querySelectorAll('.pipeline-step-badge').forEach((badge, i) => {
         if (!stepDefs[i]) return;
         badge.querySelector('.pipeline-step-num').textContent = stepDefs[i].stepNum;
@@ -172,47 +186,31 @@
 
     // Step 1 — input cards (text only; canvases and glows are untouched)
     const inputCards = document.querySelectorAll('.pipeline-sources .p-card');
-    steps.inputs.cards.forEach((card, i) => {
-        if (!inputCards[i]) return;
-        inputCards[i].querySelector('.p-card-tag').textContent = card.tag;
-        inputCards[i].querySelector('.p-card-title').textContent = card.title;
-        inputCards[i].querySelector('.p-card-desc').textContent = card.desc;
-    });
+    steps.inputs.cards.forEach((card, i) => populateCard(inputCards[i], card));
 
     // Step 2 — anonymisation card
-    const anonCard = document.querySelector('[data-pipeline="anon"]');
-    if (anonCard) {
-        anonCard.querySelector('.p-card-tag').textContent = steps.anonymisation.tag;
-        anonCard.querySelector('.p-card-title').textContent = steps.anonymisation.title;
-        anonCard.querySelector('.p-card-desc').textContent = steps.anonymisation.desc;
-    }
+    populateCard(document.querySelector('[data-pipeline="anon"]'), steps.anonymisation);
 
     // Step 3 — engine card
     const engineCard = document.querySelector('[data-pipeline="engine"]');
-    if (engineCard) {
-        engineCard.querySelector('.p-card-tag').textContent = steps.engine.tag;
-        engineCard.querySelector('.p-card-title').textContent = steps.engine.title;
-        engineCard.querySelector('.p-card-desc').textContent = steps.engine.desc;
-        if (steps.engine.features && steps.engine.features.length) {
-            let featsEl = engineCard.querySelector('.engine-features');
-            if (!featsEl) {
-                featsEl = document.createElement('div');
-                featsEl.className = 'engine-features';
-                engineCard.appendChild(featsEl);
-            }
-            featsEl.innerHTML = steps.engine.features
-                .map(f => `<div class="engine-feat"><strong>${f.title}</strong>${f.desc}</div>`)
-                .join('');
+    populateCard(engineCard, steps.engine);
+    if (engineCard && steps.engine.features && steps.engine.features.length) {
+        let featsEl = engineCard.querySelector('.engine-features');
+        if (!featsEl) {
+            featsEl = document.createElement('div');
+            featsEl.className = 'engine-features';
+            engineCard.appendChild(featsEl);
         }
+        featsEl.innerHTML = steps.engine.features
+            .map(f => `<div class="engine-feat"><strong>${f.title}</strong>${f.desc}</div>`)
+            .join('');
     }
 
-    // Step 4 — early warning card
-    const alertCard = document.querySelector('[data-pipeline="alert"]');
-    if (alertCard) {
-        alertCard.querySelector('.p-card-tag').textContent = steps.earlyWarning.tag;
-        alertCard.querySelector('.p-card-title').textContent = steps.earlyWarning.title;
-        alertCard.querySelector('.p-card-desc').textContent = steps.earlyWarning.desc;
-    }
+    // Step 4 — Alerts & Reports
+    populateCard(document.querySelector('[data-pipeline="alertsReports"]'), steps.alertsReports);
+
+    // Step 5 — IPC Co-Pilot
+    populateCard(document.querySelector('[data-pipeline="ipc"]'), steps.ipcSupport);
 
     // ── RESEARCH ──────────────────────────────────────────────────────────────
 
