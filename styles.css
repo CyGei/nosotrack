@@ -725,7 +725,7 @@ nav.main-nav {
 /* ── Simulation engine — enhanced ── */
 .ipc-engine-box {
     display: flex; align-items: center; justify-content: center;
-    padding: 14px 24px; border-radius: 8px;
+    padding: 8px 20px; border-radius: 7px;
     border: 1px solid rgba(var(--accent-rgb), 0.15);
     background: rgba(var(--accent-rgb), 0.03);
     position: relative; overflow: hidden;
@@ -747,19 +747,19 @@ nav.main-nav {
 }
 .ipc-engine-box.processing .ipc-engine-canvas { opacity: 0.5; }
 .ipc-engine-content {
-    display: flex; align-items: center; gap: 12px;
+    display: flex; align-items: center; gap: 8px;
     position: relative; z-index: 1;
 }
 .ipc-engine-gears { display: flex; align-items: center; }
 .ipc-engine-icon { flex-shrink: 0; animation: gearSpin 6s linear infinite; }
-.ipc-engine-icon--lg { width: 32px; height: 32px; }
-.ipc-engine-icon--sm { width: 22px; height: 22px; margin-left: -6px; animation-direction: reverse; animation-duration: 4s; }
+.ipc-engine-icon--lg { width: 24px; height: 24px; }
+.ipc-engine-icon--sm { width: 16px; height: 16px; margin-left: -4px; animation-direction: reverse; animation-duration: 4s; }
 .ipc-engine-box.processing .ipc-engine-icon { animation-duration: 1.8s; }
 .ipc-engine-box.processing .ipc-engine-icon--sm { animation-duration: 1.2s; }
 @keyframes gearSpin { to { transform: rotate(360deg); } }
 .ipc-engine-text { display: flex; flex-direction: column; gap: 2px; }
 .ipc-engine-label {
-    font-family: var(--mono); font-size: 0.65rem; letter-spacing: 1.5px;
+    font-family: var(--mono); font-size: 0.58rem; letter-spacing: 1.5px;
     text-transform: uppercase; color: var(--accent); font-weight: 700;
 }
 .ipc-engine-status {
@@ -781,8 +781,8 @@ nav.main-nav {
 
 /* ── Optimal intervention callout ── */
 .ipc-optimal {
-    display: flex; flex-direction: column; gap: 10px;
-    padding: 14px 18px 12px; border-radius: 10px;
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 10px 14px 8px; border-radius: 8px;
     border: 1px solid rgba(20,184,166,0.25);
     background: linear-gradient(135deg, rgba(20,184,166,0.07) 0%, rgba(20,184,166,0.02) 100%);
     margin-top: 4px; position: relative; overflow: hidden;
@@ -799,21 +799,19 @@ nav.main-nav {
     to { opacity: 1; transform: translateY(0); }
 }
 .ipc-optimal-badge {
-    font-family: var(--mono); font-size: 0.5rem; letter-spacing: 1.8px;
+    font-family: var(--mono); font-size: 0.45rem; letter-spacing: 1.5px;
     text-transform: uppercase; color: rgba(20,184,166,0.9);
     background: rgba(20,184,166,0.1); border: 1px solid rgba(20,184,166,0.2);
-    border-radius: 3px; padding: 2px 8px; align-self: flex-start;
-    font-weight: 600;
+    border-radius: 3px; padding: 1px 6px;
+    font-weight: 600; flex-shrink: 0;
 }
 .ipc-optimal-header {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; gap: 6px;
+    margin-left: 20px;
 }
-.ipc-optimal-icon { width: 22px; height: 22px; flex-shrink: 0; }
-.ipc-optimal-title-group {
-    display: flex; flex-direction: column; gap: 2px;
-}
+.ipc-optimal-icon { width: 17px; height: 17px; position: absolute; top: 8px; left: 10px; }
 .ipc-optimal-title {
-    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.8px;
+    font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.8px;
     text-transform: uppercase; color: #5eead4; font-weight: 700;
 }
 .ipc-optimal-subtitle {
@@ -821,20 +819,20 @@ nav.main-nav {
     color: rgba(94,234,212,0.6);
 }
 .ipc-optimal-metrics {
-    display: flex; gap: 6px;
+    display: flex; gap: 4px;
 }
 .ipc-optimal-metric {
     flex: 1; display: flex; flex-direction: column; align-items: center;
-    gap: 2px; padding: 7px 4px; border-radius: 6px;
+    gap: 1px; padding: 4px 3px; border-radius: 5px;
     background: rgba(20,184,166,0.05);
     border: 1px solid rgba(20,184,166,0.1);
 }
 .ipc-optimal-metric-val {
-    font-family: var(--mono); font-size: 0.75rem; font-weight: 700;
+    font-family: var(--mono); font-size: 0.65rem; font-weight: 700;
     color: #5eead4; letter-spacing: 0.5px;
 }
 .ipc-optimal-metric-label {
-    font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.5px;
+    font-family: var(--mono); font-size: 0.48rem; letter-spacing: 0.5px;
     color: rgba(94,234,212,0.7); text-transform: uppercase; text-align: center;
 }
 .ipc-optimal-compare {
@@ -864,8 +862,8 @@ nav.main-nav {
     .ipc-scenarios-row .ipc-scenario-card { flex: 1 1 calc(50% - 4px); min-width: calc(50% - 4px); }
     .ipc-sc-details { display: none; }
     #ipc-spider-canvas { height: 220px; }
-    .ipc-optimal { padding: 10px 12px; }
-    .ipc-optimal-title { font-size: 0.62rem; }
+    .ipc-optimal { padding: 8px 10px; }
+    .ipc-optimal-title { font-size: 0.55rem; }
     .ipc-optimal-metrics { flex-wrap: wrap; }
     .ipc-optimal-metric { flex: 1 1 calc(50% - 4px); min-width: calc(50% - 4px); }
     .ipc-optimal-compare { font-size: 0.5rem; }
