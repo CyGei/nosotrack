@@ -450,13 +450,13 @@
         }
 
         // Axis labels
-        spCtx.font = '8px monospace';
-        spCtx.fillStyle = 'rgba(255,255,255,0.45)';
+        spCtx.font = '10px monospace';
+        spCtx.fillStyle = 'rgba(255,255,255,0.6)';
         spCtx.textAlign = 'center';
         spCtx.textBaseline = 'middle';
         for (let i = 0; i < NUM_AXES; i++) {
             const a = angle(i);
-            const lbR = radius + 18;
+            const lbR = radius + 22;
             const lx = cx + Math.cos(a) * lbR;
             const ly = cy + Math.sin(a) * lbR;
             const lines = axisLabels[i].split('\n');
