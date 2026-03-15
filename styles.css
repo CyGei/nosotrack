@@ -546,7 +546,7 @@ nav.main-nav {
     text-align: center; white-space: nowrap;
 }
 .ipc-bubble-area {
-    flex: 1; min-height: 100px; max-height: 110px;
+    flex: 1; height: 110px;
     display: flex; flex-direction: column; gap: 6px;
     overflow: hidden; padding: 0 6px;
     position: relative;

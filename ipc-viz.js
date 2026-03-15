@@ -282,7 +282,7 @@
     }
     resizeSpider();
 
-    const axisLabels = ['Cases', 'Bed-days\nlost', 'Cost', 'Containment\ntime', 'Staff\nburden'];
+    const axisLabels = ['CASES', 'BED-DAYS\nLOST', 'COST', 'CONTAINMENT\nDURATION', 'STAFF\nBURDEN'];
     const colors = ['#3b82f6', '#8b5cf6', '#14b8a6', '#f59e0b'];
     const NUM_AXES = 5;
     const NUM_SCENARIOS = 4;
