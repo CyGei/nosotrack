@@ -8,13 +8,13 @@
        ============================================================ */
     const bubbleArea = document.getElementById('ipc-bubble-area');
     const chatMessages = [
-        { who: 'expert', text: 'Generate 4 interventions for this outbreak.' },
-        { who: 'ai', text: '4 scenarios ready. Run simulations?' },
-        { who: 'expert', text: 'Max 12 beds offline in Ward C.' },
-        { who: 'ai', text: 'Bed cap applied. Updating all scenarios.' },
-        { who: 'expert', text: 'Lab capacity: 15 swabs/day.' },
-        { who: 'ai', text: 'Screening re-allocated. Run?' },
-        { who: 'expert', text: 'Go. Show projections.' },
+        { who: 'expert', text: 'Generate 4 intervention scenarios based on the current outbreak.' },
+        { who: 'ai', text: '4 scenarios loaded. Run simulations?' },
+        { who: 'expert', text: 'We cannot close more than 2 units in Ward C.' },
+        { who: 'ai', text: 'Constraint applied. Scenarios updated. Run simulations?' },
+        { who: 'expert', text: 'Lab capacity capped at 15 PCR tests/day.' },
+        { who: 'ai', text: 'Daily screening limited to 15 tests. Run simulations?' },
+        { who: 'expert', text: 'Yes.' },
     ];
     let chatIdx = 0, charIdx = 0, visibleBubbles = [];
     const MAX_VISIBLE = 3;
@@ -100,43 +100,62 @@
     }
 
     /* ── Edits triggered by chat messages ── */
-    // Detail indices: 0=Screening, 1=Staff, 2=Beds, 3=Duration, 4=Units
+    // Detail indices: 0=Screening, 1=Tests, 2=Staffing, 3=Isolation, 4=Scope
 
-    // Phase 1 — Expert: "Max 12 beds offline in Ward C"
-    // S1 (28) and S2 (18) exceed cap → beds capped, staff scaled, duration extends.
-    // S3/S4 under cap but tighter bed pool slows isolation → duration extends.
+    // Phase 1 — Expert: "We cannot close more than 2 units in Ward C."
+    // Unit closure cap limits isolation/cohorting/deep-clean space.
+    // S4 Ward Closure wanted full Ward C → only 2 units → tests, staffing, isolation, scope degrade.
+    // S2 Patient Cohorting → fewer beds, screening narrows to contacts, ratio worsens.
+    // S3 Patient + Staff Cohorting → cohort space shrinks, can't hold 2-ward cohort.
+    // S1 Standard Precautions → absorbs displaced patients, tightens.
     const bedEdits = [
-        // S1 Ward closure: 28→12 beds, proportional staff cut, lose 1 unit, slower
-        { scenario: 0, detail: 2, value: '12' },
-        { scenario: 0, detail: 1, value: '12' },
-        { scenario: 0, detail: 4, value: '1' },
-        { scenario: 0, detail: 3, value: '16d' },
-        // S2 Cohorting: 18→12 beds, fewer staff needed, slower clearance
-        { scenario: 1, detail: 2, value: '12' },
-        { scenario: 1, detail: 1, value: '8' },
-        { scenario: 1, detail: 3, value: '18d' },
-        // S3 Surveillance: 8 beds under cap, but fewer isolation beds available → longer
-        { scenario: 2, detail: 3, value: '12d' },
-        // S4 Isolation: 0 beds, but tighter system capacity → longer tail
-        { scenario: 3, detail: 3, value: '24d' },
+        // S4 Ward Closure: full closure impossible → partial, tests/ratio/isolation slashed
+        { scenario: 3, detail: 1, value: ' 35/day' },
+        { scenario: 3, detail: 2, value: ' 1:5' },
+        { scenario: 3, detail: 3, value: ' 12 beds' },
+        { scenario: 3, detail: 4, value: ' 2 units Ward C' },
+        // S2 Patient Cohorting: fewer beds → narrow screening to contacts, ratio worsens
+        { scenario: 1, detail: 0, value: ' Contact-based' },
+        { scenario: 1, detail: 1, value: ' 20/day' },
+        { scenario: 1, detail: 2, value: ' 1:8' },
+        { scenario: 1, detail: 3, value: ' 10 beds' },
+        // S3 Patient + Staff Cohorting: cohort shrinks, can't sustain Ward C + B
+        { scenario: 2, detail: 1, value: ' 15/day' },
+        { scenario: 2, detail: 2, value: ' 1:6' },
+        { scenario: 2, detail: 3, value: ' 8 beds' },
+        { scenario: 2, detail: 4, value: ' Ward C' },
+        // S1 Standard Precautions: displaced patients increase load
+        { scenario: 0, detail: 2, value: ' 1:12' },
+        { scenario: 0, detail: 3, value: ' Restricted' },
+        { scenario: 0, detail: 4, value: ' Ward A + B' },
     ];
 
-    // Phase 2 — Expert: "Lab capacity: 15 swabs/day"
-    // Every screening strategy must fit 15/day throughput → prioritised, slower detection.
+    // Phase 2 — Expert: "Lab capacity capped at 15 PCR tests/day."
+    // Testing bottleneck cascades: fewer tests → fewer detected → fewer to isolate → staff rebalanced.
+    // S4 Ward Closure: tests slashed, isolation shrinks, scope narrows further.
+    // S2 Patient Cohorting: contact-based→symptomatic, tests capped, isolation halved.
+    // S3 Patient + Staff Cohorting: risk-ranked→symptomatic, tests cut, isolation shrinks.
+    // S1 Standard Precautions: tests finally capped, staffing stretched, scope narrows.
     const testEdits = [
-        // S1 Ward closure: can't screen all patients at 15/day → prioritised
-        { scenario: 0, detail: 0, value: '15/day priority' },
-        { scenario: 0, detail: 3, value: '20d' },
-        // S2 Cohorting: exposed contacts exceed 15/day → risk-ranked
-        { scenario: 1, detail: 0, value: 'Risk-ranked' },
-        { scenario: 1, detail: 3, value: '22d' },
-        // S3 Surveillance: all contacts → risk-ranked within cap; flex pool cut
-        { scenario: 2, detail: 0, value: 'Risk-ranked' },
-        { scenario: 2, detail: 1, value: '6 + 2 flex' },
-        { scenario: 2, detail: 3, value: '14d' },
-        // S4 Isolation: low-volume testing, but slower detection → needs extra staff
-        { scenario: 3, detail: 1, value: '2 added' },
-        { scenario: 3, detail: 3, value: '28d' },
+        // S4 Ward Closure: 35→15/day, 12→10 beds, can only sustain 1 unit
+        { scenario: 3, detail: 1, value: ' 15/day' },
+        { scenario: 3, detail: 2, value: ' 1:6' },
+        { scenario: 3, detail: 3, value: ' 10 beds' },
+        { scenario: 3, detail: 4, value: ' 1 unit Ward C' },
+        // S2 Patient Cohorting: contact-based→symptomatic, 20→15/day, 10→8 beds
+        { scenario: 1, detail: 0, value: ' Symptomatic' },
+        { scenario: 1, detail: 1, value: ' 15/day' },
+        { scenario: 1, detail: 2, value: ' 1:10' },
+        { scenario: 1, detail: 3, value: ' 8 beds' },
+        // S3 Patient + Staff Cohorting: risk-ranked→symptomatic, 15→10/day, 8→6 beds
+        { scenario: 2, detail: 0, value: ' Symptomatic' },
+        { scenario: 2, detail: 1, value: ' 10/day' },
+        { scenario: 2, detail: 2, value: ' 1:8' },
+        { scenario: 2, detail: 3, value: ' 6 beds' },
+        // S1 Standard Precautions: unlimited→15/day, ratio worsens, scope narrows
+        { scenario: 0, detail: 1, value: ' 15/day' },
+        { scenario: 0, detail: 2, value: ' 1:14' },
+        { scenario: 0, detail: 4, value: ' Ward A' },
     ];
 
     function onBubbleComplete(msgIdx) {
@@ -275,70 +294,80 @@
     const bedBaseline = t => 0.15 + 0.82 * t;
     const costBaseline = t => 0.1 + 0.85 * t;
 
-    /* --- Curve phases: initial → post-bed-cap → post-screening-cap --- */
+    /* --- Curve phases: initial → post-unit-cap → post-screening-cap ---
+       Index order: [0]=S1 Standard, [1]=S2 Patient Cohorting,
+                    [2]=S3 Patient+Staff Cohorting, [3]=S4 Ward Closure
+       Colors:      [0]=blue,       [1]=purple,
+                    [2]=teal,                       [3]=amber
+
+       Clinical ordering per metric:
+         Cases:    S1 most > S2 > S3 > S4 least   (closure contains best)
+         Bed-days: S4 most > S1 > S3 > S2 least   (closure = max bed loss)
+         Cost:     S4 most > S1 > S3 > S2 least   (closure = most expensive)
+    --- */
     const curvePhases = [
-        { // Phase 0: no constraints — S1 contains best but at high cost
+        { // Phase 0: unconstrained — Ward Closure contains best but burns beds/cost
             infect: [
-                t => 0.05 + 0.12 * (1 - Math.exp(-5.5 * t)),
-                t => 0.05 + 0.28 * (1 - Math.exp(-3.8 * t)),
-                t => 0.05 + 0.16 * (1 - Math.exp(-5.0 * t)),
-                t => 0.05 + 0.55 * (1 - Math.exp(-2.5 * t)),
+                t => 0.05 + 0.58 * (1 - Math.exp(-3.0 * t)),   // S1 Standard: most cases
+                t => 0.05 + 0.35 * (1 - Math.exp(-3.5 * t)),   // S2 Patient Cohorting
+                t => 0.05 + 0.22 * (1 - Math.exp(-4.0 * t)),   // S3 Patient+Staff Cohorting
+                t => 0.05 + 0.10 * (1 - Math.exp(-5.5 * t)),   // S4 Ward Closure: fewest cases
             ],
             bed: [
-                t => 0.12 + 0.60 * t * (1 - 0.1 * t),
-                t => 0.08 + 0.30 * t * (1 - 0.15 * t),
-                t => 0.04 + 0.14 * t * (1 - 0.25 * t),
-                t => 0.02 + 0.08 * t * (1 - 0.3 * t),
+                t => 0.08 + 0.55 * t * (1 - 0.10 * t),         // S1 Standard: high (infections drive occupancy)
+                t => 0.03 + 0.15 * t * (1 - 0.20 * t),         // S2 Patient Cohorting: lowest
+                t => 0.04 + 0.22 * t * (1 - 0.18 * t),         // S3 Patient+Staff: low
+                t => 0.10 + 0.62 * t * (1 - 0.08 * t),         // S4 Ward Closure: most bed-days
             ],
             cost: [
-                t => 0.12 + 0.65 * t,
-                t => 0.08 + 0.38 * t,
-                t => 0.06 + 0.20 * t,
-                t => 0.04 + 0.45 * t,
+                t => 0.08 + 0.55 * t,                           // S1 Standard: second highest
+                t => 0.03 + 0.18 * t,                           // S2 Patient Cohorting: lowest
+                t => 0.05 + 0.30 * t,                           // S3 Patient+Staff: moderate
+                t => 0.10 + 0.68 * t,                           // S4 Ward Closure: most expensive
             ],
-            optimal: 0,
+            optimal: 3,  // Ward Closure — fewest cases when unconstrained
         },
-        { // Phase 1: bed cap at 12 — S1 can't fully close, ring-fence leads
+        { // Phase 1: 2-unit closure cap — Ward Closure degraded, Patient+Staff Cohorting leads
             infect: [
-                t => 0.05 + 0.30 * (1 - Math.exp(-3.2 * t)),
-                t => 0.05 + 0.26 * (1 - Math.exp(-3.8 * t)),
-                t => 0.05 + 0.15 * (1 - Math.exp(-5.0 * t)),
-                t => 0.05 + 0.55 * (1 - Math.exp(-2.5 * t)),
+                t => 0.05 + 0.55 * (1 - Math.exp(-3.0 * t)),   // S1 Standard: still most
+                t => 0.05 + 0.33 * (1 - Math.exp(-3.5 * t)),   // S2 Patient Cohorting
+                t => 0.05 + 0.20 * (1 - Math.exp(-4.2 * t)),   // S3 Patient+Staff: best now
+                t => 0.05 + 0.26 * (1 - Math.exp(-3.8 * t)),   // S4 Ward Closure: DEGRADED
             ],
             bed: [
-                t => 0.10 + 0.38 * t * (1 - 0.1 * t),
-                t => 0.07 + 0.28 * t * (1 - 0.15 * t),
-                t => 0.04 + 0.14 * t * (1 - 0.25 * t),
-                t => 0.02 + 0.08 * t * (1 - 0.3 * t),
+                t => 0.08 + 0.52 * t * (1 - 0.10 * t),         // S1 Standard: still high
+                t => 0.03 + 0.16 * t * (1 - 0.20 * t),         // S2 Patient Cohorting: still lowest
+                t => 0.04 + 0.20 * t * (1 - 0.18 * t),         // S3 Patient+Staff: still low
+                t => 0.08 + 0.48 * t * (1 - 0.10 * t),         // S4 Ward Closure: less (only 2 units)
             ],
             cost: [
-                t => 0.10 + 0.48 * t,
-                t => 0.07 + 0.34 * t,
-                t => 0.06 + 0.20 * t,
-                t => 0.04 + 0.45 * t,
+                t => 0.08 + 0.52 * t,                           // S1 Standard: second
+                t => 0.03 + 0.20 * t,                           // S2 Patient Cohorting: still lowest
+                t => 0.05 + 0.28 * t,                           // S3 Patient+Staff: moderate
+                t => 0.09 + 0.58 * t,                           // S4 Ward Closure: still most expensive
             ],
-            optimal: 2,
+            optimal: 2,  // Patient+Staff Cohorting — best trade-off now
         },
-        { // Phase 2: screening cap (15/day) — S2 degrades, S3 holds via risk ranking
+        { // Phase 2: 15 PCR/day cap — Patient Cohorting degrades, Patient+Staff Cohorting holds
             infect: [
-                t => 0.05 + 0.32 * (1 - Math.exp(-3.0 * t)),
-                t => 0.05 + 0.34 * (1 - Math.exp(-3.2 * t)),
-                t => 0.05 + 0.13 * (1 - Math.exp(-5.2 * t)),
-                t => 0.05 + 0.58 * (1 - Math.exp(-2.3 * t)),
+                t => 0.05 + 0.58 * (1 - Math.exp(-2.8 * t)),   // S1 Standard: worst
+                t => 0.05 + 0.40 * (1 - Math.exp(-3.2 * t)),   // S2 Patient Cohorting: DEGRADED
+                t => 0.05 + 0.18 * (1 - Math.exp(-4.5 * t)),   // S3 Patient+Staff: holds well
+                t => 0.05 + 0.30 * (1 - Math.exp(-3.5 * t)),   // S4 Ward Closure: further degraded
             ],
             bed: [
-                t => 0.10 + 0.40 * t * (1 - 0.1 * t),
-                t => 0.08 + 0.32 * t * (1 - 0.12 * t),
-                t => 0.04 + 0.12 * t * (1 - 0.28 * t),
-                t => 0.02 + 0.10 * t * (1 - 0.25 * t),
+                t => 0.08 + 0.55 * t * (1 - 0.10 * t),         // S1 Standard: high
+                t => 0.04 + 0.20 * t * (1 - 0.18 * t),         // S2 Patient Cohorting: still low
+                t => 0.04 + 0.18 * t * (1 - 0.20 * t),         // S3 Patient+Staff: lowest now
+                t => 0.07 + 0.42 * t * (1 - 0.12 * t),         // S4 Ward Closure: less (1 unit)
             ],
             cost: [
-                t => 0.10 + 0.48 * t,
-                t => 0.08 + 0.40 * t,
-                t => 0.05 + 0.18 * t,
-                t => 0.04 + 0.50 * t,
+                t => 0.08 + 0.52 * t,                           // S1 Standard: second
+                t => 0.04 + 0.24 * t,                           // S2 Patient Cohorting: still lowest
+                t => 0.05 + 0.28 * t,                           // S3 Patient+Staff: moderate
+                t => 0.09 + 0.55 * t,                           // S4 Ward Closure: still most expensive
             ],
-            optimal: 2,
+            optimal: 2,  // Patient+Staff Cohorting — most resilient under both constraints
         },
     ];
 
