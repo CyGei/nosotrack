@@ -159,8 +159,8 @@
     ];
 
     function onBubbleComplete(msgIdx) {
-        if (msgIdx === 3) { terminalEditSequence(bedEdits); setCurvePhase(1); }
-        if (msgIdx === 5) { terminalEditSequence(testEdits); setCurvePhase(2); }
+        if (msgIdx === 3) { terminalEditSequence(bedEdits); setSpiderPhase(1); }
+        if (msgIdx === 5) { terminalEditSequence(testEdits); setSpiderPhase(2); }
     }
 
     function addBubble() {
@@ -265,269 +265,214 @@
     }
 
     /* ============================================================
-       3. THREE PROJECTION CANVASES — infections, bed-days, cost
+       3. SPIDER / RADAR PLOT — 5-axis outcome comparison
        ============================================================ */
-    const canvasIds = ['ipc-canvas-infections', 'ipc-canvas-beddays', 'ipc-canvas-cost'];
-    const canvases = canvasIds.map(id => document.getElementById(id));
-    if (!canvases[0]) return;
-    const ctxs = canvases.map(c => c.getContext('2d'));
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const spiderCanvas = document.getElementById('ipc-spider-canvas');
+    if (!spiderCanvas) return;
+    const spCtx = spiderCanvas.getContext('2d');
+    const spDpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    function resizeAllCanvases() {
-        canvases.forEach((c, i) => {
-            const rect = c.getBoundingClientRect();
-            c.width = rect.width * dpr;
-            c.height = rect.height * dpr;
-            ctxs[i].setTransform(dpr, 0, 0, dpr, 0, 0);
-        });
+    let spW, spH;
+    function resizeSpider() {
+        const rect = spiderCanvas.getBoundingClientRect();
+        spW = rect.width; spH = rect.height;
+        spiderCanvas.width = spW * spDpr;
+        spiderCanvas.height = spH * spDpr;
+        spCtx.setTransform(spDpr, 0, 0, spDpr, 0, 0);
     }
-    resizeAllCanvases();
+    resizeSpider();
 
-    const cW = (ci) => canvases[ci].width / dpr;
-    const cH = (ci) => canvases[ci].height / dpr;
-
-    // Scenario colors (same order as scenario cards)
+    const axisLabels = ['Cases', 'Bed-days\nlost', 'Cost', 'Containment\ntime', 'Staff\nburden'];
     const colors = ['#3b82f6', '#8b5cf6', '#14b8a6', '#f59e0b'];
+    const NUM_AXES = 5;
+    const NUM_SCENARIOS = 4;
 
-    /* --- Baselines (no action — unchanged across constraint phases) --- */
-    const infectBaseline = t => 0.05 + 0.9 * (1 - Math.exp(-3.5 * t));
-    const bedBaseline = t => 0.15 + 0.82 * t;
-    const costBaseline = t => 0.1 + 0.85 * t;
-
-    /* --- Curve phases: initial → post-unit-cap → post-screening-cap ---
-       Index order: [0]=S1 Standard, [1]=S2 Patient Cohorting,
-                    [2]=S3 Patient+Staff Cohorting, [3]=S4 Ward Closure
-       Colors:      [0]=blue,       [1]=purple,
-                    [2]=teal,                       [3]=amber
-
-       Clinical ordering per metric:
-         Cases:    S1 most > S2 > S3 > S4 least   (closure contains best)
-         Bed-days: S4 most > S1 > S3 > S2 least   (closure = max bed loss)
-         Cost:     S4 most > S1 > S3 > S2 least   (closure = most expensive)
-    --- */
-    const curvePhases = [
-        { // Phase 0: unconstrained — Ward Closure contains best but burns beds/cost
-            infect: [
-                t => 0.05 + 0.58 * (1 - Math.exp(-3.0 * t)),   // S1 Standard: most cases
-                t => 0.05 + 0.35 * (1 - Math.exp(-3.5 * t)),   // S2 Patient Cohorting
-                t => 0.05 + 0.22 * (1 - Math.exp(-4.0 * t)),   // S3 Patient+Staff Cohorting
-                t => 0.05 + 0.10 * (1 - Math.exp(-5.5 * t)),   // S4 Ward Closure: fewest cases
+    /* Spider data: 5 axes × 4 scenarios × 3 phases (values 0–1, outward = worse)
+       Axes: Cases, Bed-days lost, Cost, Containment time, Staff burden
+       Scenarios: S1 Standard, S2 Patient Cohorting, S3 Patient+Staff, S4 Ward Closure */
+    const spiderPhases = [
+        { // Phase 0: unconstrained
+            data: [
+                [0.85, 0.68, 0.62, 0.80, 0.20],  // S1 Standard Precautions
+                [0.48, 0.22, 0.22, 0.52, 0.45],  // S2 Patient Cohorting
+                [0.28, 0.28, 0.38, 0.30, 0.65],  // S3 Patient+Staff Cohorting
+                [0.12, 0.85, 0.85, 0.18, 0.82],  // S4 Ward Closure
             ],
-            bed: [
-                t => 0.08 + 0.55 * t * (1 - 0.10 * t),         // S1 Standard: high (infections drive occupancy)
-                t => 0.03 + 0.15 * t * (1 - 0.20 * t),         // S2 Patient Cohorting: lowest
-                t => 0.04 + 0.22 * t * (1 - 0.18 * t),         // S3 Patient+Staff: low
-                t => 0.10 + 0.62 * t * (1 - 0.08 * t),         // S4 Ward Closure: most bed-days
-            ],
-            cost: [
-                t => 0.08 + 0.55 * t,                           // S1 Standard: second highest
-                t => 0.03 + 0.18 * t,                           // S2 Patient Cohorting: lowest
-                t => 0.05 + 0.30 * t,                           // S3 Patient+Staff: moderate
-                t => 0.10 + 0.68 * t,                           // S4 Ward Closure: most expensive
-            ],
-            optimal: 3,  // Ward Closure — fewest cases when unconstrained
+            optimal: 3,
         },
-        { // Phase 1: 2-unit closure cap — Ward Closure degraded, Patient+Staff Cohorting leads
-            infect: [
-                t => 0.05 + 0.55 * (1 - Math.exp(-3.0 * t)),   // S1 Standard: still most
-                t => 0.05 + 0.33 * (1 - Math.exp(-3.5 * t)),   // S2 Patient Cohorting
-                t => 0.05 + 0.20 * (1 - Math.exp(-4.2 * t)),   // S3 Patient+Staff: best now
-                t => 0.05 + 0.26 * (1 - Math.exp(-3.8 * t)),   // S4 Ward Closure: DEGRADED
+        { // Phase 1: 2-unit closure cap
+            data: [
+                [0.82, 0.65, 0.60, 0.78, 0.22],
+                [0.45, 0.25, 0.25, 0.50, 0.48],
+                [0.25, 0.26, 0.36, 0.28, 0.62],
+                [0.38, 0.58, 0.70, 0.42, 0.72],
             ],
-            bed: [
-                t => 0.08 + 0.52 * t * (1 - 0.10 * t),         // S1 Standard: still high
-                t => 0.03 + 0.16 * t * (1 - 0.20 * t),         // S2 Patient Cohorting: still lowest
-                t => 0.04 + 0.20 * t * (1 - 0.18 * t),         // S3 Patient+Staff: still low
-                t => 0.08 + 0.48 * t * (1 - 0.10 * t),         // S4 Ward Closure: less (only 2 units)
-            ],
-            cost: [
-                t => 0.08 + 0.52 * t,                           // S1 Standard: second
-                t => 0.03 + 0.20 * t,                           // S2 Patient Cohorting: still lowest
-                t => 0.05 + 0.28 * t,                           // S3 Patient+Staff: moderate
-                t => 0.09 + 0.58 * t,                           // S4 Ward Closure: still most expensive
-            ],
-            optimal: 2,  // Patient+Staff Cohorting — best trade-off now
+            optimal: 2,
         },
-        { // Phase 2: 15 PCR/day cap — Patient Cohorting degrades, Patient+Staff Cohorting holds
-            infect: [
-                t => 0.05 + 0.58 * (1 - Math.exp(-2.8 * t)),   // S1 Standard: worst
-                t => 0.05 + 0.40 * (1 - Math.exp(-3.2 * t)),   // S2 Patient Cohorting: DEGRADED
-                t => 0.05 + 0.18 * (1 - Math.exp(-4.5 * t)),   // S3 Patient+Staff: holds well
-                t => 0.05 + 0.30 * (1 - Math.exp(-3.5 * t)),   // S4 Ward Closure: further degraded
+        { // Phase 2: 15 PCR/day cap
+            data: [
+                [0.88, 0.70, 0.65, 0.85, 0.25],
+                [0.58, 0.30, 0.30, 0.62, 0.42],
+                [0.22, 0.24, 0.34, 0.26, 0.60],
+                [0.45, 0.52, 0.65, 0.50, 0.68],
             ],
-            bed: [
-                t => 0.08 + 0.55 * t * (1 - 0.10 * t),         // S1 Standard: high
-                t => 0.04 + 0.20 * t * (1 - 0.18 * t),         // S2 Patient Cohorting: still low
-                t => 0.04 + 0.18 * t * (1 - 0.20 * t),         // S3 Patient+Staff: lowest now
-                t => 0.07 + 0.42 * t * (1 - 0.12 * t),         // S4 Ward Closure: less (1 unit)
-            ],
-            cost: [
-                t => 0.08 + 0.52 * t,                           // S1 Standard: second
-                t => 0.04 + 0.24 * t,                           // S2 Patient Cohorting: still lowest
-                t => 0.05 + 0.28 * t,                           // S3 Patient+Staff: moderate
-                t => 0.09 + 0.55 * t,                           // S4 Ward Closure: still most expensive
-            ],
-            optimal: 2,  // Patient+Staff Cohorting — most resilient under both constraints
+            optimal: 2,
         },
     ];
 
-    let currentPhase = 0;
-    let optimalIdx = curvePhases[0].optimal;
+    // Current and target values for smooth morphing
+    let spCurrent = spiderPhases[0].data.map(row => [...row]);
+    let spTarget  = spiderPhases[0].data.map(row => [...row]);
+    let spOptimal = spiderPhases[0].optimal;
+    const MORPH_SPEED = 0.018; // per frame, ~1.5s at 60fps
 
-    const allBaselines = [infectBaseline, bedBaseline, costBaseline];
-    let allCurves = [curvePhases[0].infect, curvePhases[0].bed, curvePhases[0].cost];
-    const xLabels = [
-        [0, 7, 14, 21, 28],
-        [0, 7, 14, 21, 28],
-        [0, 7, 14, 21, 28],
-    ];
+    // Continuous looping: cycle through phases automatically
+    let spCurrentPhase = 0;
+    let spLoopTimer = null;
+    const PHASE_HOLD = 4000; // ms to hold each phase before advancing
 
-    // Continuous loop: draw-in (2s) → hold (4s) → fade (0.5s) → restart
-    const DRAW_DUR = 2, HOLD_DUR = 4, FADE_DUR = 0.5;
-    const CYCLE_DUR = DRAW_DUR + HOLD_DUR + FADE_DUR;
-    let revealed = false;
-    let loopStart = 0;
-
-    function setCurvePhase(phase) {
-        currentPhase = phase;
-        const p = curvePhases[phase];
-        allCurves = [p.infect, p.bed, p.cost];
-        optimalIdx = p.optimal;
-        loopStart = 0; // reset draw-in animation
+    function advanceSpiderLoop() {
+        spCurrentPhase = (spCurrentPhase + 1) % spiderPhases.length;
+        const p = spiderPhases[spCurrentPhase];
+        spTarget = p.data.map(row => [...row]);
+        spOptimal = p.optimal;
+        spLoopTimer = setTimeout(advanceSpiderLoop, PHASE_HOLD);
     }
 
-    function drawAllProjections(timestamp) {
-        if (!loopStart) loopStart = timestamp;
-        const elapsed = ((timestamp - loopStart) / 1000) % CYCLE_DUR;
+    function startSpiderLoop() {
+        if (spLoopTimer) clearTimeout(spLoopTimer);
+        spLoopTimer = setTimeout(advanceSpiderLoop, PHASE_HOLD);
+    }
 
-        let ease, globalAlpha;
-        if (elapsed < DRAW_DUR) {
-            const p = elapsed / DRAW_DUR;
-            ease = 1 - Math.pow(1 - p, 3);
-            globalAlpha = 1;
-        } else if (elapsed < DRAW_DUR + HOLD_DUR) {
-            ease = 1;
-            globalAlpha = 1;
-        } else {
-            ease = 1;
-            globalAlpha = 1 - (elapsed - DRAW_DUR - HOLD_DUR) / FADE_DUR;
+    function setSpiderPhase(phase) {
+        // Chat-triggered phase change: set phase and restart loop from here
+        if (spLoopTimer) clearTimeout(spLoopTimer);
+        spCurrentPhase = phase;
+        const p = spiderPhases[phase];
+        spTarget = p.data.map(row => [...row]);
+        spOptimal = p.optimal;
+        spLoopTimer = setTimeout(advanceSpiderLoop, PHASE_HOLD);
+    }
+
+    function drawSpider() {
+        const cx = spW / 2, cy = spH / 2;
+        const radius = Math.min(cx, cy) * 0.68;
+        spCtx.clearRect(0, 0, spW, spH);
+
+        // Morph current towards target
+        let morphing = false;
+        for (let s = 0; s < NUM_SCENARIOS; s++) {
+            for (let a = 0; a < NUM_AXES; a++) {
+                const diff = spTarget[s][a] - spCurrent[s][a];
+                if (Math.abs(diff) > 0.001) {
+                    spCurrent[s][a] += diff * MORPH_SPEED * 3.5;
+                    morphing = true;
+                } else {
+                    spCurrent[s][a] = spTarget[s][a];
+                }
+            }
         }
 
-        for (let ci = 0; ci < 3; ci++) {
-            const ctx = ctxs[ci];
-            const w = cW(ci), h = cH(ci);
-            const padL = 8, padR = 8, padT = 10, padB = 18;
-            const plotW = w - padL - padR;
-            const plotH = h - padT - padB;
+        // Axis angle helper
+        const angle = (i) => (Math.PI * 2 * i / NUM_AXES) - Math.PI / 2;
 
-            ctx.clearRect(0, 0, w, h);
-            ctx.globalAlpha = globalAlpha;
-
-            // X-axis ticks
-            ctx.save();
-            ctx.font = '7px monospace';
-            ctx.textAlign = 'center';
-            xLabels[ci].forEach(d => {
-                const x = padL + (d / 28) * plotW;
-                ctx.fillStyle = 'rgba(255,255,255,0.22)';
-                ctx.fillText(d + 'd', x, h - 4);
-                ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-                ctx.lineWidth = 0.5;
-                ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, h - padB); ctx.stroke();
-            });
-            ctx.restore();
-
-            // Horizontal grid
-            ctx.strokeStyle = 'rgba(255,255,255,0.035)'; ctx.lineWidth = 0.5;
-            for (let i = 0; i <= 4; i++) {
-                const y = padT + (i / 4) * plotH;
-                ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
+        // Concentric pentagon grid (levels 0.2, 0.4, 0.6, 0.8, 1.0)
+        for (let lvl = 1; lvl <= 5; lvl++) {
+            const r = radius * (lvl / 5);
+            spCtx.beginPath();
+            for (let i = 0; i <= NUM_AXES; i++) {
+                const a = angle(i % NUM_AXES);
+                const x = cx + Math.cos(a) * r;
+                const y = cy + Math.sin(a) * r;
+                i === 0 ? spCtx.moveTo(x, y) : spCtx.lineTo(x, y);
             }
-
-            const steps = Math.floor(120 * ease);
-            const blFn = allBaselines[ci];
-            const scFns = allCurves[ci];
-
-            // Baseline (no action) — dashed, prominent
-            ctx.setLineDash([4, 4]);
-            ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1.2;
-            ctx.beginPath();
-            for (let i = 0; i <= steps; i++) {
-                const t = i / 120, x = padL + t * plotW;
-                const y = padT + plotH - blFn(t) * plotH;
-                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-            }
-            ctx.stroke(); ctx.setLineDash([]);
-
-            if (ease > 0.5) {
-                ctx.save(); ctx.font = '7px monospace';
-                ctx.fillStyle = 'rgba(255,255,255,0.35)';
-                ctx.textAlign = 'right';
-                ctx.fillText('no action', w - padR, padT + plotH - blFn(1) * plotH - 4);
-                ctx.restore();
-            }
-
-            // Scenario curves
-            scFns.forEach((fn, si) => {
-                const delay = si * 0.08;
-                const scP = Math.max(0, Math.min((ease - delay) / (1 - delay), 1));
-                const scSteps = Math.floor(120 * scP);
-                if (scSteps < 2) return;
-
-                ctx.strokeStyle = colors[si]; ctx.lineWidth = 1.5; ctx.globalAlpha = globalAlpha * 0.85;
-                ctx.beginPath();
-                for (let i = 0; i <= scSteps; i++) {
-                    const t = i / 120, x = padL + t * plotW;
-                    const y = padT + plotH - Math.max(0, fn(t)) * plotH;
-                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-                }
-                ctx.stroke();
-
-                // Glow
-                ctx.lineWidth = 5; ctx.globalAlpha = globalAlpha * 0.07;
-                ctx.beginPath();
-                for (let i = 0; i <= scSteps; i++) {
-                    const t = i / 120, x = padL + t * plotW;
-                    const y = padT + plotH - Math.max(0, fn(t)) * plotH;
-                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-                }
-                ctx.stroke();
-                ctx.globalAlpha = globalAlpha;
-
-                // Extra glow for optimal scenario (dynamic)
-                if (si === optimalIdx && ease >= 1) {
-                    ctx.lineWidth = 8; ctx.globalAlpha = globalAlpha * 0.06;
-                    ctx.strokeStyle = colors[optimalIdx];
-                    ctx.beginPath();
-                    for (let i = 0; i <= 120; i++) {
-                        const t = i / 120, x = padL + t * plotW;
-                        const y = padT + plotH - Math.max(0, fn(t)) * plotH;
-                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-                    }
-                    ctx.stroke();
-                    ctx.globalAlpha = globalAlpha;
-                }
-
-                // Tip dot during draw-in
-                if (scP < 1) {
-                    const tipT = scSteps / 120;
-                    const tipX = padL + tipT * plotW;
-                    const tipY = padT + plotH - Math.max(0, fn(tipT)) * plotH;
-                    ctx.beginPath(); ctx.arc(tipX, tipY, 2.5, 0, Math.PI * 2);
-                    ctx.fillStyle = colors[si]; ctx.globalAlpha = globalAlpha * 0.9;
-                    ctx.fill(); ctx.globalAlpha = globalAlpha;
-                }
-            });
-
-            ctx.globalAlpha = 1;
+            spCtx.strokeStyle = 'rgba(255,255,255,' + (lvl === 5 ? '0.08' : '0.04') + ')';
+            spCtx.lineWidth = 0.5;
+            spCtx.stroke();
         }
 
-        requestAnimationFrame(drawAllProjections);
+        // Axis spokes
+        for (let i = 0; i < NUM_AXES; i++) {
+            const a = angle(i);
+            spCtx.beginPath();
+            spCtx.moveTo(cx, cy);
+            spCtx.lineTo(cx + Math.cos(a) * radius, cy + Math.sin(a) * radius);
+            spCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+            spCtx.lineWidth = 0.5;
+            spCtx.stroke();
+        }
+
+        // Draw scenario polygons — all equal weight
+        for (let s = 0; s < NUM_SCENARIOS; s++) {
+            const vals = spCurrent[s];
+
+            // Build polygon path helper
+            function polyPath() {
+                spCtx.beginPath();
+                for (let i = 0; i <= NUM_AXES; i++) {
+                    const ai = i % NUM_AXES;
+                    const a = angle(ai);
+                    const r = radius * vals[ai];
+                    const x = cx + Math.cos(a) * r;
+                    const y = cy + Math.sin(a) * r;
+                    i === 0 ? spCtx.moveTo(x, y) : spCtx.lineTo(x, y);
+                }
+            }
+
+            // Filled polygon
+            polyPath();
+            spCtx.fillStyle = colors[s];
+            spCtx.globalAlpha = 0.06;
+            spCtx.fill();
+            spCtx.globalAlpha = 1;
+
+            // Stroke
+            polyPath();
+            spCtx.strokeStyle = colors[s];
+            spCtx.lineWidth = 1.2;
+            spCtx.globalAlpha = 0.6;
+            spCtx.stroke();
+            spCtx.globalAlpha = 1;
+
+            // Vertex dots
+            for (let i = 0; i < NUM_AXES; i++) {
+                const a = angle(i);
+                const r = radius * vals[i];
+                const x = cx + Math.cos(a) * r;
+                const y = cy + Math.sin(a) * r;
+                spCtx.beginPath();
+                spCtx.arc(x, y, 1.8, 0, Math.PI * 2);
+                spCtx.fillStyle = colors[s];
+                spCtx.globalAlpha = 0.6;
+                spCtx.fill();
+                spCtx.globalAlpha = 1;
+            }
+        }
+
+        // Axis labels
+        spCtx.font = '8px monospace';
+        spCtx.fillStyle = 'rgba(255,255,255,0.45)';
+        spCtx.textAlign = 'center';
+        spCtx.textBaseline = 'middle';
+        for (let i = 0; i < NUM_AXES; i++) {
+            const a = angle(i);
+            const lbR = radius + 18;
+            const lx = cx + Math.cos(a) * lbR;
+            const ly = cy + Math.sin(a) * lbR;
+            const lines = axisLabels[i].split('\n');
+            lines.forEach((line, li) => {
+                spCtx.fillText(line, lx, ly + (li - (lines.length - 1) / 2) * 10);
+            });
+        }
+
+        requestAnimationFrame(drawSpider);
     }
 
     /* ============================================================
        5. INTERSECTION OBSERVER — start everything on scroll reveal
        ============================================================ */
+    let revealed = false;
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && !revealed) {
@@ -537,18 +482,18 @@
                 // Engine canvas
                 initEngineCanvas();
                 drawEngine();
-                // Projection canvases
-                loopStart = 0;
-                requestAnimationFrame(drawAllProjections);
+                // Spider plot — start rendering + continuous phase loop
+                requestAnimationFrame(drawSpider);
+                startSpiderLoop();
             }
         });
     }, { threshold: 0.2 });
 
-    observer.observe(canvases[0]);
+    observer.observe(spiderCanvas);
 
     // Handle resize
     window.addEventListener('resize', () => {
-        resizeAllCanvases();
+        resizeSpider();
         initEngineCanvas();
     });
 })();

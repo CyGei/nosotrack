@@ -718,30 +718,14 @@ nav.main-nav {
 }
 .ipc-engine-box.processing .ipc-engine-status { color: rgba(var(--accent-rgb), 0.7); }
 
-/* ── Projected outcomes ── */
-.ipc-projections-grid {
-    display: flex; gap: 8px; width: 100%;
+/* ── Spider / Radar Plot ── */
+.ipc-spider-container {
+    display: flex; flex-direction: column; align-items: center;
+    width: 100%; position: relative; z-index: 1;
 }
-.ipc-projection-panel {
-    flex: 1; min-width: 0;
-}
-.ipc-outcomes-header {
-    display: flex; align-items: baseline; justify-content: space-between;
-    margin-bottom: 6px;
-}
-.ipc-outcomes-label {
-    font-family: var(--mono); font-size: 0.48rem; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--text-dim);
-}
-.ipc-outcomes-unit {
-    font-family: var(--mono); font-size: 0.44rem; letter-spacing: 0.5px;
-    color: rgba(255,255,255,0.45);
-}
-.ipc-projection-panel canvas {
-    width: 100%; height: 140px;
-    border-radius: 6px;
-    background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.03);
+#ipc-spider-canvas {
+    width: 100%; max-width: 440px; height: 280px;
+    border-radius: 8px;
 }
 
 /* ── Optimal intervention callout ── */
@@ -805,8 +789,7 @@ nav.main-nav {
     .ipc-scenarios-row { flex-wrap: wrap; }
     .ipc-scenarios-row .ipc-scenario-card { flex: 1 1 calc(50% - 4px); min-width: calc(50% - 4px); }
     .ipc-sc-details { display: none; }
-    .ipc-projections-grid { flex-direction: column; }
-    .ipc-projection-panel canvas { height: 110px; }
+    #ipc-spider-canvas { height: 220px; }
     .ipc-optimal { padding: 8px 12px; }
     .ipc-optimal-title { font-size: 0.48rem; }
     .ipc-optimal-metrics { flex-wrap: wrap; }
