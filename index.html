@@ -278,22 +278,17 @@
                                 <div class="ipc-row">
                                     <div class="ipc-chat-scene" id="ipc-chat-scene">
                                         <!-- Doctor icon -->
-                                        <div class="ipc-avatar ipc-avatar--expert">
-                                            <svg class="ipc-avatar-icon" viewBox="0 0 44 44" fill="none">
-                                                <circle cx="22" cy="12" r="6" stroke="rgba(255,255,255,0.5)"
-                                                    stroke-width="1.3" fill="none" />
-                                                <path d="M10 38c0-6.63 5.37-12 12-12s12 5.37 12 12"
-                                                    stroke="rgba(255,255,255,0.35)" stroke-width="1.3" fill="none" />
-                                                <path d="M18 26l4 5 4-5" stroke="rgba(255,255,255,0.25)"
-                                                    stroke-width="1" fill="none" />
-                                                <path d="M17 28c0 0-3 1-3 4a2 2 0 004 0" stroke="rgba(255,255,255,0.35)"
-                                                    stroke-width="0.9" fill="none" />
-                                                <circle cx="18" cy="32" r="1.2" fill="rgba(255,255,255,0.3)" />
-                                                <line x1="20" y1="7" x2="24" y2="7" stroke="rgba(255,255,255,0.3)"
-                                                    stroke-width="0.8" />
-                                                <line x1="22" y1="5.5" x2="22" y2="8.5" stroke="rgba(255,255,255,0.3)"
-                                                    stroke-width="0.8" />
-                                            </svg>
+                                        <div class="ipc-avatar ipc-avatar--expert" id="ipc-avatar-expert">
+                                            <div class="ipc-avatar-ring">
+                                                <svg class="ipc-avatar-icon" viewBox="0 0 44 44" fill="none">
+                                                    <!-- Head -->
+                                                    <circle cx="22" cy="13" r="5.5" stroke="rgba(255,255,255,0.6)"
+                                                        stroke-width="1.3" fill="rgba(255,255,255,0.04)" />
+                                                    <!-- Body / shoulders -->
+                                                    <path d="M12 38c0-5.52 4.48-10 10-10s10 4.48 10 10"
+                                                        stroke="rgba(255,255,255,0.5)" stroke-width="1.3" fill="rgba(255,255,255,0.03)" />
+                                                </svg>
+                                            </div>
                                             <span class="ipc-avatar-label">IPC Expert</span>
                                         </div>
                                         <!-- Chat bubble area -->
@@ -301,22 +296,24 @@
                                             <!-- Bubbles injected by JS -->
                                         </div>
                                         <!-- AI robot icon -->
-                                        <div class="ipc-avatar ipc-avatar--ai">
-                                            <svg class="ipc-avatar-icon" viewBox="0 0 44 44" fill="none">
-                                                <rect x="10" y="10" width="24" height="18" rx="4" stroke="#ff073a"
-                                                    stroke-width="1.3" fill="rgba(255,7,58,0.04)" />
-                                                <circle cx="18" cy="18" r="2.5" stroke="#ff073a" stroke-width="1"
-                                                    fill="rgba(255,7,58,0.1)" />
-                                                <circle cx="26" cy="18" r="2.5" stroke="#ff073a" stroke-width="1"
-                                                    fill="rgba(255,7,58,0.1)" />
-                                                <circle cx="18" cy="18" r="1" fill="#ff073a" opacity="0.7" />
-                                                <circle cx="26" cy="18" r="1" fill="#ff073a" opacity="0.7" />
-                                                <line x1="17" y1="24" x2="27" y2="24" stroke="#ff073a"
-                                                    stroke-width="0.8" opacity="0.4" />
-                                                <line x1="22" y1="10" x2="22" y2="4" stroke="#ff073a" stroke-width="1"
-                                                    opacity="0.5" />
-                                                <circle cx="22" cy="3" r="1.5" fill="#ff073a" opacity="0.5" />
-                                            </svg>
+                                        <div class="ipc-avatar ipc-avatar--ai" id="ipc-avatar-ai">
+                                            <div class="ipc-avatar-ring">
+                                                <svg class="ipc-avatar-icon" viewBox="0 0 44 44" fill="none">
+                                                    <rect x="11" y="12" width="22" height="16" rx="3.5" stroke="#ff073a"
+                                                        stroke-width="1.2" fill="rgba(255,7,58,0.05)" />
+                                                    <circle cx="18" cy="19" r="2.2" stroke="#ff073a" stroke-width="0.9"
+                                                        fill="rgba(255,7,58,0.12)" />
+                                                    <circle cx="26" cy="19" r="2.2" stroke="#ff073a" stroke-width="0.9"
+                                                        fill="rgba(255,7,58,0.12)" />
+                                                    <circle cx="18" cy="19" r="0.9" fill="#ff073a" opacity="0.8" />
+                                                    <circle cx="26" cy="19" r="0.9" fill="#ff073a" opacity="0.8" />
+                                                    <line x1="19" y1="25" x2="25" y2="25" stroke="#ff073a"
+                                                        stroke-width="0.7" opacity="0.4" stroke-linecap="round" />
+                                                    <line x1="22" y1="12" x2="22" y2="7" stroke="#ff073a" stroke-width="0.9"
+                                                        opacity="0.5" />
+                                                    <circle cx="22" cy="5.5" r="1.3" fill="#ff073a" opacity="0.5" />
+                                                </svg>
+                                            </div>
                                             <span class="ipc-avatar-label">AI Assistant</span>
                                         </div>
                                     </div>
@@ -466,19 +463,21 @@
                                 <!-- Row 5: Optimal intervention callout -->
                                 <div class="ipc-row">
                                     <div class="ipc-optimal" id="ipc-optimal">
+                                        <div class="ipc-optimal-badge">Recommended Strategy</div>
                                         <div class="ipc-optimal-header">
-                                            <svg class="ipc-optimal-icon" viewBox="0 0 20 20" fill="none">
-                                                <circle cx="10" cy="10" r="9" stroke="#14b8a6" stroke-width="1.5"
-                                                    fill="rgba(20,184,166,0.08)" />
-                                                <path d="M6 10l3 3 5-6" stroke="#14b8a6" stroke-width="1.8"
-                                                    stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                                            <svg class="ipc-optimal-icon" viewBox="0 0 24 24" fill="none">
+                                                <path d="M12 2l2.4 7.2H22l-6 4.8 2.4 7.2L12 16.4l-6.4 4.8 2.4-7.2-6-4.8h7.6z"
+                                                    stroke="#14b8a6" stroke-width="1.5" stroke-linejoin="round"
+                                                    fill="rgba(20,184,166,0.12)" />
                                             </svg>
-                                            <span class="ipc-optimal-title">Optimal: Patient + Staff Cohorting</span>
+                                            <div class="ipc-optimal-title-group">
+                                                <span class="ipc-optimal-title">Patient + Staff Cohorting</span>
+                                            </div>
                                         </div>
                                         <div class="ipc-optimal-metrics">
                                             <div class="ipc-optimal-metric">
                                                 <span class="ipc-optimal-metric-val">96%</span>
-                                                <span class="ipc-optimal-metric-label">containment score</span>
+                                                <span class="ipc-optimal-metric-label">containment</span>
                                             </div>
                                             <div class="ipc-optimal-metric">
                                                 <span class="ipc-optimal-metric-val">19</span>
@@ -486,11 +485,11 @@
                                             </div>
                                             <div class="ipc-optimal-metric">
                                                 <span class="ipc-optimal-metric-val">154</span>
-                                                <span class="ipc-optimal-metric-label">bed-days spared</span>
+                                                <span class="ipc-optimal-metric-label">bed-days saved</span>
                                             </div>
                                             <div class="ipc-optimal-metric">
                                                 <span class="ipc-optimal-metric-val">$85K</span>
-                                                <span class="ipc-optimal-metric-label">saved</span>
+                                                <span class="ipc-optimal-metric-label">cost saved</span>
                                             </div>
                                         </div>
                                     </div>

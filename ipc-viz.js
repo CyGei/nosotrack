@@ -16,9 +16,10 @@
         { who: 'ai', text: 'Daily screening limited to 15 tests. Run simulations?' },
         { who: 'expert', text: 'Yes.' },
     ];
-    let chatIdx = 0, charIdx = 0, visibleBubbles = [];
-    const MAX_VISIBLE = 3;
+    let chatIdx = 0, charIdx = 0, activeBubble = null;
     let chatTimer, cursorEl;
+    const expertAvatar = document.getElementById('ipc-avatar-expert');
+    const aiAvatar = document.getElementById('ipc-avatar-ai');
 
     /* ── Terminal-edit helpers for scenario cards ── */
     function getDetailEl(scenarioIdx, detailIdx) {
@@ -163,44 +164,79 @@
         if (msgIdx === 5) { terminalEditSequence(testEdits); setSpiderPhase(2); }
     }
 
-    function addBubble() {
-        if (!bubbleArea) return;
-        const msg = chatMessages[chatIdx % chatMessages.length];
+    function setSpeaking(who) {
+        if (expertAvatar) expertAvatar.classList.toggle('speaking', who === 'expert');
+        if (aiAvatar) aiAvatar.classList.toggle('speaking', who === 'ai');
+    }
+
+    function clearBubbles() {
+        const existing = bubbleArea.querySelectorAll('.ipc-bubble:not(.exit)');
+        existing.forEach(b => {
+            b.classList.add('exit');
+            setTimeout(() => b.remove(), 250);
+        });
+        activeBubble = null;
+    }
+
+    function typeBubble(msg, msgIdx, onDone) {
+        setSpeaking(msg.who);
+
         const bubble = document.createElement('div');
         bubble.className = 'ipc-bubble ipc-bubble--' + msg.who;
         bubbleArea.appendChild(bubble);
-        visibleBubbles.push(bubble);
 
-        // Remove old bubbles
-        while (visibleBubbles.length > MAX_VISIBLE) {
-            const old = visibleBubbles.shift();
-            old.classList.add('exit');
-            setTimeout(() => old.remove(), 250);
-        }
-
-        // Typewriter effect
-        charIdx = 0;
-        cursorEl = document.createElement('span');
-        cursorEl.className = 'ipc-bubble-cursor';
-        bubble.appendChild(cursorEl);
-
-        const currentMsgIdx = chatIdx % chatMessages.length;
+        let ci = 0;
+        const cur = document.createElement('span');
+        cur.className = 'ipc-bubble-cursor';
+        bubble.appendChild(cur);
 
         function typeChar() {
-            if (charIdx < msg.text.length) {
-                bubble.insertBefore(document.createTextNode(msg.text[charIdx]), cursorEl);
-                charIdx++;
+            if (ci < msg.text.length) {
+                bubble.insertBefore(document.createTextNode(msg.text[ci]), cur);
+                ci++;
                 chatTimer = setTimeout(typeChar, 22 + Math.random() * 28);
             } else {
                 setTimeout(() => {
-                    if (cursorEl.parentNode) cursorEl.remove();
-                    onBubbleComplete(currentMsgIdx);
-                    chatIdx++;
-                    chatTimer = setTimeout(addBubble, 1200);
-                }, 600);
+                    if (cur.parentNode) cur.remove();
+                    setSpeaking(null);
+                    onBubbleComplete(msgIdx);
+                    if (onDone) onDone();
+                }, 500);
             }
         }
-        chatTimer = setTimeout(typeChar, 200);
+        chatTimer = setTimeout(typeChar, 150);
+    }
+
+    function addBubble() {
+        if (!bubbleArea) return;
+        const idx = chatIdx % chatMessages.length;
+        const msg = chatMessages[idx];
+
+        // Clear previous exchange
+        clearBubbles();
+
+        const nextIdx = (idx + 1) % chatMessages.length;
+        const nextMsg = chatMessages[nextIdx];
+
+        if (msg.who === 'expert' && nextMsg && nextMsg.who === 'ai') {
+            // Type expert bubble, then AI reply below it, hold both 2s
+            typeBubble(msg, idx, () => {
+                chatIdx++;
+                chatTimer = setTimeout(() => {
+                    typeBubble(nextMsg, nextIdx, () => {
+                        chatIdx++;
+                        // Both visible together for 2 seconds
+                        chatTimer = setTimeout(addBubble, 2000);
+                    });
+                }, 600);
+            });
+        } else {
+            // Standalone message
+            typeBubble(msg, idx, () => {
+                chatIdx++;
+                chatTimer = setTimeout(addBubble, 1500);
+            });
+        }
     }
 
     /* ============================================================
@@ -288,33 +324,44 @@
     const NUM_SCENARIOS = 4;
 
     /* Spider data: 5 axes × 4 scenarios × 3 phases (values 0–1, outward = worse)
-       Axes: Cases, Bed-days lost, Cost, Containment time, Staff burden
-       Scenarios: S1 Standard, S2 Patient Cohorting, S3 Patient+Staff, S4 Ward Closure */
+       Axes: Cases, Bed-days lost, Cost, Containment duration, Staff burden
+       Scenarios: S1 Standard, S2 Patient Cohorting, S3 Patient+Staff, S4 Ward Closure
+
+       Clinical logic (consistent across all phases):
+       - S1 Standard: high cases, long containment, but low cost/bed-days/burden (minimal intervention)
+       - S2 Patient Cohorting: moderate cases, moderate cost, moderate burden
+       - S3 Patient+Staff: low cases, short containment, but high staff burden + moderate cost
+       - S4 Ward Closure: fewest cases, shortest containment, but highest cost, bed-days lost, burden
+
+       Constraints degrade scenarios that depend on the constrained resource:
+       Phase 1 (2-unit cap): S4 collapses — can't close wards → cases spike, loses its advantage
+       Phase 2 (15 PCR/day): detection-dependent strategies (S1, S2) degrade; S3 resilient (clinical detection) */
     const spiderPhases = [
-        { // Phase 0: unconstrained
+        { // Phase 0: unconstrained — full resources available
             data: [
-                [0.85, 0.68, 0.62, 0.80, 0.20],  // S1 Standard Precautions
-                [0.48, 0.22, 0.22, 0.52, 0.45],  // S2 Patient Cohorting
-                [0.28, 0.28, 0.38, 0.30, 0.65],  // S3 Patient+Staff Cohorting
-                [0.12, 0.85, 0.85, 0.18, 0.82],  // S4 Ward Closure
+                //  Cases  BedDays  Cost   Duration  Burden
+                [0.90, 0.30, 0.20, 0.88, 0.15],  // S1: many cases, long duration, but cheap & low burden
+                [0.52, 0.35, 0.40, 0.55, 0.45],  // S2: moderate across the board
+                [0.25, 0.40, 0.52, 0.28, 0.70],  // S3: few cases, fast, but costly staff deployment
+                [0.10, 0.92, 0.90, 0.15, 0.88],  // S4: fewest cases, fastest, but extreme cost/bed-days/burden
             ],
             optimal: 3,
         },
-        { // Phase 1: 2-unit closure cap
+        { // Phase 1: 2-unit closure cap — S4 can't fully close → cases rebound hard
             data: [
-                [0.82, 0.65, 0.60, 0.78, 0.22],
-                [0.45, 0.25, 0.25, 0.50, 0.48],
-                [0.25, 0.26, 0.36, 0.28, 0.62],
-                [0.38, 0.58, 0.70, 0.42, 0.72],
+                [0.88, 0.32, 0.22, 0.85, 0.18],  // S1: barely affected (doesn't rely on closures)
+                [0.48, 0.38, 0.42, 0.52, 0.50],  // S2: slight worsening, displaced patients
+                [0.22, 0.38, 0.50, 0.25, 0.72],  // S3: still strong, staff cohorting unaffected
+                [0.55, 0.60, 0.72, 0.52, 0.75],  // S4: collapses — partial closure ineffective, costs still high
             ],
             optimal: 2,
         },
-        { // Phase 2: 15 PCR/day cap
+        { // Phase 2: 15 PCR/day cap — detection bottleneck hits S1/S2 hard
             data: [
-                [0.88, 0.70, 0.65, 0.85, 0.25],
-                [0.58, 0.30, 0.30, 0.62, 0.42],
-                [0.22, 0.24, 0.34, 0.26, 0.60],
-                [0.45, 0.52, 0.65, 0.50, 0.68],
+                [0.95, 0.35, 0.28, 0.92, 0.20],  // S1: cases spike (can't detect), duration extends
+                [0.72, 0.42, 0.38, 0.70, 0.42],  // S2: cohorting blind without tests, cases rise significantly
+                [0.28, 0.36, 0.48, 0.30, 0.68],  // S3: resilient — staff cohorting detects clinically, barely affected
+                [0.60, 0.55, 0.68, 0.55, 0.70],  // S4: still degraded from Phase 1, testing cap worsens slightly
             ],
             optimal: 2,
         },
@@ -401,6 +448,33 @@
             spCtx.lineWidth = 0.5;
             spCtx.stroke();
         }
+
+        // "No Action" baseline — fixed dashed polygon (worst-case reference)
+        // Without intervention: everything bad — uncontrolled outbreak overwhelms all resources
+        const noAction = [0.95, 0.90, 0.85, 0.95, 0.80];
+        spCtx.beginPath();
+        for (let i = 0; i <= NUM_AXES; i++) {
+            const ai = i % NUM_AXES;
+            const a = angle(ai);
+            const r = radius * noAction[ai];
+            const x = cx + Math.cos(a) * r;
+            const y = cy + Math.sin(a) * r;
+            i === 0 ? spCtx.moveTo(x, y) : spCtx.lineTo(x, y);
+        }
+        spCtx.setLineDash([4, 3]);
+        spCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+        spCtx.lineWidth = 1;
+        spCtx.stroke();
+        spCtx.setLineDash([]);
+
+        // "No Action" label — right side, between Cases and Bed-Days Lost axes
+        const naAngle = (angle(0) + angle(1)) / 2;  // midpoint of axes 0 and 1
+        const naR = radius * 0.92;
+        spCtx.font = '8px monospace';
+        spCtx.fillStyle = 'rgba(255,255,255,0.3)';
+        spCtx.textAlign = 'left';
+        spCtx.textBaseline = 'middle';
+        spCtx.fillText('NO ACTION', cx + Math.cos(naAngle) * naR + 4, cy + Math.sin(naAngle) * naR);
 
         // Draw scenario polygons — all equal weight
         for (let s = 0; s < NUM_SCENARIOS; s++) {
