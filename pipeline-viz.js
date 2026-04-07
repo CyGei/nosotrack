@@ -715,6 +715,20 @@
         engTrackEl = document.getElementById('engTrack');
         if (!engListenersAdded) {
             engListenersAdded = true;
+            // Pause / play button
+            const pauseBtn = document.getElementById('engPause');
+            const pauseSvg = '<svg viewBox="0 0 10 12" fill="currentColor"><rect x="0" y="0" width="3" height="12" rx=".5"/><rect x="7" y="0" width="3" height="12" rx=".5"/></svg>';
+            const playSvg = '<svg viewBox="0 0 10 12" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>';
+            function updatePauseIcon() {
+                if (pauseBtn) {
+                    pauseBtn.innerHTML = engPlaying ? pauseSvg : playSvg;
+                    pauseBtn.setAttribute('aria-label', engPlaying ? 'Pause' : 'Play');
+                }
+            }
+            if (pauseBtn) pauseBtn.addEventListener('click', () => {
+                engPlaying = !engPlaying;
+                updatePauseIcon();
+            });
             // Speed button
             const spdBtn = document.getElementById('engSpd');
             if (spdBtn) spdBtn.addEventListener('click', () => {
@@ -726,7 +740,7 @@
             // Replay button
             const replayBtn = document.getElementById('engReplay');
             if (replayBtn) replayBtn.addEventListener('click', () => {
-                initEngState(); engPlaying = true;
+                initEngState(); engPlaying = true; updatePauseIcon();
             });
             // Timeline scrubbing — mouse
             function engGetPct(e) {
@@ -749,7 +763,7 @@
                 processEngEventsUpTo(engElapsed);
             });
             window.addEventListener('mouseup', () => {
-                if (engDragging) { engDragging = false; engPlaying = true; }
+                if (engDragging) { engDragging = false; engPlaying = true; updatePauseIcon(); }
             });
             // Touch support
             if (engTrackEl) {
@@ -769,7 +783,7 @@
                 processEngEventsUpTo(engElapsed);
             }, { passive: true });
             window.addEventListener('touchend', () => {
-                if (engDragging) { engDragging = false; engPlaying = true; }
+                if (engDragging) { engDragging = false; engPlaying = true; updatePauseIcon(); }
             });
         }
     }

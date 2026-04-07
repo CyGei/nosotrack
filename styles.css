@@ -371,6 +371,14 @@ nav.main-nav {
     color: #b0b7c0; cursor: pointer; transition: all .25s;
 }
 .eng-spd:hover { background: var(--bg-card-hover); color: #ececec; }
+.eng-pause {
+    display: flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 4px; padding: 0; flex-shrink: 0;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08);
+    color: #b0b7c0; cursor: pointer; transition: all .25s;
+}
+.eng-pause:hover { background: var(--bg-card-hover); color: #ececec; }
+.eng-pause svg { width: 8px; height: 10px; }
 .eng-tbar {
     height: 36px; background: rgba(13,15,18,.92);
     border: 1px solid rgba(255,255,255,0.03); border-top: none;

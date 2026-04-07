@@ -18,6 +18,7 @@
     ];
     let chatIdx = 0, charIdx = 0, activeBubble = null;
     let chatTimer, cursorEl;
+    let isVisible = false;
     const expertAvatar = document.getElementById('ipc-avatar-expert');
     const aiAvatar = document.getElementById('ipc-avatar-ai');
 
@@ -48,8 +49,10 @@
     }
 
     // Terminal delete-then-type on a single detail element
+    let editGeneration = 0;
     function terminalEdit(el, newValue, onDone) {
         if (!el) { if (onDone) onDone(); return; }
+        const gen = editGeneration;
         el.classList.add('editing');
         const oldVal = getDetailValue(el);
         const cursor = document.createElement('span');
@@ -61,6 +64,7 @@
 
         // Phase 1: delete characters
         function deleteChar() {
+            if (gen !== editGeneration) return;
             if (current.length > 1) { // keep leading space
                 current = current.slice(0, -1);
                 setDetailValue(el, current);
@@ -72,6 +76,7 @@
         // Phase 2: type new characters
         let tIdx = 0;
         function typeNewChar() {
+            if (gen !== editGeneration) return;
             if (tIdx < newValue.length) {
                 current += newValue[tIdx];
                 setDetailValue(el, current);
@@ -79,6 +84,7 @@
                 setTimeout(typeNewChar, TYPE_SPEED + Math.random() * 20);
             } else {
                 setTimeout(() => {
+                    if (gen !== editGeneration) return;
                     el.classList.remove('editing');
                     if (cursor.parentNode) cursor.remove();
                     if (onDone) onDone();
@@ -98,6 +104,42 @@
             terminalEdit(el, e.value, () => setTimeout(next, 150));
         }
         next();
+    }
+
+    /* ── Initial card values (for loop reset) ── */
+    const initialCardValues = [];
+    (function () {
+        var allCards = document.querySelectorAll('#ipc-scenarios .ipc-scenario-card');
+        allCards.forEach(function (card, ci) {
+            var details = card.querySelectorAll('.ipc-sc-detail');
+            initialCardValues[ci] = [];
+            details.forEach(function (d, di) {
+                initialCardValues[ci][di] = getDetailValue(d);
+            });
+        });
+    })();
+
+    function resetCards() {
+        editGeneration++;
+        initialCardValues.forEach(function (cardVals, ci) {
+            cardVals.forEach(function (val, di) {
+                var el = getDetailEl(ci, di);
+                if (el) {
+                    el.classList.remove('editing');
+                    var cursor = el.querySelector('.ipc-sc-cursor');
+                    if (cursor) cursor.remove();
+                    setDetailValue(el, val);
+                }
+            });
+        });
+    }
+
+    function stopChat() {
+        clearTimeout(chatTimer);
+        chatTimer = null;
+        chatIdx = 0;
+        clearBubbles();
+        setSpeaking(null);
     }
 
     /* ── Edits triggered by chat messages ── */
@@ -210,6 +252,13 @@
     function addBubble() {
         if (!bubbleArea) return;
         const idx = chatIdx % chatMessages.length;
+
+        // On loop restart, reset scenario cards and spider chart to initial state
+        if (chatIdx > 0 && idx === 0) {
+            resetCards();
+            setSpiderPhase(0);
+        }
+
         const msg = chatMessages[idx];
 
         // Clear previous exchange
@@ -269,7 +318,7 @@
 
     let engPhase = 0;
     function drawEngine() {
-        if (!engCtx) return;
+        if (!engCtx || !isVisible) return;
         engCtx.clearRect(0, 0, engW, engH);
         engPhase += 0.02;
 
@@ -539,31 +588,44 @@
             });
         }
 
-        requestAnimationFrame(drawSpider);
+        if (isVisible) requestAnimationFrame(drawSpider);
     }
 
     /* ============================================================
-       5. INTERSECTION OBSERVER — start everything on scroll reveal
+       5. INTERSECTION OBSERVER — pause / resume on scroll visibility
        ============================================================ */
-    let revealed = false;
+    let initialized = false;
+    const observeTarget = document.getElementById('ipc-chat-scene') || spiderCanvas;
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting && !revealed) {
-                revealed = true;
-                // Terminal chat
+            if (entry.isIntersecting && !isVisible) {
+                isVisible = true;
+                if (!initialized) {
+                    initialized = true;
+                    initEngineCanvas();
+                }
+                // Reset to clean state for a fresh start
+                stopChat();
+                resetCards();
+                setSpiderPhase(0);
+                spCurrent = spiderPhases[0].data.map(row => [...row]);
+                spTarget  = spiderPhases[0].data.map(row => [...row]);
+                // Kick off all animations
                 if (bubbleArea) addBubble();
-                // Engine canvas
-                initEngineCanvas();
                 drawEngine();
-                // Spider plot — start rendering + continuous phase loop
                 requestAnimationFrame(drawSpider);
                 startSpiderLoop();
+            } else if (!entry.isIntersecting && isVisible) {
+                isVisible = false;
+                stopChat();
+                resetCards();
+                if (spLoopTimer) { clearTimeout(spLoopTimer); spLoopTimer = null; }
             }
         });
     }, { threshold: 0.2 });
 
-    observer.observe(spiderCanvas);
+    observer.observe(observeTarget);
 
     // Handle resize
     window.addEventListener('resize', () => {
