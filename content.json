@@ -17,7 +17,7 @@
   },
 
   "hero": {
-    "eyebrow": "Real-Time Outbreak Intelligence for Healthcare Facilities",
+    "eyebrow": "Real Time Outbreak Intelligence for Healthcare Facilities",
     "title": ["Track.", "Intervene.", "Protect."],
     "subtitle": "NosoTrack infers who infected whom in near real-time, enabling hospital control teams to stop outbreaks before they escalate.",
     "primaryCta": { "label": "Learn More", "href": "#about" },

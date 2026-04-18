@@ -5,7 +5,7 @@
 // ==========================================
 (function () {
     const ACCENT = '#ff073a';
-    const ACTIVE = '#f0f0f0';
+    const ACTIVE = '#1e1e2b';
     const MONO = '"JetBrains Mono", monospace';
     let frame = 0;
 
@@ -59,7 +59,7 @@
     function animateConnector(c) {
         if (!c) return;
         c.ctx.clearRect(0, 0, c.w, c.h);
-        c.ctx.strokeStyle = 'rgba(255,255,255,0.03)'; c.ctx.lineWidth = 1; c.ctx.setLineDash([2, 6]);
+        c.ctx.strokeStyle = 'rgba(30,30,43,0.03)'; c.ctx.lineWidth = 1; c.ctx.setLineDash([2, 6]);
         c.ctx.beginPath(); c.ctx.moveTo(c.w / 2, 0); c.ctx.lineTo(c.w / 2, c.h); c.ctx.stroke();
         c.ctx.setLineDash([]);
         c.particles.forEach(p => {
@@ -69,7 +69,7 @@
             grad.addColorStop(0, 'rgba(255,7,58,0.5)'); grad.addColorStop(1, 'transparent');
             c.ctx.fillStyle = grad;
             c.ctx.beginPath(); c.ctx.arc(p.x, p.y, p.size * 3.5, 0, Math.PI * 2); c.ctx.fill();
-            c.ctx.fillStyle = '#fff';
+            c.ctx.fillStyle = '#1e1e2b';
             c.ctx.beginPath(); c.ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2); c.ctx.fill();
         });
     }
@@ -95,7 +95,8 @@
             ctx.stroke();
         }
         ctx.globalAlpha = 1;
-        const baseCols = ['#5b9bd5', '#70ad47', '#ff073a', '#ffc000'];
+        // Monochrome DNA rungs — one accent tracer for alert markers only.
+        const baseCols = ['#6b7d8f', '#8a7966', '#7a8a70', '#1e1e2b'];
         for (let i = 0; i < 7; i++) { const t = (i + 0.3) / 7; const y = cy - len / 2 + t * len; const off = Math.sin(t * Math.PI * 3 + frame * 0.025) * amp; ctx.strokeStyle = baseCols[i % 4]; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.4; ctx.beginPath(); ctx.moveTo(cx + off, y); ctx.lineTo(cx - off, y); ctx.stroke(); }
         ctx.globalAlpha = 1;
         const scanY = cy - len / 2 + ((frame * 1.2) % len);
@@ -110,10 +111,10 @@
         const cx = w / 2, cy = h / 2;
         const nodes = [{ x: cx, y: cy, r: 5, staff: true }, { x: cx - 45, y: cy - 22, r: 3.5 }, { x: cx + 50, y: cy - 18, r: 3.5 }, { x: cx - 35, y: cy + 26, r: 3.5 }, { x: cx + 40, y: cy + 24, r: 3.5 }, { x: cx - 8, y: cy - 34, r: 3 }, { x: cx + 12, y: cy + 36, r: 3 }];
         const edges = [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [1, 5], [2, 4], [3, 6]];
-        edges.forEach(([a, b]) => { ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(nodes[a].x, nodes[a].y); ctx.lineTo(nodes[b].x, nodes[b].y); ctx.stroke(); });
+        edges.forEach(([a, b]) => { ctx.strokeStyle = 'rgba(30,30,43,0.07)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(nodes[a].x, nodes[a].y); ctx.lineTo(nodes[b].x, nodes[b].y); ctx.stroke(); });
         nodes.forEach((n, i) => {
             const maxPhase = n.staff ? 30 : 22;
-            const waveColor = n.staff ? ACCENT : 'rgba(255,255,255,0.35)';
+            const waveColor = n.staff ? ACCENT : 'rgba(30,30,43,0.35)';
             for (let ring = 0; ring < 2; ring++) {
                 const phase = (frame * 0.5 + i * 13 + ring * 15) % maxPhase;
                 const pulseR = n.r + 5 + phase;
@@ -122,115 +123,124 @@
             }
         });
         ctx.globalAlpha = 1;
-        nodes.forEach(n => { ctx.fillStyle = n.staff ? ACCENT : 'rgba(255,255,255,0.45)'; ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill(); });
+        nodes.forEach(n => { ctx.fillStyle = n.staff ? ACCENT : 'rgba(30,30,43,0.45)'; ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill(); });
     }
 
     // EHR scrolling
     function vizEHR() {
         const v = vizCanvases.ehr; if (!v) return;
         const { ctx, w, h } = v; ctx.clearRect(0, 0, w, h);
-        const rowH = 16, cols = [w * 0.08, w * 0.28, w * 0.55, w * 0.78], scrollY = (frame * 0.35) % (rowH * 8);
+        const rowH = 20, cols = [w * 0.08, w * 0.28, w * 0.55, w * 0.78], scrollY = (frame * 0.35) % (rowH * 8);
         ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, h); ctx.clip();
         for (let r = -1; r < 8; r++) {
             const y = r * rowH - scrollY + h / 2; if (y < -rowH || y > h + rowH) continue;
             const rowAlpha = 1 - Math.abs(y - h / 2) / (h * 0.6);
             ctx.globalAlpha = Math.max(0.04, Math.min(0.45, rowAlpha));
-            if (r === 0) { ctx.font = `500 7px ${MONO}`; ctx.fillStyle = ACCENT;['ID', 'WARD', 'DATE', 'STATUS'].forEach((t, i) => { ctx.textAlign = 'left'; ctx.fillText(t, cols[i], y); }); }
-            else { ctx.font = `300 7px ${MONO}`; ctx.fillStyle = '#ffffffff'; const ids = ['P001', 'P002', 'S003', 'P004', 'S005', 'P006', 'P007'], wards = ['A', 'B', 'C', 'A', 'B', 'C', 'A'], stati = ['POS', 'NEG', 'POS', 'NEG', 'POS', 'NEG', 'POS']; const ri = ((r - 1) + Math.floor(frame * 0.01)) % 7; ctx.textAlign = 'left'; ctx.fillText(ids[ri], cols[0], y); ctx.fillText(wards[ri], cols[1], y); ctx.fillText('2025-0' + (ri + 1), cols[2], y); ctx.fillStyle = stati[ri] === 'POS' ? ACCENT : '#ffffffff'; ctx.fillText(stati[ri], cols[3], y); }
+            if (r === 0) { ctx.font = `500 10px ${MONO}`; ctx.fillStyle = ACCENT;['ID', 'WARD', 'DATE', 'STATUS'].forEach((t, i) => { ctx.textAlign = 'left'; ctx.fillText(t, cols[i], y); }); }
+            else { ctx.font = `400 10px ${MONO}`; ctx.fillStyle = '#1e1e2b'; const ids = ['P001', 'P002', 'S003', 'P004', 'S005', 'P006', 'P007'], wards = ['A', 'B', 'C', 'A', 'B', 'C', 'A'], stati = ['POS', 'NEG', 'POS', 'NEG', 'POS', 'NEG', 'POS']; const ri = ((r - 1) + Math.floor(frame * 0.01)) % 7; ctx.textAlign = 'left'; ctx.fillText(ids[ri], cols[0], y); ctx.fillText(wards[ri], cols[1], y); ctx.fillText('2025-0' + (ri + 1), cols[2], y); ctx.fillStyle = stati[ri] === 'POS' ? ACCENT : '#1e1e2b'; ctx.fillText(stati[ri], cols[3], y); }
         }
         ctx.restore(); ctx.globalAlpha = 1;
-        const fadeH = 18; let gradTop = ctx.createLinearGradient(0, 0, 0, fadeH); gradTop.addColorStop(0, 'rgba(0,0,0,0.7)'); gradTop.addColorStop(1, 'transparent'); ctx.fillStyle = gradTop; ctx.fillRect(0, 0, w, fadeH);
-        let gradBot = ctx.createLinearGradient(0, h - fadeH, 0, h); gradBot.addColorStop(0, 'transparent'); gradBot.addColorStop(1, 'rgba(0,0,0,0.7)'); ctx.fillStyle = gradBot; ctx.fillRect(0, h - fadeH, w, fadeH);
+        const fadeH = 18; let gradTop = ctx.createLinearGradient(0, 0, 0, fadeH); gradTop.addColorStop(0, 'rgba(239,238,239,0.7)'); gradTop.addColorStop(1, 'transparent'); ctx.fillStyle = gradTop; ctx.fillRect(0, 0, w, fadeH);
+        let gradBot = ctx.createLinearGradient(0, h - fadeH, 0, h); gradBot.addColorStop(0, 'transparent'); gradBot.addColorStop(1, 'rgba(239,238,239,0.7)'); ctx.fillStyle = gradBot; ctx.fillRect(0, h - fadeH, w, fadeH);
     }
 
     // Anonymisation
+    // Symmetric two-column layout:
+    //   header labels are centred in their respective halves
+    //   identifiable data is right-aligned toward the divider
+    //   anonymised data is left-aligned away from the divider
+    //   the red arrow sits precisely at the centre between the two
     function vizAnon() {
         const v = vizCanvases.anon; if (!v) return;
         const { ctx, w, h } = v; ctx.clearRect(0, 0, w, h);
 
-        // Full cycle: 0-60% transform rows one by one, 60-85% hold, 85-100% fade out
         const cycle = (frame * 0.007) % 1;
         const TRANSFORM_END = 0.60, HOLD_END = 0.85;
         const globalFade = cycle > HOLD_END ? 1 - (cycle - HOLD_END) / (1 - HOLD_END) : 1;
 
         const fields = [
-            { raw: 'Smith, John A.', anon: 'SUBJ_7f3a9b2c' },
-            { raw: 'DOB: 1985-03-12', anon: 'AGE_GRP: 35-44' },
-            { raw: 'NHS: 485 777 3291', anon: 'REF_\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588' },
-            { raw: 'Room 14-B, Wing 3', anon: 'LOC_\u2588\u2588\u2588\u2588\u2588\u2588' },
-            { raw: 'Ward: Birch North', anon: 'ZONE_BN_SECTOR' },
-            { raw: 'Nurse: K. Evans', anon: 'STAFF_A3' },
-            { raw: 'Admit: 2025-03-01', anon: 'ADM_Q1_25_\u2588\u2588' },
-            { raw: 'PCR+ / MRSA Screen+', anon: 'FLAG_HAI_POS_003' },
-            { raw: 'GP: St. Jude Prac.', anon: 'PRAC_\u2588\u2588\u2588\u2588' },
+            { raw: 'Smith, John A.',      anon: 'SUBJ_7f3a9b2c' },
+            { raw: 'DOB 1985-03-12',      anon: 'AGE_GRP 35-44' },
+            { raw: 'NHS 485 777 3291',    anon: 'REF_\u2588\u2588\u2588\u2588\u2588\u2588' },
+            { raw: 'Room 14-B',           anon: 'LOC_\u2588\u2588\u2588\u2588' },
+            { raw: 'Ward Birch North',    anon: 'ZONE_BN' },
+            { raw: 'Nurse K. Evans',      anon: 'STAFF_A3' },
+            { raw: 'Admit 2025-03-01',    anon: 'ADM_Q1_25' },
+            { raw: 'PCR+ / MRSA+',        anon: 'FLAG_HAI_POS' },
+            { raw: 'GP St. Jude Prac.',   anon: 'PRAC_\u2588\u2588\u2588' },
         ];
         const nRows = fields.length;
-        const headerH = 13, statusH = 8, topPad = 2;
+        const headerH = 14, statusH = 10, topPad = 3;
         const rowH = Math.floor((h - headerH - statusH - topPad) / nRows);
         const tableH = nRows * rowH;
         const topY = topPad;
-        const headerY = topY + headerH - 3;
-        const startY = topY + headerH + 1;
+        const headerY = topY + headerH - 4;
+        const startY = topY + headerH + 2;
         const midX = w / 2;
-        const leftX = 8, rightX = midX + 8;
+        // Symmetric column centres and data anchors
+        const colGap = 18;                 // gap around the centre arrow
+        const leftColCentre  = w * 0.25;
+        const rightColCentre = w * 0.75;
+        const leftDataX  = midX - colGap / 2;   // right-aligned endpoint
+        const rightDataX = midX + colGap / 2;   // left-aligned startpoint
 
-        // Column labels
-        ctx.font = `400 5.5px ${MONO}`; ctx.textAlign = 'left';
-        ctx.fillStyle = `rgba(255,255,255,${0.22 * globalFade})`;
-        ctx.fillText('IDENTIFIABLE', leftX, headerY);
-        ctx.fillStyle = `rgba(120,255,120,${0.28 * globalFade})`;
-        ctx.fillText('ANONYMISED', rightX, headerY);
+        // ── Column headers — centred in each half
+        ctx.font = `500 9px ${MONO}`; ctx.textAlign = 'center';
+        ctx.fillStyle = `rgba(30,30,43,${0.55 * globalFade})`;
+        ctx.fillText('IDENTIFIABLE', leftColCentre, headerY);
+        ctx.fillStyle = `rgba(106,140,102,${0.7 * globalFade})`;
+        ctx.fillText('ANONYMISED', rightColCentre, headerY);
 
-        // Centre divider
-        ctx.strokeStyle = `rgba(255,7,58,${0.15 * globalFade})`; ctx.lineWidth = 1;
+        // ── Centre divider
+        ctx.strokeStyle = `rgba(255,7,58,${0.18 * globalFade})`; ctx.lineWidth = 1;
         ctx.setLineDash([2, 4]);
         ctx.beginPath(); ctx.moveTo(midX, topY + 2); ctx.lineTo(midX, topY + headerH + tableH); ctx.stroke();
         ctx.setLineDash([]);
 
         fields.forEach((f, i) => {
             const y = startY + i * rowH;
-            // Each row transforms in a 0.14-wide window, staggered across TRANSFORM_END
             const rowStart = (i / nRows) * TRANSFORM_END;
             const t = Math.max(0, Math.min(1, (cycle - rowStart) / 0.14));
 
-            // Left: raw text — clear before transform, dim after
-            const rawAlpha = t < 0.5 ? 0.38 : Math.max(0.06, 0.38 - (t - 0.5) * 0.64);
-            ctx.font = `300 7px ${MONO}`; ctx.textAlign = 'left';
-            ctx.fillStyle = `rgba(255,255,255,${rawAlpha * globalFade})`;
-            ctx.fillText(f.raw, leftX, y);
+            // Left column — right-aligned, pointing inward at divider
+            const rawAlpha = t < 0.5 ? 0.78 : Math.max(0.18, 0.78 - (t - 0.5) * 1.2);
+            ctx.font = `400 9px ${MONO}`; ctx.textAlign = 'right';
+            ctx.fillStyle = `rgba(30,30,43,${rawAlpha * globalFade})`;
+            ctx.fillText(f.raw, leftDataX, y);
 
-            // Red redaction bar sweeping over raw text
+            // Red redaction bar sweeping across raw text
             if (t > 0.2) {
                 const barT = Math.min(1, (t - 0.2) / 0.4);
-                const fullW = ctx.measureText(f.raw).width;
-                ctx.fillStyle = `rgba(255,7,58,${barT * 0.25 * globalFade})`;
-                ctx.fillRect(leftX - 1, y - 8, fullW * barT + 2, 10);
+                const rawW = ctx.measureText(f.raw).width;
+                ctx.fillStyle = `rgba(255,7,58,${barT * 0.28 * globalFade})`;
+                ctx.fillRect(leftDataX - rawW * barT - 1, y - 8, rawW * barT + 2, 10);
             }
 
-            // Centre: arrow pulses during the transform window
+            // Centre arrow — pulses during the transform window
             if (t > 0.15 && t < 0.9) {
-                const arrowAlpha = Math.sin(((t - 0.15) / 0.75) * Math.PI) * 0.45;
-                ctx.font = `400 7px ${MONO}`; ctx.textAlign = 'center';
+                const arrowAlpha = Math.sin(((t - 0.15) / 0.75) * Math.PI) * 0.85;
+                ctx.font = `500 11px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.fillStyle = `rgba(255,7,58,${arrowAlpha * globalFade})`;
-                ctx.fillText('\u2192', midX, y);
+                ctx.fillText('\u2192', midX, y - 3);
+                ctx.textBaseline = 'alphabetic';
             }
 
-            // Right: anonymised value fades in after redaction starts
-            const anonAlpha = t > 0.45 ? Math.min(0.55, (t - 0.45) / 0.4) : 0;
-            ctx.font = `300 7px ${MONO}`; ctx.textAlign = 'left';
-            ctx.fillStyle = `rgba(120,255,120,${anonAlpha * globalFade})`;
-            ctx.fillText(f.anon, rightX, y);
+            // Right column — left-aligned, flowing outward
+            const anonAlpha = t > 0.45 ? Math.min(0.9, (t - 0.45) / 0.4) : 0;
+            ctx.font = `400 9px ${MONO}`; ctx.textAlign = 'left';
+            ctx.fillStyle = `rgba(106,140,102,${anonAlpha * globalFade})`;
+            ctx.fillText(f.anon, rightDataX, y);
         });
 
-        // Status label
-        const statusY = topY + headerH + tableH + 6;
-        ctx.font = `400 5.5px ${MONO}`; ctx.textAlign = 'left';
+        // ── Status label — centred under the table
+        const statusY = topY + headerH + tableH + 8;
+        ctx.font = `500 9px ${MONO}`; ctx.textAlign = 'center';
         if (cycle < TRANSFORM_END) {
-            ctx.fillStyle = `rgba(255,7,58,${(0.3 + Math.sin(frame * 0.06) * 0.08) * globalFade})`;
-            ctx.fillText('ANONYMISING...', leftX, statusY);
+            ctx.fillStyle = `rgba(255,7,58,${(0.6 + Math.sin(frame * 0.06) * 0.15) * globalFade})`;
+            ctx.fillText('ANONYMISING...', midX, statusY);
         } else if (cycle < HOLD_END) {
-            ctx.fillStyle = `rgba(120,255,120,${0.35 * globalFade})`;
-            ctx.fillText('GDPR/HIPAA COMPLIANT \u2713', leftX, statusY);
+            ctx.fillStyle = `rgba(106,140,102,${0.75 * globalFade})`;
+            ctx.fillText('GDPR/HIPAA COMPLIANT \u2713', midX, statusY);
         }
     }
 
@@ -252,21 +262,22 @@
         const ctx = alertsCtx, w = alertsW, h = alertsH;
         ctx.clearRect(0, 0, w, h);
 
-        const pad = { top: 16, right: 12, bottom: 20, left: 28 };
+        const pad = { top: 16, right: 22, bottom: 20, left: 28 };
         const cw = w - pad.left - pad.right;
         const ch = h - pad.top - pad.bottom;
         const N = 30;
 
         // Y-axis labels & grid
-        ctx.font = `300 6px ${MONO}`; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+        ctx.font = `400 10px ${MONO}`; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
         for (let i = 0; i <= 4; i++) {
             const y = pad.top + ch - (i / 4) * ch;
-            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+            ctx.fillStyle = 'rgba(30,30,43,0.42)';
             ctx.fillText(String(i * 25), pad.left - 4, y);
-            ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 0.5;
+            ctx.strokeStyle = 'rgba(30,30,43,0.08)'; ctx.lineWidth = 0.5;
             ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
         }
-        ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,255,255,0.12)';
+        ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(30,30,43,0.42)';
+        ctx.font = `500 9px ${MONO}`;
         ctx.fillText('TIME', w / 2, h - 4);
 
         // Animation progress
@@ -286,78 +297,95 @@
         function sx(i) { return pad.left + (i / N) * cw; }
         function sy(fn, i) { return pad.top + ch - (Math.min(100, fn(i)) / 100) * ch; }
 
-        function drawLine(fn, color, glow) {
+        function drawLine(fn, color, lineWidth) {
             if (visibleSteps < 2) return;
             ctx.beginPath();
             for (let i = 0; i <= visibleSteps; i++) {
                 i === 0 ? ctx.moveTo(sx(i), sy(fn, i)) : ctx.lineTo(sx(i), sy(fn, i));
             }
-            ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.lineJoin = 'round'; ctx.stroke();
+            ctx.strokeStyle = color; ctx.lineWidth = lineWidth || 1.2; ctx.lineJoin = 'round'; ctx.stroke();
+        }
 
-            if (glow && visibleSteps > N * 0.6) {
-                ctx.save(); ctx.shadowColor = 'rgba(150,255,100,0.8)'; ctx.shadowBlur = 10;
-                ctx.beginPath();
-                const s0 = Math.floor(N * 0.55);
-                for (let i = s0; i <= visibleSteps; i++) {
-                    i === s0 ? ctx.moveTo(sx(i), sy(fn, i)) : ctx.lineTo(sx(i), sy(fn, i));
-                }
-                ctx.strokeStyle = 'rgba(150,255,100,0.75)'; ctx.lineWidth = 2.5; ctx.stroke();
-                ctx.restore();
+        // Neutral mono-ink plot; Ward C (the spiking one) gets a heavier stroke + spike highlight.
+        const INK_LIGHT  = 'rgba(30,30,43,0.32)';
+        const INK_MEDIUM = 'rgba(30,30,43,0.55)';
+        const INK_HEAVY  = 'rgba(30,30,43,0.92)';
 
-                if (visibleSteps >= N) {
-                    const ex = sx(N), ey = sy(fn, N);
-                    const pulse = 0.5 + Math.sin(frame * 0.08) * 0.3;
-                    ctx.fillStyle = `rgba(150,255,100,${pulse})`;
-                    ctx.beginPath(); ctx.arc(ex, ey, 4, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = 'rgba(150,255,100,0.9)';
-                    ctx.beginPath(); ctx.arc(ex, ey, 2, 0, Math.PI * 2); ctx.fill();
-                }
+        drawLine(wA, INK_LIGHT, 1.1);
+        drawLine(wB, INK_MEDIUM, 1.2);
+        drawLine(wC, INK_HEAVY, 2.2);
+
+        // Ward C alert spike highlight — red tracer where the curve climbs above threshold.
+        if (visibleSteps > N * 0.55) {
+            ctx.save();
+            const s0 = Math.floor(N * 0.55);
+            ctx.beginPath();
+            for (let i = s0; i <= visibleSteps; i++) {
+                i === s0 ? ctx.moveTo(sx(i), sy(wC, i)) : ctx.lineTo(sx(i), sy(wC, i));
+            }
+            ctx.strokeStyle = 'rgba(255,7,58,0.55)'; ctx.lineWidth = 2.2; ctx.stroke();
+            ctx.restore();
+
+            if (visibleSteps >= N) {
+                const ex = sx(N), ey = sy(wC, N);
+                const pulse = 0.4 + Math.sin(frame * 0.08) * 0.25;
+                ctx.fillStyle = `rgba(255,7,58,${pulse})`;
+                ctx.beginPath(); ctx.arc(ex, ey, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = 'rgba(255,7,58,0.95)';
+                ctx.beginPath(); ctx.arc(ex, ey, 2.4, 0, Math.PI * 2); ctx.fill();
             }
         }
 
-        // Draw lines: Ward A (blue), Ward B (orange), Ward C (green, with red glow on spike)
-        drawLine(wA, 'rgba(100,150,255,0.6)', false);
-        drawLine(wB, 'rgba(255,150,100,0.6)', false);
-        drawLine(wC, 'rgba(150,255,100,0.7)', true);
+        // End-of-line ward labels (replaces the external colour legend).
+        if (visibleSteps >= N) {
+            ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+            ctx.font = `500 10px ${MONO}`;
+            const endX = sx(N) + 8;
+            ctx.fillStyle = 'rgba(30,30,43,0.55)';
+            ctx.fillText('A', Math.min(endX, w - 14), sy(wA, N));
+            ctx.fillText('B', Math.min(endX, w - 14), sy(wB, N));
+            ctx.fillStyle = 'rgba(255,7,58,0.95)';
+            ctx.fillText('C', Math.min(endX + 6, w - 14), sy(wC, N));
+        }
 
-        // Timeline annotation labels
-        ctx.font = `400 7px ${MONO}`; ctx.textBaseline = 'bottom';
+        // In-line event annotations (replace ward colour coding with neutral ink callouts).
+        ctx.font = `500 10px ${MONO}`; ctx.textBaseline = 'bottom';
 
-        // Ward C label: "Patient C admitted" near the inflection point
+        // Ward C — patient admission drives the spike
         const cLabelStep = Math.floor(N * 0.52);
         if (visibleSteps >= cLabelStep) {
             const lx = sx(cLabelStep), ly = sy(wC, cLabelStep);
             ctx.save();
-            ctx.strokeStyle = 'rgba(150,255,100,0.25)'; ctx.lineWidth = 0.5; ctx.setLineDash([2, 2]);
-            ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx, ly - 16); ctx.stroke();
+            ctx.strokeStyle = 'rgba(30,30,43,0.45)'; ctx.lineWidth = 0.6; ctx.setLineDash([2, 2]);
+            ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx, ly - 18); ctx.stroke();
             ctx.setLineDash([]);
-            ctx.fillStyle = 'rgba(150,255,100,0.6)'; ctx.textAlign = 'center';
-            ctx.fillText('Patient C9 admitted', lx, ly - 18);
+            ctx.fillStyle = 'rgba(30,30,43,0.95)'; ctx.textAlign = 'center';
+            ctx.fillText('Patient C9 admitted', lx, ly - 20);
             ctx.restore();
         }
 
-        // Ward A label: "Staff rotation" early in the timeline
+        // Ward A — staff rotation event
         const aLabelStep = Math.floor(N * 0.2);
         if (visibleSteps >= aLabelStep) {
             const lx = sx(aLabelStep), ly = sy(wA, aLabelStep);
             ctx.save();
-            ctx.strokeStyle = 'rgba(100,150,255,0.2)'; ctx.lineWidth = 0.5; ctx.setLineDash([2, 2]);
+            ctx.strokeStyle = 'rgba(30,30,43,0.3)'; ctx.lineWidth = 0.6; ctx.setLineDash([2, 2]);
             ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx, ly - 14); ctx.stroke();
             ctx.setLineDash([]);
-            ctx.fillStyle = 'rgba(100,150,255,0.5)'; ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(30,30,43,0.75)'; ctx.textAlign = 'center';
             ctx.fillText('Staff rotation', lx, ly - 16);
             ctx.restore();
         }
 
-        // Ward B label: "Discharge Ward B" mid-timeline
+        // Ward B — discharge event
         const bLabelStep = Math.floor(N * 0.4);
         if (visibleSteps >= bLabelStep) {
             const lx = sx(bLabelStep), ly = sy(wB, bLabelStep);
             ctx.save();
-            ctx.strokeStyle = 'rgba(255,150,100,0.2)'; ctx.lineWidth = 0.5; ctx.setLineDash([2, 2]);
+            ctx.strokeStyle = 'rgba(30,30,43,0.3)'; ctx.lineWidth = 0.6; ctx.setLineDash([2, 2]);
             ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx, ly + 14); ctx.stroke();
             ctx.setLineDash([]);
-            ctx.fillStyle = 'rgba(255,150,100,0.5)'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+            ctx.fillStyle = 'rgba(30,30,43,0.75)'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
             ctx.fillText('Patient discharge', lx, ly + 16);
             ctx.restore();
         }
@@ -435,11 +463,26 @@
     let engSpeedIdx = 2; // default 2×
     let engSpeed = ENG_SPEEDS[engSpeedIdx];
 
-    // Colours
+    // Colours — unified with the About transmission tree + ward palette.
+    //  grey  = --text-ink  (same base as About viz)
+    //  red   = --alert     (reserved for confirmed/alert states)
+    //  blue  = --ward-a
+    //  tan   = --ward-b    (re-used for superspreader)
+    //  purple= mute violet (undetected — visually distinct but monochrome-adjacent)
+    // Inference palette — node-type colours intensified slightly so Undetected / Superspreader / Imported
+    // read as distinct signals on the light canvas without tipping into the branded brand colours.
     const ECL = {
-        grey: '#6b7a8a', red: '#ff073a', orange: '#f59e0b', purple: '#8b5cf6', blue: '#3b82f6',
-        gR: 'rgba(255,7,58,.22)', gO: 'rgba(245,158,11,.28)', gP: 'rgba(139,92,246,.22)', gB: 'rgba(59,130,246,.22)',
-        eN: 'rgba(255,255,255,.22)', eI: 'rgba(139,92,246,.50)'
+        grey:   '#1e1e2b',
+        red:    '#ff073a',
+        orange: '#b47a45',   // Superspreader — warmer ochre
+        purple: '#7a5488',   // Undetected   — deeper violet
+        blue:   '#3d6b8c',   // Imported     — richer slate-blue
+        gR: 'rgba(255,7,58,.22)',
+        gO: 'rgba(180,122,69,.30)',
+        gP: 'rgba(122,84,136,.26)',
+        gB: 'rgba(61,107,140,.26)',
+        eN: 'rgba(30,30,43,.32)',
+        eI: 'rgba(122,84,136,.70)'
     };
 
     // Nodes
@@ -501,7 +544,7 @@
         at(1200); ev('confirm', { id: 11 });
         at(1000); ev('confirm', { id: 19, ann: 'Confirmed' });
         at(3000); ev('ann', { label: 'OUTBREAK DECLARED', text: 'NosoTrack engine deployed', col: ECL.red, dur: 3500, alert: false, logo: true });
-        at(4200); ev('ann', { label: 'SOURCE IDENTIFICATION', text: 'Patient Zero identified', col: '#fff', dur: 3000, alert: false });
+        at(4200); ev('ann', { label: 'SOURCE IDENTIFICATION', text: 'Patient Zero identified', col: '#1e1e2b', dur: 3000, alert: false });
         at(600); ev('p0', { id: 2 });
         at(3500); ev('edge', { from: 2, to: 0, inf: false });
         at(1200); ev('ann', { label: 'ALERT: SUSPECTED CASES', text: 'N1 is a likely undetected case', col: ECL.purple, dur: 3000, alert: true });
@@ -524,14 +567,14 @@
         at(800); ev('imported_p7', { id: 7 });
         at(1000); ev('show_source', { id: 20 });
         at(800); ev('edge', { from: 20, to: 7, inf: false });
-        at(4000); ev('ann', { label: 'ALERT: RISK FORECAST', text: 'P[4,8,14,15] at risk', col: 'rgba(255,255,255,.75)', dur: 4500, alert: true });
+        at(4000); ev('ann', { label: 'ALERT: RISK FORECAST', text: 'P[4,8,14,15] at risk', col: 'rgba(30,30,43,.75)', dur: 4500, alert: true });
         at(1200); ev('forecast', {});
         at(6000);
         ENG_TOTAL_T = T + 500;
     }
 
     function engNPos(n) {
-        const nh = engineH - 48;
+        const nh = engineH - 40;
         return { x: n.xf * engineW, y: n.yf * nh };
     }
     function engNR(n) { return n.sh === 'd' || n.sh === 'q' ? 6 : 7; }
@@ -612,7 +655,7 @@
             case 'p0': {
                 const s = engNS[e.id]; s.p0 = true; s.p0ring = instant ? 1 : 0;
                 if (!instant) { s.tSc = 1.4; setTimeout(() => { s.tSc = 1; }, 600); }
-                engNodeAnns.push({ id: e.id, text: 'Patient Zero Identified', col: '#fff', alpha: instant ? 0 : 1, born: engElapsed });
+                engNodeAnns.push({ id: e.id, text: 'Patient Zero Identified', col: '#1e1e2b', alpha: instant ? 0 : 1, born: engElapsed });
                 break;
             }
             case 'edge': {
@@ -670,7 +713,7 @@
             ctx.beginPath(); ctx.moveTo(ax, ay);
             ctx.lineTo(ax - sz * Math.cos(a - .4), ay - sz * Math.sin(a - .4));
             ctx.lineTo(ax - sz * Math.cos(a + .4), ay - sz * Math.sin(a + .4));
-            ctx.closePath(); ctx.fillStyle = inf ? ECL.eI : 'rgba(255,255,255,.3)'; ctx.fill();
+            ctx.closePath(); ctx.fillStyle = inf ? ECL.eI : 'rgba(30,30,43,.3)'; ctx.fill();
         }
         if (prog < 1) {
             ctx.globalAlpha = .85; ctx.beginPath(); ctx.arc(mx, my, 2, 0, Math.PI * 2);
@@ -836,24 +879,24 @@
             if (s.p0 && s.p0ring < 1) s.p0ring = Math.min(1, s.p0ring + .015);
         });
 
-        const nodeH = H - 48;
+        const nodeH = H - 40;
 
-        // ── Ward ellipse backgrounds (coloured) ──
+        // ── Ward ellipse backgrounds (neutral grey shading — ward zones are labelled inline) ──
         const WARD_ELL = [
-            { l: 'WARD A', rgb: '100,150,255', cx: .17, cy: .28, rx: .18, ry: .22 },
-            { l: 'WARD B', rgb: '255,150,100', cx: .79, cy: .28, rx: .18, ry: .22 },
-            { l: 'WARD C (ICU)', rgb: '150,255,100', cx: .53, cy: .76, rx: .22, ry: .17 },
+            { l: 'WARD A',       cx: .17, cy: .28, rx: .18, ry: .22 },
+            { l: 'WARD B',       cx: .79, cy: .28, rx: .18, ry: .22 },
+            { l: 'WARD C (ICU)', cx: .53, cy: .76, rx: .22, ry: .17 },
         ];
         WARD_ELL.forEach(w => {
             const cx = w.cx * W, cy = w.cy * nodeH, rx = w.rx * W, ry = w.ry * nodeH;
             ctx.save();
             ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${w.rgb},0.07)`; ctx.fill();
-            ctx.strokeStyle = `rgba(${w.rgb},0.35)`; ctx.lineWidth = 1;
+            ctx.fillStyle = 'rgba(30,30,43,0.045)'; ctx.fill();
+            ctx.strokeStyle = 'rgba(30,30,43,0.22)'; ctx.lineWidth = 1;
             ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
-            ctx.fillStyle = `rgba(${w.rgb},0.65)`;
-            ctx.font = `400 7px ${MONO}`; ctx.textAlign = 'center';
-            ctx.fillText(w.l, cx, cy - ry + 11);
+            ctx.fillStyle = 'rgba(30,30,43,0.6)';
+            ctx.font = `500 10px ${MONO}`; ctx.textAlign = 'center';
+            ctx.fillText(w.l, cx, cy - ry + 14);
             ctx.restore();
         });
 
@@ -908,12 +951,12 @@
             if (s.p0 && s.p0ring > 0) {
                 const ra = .15 + Math.sin(engFrame2 * .033) * .08;
                 ctx.beginPath(); ctx.arc(p.x, p.y, (r + 8) * s.sc, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(255,255,255,${ra})`; ctx.lineWidth = 2; ctx.stroke();
+                ctx.strokeStyle = `rgba(30,30,43,${ra})`; ctx.lineWidth = 2; ctx.stroke();
                 const gr = ctx.createRadialGradient(p.x, p.y, r, p.x, p.y, r * 3);
-                gr.addColorStop(0, 'rgba(255,255,255,.08)'); gr.addColorStop(1, 'transparent');
+                gr.addColorStop(0, 'rgba(30,30,43,.08)'); gr.addColorStop(1, 'transparent');
                 ctx.fillStyle = gr; ctx.fillRect(p.x - r * 3, p.y - r * 3, r * 6, r * 6);
                 ctx.globalAlpha = s.al * (.3 + Math.sin(engFrame2 * .033) * .1);
-                ctx.strokeStyle = 'rgba(255,255,255,.3)'; ctx.lineWidth = 1;
+                ctx.strokeStyle = 'rgba(30,30,43,.3)'; ctx.lineWidth = 1;
                 ctx.beginPath(); ctx.moveTo(p.x - r * 1.6, p.y); ctx.lineTo(p.x + r * 1.6, p.y); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(p.x, p.y - r * 1.6); ctx.lineTo(p.x, p.y + r * 1.6); ctx.stroke();
                 ctx.globalAlpha = s.al;
@@ -937,19 +980,19 @@
             if (s.sup) {
                 const pr = 1 + Math.sin(engFrame2 * .05) * .1;
                 ctx.beginPath(); ctx.arc(p.x, p.y, (r + 6) * pr * s.sc, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(245,158,11,${.25 + Math.sin(engFrame2 * .042) * .12})`; ctx.lineWidth = 2; ctx.stroke();
+                ctx.strokeStyle = `rgba(180,122,69,${.35 + Math.sin(engFrame2 * .042) * .15})`; ctx.lineWidth = 2; ctx.stroke();
             }
             // Purple dashed ring
             if (s.col === ECL.purple) {
                 ctx.beginPath(); ctx.arc(p.x, p.y, r * s.sc + 4, 0, Math.PI * 2);
-                ctx.setLineDash([3, 3]); ctx.strokeStyle = 'rgba(139,92,246,.4)'; ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
+                ctx.setLineDash([3, 3]); ctx.strokeStyle = 'rgba(122,84,136,.55)'; ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
             }
             // Shape
             const sr = r * s.sc;
             if (n.sh === 'q') {
                 ctx.beginPath(); ctx.arc(p.x, p.y, sr, 0, Math.PI * 2);
                 ctx.fillStyle = s.col !== ECL.grey ? s.col : ECL.grey; ctx.fill();
-                ctx.fillStyle = '#fff'; ctx.font = `bold ${sr * 1.3}px "Source Sans Pro",sans-serif`;
+                ctx.fillStyle = '#1e1e2b'; ctx.font = `bold ${sr * 1.3}px "Inter Tight",sans-serif`;
                 ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.fillText('?', p.x, p.y + 1); ctx.textBaseline = 'alphabetic';
             } else if (n.sh === 'd') {
@@ -962,7 +1005,7 @@
             // Specular shine
             if (s.col !== ECL.grey && n.sh !== 'q') {
                 const ig = ctx.createRadialGradient(p.x - sr * .2, p.y - sr * .2, 0, p.x, p.y, sr);
-                ig.addColorStop(0, 'rgba(255,255,255,.15)'); ig.addColorStop(1, 'transparent');
+                ig.addColorStop(0, 'rgba(30,30,43,.15)'); ig.addColorStop(1, 'transparent');
                 if (n.sh === 'd') {
                     ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(Math.PI / 4);
                     ctx.beginPath(); ctx.rect(-sr * .7, -sr * .7, sr * 1.4, sr * 1.4); ctx.fillStyle = ig; ctx.fill(); ctx.restore();
@@ -971,8 +1014,8 @@
                 }
             }
             // Label
-            ctx.font = `400 6px ${MONO}`; ctx.fillStyle = 'rgba(255,255,255,.4)'; ctx.textAlign = 'center';
-            if (n.sh !== 'q') ctx.fillText(n.l, p.x, p.y + sr + 9);
+            ctx.font = `500 10px ${MONO}`; ctx.fillStyle = 'rgba(30,30,43,.65)'; ctx.textAlign = 'center';
+            if (n.sh !== 'q') ctx.fillText(n.l, p.x, p.y + sr + 14);
             ctx.restore();
         });
 
@@ -980,14 +1023,15 @@
         engNodeAnns.forEach(a => {
             const n = ENG_NODES[a.id], p = engNPos(n), r = engNR(n), s = engNS[a.id];
             ctx.save(); ctx.globalAlpha = a.alpha;
-            ctx.font = `500 7px ${MONO}`;
+            ctx.font = `500 10px ${MONO}`;
             const tw = ctx.measureText(a.text).width;
-            const bx = p.x - tw / 2 - 5, by = p.y - r * s.sc - 20, bw = tw + 10, bh = 13;
-            ctx.fillStyle = 'rgba(13,15,18,.92)';
-            ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, 2); else ctx.rect(bx, by, bw, bh); ctx.fill();
-            ctx.strokeStyle = a.col; ctx.lineWidth = 0.8; ctx.stroke();
+            const bx = p.x - tw / 2 - 8, by = p.y - r * s.sc - 26, bw = tw + 16, bh = 18;
+            // Light callout on light canvas — colored hairline border preserves semantics.
+            ctx.fillStyle = 'rgba(239,238,239,0.96)';
+            ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, 0); else ctx.rect(bx, by, bw, bh); ctx.fill();
+            ctx.strokeStyle = a.col; ctx.lineWidth = 1; ctx.stroke();
             ctx.fillStyle = a.col; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText(a.text, p.x, by + bh / 2);
+            ctx.fillText(a.text, p.x, by + bh / 2 + 0.5);
             ctx.restore();
         });
 
@@ -1003,8 +1047,8 @@
                 // Dark vignette (fade in, hold, fade out)
                 const vAlpha = progress < 0.1 ? (progress / 0.1) * 0.65 : progress < 0.72 ? 0.65 : 0.65 * (1 - (progress - 0.72) / 0.28);
                 const vg = ctx.createRadialGradient(W / 2, nodeH / 2, 0, W / 2, nodeH / 2, Math.max(W, nodeH) * 0.75);
-                vg.addColorStop(0, `rgba(0,0,0,${vAlpha * 0.35})`);
-                vg.addColorStop(1, `rgba(0,0,0,${vAlpha})`);
+                vg.addColorStop(0, `rgba(239,238,239,${vAlpha * 0.35})`);
+                vg.addColorStop(1, `rgba(239,238,239,${vAlpha})`);
                 ctx.fillStyle = vg; ctx.fillRect(0, 0, W, nodeH);
                 // Shockwave rings
                 for (let ri = 0; ri < 3; ri++) {
@@ -1026,10 +1070,10 @@
                     ctx.globalAlpha = tFade;
                     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                     ctx.fillStyle = '#ff073a';
-                    ctx.font = `800 ${fsBig}px "Source Sans Pro",sans-serif`;
+                    ctx.font = `800 ${fsBig}px "Inter Tight",sans-serif`;
                     ctx.fillText('OUTBREAK DECLARED', W / 2, nodeH * 0.66);
-                    ctx.fillStyle = 'rgba(255,255,255,0.88)';
-                    ctx.font = `600 ${fsSub}px "Source Sans Pro",sans-serif`;
+                    ctx.fillStyle = 'rgba(30,30,43,0.88)';
+                    ctx.font = `600 ${fsSub}px "Inter Tight",sans-serif`;
                     ctx.fillText('NOSOTRACK DEPLOYED', W / 2, nodeH * 0.66 + fsBig * 1.45);
                 }
                 ctx.restore();
@@ -1038,27 +1082,29 @@
 
         // ── Banner overlay (with alert envelope icon) — hidden during OUTBREAK overlay ──
         if (engBannOn && !overlayActive) {
-            const bw = Math.min(W - 20, 280), bh = 42, bx = (W - bw) / 2, by = 8;
+            const bw = Math.min(W - 24, 360), bh = 58, bx = (W - bw) / 2, by = 12;
             ctx.save();
-            ctx.fillStyle = 'rgba(13,15,20,0.92)';
-            ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, 6); else ctx.rect(bx, by, bw, bh); ctx.fill();
-            ctx.strokeStyle = engBannCol; ctx.lineWidth = 1;
-            ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, 6); else ctx.rect(bx, by, bw, bh); ctx.stroke();
+            // Light panel on the light canvas; colored hairline encodes the event type.
+            ctx.fillStyle = 'rgba(239,238,239,0.97)';
+            ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, 0); else ctx.rect(bx, by, bw, bh); ctx.fill();
+            ctx.strokeStyle = engBannCol; ctx.lineWidth = 1.2;
+            ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, 0); else ctx.rect(bx, by, bw, bh); ctx.stroke();
             // Alert envelope icon
             let textShift = 0;
             if (engBannAlert) {
-                const ix = bx + 14, iy = by + bh / 2;
-                ctx.strokeStyle = engBannCol; ctx.lineWidth = 0.9; ctx.globalAlpha = 0.9;
-                ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(ix - 7, iy - 5, 14, 10, 1); else ctx.rect(ix - 7, iy - 5, 14, 10); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(ix - 7, iy - 5); ctx.lineTo(ix, iy + 1); ctx.lineTo(ix + 7, iy - 5); ctx.stroke();
-                textShift = 7;
+                const ix = bx + 20, iy = by + bh / 2;
+                ctx.strokeStyle = engBannCol; ctx.lineWidth = 1.1; ctx.globalAlpha = 0.95;
+                ctx.beginPath(); ctx.rect(ix - 9, iy - 7, 18, 13); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(ix - 9, iy - 7); ctx.lineTo(ix, iy + 1); ctx.lineTo(ix + 9, iy - 7); ctx.stroke();
+                textShift = 14;
             }
             const textX = bx + bw / 2 + textShift;
-            ctx.globalAlpha = 0.95; ctx.fillStyle = engBannCol;
-            ctx.font = `400 6.5px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText(engBannLabel, textX, by + 14);
-            ctx.font = `700 10px "Source Sans Pro",sans-serif`;
-            ctx.fillText(engBannText, textX, by + 29);
+            ctx.globalAlpha = 1; ctx.fillStyle = engBannCol;
+            ctx.font = `500 10px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(engBannLabel, textX, by + 18);
+            ctx.fillStyle = '#1e1e2b';
+            ctx.font = `500 13px "Inter Tight",sans-serif`;
+            ctx.fillText(engBannText, textX, by + 40);
             ctx.restore();
         }
 
@@ -1086,8 +1132,8 @@
             }
             ctx.save(); ctx.globalAlpha = logoAlpha;
             window.drawVirusLogo(ctx, engFrame2, logoX, logoY);
-            ctx.fillStyle = '#ffffff'; ctx.globalAlpha = logoAlpha * 0.62;
-            ctx.font = `600 10px "Source Sans Pro",sans-serif`;
+            ctx.fillStyle = '#1e1e2b'; ctx.globalAlpha = logoAlpha * 0.62;
+            ctx.font = `600 10px "Inter Tight",sans-serif`;
             ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
             ctx.fillText('Noso', logoX + 17, logoY);
             ctx.fillStyle = ACCENT; ctx.globalAlpha = logoAlpha * 0.74;
@@ -1095,28 +1141,28 @@
             ctx.restore();
         }
 
-        // ── Legend strip ──
-        const stripH = 48, stripY = H - stripH;
+        // ── Legend strip (node types only — ward zones are annotated in-viz) ──
+        const stripH = 40, stripY = H - stripH;
         ctx.save();
-        ctx.fillStyle = 'rgba(13,15,21,0.92)';
+        ctx.fillStyle = 'rgba(243,243,243,0.96)';
         ctx.fillRect(0, stripY, W, stripH);
-        ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 0.6;
-        ctx.beginPath(); ctx.moveTo(0, stripY); ctx.lineTo(W, stripY); ctx.stroke();
+        ctx.strokeStyle = 'rgba(30,30,43,0.24)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(0, stripY + 0.5); ctx.lineTo(W, stripY + 0.5); ctx.stroke();
 
-        // Row 1: node type legend
-        const LY1 = stripY + 13, iR = 3.5, iGap = 4, sp = 9;
+        // Node type legend (single row)
+        const LY1 = stripY + 20, iR = 5, iGap = 6, sp = 14;
         const LEG = [
             { type: 'c', col: ECL.grey, lbl: 'Susceptible' },
             { type: 'c', col: ECL.red, lbl: 'Confirmed' },
             { type: 'c', col: ECL.purple, lbl: 'Undetected' },
             { type: 'd', col: ECL.orange, lbl: 'Superspreader' },
             { type: 'r', col: ECL.blue, lbl: 'Imported' },
-            { type: '-', col: 'rgba(255,7,58,0.65)', lbl: 'Forecast' },
+            { type: '-', col: '#ff073a', lbl: 'Forecast' },
         ];
-        ctx.font = `400 6px ${MONO}`; ctx.globalAlpha = 0.82;
+        ctx.font = `500 10px ${MONO}`; ctx.globalAlpha = 1;
         let tw2 = 0;
         LEG.forEach(it => { tw2 += iR * 2 + iGap + ctx.measureText(it.lbl).width + sp; }); tw2 -= sp;
-        let lx2 = Math.max(6, (W - tw2) / 2);
+        let lx2 = Math.max(10, (W - tw2) / 2);
         LEG.forEach(it => {
             const ix = lx2 + iR;
             if (it.type === 'c') {
@@ -1126,40 +1172,21 @@
                 ctx.moveTo(ix, LY1 - iR * 1.3); ctx.lineTo(ix + iR * 1.3, LY1); ctx.lineTo(ix, LY1 + iR * 1.3); ctx.lineTo(ix - iR * 1.3, LY1);
                 ctx.closePath(); ctx.fill();
             } else if (it.type === 'r') {
-                ctx.beginPath(); ctx.arc(ix, LY1, iR, 0, Math.PI * 2); ctx.strokeStyle = it.col; ctx.lineWidth = 1.2; ctx.stroke();
+                ctx.beginPath(); ctx.arc(ix, LY1, iR, 0, Math.PI * 2); ctx.strokeStyle = it.col; ctx.lineWidth = 1.6; ctx.stroke();
             } else {
-                ctx.strokeStyle = it.col; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+                ctx.strokeStyle = it.col; ctx.lineWidth = 1.4; ctx.setLineDash([3, 3]);
                 ctx.beginPath(); ctx.moveTo(lx2, LY1); ctx.lineTo(lx2 + iR * 2 - 1, LY1); ctx.stroke(); ctx.setLineDash([]);
                 ctx.fillStyle = it.col; ctx.beginPath();
-                ctx.moveTo(lx2 + iR * 2 + 2, LY1); ctx.lineTo(lx2 + iR * 2 - 2, LY1 - 2.5); ctx.lineTo(lx2 + iR * 2 - 2, LY1 + 2.5);
+                ctx.moveTo(lx2 + iR * 2 + 3, LY1); ctx.lineTo(lx2 + iR * 2 - 2, LY1 - 3); ctx.lineTo(lx2 + iR * 2 - 2, LY1 + 3);
                 ctx.closePath(); ctx.fill();
             }
             lx2 += iR * 2 + iGap;
-            ctx.fillStyle = 'rgba(210,215,225,0.75)'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#1e1e2b'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
             ctx.fillText(it.lbl, lx2, LY1);
             lx2 += ctx.measureText(it.lbl).width + sp;
         });
 
-        // Row 2: ward colour bands
-        const LY2 = stripY + 31;
-        const wardBands = [
-            { lbl: 'Ward A', rgb: '100,150,255' },
-            { lbl: 'Ward B', rgb: '255,150,100' },
-            { lbl: 'Ward C (ICU)', rgb: '150,255,100' },
-        ];
-        ctx.font = `400 6px ${MONO}`; ctx.globalAlpha = 0.72;
-        let tw3 = 0;
-        wardBands.forEach(w => { tw3 += 16 + ctx.measureText(w.lbl).width + sp; }); tw3 -= sp;
-        let lx3 = Math.max(6, (W - tw3) / 2);
-        wardBands.forEach(w => {
-            ctx.fillStyle = `rgba(${w.rgb},0.55)`;
-            ctx.fillRect(lx3, LY2 - 4, 10, 8);
-            ctx.strokeStyle = `rgba(${w.rgb},0.6)`; ctx.lineWidth = 0.6; ctx.strokeRect(lx3, LY2 - 4, 10, 8);
-            lx3 += 12;
-            ctx.fillStyle = `rgba(${w.rgb},0.80)`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-            ctx.fillText(w.lbl, lx3, LY2);
-            lx3 += ctx.measureText(w.lbl).width + sp;
-        });
+        // (Ward colour band row removed — ward zones are annotated directly in the viz.)
         ctx.restore();
     }
 

@@ -322,11 +322,11 @@
         engCtx.clearRect(0, 0, engW, engH);
         engPhase += 0.02;
 
-        // Scrolling waveform lines
+        // Scrolling waveform lines — ink on light
         for (let row = 0; row < 3; row++) {
             const yBase = engH * (0.25 + row * 0.25);
             engCtx.beginPath();
-            engCtx.strokeStyle = 'rgba(255,7,58,' + (0.08 + row * 0.03) + ')';
+            engCtx.strokeStyle = 'rgba(30,30,43,' + (0.10 + row * 0.04) + ')';
             engCtx.lineWidth = 0.8;
             for (let x = 0; x < engW; x += 2) {
                 const y = yBase + Math.sin((x * 0.04) + engPhase + row * 2) * (4 + row * 2)
@@ -336,13 +336,13 @@
             engCtx.stroke();
         }
 
-        // Floating data particles
+        // Floating data particles — ink on light
         engParticles.forEach(p => {
             p.x += p.vx;
             if (p.x > engW + 2) { p.x = -2; p.y = Math.random() * engH; }
             engCtx.beginPath();
             engCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            engCtx.fillStyle = 'rgba(255,7,58,' + p.opacity + ')';
+            engCtx.fillStyle = 'rgba(30,30,43,' + (p.opacity * 0.8) + ')';
             engCtx.fill();
         });
 
@@ -368,7 +368,11 @@
     resizeSpider();
 
     const axisLabels = ['CASES', 'BED-DAYS\nLOST', 'COST', 'CONTAINMENT\nDURATION', 'STAFF\nBURDEN'];
-    const colors = ['#3b82f6', '#8b5cf6', '#14b8a6', '#f59e0b'];
+    // Unified Palantir-style palette — 3 scenario signal colors + ink.
+    // Slightly more saturated than the site-wide ward tones so the four polygons are clearly distinguishable.
+    // Order matches the scenario legend in index.html:
+    //   S0 slate-blue, S1 ink, S2 moss-green, S3 ochre-tan.
+    const colors = ['#4a6f8c', '#1e1e2b', '#5c8558', '#a67248'];
     const NUM_AXES = 5;
     const NUM_SCENARIOS = 4;
 
@@ -482,7 +486,7 @@
                 const y = cy + Math.sin(a) * r;
                 i === 0 ? spCtx.moveTo(x, y) : spCtx.lineTo(x, y);
             }
-            spCtx.strokeStyle = 'rgba(255,255,255,' + (lvl === 5 ? '0.08' : '0.04') + ')';
+            spCtx.strokeStyle = 'rgba(30,30,43,' + (lvl === 5 ? '0.22' : '0.10') + ')';
             spCtx.lineWidth = 0.5;
             spCtx.stroke();
         }
@@ -493,7 +497,7 @@
             spCtx.beginPath();
             spCtx.moveTo(cx, cy);
             spCtx.lineTo(cx + Math.cos(a) * radius, cy + Math.sin(a) * radius);
-            spCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+            spCtx.strokeStyle = 'rgba(30,30,43,0.14)';
             spCtx.lineWidth = 0.5;
             spCtx.stroke();
         }
@@ -511,7 +515,7 @@
             i === 0 ? spCtx.moveTo(x, y) : spCtx.lineTo(x, y);
         }
         spCtx.setLineDash([4, 3]);
-        spCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+        spCtx.strokeStyle = 'rgba(30,30,43,0.38)';
         spCtx.lineWidth = 1;
         spCtx.stroke();
         spCtx.setLineDash([]);
@@ -519,8 +523,8 @@
         // "No Action" label — right side, between Cases and Bed-Days Lost axes
         const naAngle = (angle(0) + angle(1)) / 2;  // midpoint of axes 0 and 1
         const naR = radius * 0.92;
-        spCtx.font = '8px monospace';
-        spCtx.fillStyle = 'rgba(255,255,255,0.3)';
+        spCtx.font = '500 10px "JetBrains Mono", monospace';
+        spCtx.fillStyle = 'rgba(30,30,43,0.7)';
         spCtx.textAlign = 'left';
         spCtx.textBaseline = 'middle';
         spCtx.fillText('NO ACTION', cx + Math.cos(naAngle) * naR + 4, cy + Math.sin(naAngle) * naR);
@@ -545,7 +549,7 @@
             // Filled polygon
             polyPath();
             spCtx.fillStyle = colors[s];
-            spCtx.globalAlpha = 0.06;
+            spCtx.globalAlpha = 0.10;
             spCtx.fill();
             spCtx.globalAlpha = 1;
 
@@ -553,7 +557,7 @@
             polyPath();
             spCtx.strokeStyle = colors[s];
             spCtx.lineWidth = 1.2;
-            spCtx.globalAlpha = 0.6;
+            spCtx.globalAlpha = 0.85;
             spCtx.stroke();
             spCtx.globalAlpha = 1;
 
@@ -566,25 +570,25 @@
                 spCtx.beginPath();
                 spCtx.arc(x, y, 1.8, 0, Math.PI * 2);
                 spCtx.fillStyle = colors[s];
-                spCtx.globalAlpha = 0.6;
+                spCtx.globalAlpha = 0.85;
                 spCtx.fill();
                 spCtx.globalAlpha = 1;
             }
         }
 
         // Axis labels
-        spCtx.font = '10px monospace';
-        spCtx.fillStyle = 'rgba(255,255,255,0.6)';
+        spCtx.font = '500 11px "JetBrains Mono", monospace';
+        spCtx.fillStyle = 'rgba(30,30,43,0.85)';
         spCtx.textAlign = 'center';
         spCtx.textBaseline = 'middle';
         for (let i = 0; i < NUM_AXES; i++) {
             const a = angle(i);
-            const lbR = radius + 22;
+            const lbR = radius + 26;
             const lx = cx + Math.cos(a) * lbR;
             const ly = cy + Math.sin(a) * lbR;
             const lines = axisLabels[i].split('\n');
             lines.forEach((line, li) => {
-                spCtx.fillText(line, lx, ly + (li - (lines.length - 1) / 2) * 10);
+                spCtx.fillText(line, lx, ly + (li - (lines.length - 1) / 2) * 12);
             });
         }
 

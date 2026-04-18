@@ -34,13 +34,13 @@
             if (this.isInfected) { this.infectionTimer--; if (this.infectionTimer <= 0) this.isInfected = false; }
         }
         draw() {
-            ctx.fillStyle = this.isInfected ? 'rgba(255, 7, 58, 0.82)' : 'rgba(160, 160, 160, 0.32)';
+            ctx.fillStyle = this.isInfected ? 'rgba(255, 7, 58, 0.85)' : 'rgba(201, 201, 204, 0.45)';
             ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
             if (this.isInfected) {
-                const pulse = 0.1 + Math.sin(this.infectionTimer * 0.09) * 0.045;
+                const pulse = 0.08 + Math.sin(this.infectionTimer * 0.09) * 0.035;
                 ctx.fillStyle = `rgba(255, 7, 58, ${pulse})`;
                 ctx.beginPath(); ctx.arc(this.x, this.y, this.size + 7, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = 'rgba(255, 7, 58, 0.04)';
+                ctx.fillStyle = 'rgba(255, 7, 58, 0.035)';
                 ctx.beginPath(); ctx.arc(this.x, this.y, this.size + 16, 0, Math.PI * 2); ctx.fill();
             }
         }
@@ -78,11 +78,11 @@
                     const bothInfected = particles[i].isInfected && particles[j].isInfected;
                     const eitherInfected = particles[i].isInfected || particles[j].isInfected;
                     ctx.strokeStyle = bothInfected
-                        ? `rgba(255, 7, 58, ${opacity * 0.65})`
+                        ? `rgba(255, 7, 58, ${opacity * 0.6})`
                         : eitherInfected
-                            ? `rgba(255, 7, 58, ${opacity * 0.42})`
-                            : `rgba(150, 150, 150, ${opacity * 0.1})`;
-                    ctx.lineWidth = bothInfected ? 0.9 : 0.5;
+                            ? `rgba(255, 7, 58, ${opacity * 0.35})`
+                            : `rgba(201, 201, 204, ${opacity * 0.14})`;
+                    ctx.lineWidth = bothInfected ? 0.8 : 0.4;
                     ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
                 }
             }
@@ -98,9 +98,18 @@
 document.getElementById('navToggle').addEventListener('click', function () { document.getElementById('navLinks').classList.toggle('open'); });
 document.querySelectorAll('.nav-links a').forEach(a => { a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open')); });
 
-// Nav scroll shrink
+// Nav scroll shrink + dark-over-hero toggle
 window.addEventListener('scroll', () => {
-    document.querySelector('.main-nav').classList.toggle('scrolled', window.scrollY > 60);
+    const scrolled = window.scrollY > 60;
+    document.querySelector('.main-nav').classList.toggle('scrolled', scrolled);
+
+    // Drop the `nav-on-dark` body flag once we've passed the dark hero band,
+    // so the nav inverts back to ink-on-light for the body of the page.
+    const hero = document.getElementById('hero');
+    if (hero) {
+        const past = window.scrollY > hero.offsetHeight - 80;
+        document.body.classList.toggle('nav-on-dark', !past);
+    }
 }, { passive: true });
 
 // Scroll hint
@@ -117,12 +126,16 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 window.__revealObserver = observer;
 
 // ==========================================
-// NAV & FOOTER VIRUS LOGO ANIMATION
+// NAV & FOOTER VIRUS LOGO ANIMATION  (Palantir monochrome)
 // ==========================================
 (function () {
     var SIZE = 50;
     var dpr = window.devicePixelRatio || 1;
-    var ctxList = ['nav-virus', 'footer-virus'].map(function (id) {
+    // Color tokens — keep in sync with styles.css
+    var INK   = '30,30,43';      // --text-ink
+    var LIGHT = '239,238,239';   // --text-inv-hi
+
+    var contexts = ['nav-virus', 'footer-virus'].map(function (id) {
         var el = document.getElementById(id);
         if (!el) return null;
         el.width = SIZE * dpr;
@@ -131,13 +144,20 @@ window.__revealObserver = observer;
         el.style.height = SIZE + 'px';
         var ctx = el.getContext('2d');
         ctx.scale(dpr, dpr);
-        return ctx;
+        return { id: id, ctx: ctx };
     }).filter(Boolean);
+
+    function colorFor(id) {
+        if (id === 'footer-virus') return LIGHT;   // footer is always dark
+        // nav: light over dark hero, ink once scrolled onto light canvas
+        return document.body.classList.contains('nav-on-dark') ? LIGHT : INK;
+    }
+
     var f = 0;
     function tick() {
-        ctxList.forEach(function (ctx) {
-            ctx.clearRect(0, 0, SIZE, SIZE);
-            window.drawVirusLogo(ctx, f, SIZE / 2, SIZE / 2);
+        contexts.forEach(function (c) {
+            c.ctx.clearRect(0, 0, SIZE, SIZE);
+            window.drawVirusLogo(c.ctx, f, SIZE / 2, SIZE / 2, { color: colorFor(c.id) });
         });
         f++;
         requestAnimationFrame(tick);

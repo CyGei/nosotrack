@@ -95,8 +95,7 @@
     const heroBtns = document.querySelector('.hero-buttons');
     if (heroBtns) {
         heroBtns.innerHTML =
-            `<a href="${c.hero.primaryCta.href}" class="btn-primary">${c.hero.primaryCta.label} &darr;</a>` +
-            `<a href="${c.hero.secondaryCta.href}" class="btn-secondary">${c.hero.secondaryCta.label}</a>`;
+            `<a href="${c.hero.primaryCta.href}" class="btn-primary">${c.hero.primaryCta.label}</a>`;
     }
 
     // ── MARQUEE ───────────────────────────────────────────────────────────────
@@ -151,9 +150,7 @@
                 : `<div class="viz-legend-dot" style="background:${t.color};"></div>`;
             return `<div class="viz-legend-item">${shape} ${t.label}</div>`;
         }).join('');
-        const wardItems = legend.wards.map(w =>
-            `<div class="viz-legend-item"><div class="viz-legend-dot" style="background:${w.color};"></div> ${w.label}</div>`
-        ).join('');
+        // Ward colour legend removed — ward zones are annotated inline (grey shading + label).
         const statusItems = legend.status.map((s, i) => {
             const style = i === legend.status.length - 1
                 ? `background:${s.color}; box-shadow: 0 0 6px rgba(255,7,58,0.6);`
@@ -162,8 +159,6 @@
         }).join('');
         vizLegend.innerHTML =
             `<div class="viz-legend-group"><div class="viz-legend-title">${legend.sections.type}</div>${typeItems}</div>` +
-            `<div class="viz-legend-sep"></div>` +
-            `<div class="viz-legend-group"><div class="viz-legend-title">${legend.sections.ward}</div>${wardItems}</div>` +
             `<div class="viz-legend-sep"></div>` +
             `<div class="viz-legend-group"><div class="viz-legend-title">${legend.sections.status}</div>${statusItems}</div>`;
     }
@@ -406,7 +401,6 @@
     // Form buttons
     if (c.contact.formButtons) {
         setText('#btnSubmit', c.contact.formButtons.submit);
-        setText('#btnReset', c.contact.formButtons.reset);
     }
 
     // ── FOOTER ────────────────────────────────────────────────────────────────
