@@ -1,66 +1,61 @@
 // ==========================================
-// SHARED VIRUS LOGO COMPONENT
-// Palantir design v2 — monochrome, takes a base RGB triplet
-// so the same component can render ink-on-light and light-on-ink.
+// SHARED BRAND MARK COMPONENT  (Networked Trilobe)
+// Canvas-drawn version of the inline SVG used in the nav & footer.
+// Palantir-restrained: 4 corner brackets + 3 nodes + 3 spokes + red hub.
+// Called by pipeline-viz.js inside the inference node animation.
 // ==========================================
-window.drawVirusLogo = function (ctx, frame, cx, cy, opts) {
+window.drawBrandMark = function (ctx, frame, cx, cy, opts) {
     opts = opts || {};
-    // Base color as "R,G,B" triplet (for rgba composition). Defaults to ink.
-    var base = opts.color || '30,30,43';
-    var coreR = 12, spikeCount = 10, spikeLen = 9, bulbR = 2.5;
+    var size = opts.size || 34;                    // total px width/height
+    var ink = opts.color || 'rgba(30,30,43,1)';    // bracket + node stroke color
+    var alert = opts.alert || '#ff073a';           // hub color
+    var s = size / 32;                             // viewBox is 32 units
+
+    // Coordinate mapping: viewBox center (16, 16) becomes (0, 0) via translate
+    function X(x) { return (x - 16) * s; }
+    function Y(y) { return (y - 16) * s; }
 
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.rotate(frame * 0.006);
 
-    // Outer subtle glow
-    var outerGlow = ctx.createRadialGradient(0, 0, coreR + spikeLen, 0, 0, coreR + spikeLen + 8);
-    outerGlow.addColorStop(0, 'rgba(' + base + ',0.05)');
-    outerGlow.addColorStop(1, 'transparent');
-    ctx.fillStyle = outerGlow;
-    ctx.beginPath(); ctx.arc(0, 0, coreR + spikeLen + 8, 0, Math.PI * 2); ctx.fill();
+    // ── Corner brackets (heaviest stroke — 1.2 in viewBox units) ──
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 1.2 * s;
+    ctx.lineCap = 'butt';
+    ctx.lineJoin = 'miter';
+    // TL
+    ctx.beginPath(); ctx.moveTo(X(3), Y(8)); ctx.lineTo(X(3), Y(3)); ctx.lineTo(X(8), Y(3)); ctx.stroke();
+    // TR
+    ctx.beginPath(); ctx.moveTo(X(24), Y(3)); ctx.lineTo(X(29), Y(3)); ctx.lineTo(X(29), Y(8)); ctx.stroke();
+    // BR
+    ctx.beginPath(); ctx.moveTo(X(29), Y(24)); ctx.lineTo(X(29), Y(29)); ctx.lineTo(X(24), Y(29)); ctx.stroke();
+    // BL
+    ctx.beginPath(); ctx.moveTo(X(8), Y(29)); ctx.lineTo(X(3), Y(29)); ctx.lineTo(X(3), Y(24)); ctx.stroke();
 
-    // Spike proteins
-    for (var si = 0; si < spikeCount; si++) {
-        var angle = (si / spikeCount) * Math.PI * 2;
-        var wobble = Math.sin(frame * 0.03 + si * 1.7) * 1;
-        var sx = Math.cos(angle) * coreR, sy = Math.sin(angle) * coreR;
-        var ex = Math.cos(angle) * (coreR + spikeLen + wobble);
-        var ey = Math.sin(angle) * (coreR + spikeLen + wobble);
-        ctx.strokeStyle = 'rgba(' + base + ',0.55)';
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
-        var bGrad = ctx.createRadialGradient(ex, ey, 0, ex, ey, bulbR);
-        bGrad.addColorStop(0, 'rgba(' + base + ',0.8)');
-        bGrad.addColorStop(1, 'rgba(' + base + ',0.2)');
-        ctx.fillStyle = bGrad;
-        ctx.beginPath(); ctx.arc(ex, ey, bulbR, 0, Math.PI * 2); ctx.fill();
+    // ── Spokes: hub → three outer nodes (thin, 0.55) ──
+    ctx.lineCap = 'round';
+    ctx.lineWidth = Math.max(0.5, 0.55 * s);
+    ctx.beginPath();
+    ctx.moveTo(X(16.00), Y(11.20)); ctx.lineTo(X(16.00), Y(15.60));
+    ctx.moveTo(X(11.31), Y(19.30)); ctx.lineTo(X(15.13), Y(17.10));
+    ctx.moveTo(X(20.69), Y(19.30)); ctx.lineTo(X(16.87), Y(17.10));
+    ctx.stroke();
+
+    // ── Three outer nodes (thinnest hairline, 0.35) ──
+    ctx.lineWidth = Math.max(0.4, 0.35 * s);
+    var NODES = [[16, 9], [9.4, 20.4], [22.6, 20.4]];
+    for (var i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(X(NODES[i][0]), Y(NODES[i][1]), 2.2 * s, 0, Math.PI * 2);
+        ctx.stroke();
     }
 
-    // Core body
-    var bodyGrad = ctx.createRadialGradient(-2, -2, 0, 0, 0, coreR);
-    bodyGrad.addColorStop(0, 'rgba(' + base + ',0.55)');
-    bodyGrad.addColorStop(0.6, 'rgba(' + base + ',0.28)');
-    bodyGrad.addColorStop(1, 'rgba(' + base + ',0.10)');
-    ctx.fillStyle = bodyGrad;
-    ctx.beginPath(); ctx.arc(0, 0, coreR, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = 'rgba(' + base + ',0.35)';
-    ctx.lineWidth = 0.8;
-    ctx.beginPath(); ctx.arc(0, 0, coreR, 0, Math.PI * 2); ctx.stroke();
-
-    // Membrane rings
-    ctx.strokeStyle = 'rgba(' + base + ',0.12)';
-    ctx.lineWidth = 0.4;
-    for (var ri = 0; ri < 2; ri++) {
-        ctx.beginPath(); ctx.arc(0, 0, 4 + ri * 4, 0, Math.PI * 2); ctx.stroke();
-    }
-
-    // Highlight (always a soft light hint for depth)
-    var hlGrad = ctx.createRadialGradient(-3, -3, 0, -2, -2, 6);
-    hlGrad.addColorStop(0, 'rgba(255,255,255,0.15)');
-    hlGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = hlGrad;
-    ctx.beginPath(); ctx.arc(-2, -2, 6, 0, Math.PI * 2); ctx.fill();
+    // ── Central red hub, with a very subtle breathing pulse tied to frame ──
+    var pulse = 1 + Math.sin((frame || 0) * 0.05) * 0.08;   // ±8% diameter
+    ctx.fillStyle = alert;
+    ctx.beginPath();
+    ctx.arc(X(16), Y(16.6), 1.05 * s * pulse, 0, Math.PI * 2);
+    ctx.fill();
 
     ctx.restore();
 };

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NosoTrack — Chosen mark</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #efeeef;
+            --bg-alt: #f3f3f3;
+            --bg-ink: #212326;
+            --ink: #1e1e2b;
+            --text: #474852;
+            --mute: #767676;
+            --inv-hi: #efeeef;
+            --inv-mute: #8a8a8f;
+            --rule: rgba(30, 30, 43, .12);
+            --rule-inv: rgba(239, 238, 239, .14);
+            --alert: #ff073a;
+            --display: "Inter Tight", sans-serif;
+            --mono: "JetBrains Mono", monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--display); background: var(--bg); color: var(--ink); }
+
+        header {
+            padding: 72px 48px 40px;
+            border-bottom: 1px solid var(--rule);
+        }
+        .eyebrow {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+        h1 {
+            font-family: var(--display);
+            font-weight: 500;
+            font-size: 40px;
+            letter-spacing: -.03em;
+        }
+        header p {
+            margin-top: 14px; max-width: 62ch;
+            color: var(--text); font-size: 15px; line-height: 1.6;
+        }
+        header dl {
+            display: grid; grid-template-columns: auto auto; gap: 4px 18px;
+            margin-top: 18px;
+            font-family: var(--mono); font-size: 12px;
+        }
+        header dt { color: var(--mute); letter-spacing: .14em; text-transform: uppercase; }
+        header dd { color: var(--ink); }
+
+        .board { display: grid; grid-template-columns: 1fr 1fr; }
+        .panel { padding: 60px 48px; border-right: 1px solid var(--rule); }
+        .panel:last-child { border-right: none; }
+        .panel--dark { background: var(--bg-ink); color: var(--inv-hi); border-right-color: var(--rule-inv); }
+
+        .tag {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--mute);
+            margin-bottom: 28px;
+        }
+        .panel--dark .tag { color: var(--inv-mute); }
+
+        .xl { display: flex; align-items: center; justify-content: center; min-height: 220px; }
+        .xl svg { width: 180px; height: 180px; display: block; }
+
+        .lockup-row {
+            display: flex; align-items: center; gap: 18px;
+            padding: 32px 0 8px;
+            border-top: 1px solid var(--rule);
+            margin-top: 28px;
+        }
+        .panel--dark .lockup-row { border-top-color: var(--rule-inv); }
+        .lockup-row svg { width: 40px; height: 40px; display: block; }
+        .lockup-row .brand {
+            font-family: var(--mono);
+            font-weight: 500;
+            font-size: 22px;
+            letter-spacing: -.02em;
+        }
+        .lockup-row .brand .track { color: var(--alert); }
+
+        .sizes {
+            display: flex; align-items: flex-end; gap: 36px;
+            margin-top: 28px;
+        }
+        .sizes > div { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .sizes .sz-tag {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--mute);
+        }
+        .panel--dark .sizes .sz-tag { color: var(--inv-mute); }
+
+        footer {
+            padding: 40px 48px;
+            border-top: 1px solid var(--rule);
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--mute);
+        }
+        footer code { color: var(--ink); background: var(--bg-alt); padding: 1px 6px; }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="eyebrow">Chosen Mark / v2</div>
+        <h1>Transmission fork<br>inside a surveillance bracket.</h1>
+        <p>
+            Stroke hierarchy refined &mdash; the corner brackets carry the heaviest weight (they define the
+            silhouette), edges sit at roughly half that, and node borders are thinner still so the nodes
+            read as quiet points rather than rings.
+        </p>
+        <dl>
+            <dt>Bracket stroke</dt><dd>1.0</dd>
+            <dt>Edge stroke</dt><dd>0.55</dd>
+            <dt>Node border</dt><dd>0.3</dd>
+        </dl>
+    </header>
+
+    <div class="board">
+
+        <!-- LIGHT PANEL -->
+        <section class="panel">
+            <div class="tag">Light canvas</div>
+            <div class="xl">
+                <!-- ────── MASTER MARK ────── -->
+                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square">
+                    <!-- Corner brackets (heaviest) -->
+                    <path d="M3 8 L3 3 L8 3"/>
+                    <path d="M24 3 L29 3 L29 8"/>
+                    <path d="M29 24 L29 29 L24 29"/>
+                    <path d="M8 29 L3 29 L3 24"/>
+                    <!-- Transmission fork edges (thinner) -->
+                    <line x1="16" y1="10.5" x2="10" y2="22" stroke-width="0.55"/>
+                    <line x1="16" y1="10.5" x2="22" y2="22" stroke-width="0.55"/>
+                    <!-- Patient zero (red, solid) -->
+                    <circle cx="16" cy="10.5" r="2.4" fill="#ff073a" stroke="none"/>
+                    <!-- Secondary cases (hollow, thinnest border) -->
+                    <circle cx="10" cy="22" r="1.9" fill="#efeeef" stroke="currentColor" stroke-width="0.3"/>
+                    <circle cx="22" cy="22" r="1.9" fill="#efeeef" stroke="currentColor" stroke-width="0.3"/>
+                </svg>
+            </div>
+
+            <div class="lockup-row">
+                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square">
+                    <path d="M3 8 L3 3 L8 3"/>
+                    <path d="M24 3 L29 3 L29 8"/>
+                    <path d="M29 24 L29 29 L24 29"/>
+                    <path d="M8 29 L3 29 L3 24"/>
+                    <line x1="16" y1="10.5" x2="10" y2="22" stroke-width="0.7"/>
+                    <line x1="16" y1="10.5" x2="22" y2="22" stroke-width="0.7"/>
+                    <circle cx="16" cy="10.5" r="2.4" fill="#ff073a" stroke="none"/>
+                    <circle cx="10" cy="22" r="1.9" fill="#efeeef" stroke="currentColor" stroke-width="0.4"/>
+                    <circle cx="22" cy="22" r="1.9" fill="#efeeef" stroke="currentColor" stroke-width="0.4"/>
+                </svg>
+                <span class="brand">Noso<span class="track">Track</span></span>
+            </div>
+
+            <div class="sizes">
+                <div>
+                    <svg width="96" height="96" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square">
+                        <path d="M3 8 L3 3 L8 3"/>
+                        <path d="M24 3 L29 3 L29 8"/>
+                        <path d="M29 24 L29 29 L24 29"/>
+                        <path d="M8 29 L3 29 L3 24"/>
+                        <line x1="16" y1="10.5" x2="10" y2="22" stroke-width="0.55"/>
+                        <line x1="16" y1="10.5" x2="22" y2="22" stroke-width="0.55"/>
+                        <circle cx="16" cy="10.5" r="2.4" fill="#ff073a" stroke="none"/>
+                        <circle cx="10" cy="22" r="1.9" fill="#efeeef" stroke="currentColor" stroke-width="0.3"/>
+                        <circle cx="22" cy="22" r="1.9" fill="#efeeef" stroke="currentColor" stroke-width="0.3"/>
+                    </svg>
+                    <span class="sz-tag">96 px</span>
+                </div>
+                <div>
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="square">
+                        <path d="M3 8 L3 3 L8 3"/>
+                        <path d="M24 3 L29 3 L29 8"/>
+                        <path d="M29 24 L29 29 L24 29"/>
+                        <path d="M8 29 L3 29 L3 24"/>
+                        <line x1="16" y1="10.5" x2="10" y2="22" stroke-width="0.75"/>
+                        <line x1="16" y1="10.5" x2="22" y2="22" stroke-width="0.75"/>
+                        <circle cx="16" cy="10.5" r="2.4" fill="#ff073a" stroke="none"/>
+                        <circle cx="10" cy="22" r="1.9" fill="#efeeef" stroke="currentColor" stroke-width="0.45"/>
+                        <circle cx="22" cy="22" r="1.9" fill="#efeeef" stroke="currentColor" stroke-width="0.45"/>
+                    </svg>
+                    <span class="sz-tag">32 px · nav</span>
+                </div>
+                <div>
+                    <svg width="16" height="16" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+                        <path d="M3 8 L3 3 L8 3"/>
+                        <path d="M24 3 L29 3 L29 8"/>
+                        <path d="M29 24 L29 29 L24 29"/>
+                        <path d="M8 29 L3 29 L3 24"/>
+                        <line x1="16" y1="10.5" x2="10" y2="22" stroke-width="1.2"/>
+                        <line x1="16" y1="10.5" x2="22" y2="22" stroke-width="1.2"/>
+                        <circle cx="16" cy="10.5" r="3" fill="#ff073a" stroke="none"/>
+                        <circle cx="10" cy="22" r="2.2" fill="currentColor" stroke="none"/>
+                        <circle cx="22" cy="22" r="2.2" fill="currentColor" stroke="none"/>
+                    </svg>
+                    <span class="sz-tag">16 px · favicon</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- DARK PANEL -->
+        <section class="panel panel--dark">
+            <div class="tag">Dark canvas</div>
+            <div class="xl">
+                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square">
+                    <path d="M3 8 L3 3 L8 3"/>
+                    <path d="M24 3 L29 3 L29 8"/>
+                    <path d="M29 24 L29 29 L24 29"/>
+                    <path d="M8 29 L3 29 L3 24"/>
+                    <line x1="16" y1="10.5" x2="10" y2="22" stroke-width="0.55"/>
+                    <line x1="16" y1="10.5" x2="22" y2="22" stroke-width="0.55"/>
+                    <circle cx="16" cy="10.5" r="2.4" fill="#ff073a" stroke="none"/>
+                    <circle cx="10" cy="22" r="1.9" fill="#212326" stroke="currentColor" stroke-width="0.3"/>
+                    <circle cx="22" cy="22" r="1.9" fill="#212326" stroke="currentColor" stroke-width="0.3"/>
+                </svg>
+            </div>
+
+            <div class="lockup-row">
+                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square">
+                    <path d="M3 8 L3 3 L8 3"/>
+                    <path d="M24 3 L29 3 L29 8"/>
+                    <path d="M29 24 L29 29 L24 29"/>
+                    <path d="M8 29 L3 29 L3 24"/>
+                    <line x1="16" y1="10.5" x2="10" y2="22" stroke-width="0.7"/>
+                    <line x1="16" y1="10.5" x2="22" y2="22" stroke-width="0.7"/>
+                    <circle cx="16" cy="10.5" r="2.4" fill="#ff073a" stroke="none"/>
+                    <circle cx="10" cy="22" r="1.9" fill="#212326" stroke="currentColor" stroke-width="0.4"/>
+                    <circle cx="22" cy="22" r="1.9" fill="#212326" stroke="currentColor" stroke-width="0.4"/>
+                </svg>
+                <span class="brand">Noso<span class="track">Track</span></span>
+            </div>
+
+            <div class="sizes">
+                <div>
+                    <svg width="96" height="96" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square">
+                        <path d="M3 8 L3 3 L8 3"/>
+                        <path d="M24 3 L29 3 L29 8"/>
+                        <path d="M29 24 L29 29 L24 29"/>
+                        <path d="M8 29 L3 29 L3 24"/>
+                        <line x1="16" y1="10.5" x2="10" y2="22" stroke-width="0.55"/>
+                        <line x1="16" y1="10.5" x2="22" y2="22" stroke-width="0.55"/>
+                        <circle cx="16" cy="10.5" r="2.4" fill="#ff073a" stroke="none"/>
+                        <circle cx="10" cy="22" r="1.9" fill="#212326" stroke="currentColor" stroke-width="0.3"/>
+                        <circle cx="22" cy="22" r="1.9" fill="#212326" stroke="currentColor" stroke-width="0.3"/>
+                    </svg>
+                    <span class="sz-tag">96 px</span>
+                </div>
+                <div>
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="square">
+                        <path d="M3 8 L3 3 L8 3"/>
+                        <path d="M24 3 L29 3 L29 8"/>
+                        <path d="M29 24 L29 29 L24 29"/>
+                        <path d="M8 29 L3 29 L3 24"/>
+                        <line x1="16" y1="10.5" x2="10" y2="22" stroke-width="0.75"/>
+                        <line x1="16" y1="10.5" x2="22" y2="22" stroke-width="0.75"/>
+                        <circle cx="16" cy="10.5" r="2.4" fill="#ff073a" stroke="none"/>
+                        <circle cx="10" cy="22" r="1.9" fill="#212326" stroke="currentColor" stroke-width="0.45"/>
+                        <circle cx="22" cy="22" r="1.9" fill="#212326" stroke="currentColor" stroke-width="0.45"/>
+                    </svg>
+                    <span class="sz-tag">32 px · nav</span>
+                </div>
+                <div>
+                    <svg width="16" height="16" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+                        <path d="M3 8 L3 3 L8 3"/>
+                        <path d="M24 3 L29 3 L29 8"/>
+                        <path d="M29 24 L29 29 L24 29"/>
+                        <path d="M8 29 L3 29 L3 24"/>
+                        <line x1="16" y1="10.5" x2="10" y2="22" stroke-width="1.2"/>
+                        <line x1="16" y1="10.5" x2="22" y2="22" stroke-width="1.2"/>
+                        <circle cx="16" cy="10.5" r="3" fill="#ff073a" stroke="none"/>
+                        <circle cx="10" cy="22" r="2.2" fill="currentColor" stroke="none"/>
+                        <circle cx="22" cy="22" r="2.2" fill="currentColor" stroke="none"/>
+                    </svg>
+                    <span class="sz-tag">16 px · favicon</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        Approve the weights and I'll wire the mark into the nav, footer, favicon, and OG card &mdash;
+        replacing <code>virus-logo.js</code> with inline SVG.
+    </footer>
+</body>
+
+</html>

@@ -8,7 +8,6 @@
 Target aesthetic: **Palantir** (palantir.com). The operative signals are:
 
 - Predominantly **light canvas** with a single dark "mission" band.
-- **Alliance No. 1 / No. 2** typography (commercial, Degarism Studio). Because Alliance cannot be redistributed via Google Fonts, v2 uses **Inter Tight** as the closest free substitute. The `@font-face` / `--display` token is isolated so we can swap in true Alliance later (one-line change) if a web license is procured.
 - **Minimalistic, sleek, thin 1px hairlines.** Sharp corners. No glassmorphism, no drop shadows, no radial glows.
 - Editorial typographic hierarchy: tight tracking, big display sizes, small uppercase mono eyebrows.
 - Telemetry/instrumentation cues (numbered indices, measurement marks, technical labels).

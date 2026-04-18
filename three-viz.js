@@ -28,7 +28,7 @@
     scene.add(pointLight);
 
     // Palette tuned for the light canvas.
-    //  healthy:  --text-ink, readable against #efeeef
+    //  healthy:  --ink, readable against #efeeef
     //  infected: --alert red, strictly for infected tracers
     //  edge:     --rule-strong, hairline graph
     // Ward colouring stripped — ward zones are conveyed via neutral grey discs + text labels.

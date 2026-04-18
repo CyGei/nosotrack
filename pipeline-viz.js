@@ -464,7 +464,7 @@
     let engSpeed = ENG_SPEEDS[engSpeedIdx];
 
     // Colours — unified with the About transmission tree + ward palette.
-    //  grey  = --text-ink  (same base as About viz)
+    //  grey  = --ink       (same base as About viz)
     //  red   = --alert     (reserved for confirmed/alert states)
     //  blue  = --ward-a
     //  tan   = --ward-b    (re-used for superspreader)
@@ -1131,13 +1131,13 @@
                 }
             }
             ctx.save(); ctx.globalAlpha = logoAlpha;
-            window.drawVirusLogo(ctx, engFrame2, logoX, logoY);
+            window.drawBrandMark(ctx, engFrame2, logoX, logoY, { size: 32 });
             ctx.fillStyle = '#1e1e2b'; ctx.globalAlpha = logoAlpha * 0.62;
             ctx.font = `600 10px "Inter Tight",sans-serif`;
             ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-            ctx.fillText('Noso', logoX + 17, logoY);
+            ctx.fillText('Noso', logoX + 20, logoY);
             ctx.fillStyle = ACCENT; ctx.globalAlpha = logoAlpha * 0.74;
-            ctx.fillText('Track', logoX + 17 + ctx.measureText('Noso').width, logoY);
+            ctx.fillText('Track', logoX + 20 + ctx.measureText('Noso').width, logoY);
             ctx.restore();
         }
 

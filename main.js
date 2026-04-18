@@ -125,42 +125,6 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 window.__revealObserver = observer;
 
-// ==========================================
-// NAV & FOOTER VIRUS LOGO ANIMATION  (Palantir monochrome)
-// ==========================================
-(function () {
-    var SIZE = 50;
-    var dpr = window.devicePixelRatio || 1;
-    // Color tokens — keep in sync with styles.css
-    var INK   = '30,30,43';      // --text-ink
-    var LIGHT = '239,238,239';   // --text-inv-hi
-
-    var contexts = ['nav-virus', 'footer-virus'].map(function (id) {
-        var el = document.getElementById(id);
-        if (!el) return null;
-        el.width = SIZE * dpr;
-        el.height = SIZE * dpr;
-        el.style.width = SIZE + 'px';
-        el.style.height = SIZE + 'px';
-        var ctx = el.getContext('2d');
-        ctx.scale(dpr, dpr);
-        return { id: id, ctx: ctx };
-    }).filter(Boolean);
-
-    function colorFor(id) {
-        if (id === 'footer-virus') return LIGHT;   // footer is always dark
-        // nav: light over dark hero, ink once scrolled onto light canvas
-        return document.body.classList.contains('nav-on-dark') ? LIGHT : INK;
-    }
-
-    var f = 0;
-    function tick() {
-        contexts.forEach(function (c) {
-            c.ctx.clearRect(0, 0, SIZE, SIZE);
-            window.drawVirusLogo(c.ctx, f, SIZE / 2, SIZE / 2, { color: colorFor(c.id) });
-        });
-        f++;
-        requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-})();
+// Nav + footer marks are now inline SVGs in index.html (networked trilobe).
+// They inherit color from currentColor, so the existing .nav-logo color rules
+// (ink on light, inv-hi on dark via body.nav-on-dark) cascade into them — no JS needed.
