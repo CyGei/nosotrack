@@ -9,8 +9,9 @@
     const H = container.clientHeight || 550;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1b1f22);
-    scene.fog = new THREE.FogExp2(0x1b1f22, 0.0012);
+    // Match the light site canvas (--bg) so the viz reads as part of the page.
+    scene.background = new THREE.Color(0xefeeef);
+    scene.fog = new THREE.FogExp2(0xefeeef, 0.0012);
 
     const camera = new THREE.PerspectiveCamera(55, W / H, 1, 2000);
     camera.position.set(0, 90, 420);
@@ -20,13 +21,18 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
     scene.add(ambientLight);
-    const pointLight = new THREE.PointLight(0xffffff, 0.6, 800);
+    const pointLight = new THREE.PointLight(0xffffff, 0.55, 800);
     pointLight.position.set(100, 200, 200);
     scene.add(pointLight);
 
-    const COLORS = { healthy: 0x8a8a8a, infected: 0xff073a, wardA: 0x6496ff, wardB: 0xff9664, wardC: 0x96ff64, edge: 0x555555, edgeInfected: 0xff073a, particle: 0xff073a };
+    // Palette tuned for the light canvas.
+    //  healthy:  --ink, readable against #efeeef
+    //  infected: --alert red, strictly for infected tracers
+    //  edge:     --rule-strong, hairline graph
+    // Ward colouring stripped — ward zones are conveyed via neutral grey discs + text labels.
+    const COLORS = { healthy: 0x1e1e2b, infected: 0xff073a, wardInk: 0x1e1e2b, edge: 0x555a66, edgeInfected: 0xff073a, particle: 0xff073a };
 
     const nodeData = [
         { id: 1, label: 'P0', ward: 'A', type: 'patient' }, { id: 2, label: 'S1', ward: 'A', type: 'staff' },
@@ -71,7 +77,7 @@
     }
     simulateForces(200);
 
-    const wardConfig = { A: { color: COLORS.wardA, radius: 80 }, B: { color: COLORS.wardB, radius: 90 }, C: { color: COLORS.wardC, radius: 75 } };
+    const wardConfig = { A: { color: COLORS.wardInk, radius: 80 }, B: { color: COLORS.wardInk, radius: 90 }, C: { color: COLORS.wardInk, radius: 75 } };
     Object.entries(wardCenters).forEach(([ward, center]) => {
         const cfg = wardConfig[ward];
         const discGeo = new THREE.CircleGeometry(cfg.radius, 64);
@@ -94,7 +100,7 @@
 
     const nodeMeshes = [], glowMeshes = [];
     Object.values(nodeMap).forEach(n => {
-        const wardColor = COLORS['ward' + n.ward]; const isStaff = n.type === 'staff'; const size = n.id === 10 ? 7 : (isStaff ? 4.5 : 5);
+        const wardColor = COLORS.wardInk; const isStaff = n.type === 'staff'; const size = n.id === 10 ? 7 : (isStaff ? 4.5 : 5);
         const geometry = isStaff ? new THREE.OctahedronGeometry(size, 0) : new THREE.SphereGeometry(size, 16, 16);
         const material = new THREE.MeshPhongMaterial({ color: COLORS.healthy, emissive: 0x111111, shininess: 60, transparent: true, opacity: 0.9 });
         const mesh = new THREE.Mesh(geometry, material); mesh.position.set(n.x, n.y, n.z);
@@ -181,7 +187,7 @@
         nodeMeshes.forEach(m => { m.material.opacity = 0.2; }); edgeMeshes.forEach(e => { e.material.opacity = 0.05; });
         const connectedIds = new Set([nodeId]); edgeData.forEach(e => { if (e.from === nodeId) connectedIds.add(e.to); if (e.to === nodeId) connectedIds.add(e.from); });
         nodeMeshes.forEach(m => { if (connectedIds.has(m.userData.nodeId)) m.material.opacity = 1; });
-        edgeMeshes.forEach(e => { if (e.userData.from === nodeId || e.userData.to === nodeId) { e.material.opacity = 0.8; e.material.color.setHex(0xffffff); } });
+        edgeMeshes.forEach(e => { if (e.userData.from === nodeId || e.userData.to === nodeId) { e.material.opacity = 0.9; e.material.color.setHex(0x1e1e2b); } });
     }
 
     function resetHighlight() {

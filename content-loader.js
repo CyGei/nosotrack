@@ -33,7 +33,8 @@
         if (el) el.innerHTML = val;
     }
 
-    // Populate a .p-card element with tag, optional title, and description
+    // Populate a .p-card element with tag, optional title, and description.
+    // Description is rendered via innerHTML with brandify so "NosoTrack" → wordmark.
     function populateCard(cardEl, data) {
         if (!cardEl || !data) return;
         const tagEl = cardEl.querySelector('.p-card-tag');
@@ -44,15 +45,24 @@
             else titleEl.style.display = 'none';
         }
         const descEl = cardEl.querySelector('.p-card-desc');
-        if (descEl) descEl.textContent = data.desc;
+        if (descEl) descEl.innerHTML = brandify(data.desc);
     }
 
-    // Split "NosoTrack" into "Noso" + <span>Track</span> for accent styling
-    function logoHtml(str) {
-        const idx = str.indexOf('Track');
-        return idx > -1
-            ? str.slice(0, idx) + '<span>' + str.slice(idx) + '</span>'
-            : str;
+    // Wrap every "NosoTrack" in the wordmark markup. JetBrains Mono styling is
+    // applied via .brand; red "Track" is scoped to nav/footer logos via CSS.
+    // Content comes from the trusted content.json source and may already contain
+    // inline HTML (<strong>, <em>, etc.) — we substitute without escaping so
+    // existing markup is preserved.
+    const BRAND_MARKUP =
+        '<span class="brand"><span class="brand-noso">Noso</span>' +
+        '<span class="brand-track">Track</span></span>';
+    function brandify(str) {
+        return String(str).split('NosoTrack').join(BRAND_MARKUP);
+    }
+    // Convenience: set a container's innerHTML to brandified content
+    function setBrand(sel, val) {
+        const el = document.querySelector(sel);
+        if (el) el.innerHTML = brandify(val);
     }
 
     // ── META ──────────────────────────────────────────────────────────────────
@@ -64,7 +74,7 @@
     // ── NAV ───────────────────────────────────────────────────────────────────
 
     const navLogoEl = document.querySelector('.nav-logo');
-    if (navLogoEl) navLogoEl.innerHTML = logoHtml(c.nav.logo);
+    if (navLogoEl) navLogoEl.innerHTML = brandify(c.nav.logo);
 
     const navLinks = document.getElementById('navLinks');
     if (navLinks) {
@@ -90,13 +100,12 @@
             `<span class="accent">${lines[lines.length - 1]}</span>`;
     }
 
-    setText('.hero-subtitle', c.hero.subtitle);
+    setBrand('.hero-subtitle', c.hero.subtitle);
 
     const heroBtns = document.querySelector('.hero-buttons');
     if (heroBtns) {
         heroBtns.innerHTML =
-            `<a href="${c.hero.primaryCta.href}" class="btn-primary">${c.hero.primaryCta.label} &darr;</a>` +
-            `<a href="${c.hero.secondaryCta.href}" class="btn-secondary">${c.hero.secondaryCta.label}</a>`;
+            `<a href="${c.hero.primaryCta.href}" class="btn-primary">${c.hero.primaryCta.label}</a>`;
     }
 
     // ── MARQUEE ───────────────────────────────────────────────────────────────
@@ -128,7 +137,9 @@
         aboutText.querySelectorAll('p').forEach(p => p.remove());
         c.about.paragraphs.forEach(para => {
             const p = document.createElement('p');
-            p.innerHTML = para; // supports <strong>, <em>, <span class="...">, etc.
+            // brandify replaces bare "NosoTrack" with the wordmark markup.
+            // Other HTML (<strong>, <em>, <span>) in the source is preserved.
+            p.innerHTML = brandify(para);
             aboutText.appendChild(p);
         });
     }
@@ -151,9 +162,7 @@
                 : `<div class="viz-legend-dot" style="background:${t.color};"></div>`;
             return `<div class="viz-legend-item">${shape} ${t.label}</div>`;
         }).join('');
-        const wardItems = legend.wards.map(w =>
-            `<div class="viz-legend-item"><div class="viz-legend-dot" style="background:${w.color};"></div> ${w.label}</div>`
-        ).join('');
+        // Ward colour legend removed — ward zones are annotated inline (grey shading + label).
         const statusItems = legend.status.map((s, i) => {
             const style = i === legend.status.length - 1
                 ? `background:${s.color}; box-shadow: 0 0 6px rgba(255,7,58,0.6);`
@@ -163,8 +172,6 @@
         vizLegend.innerHTML =
             `<div class="viz-legend-group"><div class="viz-legend-title">${legend.sections.type}</div>${typeItems}</div>` +
             `<div class="viz-legend-sep"></div>` +
-            `<div class="viz-legend-group"><div class="viz-legend-title">${legend.sections.ward}</div>${wardItems}</div>` +
-            `<div class="viz-legend-sep"></div>` +
             `<div class="viz-legend-group"><div class="viz-legend-title">${legend.sections.status}</div>${statusItems}</div>`;
     }
 
@@ -172,7 +179,7 @@
 
     setText('#platform .section-tag', c.platform.tag);
     setText('#platform .section-title', c.platform.title);
-    setText('.pipeline-subtitle', c.platform.subtitle);
+    setBrand('.pipeline-subtitle', c.platform.subtitle);
 
     const steps = c.platform.steps;
 
@@ -342,14 +349,14 @@
     if (c.roadmap) {
         setText('#roadmap .section-tag', c.roadmap.tag);
         setHtml('#roadmap .section-title', c.roadmap.title.join('<br>'));
-        setHtml('.roadmap-intro', c.roadmap.intro);
+        setHtml('.roadmap-intro', brandify(c.roadmap.intro));
 
         const phases = document.querySelectorAll('.roadmap-phase');
         c.roadmap.phases.forEach((phase, i) => {
             if (!phases[i]) return;
             phases[i].querySelector('.roadmap-phase-badge').textContent = phase.badge;
             phases[i].querySelector('.roadmap-card-title').textContent = phase.title;
-            phases[i].querySelector('.roadmap-card-desc').innerHTML = phase.desc;
+            phases[i].querySelector('.roadmap-card-desc').innerHTML = brandify(phase.desc);
             const tagsEl = phases[i].querySelector('.roadmap-card-tags');
             if (tagsEl && phase.tags) {
                 tagsEl.innerHTML = phase.tags.map(t =>
@@ -406,13 +413,12 @@
     // Form buttons
     if (c.contact.formButtons) {
         setText('#btnSubmit', c.contact.formButtons.submit);
-        setText('#btnReset', c.contact.formButtons.reset);
     }
 
     // ── FOOTER ────────────────────────────────────────────────────────────────
 
     const footerLogoEl = document.querySelector('.footer-logo');
-    if (footerLogoEl) footerLogoEl.innerHTML = logoHtml(c.footer.logo);
+    if (footerLogoEl) footerLogoEl.innerHTML = brandify(c.footer.logo);
 
     const footerLinks = document.querySelector('.footer-links');
     if (footerLinks) {
