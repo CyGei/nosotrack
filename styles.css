@@ -1253,6 +1253,34 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
     margin-bottom: var(--s-3);
 }
 
+/* Timeline header — label + step-nav arrows */
+.timeline-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+    margin-bottom: var(--s-3);
+}
+.timeline-header .research-sub { margin-bottom: 0; }
+.timeline-nav { display: flex; gap: 6px; flex-shrink: 0; }
+.timeline-nav-btn {
+    width: 34px; height: 34px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--bg);
+    border: 1px solid var(--rule-strong);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast), opacity var(--t-fast);
+    -webkit-appearance: none; appearance: none;
+}
+.timeline-nav-btn:hover:not(:disabled),
+.timeline-nav-btn:focus-visible:not(:disabled) {
+    background: var(--ink); color: var(--bg); border-color: var(--ink); outline: none;
+}
+.timeline-nav-btn:disabled { opacity: .3; cursor: default; }
+
 /* Timeline */
 .timeline-wrapper { position: relative; margin-top: var(--s-1); }
 .timeline-scroll {
@@ -1742,9 +1770,18 @@ footer {
     .about-stats                           { grid-template-columns: 1fr; border: 1px solid var(--rule); }
     .about-stat                            { border-right: none; border-bottom: 1px solid var(--rule); padding: var(--s-3) 20px; }
     .about-stat:last-child                 { border-bottom: none; }
-    .alerts-viz-inner                      { grid-template-columns: 1fr; }
+    .alerts-viz-inner                      { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .p-card--alerts                        { padding: 20px 14px; }
+    .p-card--alerts .alerts-viz            { margin: 16px 0 0; padding: 14px 12px 12px; }
+    .alerts-chart                          { height: 140px; }
+    .alerts-terminal                       { height: 170px; min-height: 170px; max-height: 170px; padding: 8px 10px; }
+    .alerts-terminal-line                  { gap: 6px; padding: 2px 0; min-width: 0; }
+    .alerts-terminal-text                  { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 9.5px; }
+    .alerts-terminal-badges                { gap: 3px; }
+    .alerts-terminal-badge                 { font-size: 8px; padding: 1px 4px; letter-spacing: .04em; }
     .tl-card                               { width: 176px; }
     .tl-milestone                          { margin: 0 10px; }
+    .timeline-nav                          { display: none; }
     .team-advisors-row                     { grid-template-columns: 1fr; gap: var(--s-5); }
     .hero-title                            { font-size: clamp(2.4rem, 10vw, 4rem); }
     .section-padding                       { padding: var(--s-10) 0; }
@@ -1752,18 +1789,36 @@ footer {
     .engine-features                       { grid-template-columns: 1fr; border-top: 1px solid var(--rule); }
     .engine-feat                           { border-right: none; border-bottom: 1px solid var(--rule); }
     .engine-feat:last-child                { border-bottom: none; }
-    .ipc-scenarios-row                     { flex-wrap: wrap; }
-    .ipc-scenarios-row .ipc-scenario-card  { flex: 1 1 calc(50% - 4px); min-width: calc(50% - 4px); }
+    .p-card--ipc                           { padding: 20px 14px; }
+    .p-card--ipc .ipc-pipeline-viz         { margin: 16px 0 0; padding: 22px 12px 20px; }
+    .ipc-scenarios-row                     { flex-wrap: wrap; gap: 6px; }
+    .ipc-scenarios-row .ipc-scenario-card  { flex: 1 1 calc(50% - 3px); min-width: calc(50% - 3px); padding: 8px; gap: 6px; }
+    .ipc-sc-title                          { font-size: 10px; white-space: normal; line-height: 1.2; }
+    .ipc-sc-num                            { font-size: 8.5px; }
     .ipc-sc-details                        { display: none; }
-    #ipc-spider-canvas                     { height: 240px; }
-    .ipc-optimal                           { padding: 12px 14px; }
+    #ipc-spider-canvas                     { height: 260px; }
+    .ipc-optimal                           { padding: 12px 12px; }
+    .ipc-optimal-icon                      { width: 14px; height: 14px; top: 12px; left: 12px; }
+    .ipc-optimal-header                    { margin-left: 22px; gap: 8px; flex-wrap: wrap; }
+    .ipc-optimal-badge                     { font-size: 9px; letter-spacing: .1em; padding: 2px 6px; }
+    .ipc-optimal-title                     { font-size: 12px; }
     .ipc-optimal-metrics                   { flex-wrap: wrap; border-top: 1px solid var(--rule); }
-    .ipc-optimal-metric                    { flex: 1 1 50%; border-bottom: 1px solid var(--rule); }
+    .ipc-optimal-metric                    { flex: 1 1 50%; border-bottom: 1px solid var(--rule); padding: 10px; }
     .ipc-optimal-metric:nth-child(2n)      { border-right: none; }
     .ipc-optimal-metric:nth-last-child(-n+2) { border-bottom: none; }
-    .ipc-engine-box                        { max-width: 100%; }
-    .ipc-avatar                            { width: 48px; }
-    .ipc-avatar-icon                       { width: 24px; height: 24px; }
+    .ipc-optimal-metric-val                { font-size: 16px; }
+    .ipc-optimal-metric-label              { font-size: 8.5px; letter-spacing: .1em; }
+    .ipc-engine-box                        { max-width: 100%; padding: 10px 14px; }
+    .ipc-engine-label                      { font-size: 10px; letter-spacing: .14em; }
+    .ipc-avatar                            { width: 40px; }
+    .ipc-avatar-ring                       { width: 36px; height: 36px; }
+    .ipc-avatar-icon                       { width: 22px; height: 22px; }
+    .ipc-avatar-label                      { font-size: 8px; letter-spacing: .04em; white-space: normal; line-height: 1.15; width: max-content; max-width: 64px; left: 50%; transform: translateX(-50%); }
+    .ipc-avatar--expert .ipc-avatar-label  { top: 40px; }
+    .ipc-avatar--ai .ipc-avatar-label      { bottom: -22px; }
+    .ipc-bubble-area                       { padding: 4px 6px; }
+    .ipc-bubble                            { max-width: 96%; font-size: 10px; padding: 5px 8px; letter-spacing: 0; line-height: 1.4; }
+    .ipc-section-label                     { font-size: 9px; letter-spacing: .14em; }
     .p-card-canvas                         { height: 100px; }
     .p-card--engine .p-card-canvas         { height: 300px; }
 }

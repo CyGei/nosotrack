@@ -518,9 +518,15 @@
             <h2 class="section-title reveal"></h2>
             <p class="research-intro reveal"></p>
 
-            <h3 class="research-sub reveal" id="researchTimelineLabel"></h3>
+            <div class="timeline-header reveal">
+                <h3 class="research-sub" id="researchTimelineLabel"></h3>
+                <div class="timeline-nav" id="timelineNav">
+                    <button class="timeline-nav-btn" data-tl-dir="-1" aria-label="Previous milestones" type="button">&larr;</button>
+                    <button class="timeline-nav-btn" data-tl-dir="1" aria-label="Next milestones" type="button">&rarr;</button>
+                </div>
+            </div>
             <div class="timeline-wrapper reveal">
-                <div class="timeline-scroll">
+                <div class="timeline-scroll" tabindex="0">
                     <div class="timeline-track"></div>
                 </div>
                 <div class="timeline-detail" id="timelineDetail">

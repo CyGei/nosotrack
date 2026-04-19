@@ -456,7 +456,14 @@
 
     function drawSpider() {
         const cx = spW / 2, cy = spH / 2;
-        const radius = Math.min(cx, cy) * 0.68;
+        // On narrow canvases, shrink the polygon so axis labels have room to sit outside it
+        const isNarrow = spW < 320;
+        const radiusRatio = isNarrow ? 0.5 : 0.68;
+        const labelOffset = isNarrow ? 14 : 26;
+        const labelFont = isNarrow ? '500 9px "JetBrains Mono", monospace' : '500 11px "JetBrains Mono", monospace';
+        const labelLineH = isNarrow ? 10 : 12;
+        const naLabelFont = isNarrow ? '500 8px "JetBrains Mono", monospace' : '500 10px "JetBrains Mono", monospace';
+        const radius = Math.min(cx, cy) * radiusRatio;
         spCtx.clearRect(0, 0, spW, spH);
 
         // Morph current towards target
@@ -523,7 +530,7 @@
         // "No Action" label — right side, between Cases and Bed-Days Lost axes
         const naAngle = (angle(0) + angle(1)) / 2;  // midpoint of axes 0 and 1
         const naR = radius * 0.92;
-        spCtx.font = '500 10px "JetBrains Mono", monospace';
+        spCtx.font = naLabelFont;
         spCtx.fillStyle = 'rgba(30,30,43,0.7)';
         spCtx.textAlign = 'left';
         spCtx.textBaseline = 'middle';
@@ -577,18 +584,23 @@
         }
 
         // Axis labels
-        spCtx.font = '500 11px "JetBrains Mono", monospace';
+        spCtx.font = labelFont;
         spCtx.fillStyle = 'rgba(30,30,43,0.85)';
         spCtx.textAlign = 'center';
         spCtx.textBaseline = 'middle';
         for (let i = 0; i < NUM_AXES; i++) {
             const a = angle(i);
-            const lbR = radius + 26;
-            const lx = cx + Math.cos(a) * lbR;
+            const lbR = radius + labelOffset;
+            let lx = cx + Math.cos(a) * lbR;
             const ly = cy + Math.sin(a) * lbR;
             const lines = axisLabels[i].split('\n');
+            // Pull labels inward from horizontal edges so they don't clip on narrow canvases
+            const widest = Math.max(...lines.map(l => spCtx.measureText(l).width));
+            const half = widest / 2;
+            if (lx - half < 2) lx = half + 2;
+            if (lx + half > spW - 2) lx = spW - half - 2;
             lines.forEach((line, li) => {
-                spCtx.fillText(line, lx, ly + (li - (lines.length - 1) / 2) * 12);
+                spCtx.fillText(line, lx, ly + (li - (lines.length - 1) / 2) * labelLineH);
             });
         }
 

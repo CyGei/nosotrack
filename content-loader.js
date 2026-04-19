@@ -297,6 +297,51 @@
             el.addEventListener('mouseenter', () => showDetail(m));
             el.addEventListener('focus', () => showDetail(m));
         });
+
+        // ── Timeline step-nav (arrow buttons + keyboard) ──────────────────
+        const tlScroll = document.querySelector('.timeline-scroll');
+        const tlNav = document.getElementById('timelineNav');
+        if (tlScroll && tlNav) {
+            const btns = tlNav.querySelectorAll('.timeline-nav-btn');
+
+            function stepSize() {
+                // Scroll by ~2 cards at a time, capped at one visible "page"
+                const card = tlScroll.querySelector('.tl-milestone');
+                const cardW = card ? card.getBoundingClientRect().width + 36 : 232; // card + side margins
+                return Math.min(cardW * 2, tlScroll.clientWidth - cardW * 0.5);
+            }
+
+            function updateBtnState() {
+                const max = tlScroll.scrollWidth - tlScroll.clientWidth - 1;
+                btns.forEach(b => {
+                    const dir = parseInt(b.dataset.tlDir, 10);
+                    b.disabled = (dir < 0 && tlScroll.scrollLeft <= 0) ||
+                                 (dir > 0 && tlScroll.scrollLeft >= max);
+                });
+            }
+
+            btns.forEach(b => {
+                b.addEventListener('click', () => {
+                    const dir = parseInt(b.dataset.tlDir, 10);
+                    tlScroll.scrollBy({ left: dir * stepSize(), behavior: 'smooth' });
+                });
+            });
+
+            // Keyboard support when the scroll area has focus
+            tlScroll.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    tlScroll.scrollBy({ left: -stepSize(), behavior: 'smooth' });
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    tlScroll.scrollBy({ left: stepSize(), behavior: 'smooth' });
+                }
+            });
+
+            tlScroll.addEventListener('scroll', updateBtnState, { passive: true });
+            window.addEventListener('resize', updateBtnState);
+            updateBtnState();
+        }
     }
 
     // ── TEAM ──────────────────────────────────────────────────────────────────
