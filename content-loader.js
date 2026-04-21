@@ -104,8 +104,14 @@
 
     const heroBtns = document.querySelector('.hero-buttons');
     if (heroBtns) {
+        const renderCta = (cta, cls) => {
+            if (!cta) return '';
+            const ext = cta.external ? ' target="_blank" rel="noopener noreferrer"' : '';
+            return `<a href="${cta.href}" class="${cls}"${ext}>${cta.label}</a>`;
+        };
         heroBtns.innerHTML =
-            `<a href="${c.hero.primaryCta.href}" class="btn-primary">${c.hero.primaryCta.label}</a>`;
+            renderCta(c.hero.primaryCta, 'btn-primary') +
+            renderCta(c.hero.secondaryCta, 'btn-secondary');
     }
 
     // ── MARQUEE ───────────────────────────────────────────────────────────────
