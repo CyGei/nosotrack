@@ -263,6 +263,24 @@ nav.main-nav.scrolled {
 }
 .nav-mark svg { width: 100%; height: 100%; display: block; }
 
+/* Inner network spins on brand hover (nav + footer). Brackets stay fixed
+   (the "frame"), the network — nodes, spikes, red core — rotates as a
+   single unit around the SVG centre (16, 16 in the 32-unit viewBox).
+   Suppressed under prefers-reduced-motion. */
+.brand-mark-network {
+    transform-origin: 16px 16px;
+    transition: transform 1.6s cubic-bezier(.2, 0, 0, 1);
+}
+.nav-brand:hover    .brand-mark-network,
+.footer-brand:hover .brand-mark-network {
+    transform: rotate(360deg);
+}
+@media (prefers-reduced-motion: reduce) {
+    .brand-mark-network { transition: none; }
+    .nav-brand:hover    .brand-mark-network,
+    .footer-brand:hover .brand-mark-network { transform: none; }
+}
+
 .nav-logo {
     font-family: var(--display);
     font-weight: 600;
@@ -382,8 +400,9 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
 }
 
 /* Hero headline — all three lines set in JetBrains Mono for a uniform
-   instrument/terminal register. "Protect." picks up a subtle red glow via
-   the .accent span. */
+   instrument/terminal register. "Protect." picks up a subtle cream halo via
+   the .accent span — luminescence rather than alert (red is reserved for
+   threat signals). */
 .hero-title {
     font-family: var(--mono);
     font-weight: 400;
@@ -401,26 +420,26 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
     font-size: inherit;
     letter-spacing: inherit;
     color: inherit;
-    /* Very subtle red aura — sits behind "Protect." without bleeding into
-       surrounding text. Layered shadows give a soft fall-off.
-       Breathes slowly via @keyframes accent-breathe (suppressed under
-       prefers-reduced-motion). */
+    /* Very subtle cream aura — sits behind "Protect." as a soft halo of light,
+       reinforcing the protective register without bleeding into surrounding
+       text. Layered shadows give a soft fall-off. Breathes slowly via
+       @keyframes accent-breathe (suppressed under prefers-reduced-motion). */
     text-shadow:
-        0 0 18px rgba(255, 7, 58, .28),
-        0 0 6px  rgba(255, 7, 58, .18);
+        0 0 22px rgba(239, 238, 239, .32),
+        0 0 8px  rgba(239, 238, 239, .22);
     animation: accent-breathe 5.2s ease-in-out infinite;
 }
 
 @keyframes accent-breathe {
     0%, 100% {
         text-shadow:
-            0 0 18px rgba(255, 7, 58, .24),
-            0 0 6px  rgba(255, 7, 58, .16);
+            0 0 22px rgba(239, 238, 239, .28),
+            0 0 8px  rgba(239, 238, 239, .18);
     }
     50% {
         text-shadow:
-            0 0 26px rgba(255, 7, 58, .42),
-            0 0 8px  rgba(255, 7, 58, .24);
+            0 0 32px rgba(239, 238, 239, .48),
+            0 0 10px rgba(239, 238, 239, .30);
     }
 }
 

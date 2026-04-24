@@ -1,131 +1,58 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!--
+    NosoTrack — Open Graph card (Design v2 / Palantir-inspired)
+    Light cream surface · ink + alert red · JetBrains Mono
+  -->
+
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1b1f22"/>
-      <stop offset="100%" stop-color="#141719"/>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#f1f0f1"/>
+      <stop offset="100%" stop-color="#e8e7e8"/>
     </linearGradient>
-    <radialGradient id="glow" cx="0.15" cy="0.4" r="0.7">
-      <stop offset="0%" stop-color="rgba(255,7,58,0.08)"/>
-      <stop offset="100%" stop-color="transparent"/>
+    <radialGradient id="vignette" cx="0.18" cy="0.22" r="0.85">
+      <stop offset="0%"   stop-color="rgba(30,30,43,0.06)"/>
+      <stop offset="60%"  stop-color="rgba(30,30,43,0)"/>
     </radialGradient>
-    <linearGradient id="topLine" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="transparent"/>
-      <stop offset="30%" stop-color="#ff073a"/>
-      <stop offset="70%" stop-color="rgba(100,150,255,0.4)"/>
-      <stop offset="100%" stop-color="transparent"/>
-    </linearGradient>
   </defs>
 
-  <!-- Background -->
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect width="1200" height="630" fill="url(#glow)"/>
+  <!-- Surface -->
+  <rect width="1200" height="630" fill="url(#paper)"/>
+  <rect width="1200" height="630" fill="url(#vignette)"/>
 
-  <!-- Top accent line -->
-  <rect x="0" y="0" width="1200" height="2" fill="url(#topLine)" opacity="0.7"/>
-
-  <!-- Subtle grid dots (network feel) -->
-  <g opacity="0.04" fill="#fff">
-    <circle cx="100" cy="100" r="1.5"/><circle cx="200" cy="100" r="1.5"/><circle cx="300" cy="100" r="1.5"/>
-    <circle cx="400" cy="100" r="1.5"/><circle cx="500" cy="100" r="1.5"/><circle cx="600" cy="100" r="1.5"/>
-    <circle cx="700" cy="100" r="1.5"/><circle cx="800" cy="100" r="1.5"/><circle cx="900" cy="100" r="1.5"/>
-    <circle cx="1000" cy="100" r="1.5"/><circle cx="1100" cy="100" r="1.5"/>
-    <circle cx="100" cy="200" r="1.5"/><circle cx="200" cy="200" r="1.5"/><circle cx="300" cy="200" r="1.5"/>
-    <circle cx="400" cy="200" r="1.5"/><circle cx="500" cy="200" r="1.5"/><circle cx="600" cy="200" r="1.5"/>
-    <circle cx="700" cy="200" r="1.5"/><circle cx="800" cy="200" r="1.5"/><circle cx="900" cy="200" r="1.5"/>
-    <circle cx="1000" cy="200" r="1.5"/><circle cx="1100" cy="200" r="1.5"/>
-    <circle cx="100" cy="300" r="1.5"/><circle cx="200" cy="300" r="1.5"/><circle cx="300" cy="300" r="1.5"/>
-    <circle cx="400" cy="300" r="1.5"/><circle cx="500" cy="300" r="1.5"/><circle cx="600" cy="300" r="1.5"/>
-    <circle cx="700" cy="300" r="1.5"/><circle cx="800" cy="300" r="1.5"/><circle cx="900" cy="300" r="1.5"/>
-    <circle cx="1000" cy="300" r="1.5"/><circle cx="1100" cy="300" r="1.5"/>
-    <circle cx="100" cy="400" r="1.5"/><circle cx="200" cy="400" r="1.5"/><circle cx="300" cy="400" r="1.5"/>
-    <circle cx="400" cy="400" r="1.5"/><circle cx="500" cy="400" r="1.5"/><circle cx="600" cy="400" r="1.5"/>
-    <circle cx="700" cy="400" r="1.5"/><circle cx="800" cy="400" r="1.5"/><circle cx="900" cy="400" r="1.5"/>
-    <circle cx="1000" cy="400" r="1.5"/><circle cx="1100" cy="400" r="1.5"/>
-    <circle cx="100" cy="500" r="1.5"/><circle cx="200" cy="500" r="1.5"/><circle cx="300" cy="500" r="1.5"/>
-    <circle cx="400" cy="500" r="1.5"/><circle cx="500" cy="500" r="1.5"/><circle cx="600" cy="500" r="1.5"/>
-    <circle cx="700" cy="500" r="1.5"/><circle cx="800" cy="500" r="1.5"/><circle cx="900" cy="500" r="1.5"/>
-    <circle cx="1000" cy="500" r="1.5"/><circle cx="1100" cy="500" r="1.5"/>
-  </g>
-
-  <!-- Network lines (subtle transmission network) -->
-  <g stroke="rgba(255,7,58,0.06)" stroke-width="0.8" fill="none">
-    <line x1="750" y1="150" x2="850" y2="220"/>
-    <line x1="850" y1="220" x2="950" y2="180"/>
-    <line x1="950" y1="180" x2="1050" y2="250"/>
-    <line x1="850" y1="220" x2="900" y2="320"/>
-    <line x1="900" y1="320" x2="1000" y2="350"/>
-    <line x1="1000" y1="350" x2="1050" y2="250"/>
-    <line x1="1050" y1="250" x2="1100" y2="330"/>
-    <line x1="750" y1="350" x2="850" y2="400"/>
-    <line x1="850" y1="400" x2="900" y2="320"/>
-    <line x1="750" y1="350" x2="750" y2="150"/>
-    <line x1="1000" y1="350" x2="1080" y2="450"/>
-    <line x1="1100" y1="330" x2="1080" y2="450"/>
-  </g>
-
-  <!-- Network nodes -->
-  <g>
-    <circle cx="750" cy="150" r="4" fill="rgba(160,160,160,0.15)" stroke="rgba(160,160,160,0.2)" stroke-width="1"/>
-    <circle cx="850" cy="220" r="5" fill="rgba(255,7,58,0.2)" stroke="rgba(255,7,58,0.35)" stroke-width="1"/>
-    <circle cx="950" cy="180" r="3.5" fill="rgba(160,160,160,0.15)" stroke="rgba(160,160,160,0.2)" stroke-width="1"/>
-    <circle cx="1050" cy="250" r="5" fill="rgba(255,7,58,0.2)" stroke="rgba(255,7,58,0.35)" stroke-width="1"/>
-    <circle cx="900" cy="320" r="4" fill="rgba(255,7,58,0.15)" stroke="rgba(255,7,58,0.25)" stroke-width="1"/>
-    <circle cx="1000" cy="350" r="3.5" fill="rgba(160,160,160,0.15)" stroke="rgba(160,160,160,0.2)" stroke-width="1"/>
-    <circle cx="1100" cy="330" r="4" fill="rgba(255,7,58,0.2)" stroke="rgba(255,7,58,0.35)" stroke-width="1"/>
-    <circle cx="750" cy="350" r="3" fill="rgba(160,160,160,0.15)" stroke="rgba(160,160,160,0.2)" stroke-width="1"/>
-    <circle cx="850" cy="400" r="4.5" fill="rgba(255,7,58,0.15)" stroke="rgba(255,7,58,0.25)" stroke-width="1"/>
-    <circle cx="1080" cy="450" r="3.5" fill="rgba(160,160,160,0.15)" stroke="rgba(160,160,160,0.2)" stroke-width="1"/>
-  </g>
-
-  <!-- Virus icon -->
-  <g transform="translate(100, 180)">
-    <!-- Core -->
-    <circle cx="0" cy="0" r="28" fill="rgba(255,7,58,0.18)" stroke="rgba(255,7,58,0.35)" stroke-width="1.2"/>
-    <circle cx="0" cy="0" r="18" fill="rgba(255,7,58,0.25)"/>
-    <!-- Spikes -->
-    <line x1="0" y1="-28" x2="0" y2="-44" stroke="rgba(255,7,58,0.4)" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="0" cy="-44" r="4" fill="rgba(255,7,58,0.5)"/>
-    <line x1="0" y1="28" x2="0" y2="44" stroke="rgba(255,7,58,0.4)" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="0" cy="44" r="4" fill="rgba(255,7,58,0.5)"/>
-    <line x1="-28" y1="0" x2="-44" y2="0" stroke="rgba(255,7,58,0.4)" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="-44" cy="0" r="4" fill="rgba(255,7,58,0.5)"/>
-    <line x1="28" y1="0" x2="44" y2="0" stroke="rgba(255,7,58,0.4)" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="44" cy="0" r="4" fill="rgba(255,7,58,0.5)"/>
-    <line x1="-19.8" y1="-19.8" x2="-31.1" y2="-31.1" stroke="rgba(255,7,58,0.4)" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="-31.1" cy="-31.1" r="4" fill="rgba(255,7,58,0.5)"/>
-    <line x1="19.8" y1="-19.8" x2="31.1" y2="-31.1" stroke="rgba(255,7,58,0.4)" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="31.1" cy="-31.1" r="4" fill="rgba(255,7,58,0.5)"/>
-    <line x1="-19.8" y1="19.8" x2="-31.1" y2="31.1" stroke="rgba(255,7,58,0.4)" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="-31.1" cy="31.1" r="4" fill="rgba(255,7,58,0.5)"/>
-    <line x1="19.8" y1="19.8" x2="31.1" y2="31.1" stroke="rgba(255,7,58,0.4)" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="31.1" cy="31.1" r="4" fill="rgba(255,7,58,0.5)"/>
-    <!-- Glow -->
-    <circle cx="0" cy="0" r="55" fill="none" stroke="rgba(255,7,58,0.04)" stroke-width="12"/>
+  <!-- Brand mark (bracketed network with red core), scaled 32→360 -->
+  <g transform="translate(80, 135) scale(11.25)" fill="none" stroke="#1e1e2b" stroke-linecap="square">
+    <path d="M3 8 L3 3 L8 3"   stroke-width="1.2"/>
+    <path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
+    <path d="M29 24 L29 29 L24 29" stroke-width="1.2"/>
+    <path d="M8 29 L3 29 L3 24"   stroke-width="1.2"/>
+    <g stroke-linecap="round">
+      <line x1="16.00" y1="11.20" x2="16.00" y2="15.60" stroke-width="0.55"/>
+      <line x1="11.31" y1="19.30" x2="15.13" y2="17.10" stroke-width="0.55"/>
+      <line x1="20.69" y1="19.30" x2="16.87" y2="17.10" stroke-width="0.55"/>
+      <circle cx="16"   cy="9"    r="2.2"  stroke-width="0.35"/>
+      <circle cx="9.4"  cy="20.4" r="2.2"  stroke-width="0.35"/>
+      <circle cx="22.6" cy="20.4" r="2.2"  stroke-width="0.35"/>
+      <circle cx="16"   cy="16.6" r="1.05" fill="#ff073a" stroke="none"/>
+    </g>
   </g>
 
   <!-- Eyebrow -->
-  <text x="100" y="300" font-family="monospace" font-size="13" letter-spacing="4" fill="#ff073a" text-transform="uppercase">REAL-TIME OUTBREAK ANALYTICS</text>
+  <text x="500" y="240"
+        font-family="'JetBrains Mono','Consolas',ui-monospace,monospace"
+        font-size="22" font-weight="500" letter-spacing="6"
+        fill="#ff073a">TRANSMISSION INTELLIGENCE</text>
 
-  <!-- Title: Noso -->
-  <text x="100" y="380" font-family="'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="80" fill="#ffffff" letter-spacing="-2">Noso<tspan fill="#ff073a">Track</tspan></text>
+  <!-- Wordmark -->
+  <text x="500" y="370"
+        font-family="'JetBrains Mono','Consolas',ui-monospace,monospace"
+        font-size="100" font-weight="500" letter-spacing="-3">
+    <tspan fill="#1e1e2b">Noso</tspan><tspan fill="#ff073a">Track</tspan>
+  </text>
 
-  <!-- Subtitle -->
-  <text x="100" y="430" font-family="'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif" font-weight="300" font-size="20" fill="rgba(236,236,236,0.85)">Infers who infected whom in near real-time.</text>
-  <text x="100" y="458" font-family="'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif" font-weight="300" font-size="20" fill="rgba(236,236,236,0.85)">Stop outbreaks before they escalate.</text>
-
-  <!-- Institutions -->
-  <g transform="translate(100, 530)">
-    <line x1="0" y1="-20" x2="520" y2="-20" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-    <text font-family="Georgia, 'Times New Roman', serif" font-size="12" font-weight="700" letter-spacing="1.5" fill="rgba(255,255,255,0.35)" text-transform="uppercase">
-      <tspan>JOHNS HOPKINS UNIVERSITY</tspan>
-      <tspan dx="28">IMPERIAL COLLEGE LONDON</tspan>
-      <tspan dx="28">R EPIDEMICS CONSORTIUM</tspan>
-    </text>
-  </g>
-
-  <!-- Bottom border -->
-  <rect x="0" y="626" width="1200" height="4" fill="url(#topLine)" opacity="0.5"/>
-
-  <!-- Domain -->
-  <text x="1100" y="600" font-family="monospace" font-size="13" letter-spacing="1" fill="rgba(255,255,255,0.2)" text-anchor="end">nosotrack.com</text>
+  <!-- Tagline -->
+  <text x="500" y="440"
+        font-family="'Inter Tight','Helvetica Neue',Arial,sans-serif"
+        font-size="36" font-weight="400" fill="#1e1e2b" letter-spacing="-0.5">
+    outbreak forensics
+  </text>
 </svg>

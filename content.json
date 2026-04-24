@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "NosoTrack",
-    "description": "Real-Time Nosocomial Outbreak Intelligence."
+    "description": "Outbreak forensics for healthcare facilities."
   },
 
   "nav": {
@@ -17,7 +17,7 @@
   },
 
   "hero": {
-    "eyebrow": "Real Time Outbreak Intelligence for Healthcare Facilities",
+    "eyebrow": "Outbreak Forensics for Healthcare Facilities",
     "title": ["Track.", "Intervene.", "Protect."],
     "subtitle": "NosoTrack infers who infected whom in near real-time, enabling hospital control teams to stop outbreaks before they escalate.",
     "primaryCta": { "label": "Learn More", "href": "#about" },
@@ -31,6 +31,7 @@
   ],
 
   "marquee": [
+    "Outbreak Forensics",
     "Contact Tracing",
     "Genomic Surveillance",
     "Outbreak Reconstruction",
@@ -77,7 +78,7 @@
   "platform": {
     "tag": "Platform",
     "title": "How It Works",
-    "subtitle": "NosoTrack integrates various data streams into a unified Bayesian analytics engine that infers transmission chains in near real-time.",
+    "subtitle": "NosoTrack integrates various data streams into a unified Bayesian forensics engine that infers transmission chains in near real-time.",
     "steps": {
       "inputs": {
         "stepNum": "01",
