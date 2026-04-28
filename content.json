@@ -7,6 +7,7 @@
   "nav": {
     "logo": "NosoTrack",
     "links": [
+      { "label": "Demo", "href": "#demo" },
       { "label": "About", "href": "#about" },
       { "label": "Platform", "href": "#platform" },
       { "label": "Research", "href": "#research" },
@@ -16,12 +17,20 @@
     "cta": { "label": "Get in Touch", "href": "#contact" }
   },
 
+  "demo": {
+    "title": "NosoTrack in 50 seconds",
+    "trackLabel": "DEMO",
+    "replayLabel": "↺ Replay",
+    "speedLabel": "1×",
+    "fullscreenLabel": "Fullscreen"
+  },
+
   "hero": {
     "eyebrow": "Outbreak Forensics for Healthcare Facilities",
     "title": ["Track.", "Intervene.", "Protect."],
     "subtitle": "NosoTrack infers who infected whom in near real-time, enabling hospital control teams to stop outbreaks before they escalate.",
     "primaryCta": { "label": "Learn More", "href": "#about" },
-    "secondaryCta": { "label": "Demo", "href": "https://cygeismar.shinyapps.io/nosotrack-ui/", "external": true }
+    "secondaryCta": { "label": "Dashboard", "href": "https://cygeismar.shinyapps.io/nosotrack-ui/", "external": true }
   },
 
   "logoStrip": [

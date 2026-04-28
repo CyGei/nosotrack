@@ -14,8 +14,26 @@
     const infectionChance = 0.012;
     const recoveryTime = 700;
 
-    function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+    // The canvas now lives inside .dark-band (which spans hero + demo) so
+    // the particle field is one continuous surface behind both sections.
+    // Fall back to the viewport if the wrapper isn't found, so the
+    // standalone hero still works.
+    const surface = canvas.parentElement || document.body;
+
+    function resize() {
+        // clientWidth/Height reflects the wrapper's current rendered size
+        // including hero (100vh) and demo content below it.
+        width  = canvas.width  = surface.clientWidth  || window.innerWidth;
+        height = canvas.height = surface.clientHeight || window.innerHeight;
+    }
     window.addEventListener('resize', resize);
+    // ResizeObserver picks up height changes from demo content (the
+    // lazy-loaded iframe finishing layout, fullscreen exit, etc.) without
+    // polling.
+    if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(resize);
+        ro.observe(surface);
+    }
     resize();
 
     class Particle {

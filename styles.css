@@ -360,27 +360,34 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
 }
 
 /* ========== 8. HERO ========== */
+
+/* Dark band — wraps #hero and #demo so the particle canvas paints a
+   single continuous field behind both. The hero retains its 100vh height
+   for impact; #demo flows immediately after with reduced top padding so
+   its headline reads as a subhead of the hero rather than a new section. */
+.dark-band {
+    position: relative;
+    background: var(--bg-ink);
+    color: var(--inv);
+    overflow: hidden;
+}
+
 #hero {
     position: relative;
     min-height: 100vh;
-    background: var(--bg-ink);
     color: var(--inv);
     display: flex;
     align-items: center;
-    overflow: hidden;
 }
-#hero::after {
-    content: '';
-    position: absolute; inset: auto 0 0 0; height: 140px;
-    background: linear-gradient(to top, var(--bg-ink) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 1;
-}
+
+/* Network canvas is now pinned to .dark-band, not #hero, so the particle
+   field spans hero + demo. Sized in main.js to match the wrapper. */
 #network-canvas {
     position: absolute; inset: 0;
     width: 100%; height: 100%;
     z-index: 0;
     opacity: .85;
+    pointer-events: none;
 }
 .hero-content {
     position: relative; z-index: 2;
@@ -535,6 +542,180 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
     transition: color var(--t-fast);
 }
 .logo-strip-item:hover { color: var(--ink); }
+
+/* ========== 10b. DEMO ==========
+   Embedded interactive Foundry walkthrough. Dark surround framing a light
+   product UI inside a Palantir-style bezel: thin red top rail + four small
+   square brackets at the corners (echoing the brand mark). The demo itself
+   lives in foundry-demo/index.html and is loaded as a sandboxed iframe at
+   16:9, so the React/Babel runtime never enters the main page bundle. */
+#demo {
+    /* Background lives on .dark-band so the network canvas can show
+       through. Borders dropped — the band is one continuous space. */
+    background: transparent;
+    color: var(--inv);
+    position: relative;
+    z-index: 1;             /* sit above the .dark-band canvas */
+    /* Top padding tightened so the demo headline reads as a hero subhead
+       rather than the start of a new section. */
+    padding-top: var(--s-6);
+}
+
+.demo-head {
+    max-width: 760px;
+    margin-bottom: var(--s-8);
+}
+.demo-head .section-title {
+    color: var(--inv-hi);
+    margin-bottom: 0;
+    /* Subtle cream halo so the title reads cleanly over the particle
+       field. Lighter than the hero's ".accent" halo so it doesn't
+       compete with "Protect." above. */
+    text-shadow:
+        0 0 18px rgba(239, 238, 239, .18),
+        0 0 6px  rgba(239, 238, 239, .12);
+}
+
+.demo-frame {
+    position: relative;
+    margin: 0 auto;
+    max-width: var(--container);
+    padding: 18px;
+    background: linear-gradient(180deg, #15171a 0%, #101114 100%);
+    border: 1px solid var(--rule-inv);
+}
+
+/* Top accent rail — narrow red line, off-center, signature Palantir motif */
+.demo-rail {
+    position: absolute;
+    top: -1px; left: 18px;
+    width: 96px; height: 2px;
+    background: var(--alert);
+    box-shadow: 0 0 12px rgba(var(--alert-rgb), .35);
+}
+
+/* Corner brackets — square L-shapes, 14px arms */
+.demo-bracket {
+    position: absolute;
+    width: 14px; height: 14px;
+    border: 0 solid var(--rule-inv-strong);
+    pointer-events: none;
+}
+.demo-bracket--tl { top: 6px;    left: 6px;    border-top-width: 1px; border-left-width: 1px; }
+.demo-bracket--tr { top: 6px;    right: 6px;   border-top-width: 1px; border-right-width: 1px; }
+.demo-bracket--bl { bottom: 6px; left: 6px;    border-bottom-width: 1px; border-left-width: 1px; }
+.demo-bracket--br { bottom: 6px; right: 6px;   border-bottom-width: 1px; border-right-width: 1px; }
+
+/* 16:9 stage — iframe absolute-fills the box */
+.demo-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #fafafa;
+    overflow: hidden;
+}
+.demo-iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: #fafafa;
+}
+
+/* Playback bar — mirrors the .eng-tbar on the platform section's engine
+   card, but inverted for the dark surround. The internal bar inside the
+   iframe is hidden via STAGE_EMBED logic in foundry-demo/animations.jsx;
+   this bar drives the iframe via postMessage. */
+.demo-tbar {
+    margin-top: 0;
+    height: 44px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--rule-inv);
+    border-top: none;
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 14px;
+}
+.demo-tl {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--inv-mute);
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    user-select: none;
+}
+.demo-track {
+    flex: 1; height: 2px;
+    background: var(--rule-inv);
+    position: relative;
+    cursor: pointer;
+}
+.demo-tfill {
+    position: absolute; top: 0; left: 0;
+    height: 100%;
+    background: var(--inv-hi);
+    width: 0;
+    pointer-events: none;
+}
+.demo-thandle {
+    position: absolute; top: 50%; left: 0;
+    width: 10px; height: 10px;
+    background: var(--inv-hi);
+    transform: translate(-50%, -50%);
+    cursor: grab; z-index: 2;
+}
+.demo-thandle:active { cursor: grabbing; }
+.demo-time {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--inv-mute);
+    letter-spacing: .08em;
+    white-space: nowrap;
+    min-width: 4ch;
+    text-align: right;
+    user-select: none;
+}
+.demo-pause, .demo-spd, .demo-replay, .demo-fs {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    background: transparent;
+    border: 1px solid var(--rule-inv-strong);
+    color: var(--inv);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
+}
+.demo-pause { width: 26px; height: 26px; padding: 0;
+    display: flex; align-items: center; justify-content: center; }
+.demo-pause svg { width: 8px; height: 10px; }
+.demo-fs    { width: 30px; height: 26px; padding: 0;
+    display: flex; align-items: center; justify-content: center; }
+.demo-fs svg { width: 12px; height: 12px; }
+.demo-pause:hover, .demo-spd:hover, .demo-replay:hover, .demo-fs:hover {
+    color: var(--inv-hi);
+    border-color: var(--inv-hi);
+    background: rgba(255,255,255,.04);
+}
+
+/* Native fullscreen — when the user fullscreens .demo-frame the iframe
+   needs to stretch to fill, with the bar pinned at the bottom. */
+.demo-frame:fullscreen {
+    padding: 0;
+    background: #0a0a0c;
+    display: flex; flex-direction: column;
+    width: 100vw; height: 100vh;
+    max-width: none;
+    border: 0;
+}
+.demo-frame:fullscreen .demo-bracket,
+.demo-frame:fullscreen .demo-rail { display: none; }
+.demo-frame:fullscreen .demo-stage { flex: 1; aspect-ratio: auto; }
+.demo-frame:fullscreen .demo-tbar  { border-left: 0; border-right: 0; border-bottom: 0; }
 
 /* ========== 11. ABOUT ========== */
 #about { background: var(--bg); }
@@ -1804,6 +1985,14 @@ footer {
     .team-advisors-row                     { grid-template-columns: 1fr; gap: var(--s-5); }
     .hero-title                            { font-size: clamp(2.4rem, 10vw, 4rem); }
     .section-padding                       { padding: var(--s-10) 0; }
+    .demo-frame                            { padding: 10px; }
+    .demo-rail                             { left: 10px; width: 64px; }
+    .demo-bracket                          { width: 10px; height: 10px; }
+    .demo-tbar                             { padding: 0 8px; gap: 8px; }
+    .demo-tl                               { display: none; }
+    .demo-time                             { display: none; }
+    .demo-spd                              { padding: 5px 6px; }
+    .demo-replay                           { padding: 5px 8px; }
     #three-container                       { height: 340px; }
     .engine-features                       { grid-template-columns: 1fr; border-top: 1px solid var(--rule); }
     .engine-feat                           { border-right: none; border-bottom: 1px solid var(--rule); }

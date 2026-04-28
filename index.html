@@ -69,24 +69,93 @@
         </div>
     </nav>
 
-    <!-- ========== HERO ========== -->
-    <section id="hero">
+    <!-- ========== DARK BAND (Hero + Demo, continuous particle field) ==========
+         The network canvas is pinned to this wrapper so the same particle
+         simulation flows behind both the hero and the demo without a
+         visible seam. The marquee was previously sandwiched between hero
+         and demo; it now sits just above the logo strip below. -->
+    <div class="dark-band">
         <canvas id="network-canvas"></canvas>
-        <div class="hero-content">
-            <div class="hero-eyebrow"></div>
-            <h1 class="hero-title"></h1>
-            <p class="hero-subtitle"></p>
-            <div class="hero-buttons"></div>
-        </div>
-        <div class="hero-scroll-hint" id="heroScrollHint" aria-label="Scroll down">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+
+        <!-- ========== HERO ========== -->
+        <section id="hero">
+            <div class="hero-content">
+                <div class="hero-eyebrow"></div>
+                <h1 class="hero-title"></h1>
+                <p class="hero-subtitle"></p>
+                <div class="hero-buttons"></div>
+            </div>
+            <div class="hero-scroll-hint" id="heroScrollHint" aria-label="Scroll down">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+        </section>
+
+    <!-- ========== DEMO (embedded interactive Foundry walkthrough) ========== -->
+    <section id="demo" class="section-padding on-dark">
+        <div class="container">
+            <div class="demo-head reveal">
+                <h2 class="section-title"></h2>
+            </div>
+
+            <figure class="demo-frame reveal">
+                <!-- Corner brackets — match the brand mark's bracketed-hub motif -->
+                <span class="demo-bracket demo-bracket--tl" aria-hidden="true"></span>
+                <span class="demo-bracket demo-bracket--tr" aria-hidden="true"></span>
+                <span class="demo-bracket demo-bracket--bl" aria-hidden="true"></span>
+                <span class="demo-bracket demo-bracket--br" aria-hidden="true"></span>
+
+                <!-- Top accent rail (red) -->
+                <span class="demo-rail" aria-hidden="true"></span>
+
+                <div class="demo-stage">
+                    <iframe
+                        id="demoIframe"
+                        class="demo-iframe"
+                        src="foundry-demo/index.html?embed=1"
+                        title="NosoTrack Foundry product walkthrough"
+                        loading="lazy"
+                        allow="autoplay; fullscreen"
+                        allowfullscreen
+                        referrerpolicy="no-referrer"></iframe>
+                </div>
+
+                <!-- Playback bar — same controls/style as the engine card on the
+                     platform section (.eng-tbar), inverted for the dark surround. -->
+                <div class="demo-tbar" role="group" aria-label="Demo playback controls">
+                    <span class="demo-tl" id="demoTl"></span>
+                    <button type="button" class="demo-pause" id="demoPause" aria-label="Pause">
+                        <!-- Pause glyph; swapped to play glyph in JS when paused -->
+                        <svg viewBox="0 0 10 12" fill="currentColor" aria-hidden="true">
+                            <rect x="0" y="0" width="3" height="12" rx=".5"/>
+                            <rect x="7" y="0" width="3" height="12" rx=".5"/>
+                        </svg>
+                    </button>
+                    <div class="demo-track" id="demoTrack">
+                        <div class="demo-tfill" id="demoFill"></div>
+                        <div class="demo-thandle" id="demoHandle"></div>
+                    </div>
+                    <span class="demo-time" id="demoTime">0:00</span>
+                    <button type="button" class="demo-spd" id="demoSpd"></button>
+                    <button type="button" class="demo-replay" id="demoReplay"></button>
+                    <button type="button" class="demo-fs" id="demoFs" aria-label="Toggle fullscreen">
+                        <svg viewBox="0 0 16 16" width="12" height="12" fill="none"
+                             stroke="currentColor" stroke-width="1.5" stroke-linecap="square"
+                             aria-hidden="true">
+                            <path d="M2 6V2h4"/><path d="M14 6V2h-4"/>
+                            <path d="M2 10v4h4"/><path d="M14 10v4h-4"/>
+                        </svg>
+                    </button>
+                </div>
+            </figure>
         </div>
     </section>
+    </div>
+    <!-- /.dark-band -->
 
-    <!-- ========== MARQUEE ========== -->
+    <!-- ========== MARQUEE (re-positioned: now sits just above the logo strip) ========== -->
     <div class="marquee-section">
         <div class="marquee-track"></div>
     </div>
