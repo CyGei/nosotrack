@@ -130,9 +130,8 @@ window.addEventListener('scroll', () => {
     }
 }, { passive: true });
 
-// Scroll hint
-const heroHint = document.getElementById('heroScrollHint');
-if (heroHint) heroHint.addEventListener('click', () => document.getElementById('about').scrollIntoView({ behavior: 'smooth' }));
+// Scroll hint is now a plain `<a href="#about">` — native smooth-scroll
+// (html { scroll-behavior: smooth } in styles.css) handles the click.
 
 // ==========================================
 // SCROLL REVEAL

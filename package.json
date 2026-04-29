@@ -1,0 +1,10 @@
+{
+  "name": "nosotrack",
+  "private": true,
+  "scripts": {
+    "build:demo": "node scripts/build-demo.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

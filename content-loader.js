@@ -101,18 +101,9 @@
     }
 
     setBrand('.hero-subtitle', c.hero.subtitle);
-
-    const heroBtns = document.querySelector('.hero-buttons');
-    if (heroBtns) {
-        const renderCta = (cta, cls) => {
-            if (!cta) return '';
-            const ext = cta.external ? ' target="_blank" rel="noopener noreferrer"' : '';
-            return `<a href="${cta.href}" class="${cls}"${ext}>${cta.label}</a>`;
-        };
-        heroBtns.innerHTML =
-            renderCta(c.hero.primaryCta, 'btn-primary') +
-            renderCta(c.hero.secondaryCta, 'btn-secondary');
-    }
+    setText('.scroll-hint-label', c.hero.scrollLabel || '');
+    // Hero has no CTAs by design — the demo is the "Learn More", and the
+    // dashboard CTA lives below the demo where the visitor is most warmed up.
 
     // ── MARQUEE ───────────────────────────────────────────────────────────────
 
@@ -133,65 +124,15 @@
     }
 
     // ── DEMO ──────────────────────────────────────────────────────────────────
-    // Embedded interactive Foundry walkthrough. Markup is in #demo; the
-    // iframe src lives in foundry-demo/index.html (loaded lazily on scroll).
-    // The Stage component inside the iframe hides its built-in playback bar
-    // when ?embed=1, so the bar below is the single source of UI truth and
-    // drives the iframe via postMessage. Time updates flow back the other
-    // way so the fill/handle stay in sync with the underlying playhead.
+    // Embedded interactive Foundry walkthrough. The Stage inside the iframe
+    // hides its built-in bar when ?embed=1; the playbar mounted at #demoPlaybar
+    // (rendered by playbar.js) is the single source of UI truth and drives the
+    // iframe via postMessage. Tick messages from the Stage keep the bar in sync.
 
-    if (c.demo) {
-        setBrand('#demo .section-title', c.demo.title);
-        setText('#demo #demoTl', c.demo.trackLabel || 'DEMO');
-        setText('#demo #demoReplay', c.demo.replayLabel || '↺ Replay');
-
-        const iframe   = document.getElementById('demoIframe');
-        const tl       = document.getElementById('demoTl');
-        const pauseBtn = document.getElementById('demoPause');
-        const track    = document.getElementById('demoTrack');
-        const fill     = document.getElementById('demoFill');
-        const handle   = document.getElementById('demoHandle');
-        const timeLbl  = document.getElementById('demoTime');
-        const spdBtn   = document.getElementById('demoSpd');
-        const replay   = document.getElementById('demoReplay');
-        const fsBtn    = document.getElementById('demoFs');
-        const frame    = document.querySelector('#demo .demo-frame');
-
-        // Speed cycle — same set as the engine card on the platform section.
-        const SPEEDS = [1, 1.5, 2, 3, 5];
-        let spdIdx = 0;
-        const fmtSpeed = (s) => (s % 1 === 0 ? `${s}×` : `${s}×`);
-        if (spdBtn) spdBtn.textContent = fmtSpeed(SPEEDS[spdIdx]);
-
-        // Local mirror of iframe state, used to drive UI without round-trips.
-        let state = { time: 0, duration: 50, playing: true, speed: 1 };
-
-        const PAUSE_SVG = '<svg viewBox="0 0 10 12" fill="currentColor" aria-hidden="true">' +
-            '<rect x="0" y="0" width="3" height="12" rx=".5"/>' +
-            '<rect x="7" y="0" width="3" height="12" rx=".5"/></svg>';
-        const PLAY_SVG = '<svg viewBox="0 0 10 12" fill="currentColor" aria-hidden="true">' +
-            '<path d="M1 1 L1 11 L9 6 Z"/></svg>';
-
-        const fmtTime = (t) => {
-            const total = Math.max(0, t);
-            const m = Math.floor(total / 60);
-            const s = Math.floor(total % 60);
-            return `${m}:${String(s).padStart(2, '0')}`;
-        };
-
-        function paint() {
-            const pct = state.duration > 0
-                ? Math.max(0, Math.min(100, (state.time / state.duration) * 100))
-                : 0;
-            if (fill)   fill.style.width = pct + '%';
-            if (handle) handle.style.left = pct + '%';
-            if (timeLbl) timeLbl.textContent = fmtTime(state.time);
-            if (pauseBtn) {
-                pauseBtn.innerHTML = state.playing ? PAUSE_SVG : PLAY_SVG;
-                pauseBtn.setAttribute('aria-label', state.playing ? 'Pause' : 'Play');
-            }
-        }
-        paint();
+    if (c.demo && window.NosoTrack && window.NosoTrack.createPlaybar) {
+        const iframe = document.getElementById('demoIframe');
+        const mount  = document.getElementById('demoPlaybar');
+        const frame  = document.querySelector('#demo .demo-frame');
 
         function send(cmd, extra) {
             if (!iframe || !iframe.contentWindow) return;
@@ -201,65 +142,42 @@
             } catch {}
         }
 
-        // ── inbound: tick + ready from the iframe ────────────────────────────
+        const bar = window.NosoTrack.createPlaybar(mount, {
+            variant: 'dark',
+            trackLabel: c.demo.trackLabel || 'DEMO',
+            speeds: [1, 1.5, 2, 3, 5],
+            initialSpeedIdx: 0,
+            showTime: true,
+            showFullscreen: true,
+            fullscreenTarget: frame,
+            onTogglePlay:  () => send('toggle'),
+            onSeek:        (t) => send('seek', { t }),
+            onSpeedChange: (s) => send('speed', { value: s })
+        });
+
+        // Tick + ready from the iframe — keep the bar in sync with the playhead.
         window.addEventListener('message', (e) => {
             const m = e && e.data;
             if (!m || typeof m !== 'object' || m.source !== 'nosotrack-demo') return;
-            if (m.type === 'ready') {
-                state.duration = m.duration || state.duration;
-                paint();
-            } else if (m.type === 'tick') {
-                state.time     = m.time;
-                state.duration = m.duration;
-                state.playing  = m.playing;
-                state.speed    = m.speed;
-                paint();
-            }
+            if (m.type === 'ready' || m.type === 'tick') bar.update(m);
         });
 
-        // ── outbound: control wiring ─────────────────────────────────────────
-        if (pauseBtn) pauseBtn.addEventListener('click', () => send('toggle'));
-        if (replay)   replay.addEventListener('click',   () => send('restart'));
-
-        if (spdBtn) spdBtn.addEventListener('click', () => {
-            spdIdx = (spdIdx + 1) % SPEEDS.length;
-            const s = SPEEDS[spdIdx];
-            spdBtn.textContent = fmtSpeed(s);
-            send('speed', { value: s });
-        });
-
-        // Scrub — click + drag on the track. Optimistically updates UI then
-        // sends the seek; the next tick from the iframe will overwrite.
-        if (track) {
-            let dragging = false;
-            const seekFromEvent = (e) => {
-                const rect = track.getBoundingClientRect();
-                const x = (e.clientX - rect.left) / rect.width;
-                const t = Math.max(0, Math.min(1, x)) * state.duration;
-                state.time = t; paint();
-                send('seek', { t });
-            };
-            track.addEventListener('mousedown', (e) => {
-                dragging = true; seekFromEvent(e); e.preventDefault();
-            });
-            window.addEventListener('mousemove', (e) => {
-                if (dragging) seekFromEvent(e);
-            });
-            window.addEventListener('mouseup', () => { dragging = false; });
-        }
-
-        // Fullscreen — toggles native fullscreen on the framed bezel.
-        if (fsBtn && frame) {
-            fsBtn.addEventListener('click', () => {
-                const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-                if (fsEl) {
-                    (document.exitFullscreen || document.webkitExitFullscreen)
-                        .call(document);
-                } else {
-                    (frame.requestFullscreen || frame.webkitRequestFullscreen)
-                        .call(frame).catch(() => {});
+        // Post-demo CTA — single conversion target for visitors who finished
+        // the walkthrough. Hides itself if the content has no CTA configured.
+        const ctaEl = document.getElementById('demoCta');
+        if (ctaEl) {
+            const cta = c.demo.cta;
+            if (cta && cta.href) {
+                ctaEl.href = cta.href;
+                if (cta.external) {
+                    ctaEl.target = '_blank';
+                    ctaEl.rel    = 'noopener noreferrer';
                 }
-            });
+                const textEl = ctaEl.querySelector('.demo-cta-text');
+                if (textEl) textEl.textContent = cta.label || 'Open the dashboard';
+            } else {
+                ctaEl.remove();
+            }
         }
     }
 

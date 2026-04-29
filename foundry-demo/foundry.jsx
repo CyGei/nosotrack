@@ -424,6 +424,13 @@ function FoundryStack() {
               skew={MID_SKEW}
               fill="#ffffff"
             />
+            <text x={640} y={MID_Y + MID_PLATFORM_D / 2 + 28}
+              textAnchor="middle"
+              fontFamily={FONT_MONO} fontSize="10"
+              fill={COLOR.ink}
+              style={{ textTransform: 'uppercase', letterSpacing: '2.5px' }}>
+              Healthcare Facility
+            </text>
 
             {Object.entries(WARDS).map(([key, w], i) => {
               const reveal = clamp((wardsP - i * 0.12) * 1.5, 0, 1);

@@ -53,35 +53,16 @@
     })();
   </script>
 
-  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <!-- React production builds (development used to pull development.js, which
+       is ~3× larger and runs slower). bundle.js is pre-compiled from the .jsx
+       sources by `npm run build:demo` — no in-browser Babel transform. -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div id="root"></div>
 
-  <script type="text/babel" src="animations.jsx"></script>
-  <script type="text/babel" src="common.jsx"></script>
-  <script type="text/babel" src="foundry.jsx"></script>
-  <script type="text/babel" src="dashboard.jsx"></script>
-
-  <script type="text/babel">
-    const DURATION = 48.5;
-
-    function NosoTrackFoundryDemo() {
-      return (
-        <Stage width={1280} height={720} duration={DURATION} background="#fafafa" persistKey="nosotrack-foundry-v3">
-          <Sprite start={0}    end={3.5}>   <BrandIntro /></Sprite>
-          {/* FoundryStack and DashboardScene OVERLAP from t=23..27 so that
-              foundry collapses toward the logo while dashboard expands FROM
-              the logo, in a single continuous camera move. */}
-          <Sprite start={3.5}  end={27}>    <FoundryStack /></Sprite>
-          <Sprite start={23}   end={48.5}>  <DashboardScene /></Sprite>
-        </Stage>
-      );
-    }
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<NosoTrackFoundryDemo />);
-  </script>
+  <!-- Pre-compiled bundle: animations + common + foundry + dashboard + main, in order. -->
+  <script src="bundle.js"></script>
 </body>
 </html>

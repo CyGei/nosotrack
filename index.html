@@ -83,23 +83,14 @@
                 <div class="hero-eyebrow"></div>
                 <h1 class="hero-title"></h1>
                 <p class="hero-subtitle"></p>
-                <div class="hero-buttons"></div>
-            </div>
-            <div class="hero-scroll-hint" id="heroScrollHint" aria-label="Scroll down">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
             </div>
         </section>
 
-    <!-- ========== DEMO (embedded interactive Foundry walkthrough) ========== -->
+    <!-- ========== DEMO (embedded interactive Foundry walkthrough) ==========
+         No header — the framed bezel + corner brackets are the section.
+         Palantir-style: let the artifact speak. -->
     <section id="demo" class="section-padding on-dark">
         <div class="container">
-            <div class="demo-head reveal">
-                <h2 class="section-title"></h2>
-            </div>
-
             <figure class="demo-frame reveal">
                 <!-- Corner brackets — match the brand mark's bracketed-hub motif -->
                 <span class="demo-bracket demo-bracket--tl" aria-hidden="true"></span>
@@ -122,36 +113,33 @@
                         referrerpolicy="no-referrer"></iframe>
                 </div>
 
-                <!-- Playback bar — same controls/style as the engine card on the
-                     platform section (.eng-tbar), inverted for the dark surround. -->
-                <div class="demo-tbar" role="group" aria-label="Demo playback controls">
-                    <span class="demo-tl" id="demoTl"></span>
-                    <button type="button" class="demo-pause" id="demoPause" aria-label="Pause">
-                        <!-- Pause glyph; swapped to play glyph in JS when paused -->
-                        <svg viewBox="0 0 10 12" fill="currentColor" aria-hidden="true">
-                            <rect x="0" y="0" width="3" height="12" rx=".5"/>
-                            <rect x="7" y="0" width="3" height="12" rx=".5"/>
-                        </svg>
-                    </button>
-                    <div class="demo-track" id="demoTrack">
-                        <div class="demo-tfill" id="demoFill"></div>
-                        <div class="demo-thandle" id="demoHandle"></div>
-                    </div>
-                    <span class="demo-time" id="demoTime">0:00</span>
-                    <button type="button" class="demo-spd" id="demoSpd"></button>
-                    <button type="button" class="demo-replay" id="demoReplay"></button>
-                    <button type="button" class="demo-fs" id="demoFs" aria-label="Toggle fullscreen">
-                        <svg viewBox="0 0 16 16" width="12" height="12" fill="none"
-                             stroke="currentColor" stroke-width="1.5" stroke-linecap="square"
-                             aria-hidden="true">
-                            <path d="M2 6V2h4"/><path d="M14 6V2h-4"/>
-                            <path d="M2 10v4h4"/><path d="M14 10v4h-4"/>
-                        </svg>
-                    </button>
-                </div>
+                <!-- Playback bar — rendered + wired by playbar.js (shared with the
+                     engine card on #platform). One source of UI truth; the bar
+                     drives the iframe via postMessage and stays in sync via tick
+                     messages from animations.jsx. -->
+                <div id="demoPlaybar"></div>
             </figure>
+
+            <!-- Post-demo CTA — minimalist right-aligned link. The demo IS the
+                 "Learn More"; this is just the conversion moment, kept quiet. -->
+            <div class="demo-cta-row">
+                <a class="demo-cta reveal" id="demoCta">
+                    <span class="demo-cta-text"></span><span class="demo-cta-arrow" aria-hidden="true">→</span>
+                </a>
+            </div>
         </div>
     </section>
+
+    <!-- Scroll hint sits at the bottom of the dark band — after hero+demo —
+         and bridges into the rest of the page. Native smooth-scroll via the
+         #about anchor; no JS needed. -->
+    <a class="scroll-hint" href="#about" aria-label="Scroll to explore">
+        <svg class="scroll-hint-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+        <span class="scroll-hint-label"></span>
+    </a>
     </div>
     <!-- /.dark-band -->
 
@@ -278,20 +266,10 @@
                     <div class="pipeline-single">
                         <div class="p-card p-card--engine" data-pipeline="engine">
                             <div class="p-card-glow"></div>
-                            <div class="eng-viewport">
+                            <div class="eng-viewport" id="engViewport">
                                 <canvas class="p-card-canvas" data-viz="engine" id="engine-canvas"></canvas>
-                                <div class="eng-tbar">
-                                    <span class="eng-tl">OUTBREAK</span>
-                                    <button class="eng-pause" id="engPause" aria-label="Pause">
-                                        <svg viewBox="0 0 10 12" fill="currentColor"><rect x="0" y="0" width="3" height="12" rx=".5"/><rect x="7" y="0" width="3" height="12" rx=".5"/></svg>
-                                    </button>
-                                    <div class="eng-track" id="engTrack">
-                                        <div class="eng-tfill" id="engFill"></div>
-                                        <div class="eng-thandle" id="engHandle"></div>
-                                    </div>
-                                    <button class="eng-spd" id="engSpd">2×</button>
-                                    <button class="eng-replay" id="engReplay">↺ Replay</button>
-                                </div>
+                                <!-- Playbar rendered + wired by pipeline-engine.js via playbar.js. -->
+                                <div id="engPlaybar"></div>
                             </div>
                             <div class="p-card-tag"></div>
                             <div class="p-card-title"></div>
@@ -731,7 +709,16 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script defer src="virus-logo.js"></script>
     <script defer src="main.js"></script>
-    <script defer src="pipeline-viz.js"></script>
+    <!-- playbar.js must load before any consumer (content-loader, pipeline-engine). -->
+    <script defer src="playbar.js"></script>
+    <!-- Platform pipeline — four self-bootstrapping modules. utils.js exposes
+         shared helpers (initCanvas + brand tokens); each feature module owns
+         its own frame counter and rAF loop. No registry, no coordination. -->
+    <script defer src="pipeline-utils.js"></script>
+    <script defer src="pipeline-bg.js"></script>
+    <script defer src="pipeline-cards.js"></script>
+    <script defer src="pipeline-alerts.js"></script>
+    <script defer src="pipeline-engine.js"></script>
     <script defer src="three-viz.js"></script>
     <script defer src="content-loader.js"></script>
     <script defer src="ipc-viz.js"></script>

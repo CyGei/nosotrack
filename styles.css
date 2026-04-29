@@ -200,10 +200,6 @@ html { scrollbar-width: thin; scrollbar-color: var(--rule-strong) transparent; }
 }
 .btn-primary:hover::after, .btn-secondary:hover::after { transform: translateX(3px); }
 
-/* Hero "Learn More" button points down as a scroll cue */
-.hero-buttons .btn-primary::after          { content: '↓'; }
-.hero-buttons .btn-primary:hover::after    { transform: translateY(3px); }
-
 /* Default on-dark styling (hero, contact, footer) */
 .btn-primary   { background: var(--inv-hi);    color: var(--bg-ink); border-color: var(--inv-hi); }
 .btn-primary:hover { background: transparent;  color: var(--inv-hi); }
@@ -370,14 +366,17 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
     background: var(--bg-ink);
     color: var(--inv);
     overflow: hidden;
+    /* Keeps the network canvas (z-index: -1) bounded inside the band so it
+       paints between the band's background and its content. */
+    isolation: isolate;
 }
 
 #hero {
     position: relative;
-    min-height: 100vh;
     color: var(--inv);
-    display: flex;
-    align-items: center;
+    /* Hero is content-sized (no full-viewport min-height) so the demo sits
+       right under the brand with minimal space between them. The scroll-hint
+       lives at the bottom of the dark band, after the demo + CTA. */
 }
 
 /* Network canvas is now pinned to .dark-band, not #hero, so the particle
@@ -385,7 +384,10 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
 #network-canvas {
     position: absolute; inset: 0;
     width: 100%; height: 100%;
-    z-index: 0;
+    /* -1 paints below normal-flow content but stays above the dark-band's
+       own background (because .dark-band is a stacking context). Lets #demo
+       be a normal block without needing its own z-index. */
+    z-index: -1;
     opacity: .85;
     pointer-events: none;
 }
@@ -393,7 +395,10 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
     position: relative; z-index: 2;
     max-width: var(--container);
     margin: 0 auto;
-    padding: 120px var(--pad) 0;
+    /* 140px clears the nav with breathing room; 32px below holds the demo
+       close. No clamp/vh needed — fixed values keep the hero predictable
+       across screen sizes. */
+    padding: 140px var(--pad) var(--s-4);
     width: 100%;
 }
 .hero-eyebrow {
@@ -459,25 +464,41 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
     max-width: 680px;
     line-height: 1.6;
     letter-spacing: -.005em;
-    margin-bottom: var(--s-6);
+    /* No buttons follow — let the subtitle close the hero block cleanly. */
+    margin-bottom: 0;
 }
-.hero-buttons { display: flex; gap: 14px; flex-wrap: wrap; }
-
-.hero-scroll-hint {
-    position: absolute; bottom: 40px; left: 50%;
-    transform: translateX(-50%);
-    z-index: 3;
+/* Scroll hint — sits at the bottom of the dark band, after hero+demo, and
+   bridges into the rest of the page. In-flow flex column (no absolute
+   positioning); only the arrow bounces so the label stays readable. */
+.scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    /* 40 above the chevron (matches the demo block's tight rhythm), 48 below
+       so the chevron has room to breathe before the marquee begins. */
+    padding: var(--s-5) 0 var(--s-6);
     color: var(--inv-mute);
-    cursor: pointer;
-    opacity: 0;
+    text-decoration: none;
     transition: color var(--t-fast);
-    animation: fadeInHint .8s 1.8s forwards, bounceHint 3s 2.8s ease-in-out infinite;
+    opacity: 0;
+    animation: fadeInHint .8s 1.8s forwards;
 }
-.hero-scroll-hint:hover { color: var(--inv-hi); }
+.scroll-hint:hover { color: var(--inv-hi); }
+.scroll-hint-arrow {
+    animation: bounceHint 3s 2.8s ease-in-out infinite;
+}
+.scroll-hint-label {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: .26em;
+    text-transform: uppercase;
+    line-height: 1;
+}
 @keyframes fadeInHint { to { opacity: 1; } }
 @keyframes bounceHint {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50%      { transform: translateX(-50%) translateY(6px); }
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(6px); }
 }
 
 /* ========== 9. MARQUEE ========== */
@@ -550,30 +571,15 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
    lives in foundry-demo/index.html and is loaded as a sandboxed iframe at
    16:9, so the React/Babel runtime never enters the main page bundle. */
 #demo {
-    /* Background lives on .dark-band so the network canvas can show
-       through. Borders dropped — the band is one continuous space. */
+    /* Background lives on .dark-band; canvas (z-index: -1) sits behind us
+       automatically, so #demo doesn't need its own stacking context. Avoiding
+       one is important — it would trap the fullscreen overlay (9999) inside
+       it and let the hero (z-index: 2) and nav (z-index: 1000) paint over. */
     background: transparent;
     color: var(--inv);
-    position: relative;
-    z-index: 1;             /* sit above the .dark-band canvas */
-    /* Top padding tightened so the demo headline reads as a hero subhead
-       rather than the start of a new section. */
-    padding-top: var(--s-6);
-}
-
-.demo-head {
-    max-width: 760px;
-    margin-bottom: var(--s-8);
-}
-.demo-head .section-title {
-    color: var(--inv-hi);
-    margin-bottom: 0;
-    /* Subtle cream halo so the title reads cleanly over the particle
-       field. Lighter than the hero's ".accent" halo so it doesn't
-       compete with "Protect." above. */
-    text-shadow:
-        0 0 18px rgba(239, 238, 239, .18),
-        0 0 6px  rgba(239, 238, 239, .12);
+    /* Override .section-padding entirely. 32 top (tight gap to hero's 32
+       bottom = 64px) and 32 bottom (tight gap to scroll-hint). */
+    padding: var(--s-4) 0;
 }
 
 .demo-frame {
@@ -624,98 +630,165 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
     background: #fafafa;
 }
 
-/* Playback bar — mirrors the .eng-tbar on the platform section's engine
-   card, but inverted for the dark surround. The internal bar inside the
-   iframe is hidden via STAGE_EMBED logic in foundry-demo/animations.jsx;
-   this bar drives the iframe via postMessage. */
-.demo-tbar {
-    margin-top: 0;
+/* ── Shared playback bar ─────────────────────────────────────────────────────
+   One block for both the demo iframe (#demo) and the engine card (#platform).
+   Markup is rendered + wired by playbar.js. Light vs. dark is a single class
+   modifier driving CSS custom properties — no duplicated rules.
+*/
+.playbar {
+    /* Light variant tokens (default — used by the engine card) */
+    --pb-fg:          var(--text);
+    --pb-fg-strong:   var(--ink);
+    --pb-mute:        var(--mute);
+    --pb-rule:        var(--rule);
+    --pb-rule-strong: var(--rule-strong);
+    --pb-bg:          var(--bg-alt);
+    --pb-hover-bg:    transparent;
+
     height: 44px;
-    background: rgba(255,255,255,.03);
-    border: 1px solid var(--rule-inv);
+    background: var(--pb-bg);
+    border: 1px solid var(--pb-rule);
     border-top: none;
     display: flex; align-items: center; gap: 12px;
     padding: 0 14px;
 }
-.demo-tl {
+.playbar--dark {
+    /* Dark variant — used by the demo iframe over the dark band */
+    --pb-fg:          var(--inv);
+    --pb-fg-strong:   var(--inv-hi);
+    --pb-mute:        var(--inv-mute);
+    --pb-rule:        var(--rule-inv);
+    --pb-rule-strong: var(--rule-inv-strong);
+    --pb-bg:          rgba(255,255,255,.03);
+    --pb-hover-bg:    rgba(255,255,255,.04);
+}
+.playbar-tl {
     font-family: var(--mono);
     font-size: 10px;
-    color: var(--inv-mute);
+    color: var(--pb-mute);
     letter-spacing: .18em;
     text-transform: uppercase;
     white-space: nowrap;
     user-select: none;
 }
-.demo-track {
+.playbar-track {
     flex: 1; height: 2px;
-    background: var(--rule-inv);
+    background: var(--pb-rule);
     position: relative;
     cursor: pointer;
+    touch-action: none;  /* let us own the scrub on touch devices */
 }
-.demo-tfill {
+.playbar-fill {
     position: absolute; top: 0; left: 0;
     height: 100%;
-    background: var(--inv-hi);
+    background: var(--pb-fg-strong);
     width: 0;
     pointer-events: none;
 }
-.demo-thandle {
+.playbar-handle {
     position: absolute; top: 50%; left: 0;
     width: 10px; height: 10px;
-    background: var(--inv-hi);
+    background: var(--pb-fg-strong);
     transform: translate(-50%, -50%);
     cursor: grab; z-index: 2;
 }
-.demo-thandle:active { cursor: grabbing; }
-.demo-time {
+.playbar-handle:active { cursor: grabbing; }
+.playbar-time {
     font-family: var(--mono);
     font-size: 10px;
-    color: var(--inv-mute);
+    color: var(--pb-mute);
     letter-spacing: .08em;
     white-space: nowrap;
     min-width: 4ch;
     text-align: right;
     user-select: none;
 }
-.demo-pause, .demo-spd, .demo-replay, .demo-fs {
+.playbar-pause, .playbar-spd, .playbar-fs {
     font-family: var(--mono);
     font-size: 10px;
     letter-spacing: .12em;
     text-transform: uppercase;
     padding: 5px 10px;
     background: transparent;
-    border: 1px solid var(--rule-inv-strong);
-    color: var(--inv);
+    border: 1px solid var(--pb-rule-strong);
+    color: var(--pb-fg);
     cursor: pointer;
     white-space: nowrap;
     transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
 }
-.demo-pause { width: 26px; height: 26px; padding: 0;
+.playbar-pause { width: 26px; height: 26px; padding: 0;
     display: flex; align-items: center; justify-content: center; }
-.demo-pause svg { width: 8px; height: 10px; }
-.demo-fs    { width: 30px; height: 26px; padding: 0;
+.playbar-pause svg { width: 8px; height: 10px; }
+.playbar-fs    { width: 30px; height: 26px; padding: 0;
     display: flex; align-items: center; justify-content: center; }
-.demo-fs svg { width: 12px; height: 12px; }
-.demo-pause:hover, .demo-spd:hover, .demo-replay:hover, .demo-fs:hover {
-    color: var(--inv-hi);
-    border-color: var(--inv-hi);
-    background: rgba(255,255,255,.04);
+.playbar-fs svg { width: 12px; height: 12px; }
+.playbar-pause:hover, .playbar-spd:hover, .playbar-fs:hover {
+    color: var(--pb-fg-strong);
+    border-color: var(--pb-fg-strong);
+    background: var(--pb-hover-bg);
 }
 
-/* Native fullscreen — when the user fullscreens .demo-frame the iframe
-   needs to stretch to fill, with the bar pinned at the bottom. */
-.demo-frame:fullscreen {
-    padding: 0;
-    background: #0a0a0c;
-    display: flex; flex-direction: column;
-    width: 100vw; height: 100vh;
-    max-width: none;
-    border: 0;
+/* ── Post-demo CTA ──────────────────────────────────────────────────────────
+   Minimalist right-aligned link. The demo above is the showcase; this is just
+   a quiet conversion handle for visitors who want the live product.
+*/
+.demo-cta-row {
+    margin-top: var(--s-4);
+    text-align: right;
 }
-.demo-frame:fullscreen .demo-bracket,
-.demo-frame:fullscreen .demo-rail { display: none; }
-.demo-frame:fullscreen .demo-stage { flex: 1; aspect-ratio: auto; }
-.demo-frame:fullscreen .demo-tbar  { border-left: 0; border-right: 0; border-bottom: 0; }
+.demo-cta {
+    color: var(--inv-hi);
+    text-decoration: none;
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: -.005em;
+}
+.demo-cta-text {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--rule-inv-strong);
+    transition: text-decoration-color var(--t-fast);
+}
+.demo-cta-arrow {
+    display: inline-block;
+    margin-left: 10px;
+    color: var(--alert);
+    transition: transform var(--t-fast);
+}
+.demo-cta:hover .demo-cta-text  { text-decoration-color: var(--inv-hi); }
+.demo-cta:hover .demo-cta-arrow { transform: translateX(4px); }
+
+/* ── Fullscreen overlay (CSS-pinned) ────────────────────────────────────────
+   Native requestFullscreen isn't available on iPhone for non-<video> elements,
+   so we toggle .is-fullscreen on the target instead. Works on every device.
+*/
+.is-fullscreen {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 9999 !important;
+    width: 100vw !important; height: 100vh !important;
+    max-width: none !important;
+    margin: 0 !important; padding: 0 !important;
+    background: #0a0a0c !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border: 0 !important;
+}
+body.has-playbar-fs { overflow: hidden; }
+/* While fullscreen, lift the dark band above the fixed nav (z-index: 1000)
+   so the demo overlay paints over the entire viewport including the nav. */
+body.has-playbar-fs .dark-band { z-index: 9998; }
+/* Demo frame in fullscreen — hide brackets/rail, stretch the stage. */
+.demo-frame.is-fullscreen .demo-bracket,
+.demo-frame.is-fullscreen .demo-rail   { display: none; }
+.demo-frame.is-fullscreen .demo-stage  { flex: 1; aspect-ratio: auto; }
+.demo-frame.is-fullscreen .playbar     { border-left: 0; border-right: 0; border-bottom: 0; }
+/* Engine viewport in fullscreen — let the canvas fill the available space. */
+.eng-viewport.is-fullscreen           { background: #fafafa; }
+.eng-viewport.is-fullscreen #engine-canvas { flex: 1; height: auto !important; width: 100% !important; }
+.eng-viewport.is-fullscreen .playbar  { border-left: 0; border-right: 0; border-bottom: 0; }
 
 /* ========== 11. ABOUT ========== */
 #about { background: var(--bg); }
@@ -985,63 +1058,7 @@ body.nav-on-dark nav.main-nav:not(.scrolled) .nav-hamburger span    { background
 .p-card--engine .p-card-desc  { margin: 0 28px 24px; }
 
 .eng-viewport { position: relative; }
-.eng-tbar {
-    height: 44px;
-    background: var(--bg-alt);
-    border: 1px solid var(--rule);
-    border-top: none;
-    display: flex; align-items: center; gap: 12px;
-    padding: 0 14px;
-}
-.eng-tl {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--mute);
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    user-select: none;
-}
-.eng-track {
-    flex: 1; height: 2px;
-    background: var(--rule);
-    position: relative;
-    cursor: pointer;
-}
-.eng-tfill {
-    position: absolute; top: 0; left: 0;
-    height: 100%;
-    background: var(--ink);
-    width: 0;
-    pointer-events: none;
-}
-.eng-thandle {
-    position: absolute; top: 50%; left: 0;
-    width: 10px; height: 10px;
-    background: var(--ink);
-    transform: translate(-50%, -50%);
-    cursor: grab; z-index: 2;
-}
-.eng-thandle:active { cursor: grabbing; }
-.eng-pause, .eng-spd, .eng-replay {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    padding: 5px 10px;
-    background: transparent;
-    border: 1px solid var(--rule-strong);
-    color: var(--text);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: color var(--t-fast), border-color var(--t-fast);
-}
-.eng-pause { width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; }
-.eng-pause svg { width: 8px; height: 10px; }
-.eng-pause:hover, .eng-spd:hover, .eng-replay:hover {
-    color: var(--ink);
-    border-color: var(--ink);
-}
+/* Engine playbar uses the shared .playbar block above (light variant). */
 
 /* Engine feature strip injected by content-loader */
 .engine-features {
@@ -1988,11 +2005,12 @@ footer {
     .demo-frame                            { padding: 10px; }
     .demo-rail                             { left: 10px; width: 64px; }
     .demo-bracket                          { width: 10px; height: 10px; }
-    .demo-tbar                             { padding: 0 8px; gap: 8px; }
-    .demo-tl                               { display: none; }
-    .demo-time                             { display: none; }
-    .demo-spd                              { padding: 5px 6px; }
-    .demo-replay                           { padding: 5px 8px; }
+    .demo-cta-row                          { margin-top: var(--s-3); }
+    .demo-cta                              { font-size: 15px; }
+    .playbar                               { padding: 0 8px; gap: 8px; }
+    .playbar-tl                            { display: none; }
+    .playbar-time                          { display: none; }
+    .playbar-spd                           { padding: 5px 6px; }
     #three-container                       { height: 340px; }
     .engine-features                       { grid-template-columns: 1fr; border-top: 1px solid var(--rule); }
     .engine-feat                           { border-right: none; border-bottom: 1px solid var(--rule); }
