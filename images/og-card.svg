@@ -36,23 +36,17 @@
     </g>
   </g>
 
-  <!-- Eyebrow -->
-  <text x="500" y="240"
-        font-family="'JetBrains Mono','Consolas',ui-monospace,monospace"
-        font-size="22" font-weight="500" letter-spacing="6"
-        fill="#ff073a">TRANSMISSION INTELLIGENCE</text>
-
   <!-- Wordmark -->
-  <text x="500" y="370"
+  <text x="500" y="320"
         font-family="'JetBrains Mono','Consolas',ui-monospace,monospace"
         font-size="100" font-weight="500" letter-spacing="-3">
     <tspan fill="#1e1e2b">Noso</tspan><tspan fill="#ff073a">Track</tspan>
   </text>
 
   <!-- Tagline -->
-  <text x="500" y="440"
+  <text x="500" y="380"
         font-family="'Inter Tight','Helvetica Neue',Arial,sans-serif"
-        font-size="36" font-weight="400" fill="#1e1e2b" letter-spacing="-0.5">
-    outbreak forensics
+        font-size="32" font-weight="400" fill="#1e1e2b" letter-spacing="-0.4">
+    Outbreak Forensics for Healthcare Facilities
   </text>
 </svg>

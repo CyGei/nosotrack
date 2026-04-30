@@ -1,4 +1,4 @@
-// pipeline-engine.js — full outbreak reconstruction (the "Transmission Tree
+// pipeline-engine.js — full outbreak forensics (the "Transmission Tree
 // Inference" card on #platform). Owns its own scripted timeline, particle
 // effects, banner overlays, and the playbar wiring (via playbar.js).
 // Self-bootstrapping: owns its frame counter and rAF loop.
