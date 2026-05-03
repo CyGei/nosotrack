@@ -74,7 +74,7 @@
     // ── NAV ───────────────────────────────────────────────────────────────────
 
     const navLogoEl = document.querySelector('.nav-logo');
-    if (navLogoEl) navLogoEl.innerHTML = brandify(c.nav.logo);
+    if (navLogoEl) navLogoEl.innerHTML = brandify(c.nav.logo) + '<sup class="brand-tm" aria-label="trademark">&trade;</sup>';
 
     const navLinks = document.getElementById('navLinks');
     if (navLinks) {
@@ -518,7 +518,7 @@
     // ── FOOTER ────────────────────────────────────────────────────────────────
 
     const footerLogoEl = document.querySelector('.footer-logo');
-    if (footerLogoEl) footerLogoEl.innerHTML = brandify(c.footer.logo);
+    if (footerLogoEl) footerLogoEl.innerHTML = brandify(c.footer.logo) + '<sup class="brand-tm" aria-label="trademark">&trade;</sup>';
 
     const footerLinks = document.querySelector('.footer-links');
     if (footerLinks) {

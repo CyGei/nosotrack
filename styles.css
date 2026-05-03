@@ -832,6 +832,18 @@ body.has-playbar-fs .dark-band { z-index: 9998; }
 .nav-logo .brand-track,
 .footer-logo .brand-track { color: var(--alert); }
 
+/* Trademark mark — small superscript ™ next to the wordmark in nav/footer */
+.brand-tm {
+    font-family: var(--mono);
+    font-size: .55em;
+    font-weight: 500;
+    line-height: 0;
+    vertical-align: super;
+    margin-left: .15em;
+    opacity: .7;
+    letter-spacing: 0;
+}
+
 /* Stats — 3-column slab separated by hairlines (no cards) */
 .about-stats {
     display: grid;

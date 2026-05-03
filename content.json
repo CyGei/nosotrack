@@ -471,9 +471,11 @@
       { "label": "Research", "href": "#research" },
       { "label": "Team", "href": "#team" },
       { "label": "Roadmap", "href": "#roadmap" },
-      { "label": "Contact", "href": "#contact" }
+      { "label": "Contact", "href": "#contact" },
+      { "label": "Privacy", "href": "privacy.html" },
+      { "label": "Terms", "href": "terms.html" }
     ],
-    "copy": "Cyril Geismar",
-    "credit": "A joint research initiative between Johns Hopkins University and Imperial College London."
+    "copy": "2026 Cyril Geismar. All rights reserved",
+    "credit": ""
   }
 }
