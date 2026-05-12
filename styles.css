@@ -1672,7 +1672,7 @@ body.has-playbar-fs .dark-band { z-index: 9998; }
 }
 .team-grid {
     display: grid;
-    grid-template-columns: 1fr auto 3fr;
+    grid-template-columns: 1fr auto 2fr;
     gap: 0;
     margin-top: var(--s-6);
     align-items: start;
@@ -1693,7 +1693,7 @@ body.has-playbar-fs .dark-band { z-index: 9998; }
 }
 .team-advisors-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--s-3);
 }
 .team-card     { background: transparent; }
