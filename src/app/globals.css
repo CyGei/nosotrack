@@ -1,0 +1,370 @@
+/* =========================================================================
+   NosoTrack — redesign-v4
+   Global styles + Tailwind v4 theme tokens.
+
+   ALL colour/typography tokens are lifted verbatim from DESIGN_BRIEF.md §2–§4.
+   Do not introduce a colour that isn't named here. If you need a new one,
+   amend DESIGN_BRIEF.md first.
+   ========================================================================= */
+
+@import "tailwindcss";
+
+/* Custom variant: dark theme is invoked per-section by adding `.on-dark`
+   to the section root (only the Hero, per §11 hard rule). */
+@custom-variant on-dark (&:where(.on-dark, .on-dark *));
+
+@theme {
+  /* ============ CANVAS ============ */
+  --color-bg: #efeeef;        /* the greyish cream — default page background */
+  --color-bg-alt: #f3f3f3;    /* subtle adjacent-section alternation */
+  --color-bg-tint: #dbdbdb;   /* chip / card backgrounds on light surfaces */
+  --color-bg-ink: #212326;    /* DARK CANVAS — HERO ONLY */
+
+  /* ============ INK (text on light) ============ */
+  --color-ink: #1e1e2b;
+  --color-text: #474852;
+  --color-mute: #767676;
+  --color-faint: #a4a4a7;
+
+  /* ============ INVERTED (text on dark hero) ============ */
+  --color-inv-hi: #efeeef;
+  --color-inv: #c9c9cc;
+  --color-inv-mute: #8a8a8f;
+  --color-inv-faint: #5a5c60;
+
+  /* ============ RULES / BORDERS ============ */
+  --color-rule: rgba(30, 30, 43, 0.12);
+  --color-rule-strong: rgba(30, 30, 43, 0.24);
+  --color-rule-inv: rgba(239, 238, 239, 0.14);
+  --color-rule-inv-strong: rgba(239, 238, 239, 0.28);
+
+  /* ============ SIGNAL — outbreak alert red (product viz only) ============ */
+  --color-alert: #ff073a;
+  --color-alert-dim: rgba(255, 7, 58, 0.12);
+
+  /* ============ WARD SIGNALS (desaturated, for dataviz) ============ */
+  --color-ward-a: #6b7d8f;
+  --color-ward-b: #8a7966;
+  --color-ward-c: #7a8a70;
+
+  /* ============ TYPOGRAPHY ============
+     Font family vars are set by next/font in layout.tsx → :root. */
+  --font-display: var(--font-display-stack);
+  --font-mono: var(--font-mono-stack);
+
+  /* ============ LAYOUT ============ */
+  --container-page: 1240px;
+  --spacing-pad: clamp(20px, 3vw, 40px);
+  --spacing-section: clamp(96px, 12vw, 168px);
+
+  /* 8pt spacing scale (Tailwind already gives us 4-based; these are aliases
+     for designer-readable names per the brief) */
+  --spacing-s1: 8px;
+  --spacing-s2: 16px;
+  --spacing-s3: 24px;
+  --spacing-s4: 32px;
+  --spacing-s5: 40px;
+  --spacing-s6: 48px;
+  --spacing-s8: 64px;
+  --spacing-s10: 80px;
+  --spacing-s12: 96px;
+
+  /* ============ MOTION ============ */
+  --ease-nt: cubic-bezier(0.2, 0, 0, 1);          /* the NosoTrack curve */
+  --transition-duration-fast: 160ms;
+  --transition-duration-base: 320ms;
+  --transition-duration-slow: 800ms;
+}
+
+/* =========================================================================
+   2. Reset & base — carried over from legacy/styles.css §2.
+   Wrapped in @layer base so Tailwind utilities (which live in
+   @layer utilities) can override the universal margin/padding reset.
+   Without this layer wrapper, unlayered `* { margin: 0 }` would beat
+   every `mt-*` / `mb-*` / `pt-*` utility in the cascade.
+   ========================================================================= */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-display);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.55;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv11";
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+canvas {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  font: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+em {
+  font-style: italic;
+  color: inherit;
+}
+
+p {
+  text-wrap: pretty;
+  hyphens: manual;
+  orphans: 2;
+  widows: 2;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+::selection {
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+
+:focus-visible {
+  outline: 1px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-rule-strong);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-mute);
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-rule-strong) transparent;
+}
+
+/* =========================================================================
+   3. Section primitives — see DESIGN_BRIEF §4 layout system.
+   ========================================================================= */
+
+.container-page {
+  max-width: var(--container-page);
+  margin-inline: auto;
+  padding-inline: var(--spacing-pad);
+}
+
+.section-pad {
+  padding-block: var(--spacing-section);
+}
+
+.on-dark {
+  background: var(--color-bg-ink);
+  color: var(--color-inv);
+}
+
+.on-dark strong {
+  color: var(--color-inv-hi);
+}
+
+/* =========================================================================
+   Nav link underline — grows from 0 to 100% width on hover, ported from
+   main branch legacy/styles.css §nav `.nav-links a:not(.nav-cta)::after`.
+   ========================================================================= */
+
+.nav-link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width var(--transition-duration-base) var(--ease-nt);
+}
+.nav-link-underline:hover::after {
+  width: 100%;
+}
+
+/* =========================================================================
+   Nav theme switcher — explicit color rules tied to `data-theme` on the
+   <nav> element. These guarantee the cream-on-dark / dark-on-cream
+   behavior wins over any Tailwind class-merge edge case and mirror main
+   branch legacy/styles.css §7 `body.nav-on-dark nav.main-nav:not(.scrolled)`
+   cascade verbatim.
+   ========================================================================= */
+
+nav.main-nav[data-theme="dark"] .nav-mark,
+nav.main-nav[data-theme="dark"] .nav-logo {
+  color: var(--color-inv-hi);
+}
+nav.main-nav[data-theme="dark"] .nav-links a {
+  color: var(--color-inv);
+}
+nav.main-nav[data-theme="dark"] .nav-links a:hover {
+  color: var(--color-inv-hi);
+}
+nav.main-nav[data-theme="dark"] .nav-hamburger span {
+  background: var(--color-inv-hi);
+}
+
+nav.main-nav[data-theme="light"] .nav-mark,
+nav.main-nav[data-theme="light"] .nav-logo {
+  color: var(--color-ink);
+}
+nav.main-nav[data-theme="light"] .nav-links a {
+  color: var(--color-mute);
+}
+nav.main-nav[data-theme="light"] .nav-links a:hover {
+  color: var(--color-ink);
+}
+nav.main-nav[data-theme="light"] .nav-hamburger span {
+  background: var(--color-ink);
+}
+
+/* =========================================================================
+   Brand mark — inner network spins 360° on nav/footer brand hover.
+   Matches main branch legacy/styles.css §nav. Brackets stay fixed (the
+   "frame"); the network rotates as a single unit around the SVG centre.
+   ========================================================================= */
+
+.brand-mark-network {
+  transform-origin: 16px 16px;
+  transition: transform 1.6s cubic-bezier(0.2, 0, 0, 1);
+}
+.nav-brand:hover .brand-mark-network,
+.footer-brand:hover .brand-mark-network {
+  transform: rotate(360deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-mark-network { transition: none; }
+  .nav-brand:hover .brand-mark-network,
+  .footer-brand:hover .brand-mark-network { transform: none; }
+}
+
+/* =========================================================================
+   Hero — cream halo on "Protect." (matches main branch legacy/styles.css
+   §8 .hero-title .accent). Subtle luminescence, not alert; red stays
+   reserved for outbreak signal.
+   ========================================================================= */
+
+.hero-accent {
+  text-shadow:
+    0 0 22px rgba(239, 238, 239, 0.32),
+    0 0 8px  rgba(239, 238, 239, 0.22);
+  animation: accent-breathe 5.2s ease-in-out infinite;
+}
+
+@keyframes accent-breathe {
+  0%, 100% {
+    text-shadow:
+      0 0 22px rgba(239, 238, 239, 0.28),
+      0 0 8px  rgba(239, 238, 239, 0.18);
+  }
+  50% {
+    text-shadow:
+      0 0 32px rgba(239, 238, 239, 0.48),
+      0 0 12px rgba(239, 238, 239, 0.32);
+  }
+}
+
+/* =========================================================================
+   Typewriter cursor — thin blinking bar that trails the typing headline
+   in About blocks. Disappears as soon as the typewriter finishes.
+   ========================================================================= */
+
+/* Thin standard text-cursor caret (not a glyph — an actual 2px bar). */
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.85em;
+  margin: 0 0.06em;
+  background: currentColor;
+  vertical-align: -0.06em;
+  animation: typewriter-blink 1s steps(1) infinite;
+}
+
+@keyframes typewriter-blink {
+  0%, 50%      { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* =========================================================================
+   Foundry-demo keyframes — referenced by embedded foundry visuals.
+   Ported from foundry-demo/index.html so the React-embedded versions
+   animate identically.
+   ========================================================================= */
+
+@keyframes fdyDash {
+  to { stroke-dashoffset: -24; }
+}
+
+@keyframes fdyPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(1.4); }
+}
+
+@keyframes fdyRingOut {
+  0%   { transform: scale(0.4); opacity: 0.7; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* =========================================================================
+   4. Reduced motion — non-negotiable per §11.
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

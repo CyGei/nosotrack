@@ -4,21 +4,20 @@
 // foundry-demo/index.html (which pulled ~3 MB of Babel and a slow per-file
 // transform on every page load). Run via `npm run build:demo`.
 //
-// The four .jsx files were previously loaded as individual <script type="text/babel">
-// tags; each file gets its own top-level scope, and cross-file references go
-// through `Object.assign(window, {...})`. We preserve those semantics by
-// transforming each file in isolation, wrapping each result in its own IIFE
-// (so top-level `const`/`let` don't collide across files), then concatenating
-// the outputs. Result: one bundle.js, no import statements, same globals.
+// Source-of-truth lives in `public/foundry-demo/`. Next's static export
+// copies everything under `public/` to `out/`, so the iframe at
+// `/foundry-demo/index.html` is served straight from there. Edit the .jsx
+// files in `public/foundry-demo/` and re-run this script to regenerate
+// the bundle alongside them.
 
 import { build } from 'esbuild';
-import { writeFileSync, readFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
-const demoDir = resolve(root, 'foundry-demo');
+const demoDir = resolve(root, 'public/foundry-demo');
 
 // Order matters — later files reference globals defined in earlier ones.
 const sources = [
@@ -58,4 +57,4 @@ const bundle = banner + wrapped.join('\n');
 writeFileSync(resolve(demoDir, 'bundle.js'), bundle, 'utf8');
 
 const sizeKB = (Buffer.byteLength(bundle, 'utf8') / 1024).toFixed(1);
-console.log(`✓ wrote foundry-demo/bundle.js (${sizeKB} KB)`);
+console.log(`✓ wrote public/foundry-demo/bundle.js (${sizeKB} KB)`);

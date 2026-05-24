@@ -1,2 +1,13 @@
 node_modules/
 .DS_Store
+
+# Next.js
+.next/
+out/
+
+# Build artefacts
+*.tsbuildinfo
+
+# OS / editor
+.idea/
+.vscode/

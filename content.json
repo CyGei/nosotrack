@@ -3,20 +3,31 @@
     "title": "NosoTrack",
     "description": "Outbreak forensics for healthcare facilities."
   },
-
   "nav": {
     "logo": "NosoTrack",
     "links": [
-      { "label": "Demo", "href": "#demo" },
-      { "label": "About", "href": "#about" },
-      { "label": "Platform", "href": "#platform" },
-      { "label": "Research", "href": "#research" },
-      { "label": "Team", "href": "#team" },
-      { "label": "Roadmap", "href": "#roadmap" }
-    ],
-    "cta": { "label": "Get in Touch", "href": "#contact" }
+      {
+        "label": "About",
+        "href": "#about"
+      },
+      {
+        "label": "Research",
+        "href": "#research"
+      },
+      {
+        "label": "Team",
+        "href": "#team"
+      },
+      {
+        "label": "Roadmap",
+        "href": "#roadmap"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
+    ]
   },
-
   "demo": {
     "trackLabel": "DEMO",
     "cta": {
@@ -25,20 +36,27 @@
       "external": true
     }
   },
-
   "hero": {
     "eyebrow": "Outbreak Forensics for Healthcare Facilities",
-    "title": ["Track.", "Intervene.", "Protect."],
+    "title": [
+      "Track.",
+      "Intervene.",
+      "Protect."
+    ],
     "subtitle": "NosoTrack infers who infected whom in near real-time, enabling hospital control teams to stop outbreaks before they escalate.",
     "scrollLabel": "Scroll to Explore"
   },
-
   "logoStrip": [
-    { "name": "Johns Hopkins University" },
-    { "name": "Imperial College London" },
-    { "name": "R Epidemics Consortium" }
+    {
+      "name": "Johns Hopkins University"
+    },
+    {
+      "name": "Imperial College London"
+    },
+    {
+      "name": "R Epidemics Consortium"
+    }
   ],
-
   "marquee": [
     "Outbreak Forensics",
     "Contact Tracing",
@@ -48,41 +66,127 @@
     "Importation Events Detection",
     "Infection Prevention & Control"
   ],
-
   "about": {
     "tag": "About",
-    "title": ["Nosocomial Outbreaks"],
-    "paragraphs": [
-      "<strong>Healthcare-associated infections (HAIs)</strong> affect approximately 1 in 10 patients worldwide, causing significant morbidity, mortality, and economic strain on healthcare systems. <strong>Nosocomial outbreaks</strong> driven by person-to-person transmitted pathogens generate the most acute clinical and operational crises: triggering staff shortages, ward closures, and delayed procedures. Current control measures rely on broad testing and isolation protocols, but <strong>effective intervention requires identifying the specific drivers of an outbreak</strong>: such as patient zero, superspreaders, transmission routes, and undetected or imported cases.",
-      "NosoTrack <strong>is an outbreak analytics platform that infers who-infected-whom in real-time, enabling control teams to identify how infections spread and design targeted interventions before outbreaks escalate.</strong>"
-    ],
-    "stats": [
-      { "label": "Cases", "value": "2.0M", "detail": "per year in the US" },
-      { "label": "Deaths", "value": "100K", "detail": "per year in the US" },
-      { "label": "Cost", "value": "$40B+", "detail": "per year to the US" }
-    ],
-    "vizLegend": {
-      "sections": {
-        "type": "Type",
-        "ward": "Ward",
-        "status": "Status"
+    "steps": [
+      {
+        "id": "0.1",
+        "label": "Crisis",
+        "headline": "Nosocomial outbreaks are deadly, costly and poorly managed.",
+        "subtitle": "Healthcare-associated infections affect 1 in 10 patients worldwide. Current control measures rely on broad testing and isolation — but stopping an outbreak requires identifying its specific drivers: patient zero, superspreaders, transmission routes, and undetected cases.",
+        "kind": "stats",
+        "stats": [
+          {
+            "value": 1,
+            "fraction": "10",
+            "caption": "Patients affected by HAIs globally.",
+            "sourceLabel": "WHO · KEY FACTS",
+            "sourceHref": "https://www.who.int/campaigns/world-hand-hygiene-day/key-facts-and-figures"
+          },
+          {
+            "value": 136,
+            "suffix": "M",
+            "caption": "Antibiotic-resistant HAIs occur worldwide every year.",
+            "sourceLabel": "WHO · GLOBAL IPC 2024",
+            "sourceHref": "https://www.who.int/publications/i/item/9789240103986"
+          },
+          {
+            "value": 3.5,
+            "decimals": 1,
+            "suffix": "M",
+            "caption": "Estimated annual deaths from HAIs without urgent action.",
+            "sourceLabel": "WHO · IPC INVESTMENT",
+            "sourceHref": "https://www.who.int/news/item/29-11-2024-new-report-highlights-need-for-sustained-investment-in-infection-prevention-and-control-programmes"
+          },
+          {
+            "staticHead": "AMR",
+            "caption": "Major driver of antimicrobial resistance worldwide.",
+            "sourceLabel": "WHO · GLOBAL IPC 2024",
+            "sourceHref": "https://www.who.int/publications/i/item/9789240103986"
+          }
+        ]
       },
-      "types": [
-        { "label": "Patient", "shape": "dot", "color": "#888" },
-        { "label": "Staff", "shape": "triangle", "color": "#888" }
-      ],
-      "wards": [
-        { "label": "Ward A", "color": "rgba(100,150,255,0.7)" },
-        { "label": "Ward B", "color": "rgba(255,150,100,0.7)" },
-        { "label": "Ward C", "color": "rgba(150,255,100,0.7)" }
-      ],
-      "status": [
-        { "label": "Susceptible", "color": "#555" },
-        { "label": "Infected", "color": "#e63946" }
-      ]
-    }
+      {
+        "id": "0.2",
+        "label": "Failure",
+        "headline": "Today's case investigation is slow, manual and labour-intensive.",
+        "subtitle": "Outbreaks unfold in hours. Investigations take weeks. Control teams chase paper trails while the next ward goes down.",
+        "kind": "failures",
+        "failures": [
+          {
+            "value": "77%",
+            "title": "Non-compliance",
+            "desc": "of US hospitals surveyed by the Joint Commission were cited for at least one Infection Prevention and Control deficiency (2024)."
+          },
+          {
+            "value": "$45B",
+            "title": "Economic burden",
+            "desc": "annual cost of HAIs to the US healthcare system."
+          },
+          {
+            "value": "100K",
+            "title": "Annual deaths",
+            "desc": "from HAIs in the United States — every year."
+          },
+          {
+            "value": "2M",
+            "title": "HAIs per year",
+            "desc": "in the United States alone — a chronic baseline that erupts into outbreaks."
+          }
+        ]
+      }
+    ]
   },
-
+  "solution": {
+    "tag": "The Solution",
+    "steps": [
+      {
+        "id": "0.1",
+        "label": "Integration",
+        "headline": "Outbreak forensics, end-to-end.",
+        "subtitle": "Current tools work in silos. Integration unlocks intelligence. NosoTrack fuses three data streams into a unified analytical engine that infers who-infected-whom in real time.",
+        "kind": "streams",
+        "streams": [
+          {
+            "icon": "Stethoscope",
+            "tag": "Clinical Surveillance",
+            "name": "Electronic health records"
+          },
+          {
+            "icon": "Microscope",
+            "tag": "Diagnostic Labs",
+            "name": "Sequencing & microbiology"
+          },
+          {
+            "icon": "Bluetooth",
+            "tag": "Hardware Tracking",
+            "name": "Bluetooth & RTLS sensors"
+          }
+        ]
+      },
+      {
+        "id": "0.2",
+        "label": "Reconstruction",
+        "headline": "From scattered cases to a single transmission tree.",
+        "subtitle": "Bayesian inference fuses genomic distance, contact proximity and admission timing into one probabilistic graph: who infected whom, with confidence on every edge.",
+        "kind": "tree"
+      },
+      {
+        "id": "0.3",
+        "label": "Reporting",
+        "headline": "Alerts and reports that hospital teams can actually use.",
+        "subtitle": "Every inferred outbreak surfaces as a typed alert: scope, suspected index case, transmission routes, projected trajectory. Reports compile in one click for the IPC committee.",
+        "kind": "reporting"
+      },
+      {
+        "id": "0.4",
+        "label": "Co-pilot",
+        "headline": "An IPC co-pilot, embedded in the workflow.",
+        "subtitle": "A retrieval-augmented agent reads the inferred tree, the latest guidelines and your local IPC protocols, and proposes the next intervention — ward cohorting, screening sweeps, contact-tracing windows.",
+        "kind": "copilot"
+      }
+    ]
+  },
   "platform": {
     "tag": "Platform",
     "title": "How It Works",
@@ -122,12 +226,30 @@
         "tag": "Transmission Tree Inference",
         "desc": "NosoTrack uses Bayesian inference to probabilistically reconstruct transmission trees (who infected whom).",
         "features": [
-          { "title": "Patient 0", "desc": "Identifies the source case."},
-          { "title": "Importation Events", "desc": "Identifies cases imported outside the hospital." },
-          { "title": "Undetected Cases", "desc": "Identifies potential missed cases." },
-          { "title": "Superspreading Events", "desc": "Identifies superspreaders & cross-ward contamination." },
-          { "title": "Transmission Patterns", "desc": "Characterises transmission patterns between wards, staff and patients." },
-          { "title": "Forecasting", "desc": "Projects short-term transmission risk for staff and patients." }
+          {
+            "title": "Patient 0",
+            "desc": "Identifies the source case."
+          },
+          {
+            "title": "Importation Events",
+            "desc": "Identifies cases imported outside the hospital."
+          },
+          {
+            "title": "Undetected Cases",
+            "desc": "Identifies potential missed cases."
+          },
+          {
+            "title": "Superspreading Events",
+            "desc": "Identifies superspreaders & cross-ward contamination."
+          },
+          {
+            "title": "Transmission Patterns",
+            "desc": "Characterises transmission patterns between wards, staff and patients."
+          },
+          {
+            "title": "Forecasting",
+            "desc": "Projects short-term transmission risk for staff and patients."
+          }
         ]
       },
       "alertsReports": {
@@ -144,10 +266,11 @@
       }
     }
   },
-
   "research": {
     "tag": "Research",
-    "title": ["Methods & Software"],
+    "title": [
+      "Methods & Software"
+    ],
     "intro": "<span class=\"nosotrack-noso\">Noso</span><span class=\"nosotrack-highlight\">Track</span> <strong>builds on over a decade of research in outbreak forensics, focusing on the integration of epidemiological, genomic and contact data to infer transmission trees</strong>. Our team and collaborators have published extensively on methodological advances, including the <em>outbreaker2</em> R package and the <em>linktree</em> method for inferring transmission patterns between staff and patients. These methods have been applied to real outbreak data, including SARS-CoV-2 nosocomial outbreaks in Switzerland and the UK, MRSA in neonatal intensive care units in the UK, <em>Klebsiella pneumoniae</em> in a Nepali neonatal unit, <em>Acinetobacter baumannii</em> in hospitals in North Carolina, and Ebola outbreaks in the DRC. We are committed to open science, with all software freely available and publications accessible to the public.",
     "timelineLabel": "Evolution of Outbreak Forensics: Methods & Applications",
     "timeline": [
@@ -158,7 +281,11 @@
         "authors": "Cottam et al.",
         "description": "Integrates genetic and epidemiological data using an SEIR model for transmission; assumes complete bottleneck and all cases observed/sampled; inference via maximum likelihood.",
         "pathogens": [
-          {"name": "Foot-and-mouth disease<br>(FMD)", "applicationYear": "2001", "icon": "🐄"}
+          {
+            "name": "Foot-and-mouth disease<br>(FMD)",
+            "applicationYear": "2001",
+            "icon": "🐄"
+          }
         ],
         "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2599933/"
       },
@@ -169,10 +296,26 @@
         "authors": "Jombart et al.",
         "description": "Reconstructs transmission trees from genetic data using a graph approach; minimizes total genetic distance; no explicit transmission model.",
         "pathogens": [
-          {"name": "H1N1 influenza", "applicationYear": "2009", "icon": "🦠"},
-          {"name": "H3N8 equine influenza", "applicationYear": "N/A", "icon": "🐴"},
-          {"name": "Mycobacterium tuberculosis", "applicationYear": "N/A", "icon": "🦠"},
-          {"name": "Klebsiella pneumoniae", "applicationYear": "N/A", "icon": "🦠"}
+          {
+            "name": "H1N1 influenza",
+            "applicationYear": "2009",
+            "icon": "🦠"
+          },
+          {
+            "name": "H3N8 equine influenza",
+            "applicationYear": "N/A",
+            "icon": "🐴"
+          },
+          {
+            "name": "Mycobacterium tuberculosis",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          },
+          {
+            "name": "Klebsiella pneumoniae",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3183872/"
       },
@@ -183,7 +326,11 @@
         "authors": "Ypma et al.",
         "description": "Bayesian method using mutations; SEIR transmission model with spatial kernel; single introduction.",
         "pathogens": [
-          {"name": "H7N7 avian influenza", "applicationYear": "N/A", "icon": "🐔"}
+          {
+            "name": "H7N7 avian influenza",
+            "applicationYear": "N/A",
+            "icon": "🐔"
+          }
         ],
         "reference_url": "https://pubmed.ncbi.nlm.nih.gov/23230058/"
       },
@@ -194,7 +341,11 @@
         "authors": "Teunis et al.",
         "description": "Frames infectious disease transmission as a forensic problem; uses likelihood-based approach to identify who infected whom from epidemiological data; models serial interval and infectious period distributions.",
         "pathogens": [
-          {"name": "Norovirus", "applicationYear": "N/A", "icon": "🦠"}
+          {
+            "name": "Norovirus",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://royalsocietypublishing.org/doi/10.1098/rsif.2012.0955"
       },
@@ -205,10 +356,26 @@
         "authors": "Jombart et al.",
         "description": "Bayesian reconstruction combining epidemiologic and genomic data; SI transmission model; handles multiple introductions and sampled cases.",
         "pathogens": [
-          {"name": "SARS-CoV-1", "applicationYear": "N/A", "icon": "[Spike]"},
-          {"name": "Bovine viral diarrhea virus", "applicationYear": "N/A", "icon": "🐄"},
-          {"name": "Klebsiella pneumoniae", "applicationYear": "N/A", "icon": "🦠"},
-          {"name": "Acinetobacter baumannii", "applicationYear": "N/A", "icon": "🦠"}
+          {
+            "name": "SARS-CoV-1",
+            "applicationYear": "N/A",
+            "icon": "[Spike]"
+          },
+          {
+            "name": "Bovine viral diarrhea virus",
+            "applicationYear": "N/A",
+            "icon": "🐄"
+          },
+          {
+            "name": "Klebsiella pneumoniae",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          },
+          {
+            "name": "Acinetobacter baumannii",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457"
       },
@@ -219,8 +386,16 @@
         "authors": "Hall et al.",
         "description": "Simultaneous inference in BEAST framework; coalescent process; SEIR model with spatial kernel.",
         "pathogens": [
-          {"name": "H7N7 avian influenza", "applicationYear": "N/A", "icon": "🐔"},
-          {"name": "H5N8 avian influenza", "applicationYear": "N/A", "icon": "🐔"}
+          {
+            "name": "H7N7 avian influenza",
+            "applicationYear": "N/A",
+            "icon": "🐔"
+          },
+          {
+            "name": "H5N8 avian influenza",
+            "applicationYear": "N/A",
+            "icon": "🐔"
+          }
         ],
         "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004613"
       },
@@ -231,9 +406,21 @@
         "authors": "Famulare et al.",
         "description": "Uses likelihood ratio test for time of most recent common ancestor; Poisson mutation model; no explicit transmission model.",
         "pathogens": [
-          {"name": "Ebola virus", "applicationYear": "2014", "icon": "🦠"},
-          {"name": "H1N1 influenza", "applicationYear": "2009", "icon": "🦠"},
-          {"name": "Polio", "applicationYear": "2005-2008", "icon": "🦠"}
+          {
+            "name": "Ebola virus",
+            "applicationYear": "2014",
+            "icon": "🦠"
+          },
+          {
+            "name": "H1N1 influenza",
+            "applicationYear": "2009",
+            "icon": "🦠"
+          },
+          {
+            "name": "Polio",
+            "applicationYear": "2005-2008",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://academic.oup.com/inthealth/article/7/2/130/663364"
       },
@@ -244,10 +431,26 @@
         "authors": "Didelot et al.",
         "description": "Bayesian method in R package; coalescent process; SI model; handles ongoing outbreaks and proportion of sampled cases.",
         "pathogens": [
-          {"name": "Mycobacterium tuberculosis", "applicationYear": "N/A", "icon": "🦠"},
-          {"name": "Klebsiella pneumoniae", "applicationYear": "N/A", "icon": "🦠"},
-          {"name": "SARS-CoV-2", "applicationYear": "2020", "icon": "[Spike]"},
-          {"name": "Mumps", "applicationYear": "N/A", "icon": "🦠"}
+          {
+            "name": "Mycobacterium tuberculosis",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          },
+          {
+            "name": "Klebsiella pneumoniae",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          },
+          {
+            "name": "SARS-CoV-2",
+            "applicationYear": "2020",
+            "icon": "[Spike]"
+          },
+          {
+            "name": "Mumps",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://academic.oup.com/mbe/article/34/4/997/2919386"
       },
@@ -258,10 +461,26 @@
         "authors": "Klinkenberg et al.",
         "description": "Simultaneous inference in R package; coalescent process; SI model; all cases observed but not always sampled.",
         "pathogens": [
-          {"name": "Mycobacterium tuberculosis", "applicationYear": "N/A", "icon": "🦠"},
-          {"name": "MRSA", "applicationYear": "N/A", "icon": "🦠"},
-          {"name": "FMD", "applicationYear": "N/A", "icon": "🐄"},
-          {"name": "H7N7 avian influenza", "applicationYear": "N/A", "icon": "🐔"}
+          {
+            "name": "Mycobacterium tuberculosis",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          },
+          {
+            "name": "MRSA",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          },
+          {
+            "name": "FMD",
+            "applicationYear": "N/A",
+            "icon": "🐄"
+          },
+          {
+            "name": "H7N7 avian influenza",
+            "applicationYear": "N/A",
+            "icon": "🐔"
+          }
         ],
         "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005495"
       },
@@ -272,9 +491,21 @@
         "authors": "Campbell et al.",
         "description": "A modular platform for outbreak forensics; extends outbreaker with a flexible, module-based architecture allowing custom likelihood functions, movement models, and prior distributions; implemented as an R package.",
         "pathogens": [
-          {"name": "SARS-CoV-1", "applicationYear": "N/A", "icon": "[Spike]"},
-          {"name": "Influenza", "applicationYear": "N/A", "icon": "🦠"},
-          {"name": "Ebola virus", "applicationYear": "2014", "icon": "🦠"}
+          {
+            "name": "SARS-CoV-1",
+            "applicationYear": "N/A",
+            "icon": "[Spike]"
+          },
+          {
+            "name": "Influenza",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          },
+          {
+            "name": "Ebola virus",
+            "applicationYear": "2014",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2330-z"
       },
@@ -285,7 +516,11 @@
         "authors": "Campbell et al.",
         "description": "Investigates when pathogen genome sequences are informative of transmission events; quantifies the relationship between genomic diversity, mutation rates, and the ability to resolve transmission links; provides guidance on when genomic data adds value to epidemiological investigation.",
         "pathogens": [
-          {"name": "Various pathogens", "applicationYear": "N/A", "icon": "🦠"}
+          {
+            "name": "Various pathogens",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://journals.plos.org/plospathogens/article?id=10.1371/journal.ppat.1006885"
       },
@@ -296,9 +531,21 @@
         "authors": "Campbell et al.",
         "description": "Bayesian inference of transmission chains combining timing of symptoms, pathogen genomes, and contact data; extends outbreaker2 framework to integrate contact tracing data as an additional source of information for transmission tree reconstruction.",
         "pathogens": [
-          {"name": "SARS-CoV-1", "applicationYear": "N/A", "icon": "[Spike]"},
-          {"name": "MERS-CoV", "applicationYear": "N/A", "icon": "[Spike]"},
-          {"name": "Ebola virus", "applicationYear": "2014", "icon": "🦠"}
+          {
+            "name": "SARS-CoV-1",
+            "applicationYear": "N/A",
+            "icon": "[Spike]"
+          },
+          {
+            "name": "MERS-CoV",
+            "applicationYear": "N/A",
+            "icon": "[Spike]"
+          },
+          {
+            "name": "Ebola virus",
+            "applicationYear": "2014",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006930"
       },
@@ -309,7 +556,11 @@
         "authors": "Sashittal et al.",
         "description": "Labels internal nodes in phylogenetic tree; weak bottleneck; no explicit transmission model.",
         "pathogens": [
-          {"name": "HIV", "applicationYear": "N/A", "icon": "🦠"}
+          {
+            "name": "HIV",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://academic.oup.com/bioinformatics/article/36/Supplement_1/i362/5870507"
       },
@@ -320,8 +571,16 @@
         "authors": "Montazeri et al.",
         "description": "Reconstructs phylogenetic tree from transmission tree; Jukes-Cantor model; all cases observed and sampled.",
         "pathogens": [
-          {"name": "HIV", "applicationYear": "N/A", "icon": "🦠"},
-          {"name": "Ebola virus", "applicationYear": "2014", "icon": "🦠"}
+          {
+            "name": "HIV",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          },
+          {
+            "name": "Ebola virus",
+            "applicationYear": "2014",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8212962/"
       },
@@ -332,7 +591,11 @@
         "authors": "Abbas et al.",
         "description": "Bayesian framework combining genomic and epidemiological data using outbreaker2 to reconstruct transmission trees in a nosocomial SARS-CoV-2 outbreak; assesses limits of genomics for outbreak forensics.",
         "pathogens": [
-          {"name": "SARS-CoV-2", "applicationYear": "2020", "icon": "[Spike]"}
+          {
+            "name": "SARS-CoV-2",
+            "applicationYear": "2020",
+            "icon": "[Spike]"
+          }
         ],
         "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8393517/"
       },
@@ -343,7 +606,11 @@
         "authors": "Lindsey, Villabona-Arenas, Campbell et al.",
         "description": "Combines viral genomic and epidemiological data from 2,181 participants across two pandemic waves at a UK NHS Trust using Bayesian transmission reconstruction; reveals a shift from staff-to-staff to patient-to-patient transmissions between waves, and finds that hospital-onset cases drove most onward transmission.",
         "pathogens": [
-          {"name": "SARS-CoV-2", "applicationYear": "2020–2021", "icon": "[Spike]"}
+          {
+            "name": "SARS-CoV-2",
+            "applicationYear": "2020–2021",
+            "icon": "[Spike]"
+          }
         ],
         "reference_url": "https://www.nature.com/articles/s41467-022-28291-y"
       },
@@ -354,7 +621,11 @@
         "authors": "Abbas et al.",
         "description": "Combined retrospective epidemiological and genomic study using outbreaker2 to reconstruct transmission chains of SARS-CoV-2 amidst multiple outbreaks in a geriatric acute-care hospital.",
         "pathogens": [
-          {"name": "SARS-CoV-2", "applicationYear": "2020", "icon": "[Spike]"}
+          {
+            "name": "SARS-CoV-2",
+            "applicationYear": "2020",
+            "icon": "[Spike]"
+          }
         ],
         "reference_url": "https://elifesciences.org/articles/76854"
       },
@@ -365,7 +636,11 @@
         "authors": "Geismar et al.",
         "description": "Uses a Bayesian framework to infer transmission pairs by exploring all compatible transmission trees based on symptom dates, incorporating a wide range of incubation period and generation time distributions; derives serial intervals from reconstructed pairs, stratified by variants, to account for negative serial intervals.",
         "pathogens": [
-          {"name": "SARS-CoV-2", "applicationYear": "2020–2022", "icon": "[Spike]"}
+          {
+            "name": "SARS-CoV-2",
+            "applicationYear": "2020–2022",
+            "icon": "[Spike]"
+          }
         ],
         "reference_url": "https://pubmed.ncbi.nlm.nih.gov/37579586/"
       },
@@ -376,7 +651,11 @@
         "authors": "Geismar et al.",
         "description": "A framework to estimate group transmission assortativity from transmission chain data, quantifying the extent of within-group vs. between-group transmissions while accounting for group sizes and depletion of susceptibles; implemented in an R package.",
         "pathogens": [
-          {"name": "Various pathogens", "applicationYear": "N/A", "icon": "🦠"}
+          {
+            "name": "Various pathogens",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037"
       },
@@ -387,16 +666,191 @@
         "authors": "Geismar et al.",
         "description": "A statistical framework implemented in the R package mixtree to compare epidemic forests (collections of plausible transmission trees) using chi-square test and PERMANOVA for detecting differences in transmission dynamics.",
         "pathogens": [
-          {"name": "Various pathogens", "applicationYear": "N/A", "icon": "🦠"}
+          {
+            "name": "Various pathogens",
+            "applicationYear": "N/A",
+            "icon": "🦠"
+          }
         ],
         "reference_url": "https://arxiv.org/html/2511.20819v1"
       }
-    ]
+    ],
+    "pathogens": [
+      {
+        "id": "sars-cov-2",
+        "name": "SARS-CoV-2",
+        "common": "COVID-19",
+        "type": "virus",
+        "geometryHint": "coronavirus-dense",
+        "cases": "~770M reported / cumulative",
+        "deaths": "~7M reported globally",
+        "research": [
+          {
+            "title": "TransPhylo — Bayesian transmission tree inference",
+            "url": "https://academic.oup.com/mbe/article/34/4/997/2919386",
+            "year": 2017
+          },
+          {
+            "title": "Rehabilitation-clinic outbreak — Abbas et al.",
+            "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8393517/",
+            "year": 2021
+          },
+          {
+            "title": "Within-hospital transmission across two pandemic waves",
+            "url": "https://www.nature.com/articles/s41467-022-28291-y",
+            "year": 2022
+          },
+          {
+            "title": "Geriatric acute-care hospital outbreak — Abbas et al.",
+            "url": "https://elifesciences.org/articles/76854",
+            "year": 2022
+          },
+          {
+            "title": "Household transmissions — Geismar et al.",
+            "url": "https://pubmed.ncbi.nlm.nih.gov/37579586/",
+            "year": 2023
+          }
+        ]
+      },
+      {
+        "id": "sars-cov-1",
+        "name": "SARS-CoV-1",
+        "common": "2003 SARS",
+        "type": "virus",
+        "geometryHint": "coronavirus-sparse",
+        "cases": "~8,096 cumulative cases (contained outbreak)",
+        "deaths": "~774 deaths globally",
+        "research": [
+          {
+            "title": "outbreaker — Bayesian transmission reconstruction",
+            "url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457",
+            "year": 2014
+          },
+          {
+            "title": "outbreaker2 — extensible reconstruction framework",
+            "url": "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2330-z",
+            "year": 2018
+          },
+          {
+            "title": "Adding contact data to outbreaker2",
+            "url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1007330",
+            "year": 2019
+          }
+        ]
+      },
+      {
+        "id": "ebola",
+        "name": "Ebola virus",
+        "common": "EVD",
+        "type": "virus",
+        "geometryHint": "filament-helical",
+        "cases": "~35,000 cumulative cases (since 1976)",
+        "deaths": "~15,000 deaths reported",
+        "research": [
+          {
+            "title": "Famulare et al. — early-outbreak rate inference",
+            "url": "https://academic.oup.com/inthealth/article/7/2/130/663364",
+            "year": 2015
+          },
+          {
+            "title": "outbreaker2 — Campbell et al.",
+            "url": "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2330-z",
+            "year": 2018
+          },
+          {
+            "title": "Adding contact data to outbreaker2",
+            "url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1007330",
+            "year": 2019
+          },
+          {
+            "title": "Montazeri et al. — transmission-tree inference under uncertainty",
+            "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8212962/",
+            "year": 2020
+          }
+        ]
+      },
+      {
+        "id": "mrsa",
+        "name": "MRSA",
+        "common": "Staphylococcus aureus",
+        "type": "bacteria",
+        "geometryHint": "grape-cluster",
+        "cases": "~120,000 invasive infections / yr (US)",
+        "deaths": "~20,000 deaths / yr (US)",
+        "research": [
+          {
+            "title": "phybreak — within-host evolution + transmission",
+            "url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005495",
+            "year": 2017
+          }
+        ]
+      },
+      {
+        "id": "c-difficile",
+        "name": "C. difficile",
+        "common": "Clostridioides difficile",
+        "type": "bacteria",
+        "geometryHint": "rod-flagella",
+        "cases": "~500K cases / yr (US)",
+        "deaths": "~30,000 deaths / yr (US)",
+        "research": [
+          {
+            "title": "Campbell et al. — Genome informativeness for transmission",
+            "url": "https://journals.plos.org/plospathogens/article?id=10.1371/journal.ppat.1006885",
+            "year": 2018
+          }
+        ]
+      },
+      {
+        "id": "klebsiella",
+        "name": "K. pneumoniae",
+        "common": "Klebsiella pneumoniae",
+        "type": "bacteria",
+        "geometryHint": "rod-capsule",
+        "cases": "~7,900 invasive infections / yr (US)",
+        "deaths": "~600 deaths / yr (US)",
+        "research": [
+          {
+            "title": "SeqTrack — Jombart et al.",
+            "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3183872/",
+            "year": 2011
+          },
+          {
+            "title": "outbreaker — Jombart et al.",
+            "url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457",
+            "year": 2014
+          },
+          {
+            "title": "TransPhylo — Didelot et al.",
+            "url": "https://academic.oup.com/mbe/article/34/4/997/2919386",
+            "year": 2017
+          }
+        ]
+      },
+      {
+        "id": "norovirus",
+        "name": "Norovirus",
+        "common": "Caliciviridae",
+        "type": "virus",
+        "geometryHint": "icosahedral",
+        "cases": "~685M cases / yr (global)",
+        "deaths": "~200,000 deaths / yr (global)",
+        "research": [
+          {
+            "title": "Teunis et al. — within-host evolution & transmission",
+            "url": "https://royalsocietypublishing.org/doi/10.1098/rsif.2012.0955",
+            "year": 2013
+          }
+        ]
+      }
+    ],
+    "pathogenIntro": "Seven pathogens drive the majority of nosocomial outbreaks worldwide. Below are the studies that informed our methods, organised by the organism each one reconstructed."
   },
-
   "team": {
     "tag": "Team",
-    "title": [""],
+    "title": [
+      ""
+    ],
     "founder": {
       "name": "Dr Cyril Geismar",
       "role": "Johns Hopkins University",
@@ -419,10 +873,11 @@
       }
     ]
   },
-
   "roadmap": {
     "tag": "Roadmap",
-    "title": ["Next Steps"],
+    "title": [
+      "Next Steps"
+    ],
     "intro": "We are seeking funding to validate and deploy NosoTrack in two stages.",
     "phases": [
       {
@@ -433,17 +888,25 @@
       {
         "badge": "Phase 2",
         "title": "Pilot Study",
-        "desc": "Deploy the platform in a 1\u20132 year pilot, integrating EHR and Bluetooth-enabled contact tracing in a live hospital environment.<br>This phase will generate real-world evidence on reduced infections, cost savings, and improved hospital capacity management."
+        "desc": "Deploy the platform in a 1–2 year pilot, integrating EHR and Bluetooth-enabled contact tracing in a live hospital environment.<br>This phase will generate real-world evidence on reduced infections, cost savings, and improved hospital capacity management."
       }
     ]
   },
-
   "contact": {
     "tag": "Contact",
-    "title": ["Let's Work", "Together"],
+    "title": [
+      "Let's Work",
+      "Together"
+    ],
     "subtitle": "We are actively seeking collaborations and funding. Please reach out!",
-    "github": { "label": "github.com/CyGei", "url": "https://github.com/CyGei" },
-    "linkedin": { "label": "linkedin.com/in/cyril-geismar", "url": "https://www.linkedin.com/in/cyril-geismar-900926240/" },
+    "github": {
+      "label": "github.com/CyGei",
+      "url": "https://github.com/CyGei"
+    },
+    "linkedin": {
+      "label": "linkedin.com/in/cyril-geismar",
+      "url": "https://www.linkedin.com/in/cyril-geismar-900926240/"
+    },
     "formAction": "https://formspree.io/f/maqdqzqw",
     "formLabels": {
       "name": "Name",
@@ -455,19 +918,37 @@
       "reset": "Reset"
     }
   },
-
   "footer": {
     "logo": "NosoTrack",
     "links": [
-      { "label": "Demo", "href": "#demo" },
-      { "label": "About", "href": "#about" },
-      { "label": "Platform", "href": "#platform" },
-      { "label": "Research", "href": "#research" },
-      { "label": "Team", "href": "#team" },
-      { "label": "Roadmap", "href": "#roadmap" },
-      { "label": "Contact", "href": "#contact" },
-      { "label": "Privacy", "href": "privacy.html" },
-      { "label": "Terms", "href": "terms.html" }
+      {
+        "label": "About",
+        "href": "#about"
+      },
+      {
+        "label": "Research",
+        "href": "#research"
+      },
+      {
+        "label": "Team",
+        "href": "#team"
+      },
+      {
+        "label": "Roadmap",
+        "href": "#roadmap"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      },
+      {
+        "label": "Privacy",
+        "href": "privacy.html"
+      },
+      {
+        "label": "Terms",
+        "href": "terms.html"
+      }
     ],
     "copy": "2026 Cyril Geismar. All rights reserved",
     "credit": ""
