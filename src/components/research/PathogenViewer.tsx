@@ -277,7 +277,7 @@ export function PathogenViewer({
         }`}
         aria-hidden
       >
-        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-faint">
+        <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
           Loading specimen…
         </span>
       </div>

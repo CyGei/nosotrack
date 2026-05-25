@@ -75,7 +75,11 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
       aria-label={`${pathogen.name} dossier`}
       onClick={onClose}
       className={[
-        "fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8",
+        "fixed inset-0 z-[100] flex items-center justify-center",
+        // Asymmetric vertical padding: enough top room to clear the 72px
+        // fixed nav even on short viewports (≤700px) where items-center
+        // would otherwise pull the card under the nav.
+        "px-4 pt-20 pb-4 sm:px-8 sm:pt-24 sm:pb-8",
         "bg-[rgba(33,35,38,0.78)] backdrop-blur-[2px]",
         "animate-[fadeIn_180ms_ease-out]",
       ].join(" ")}
@@ -83,7 +87,7 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
       <div
         onClick={(e) => e.stopPropagation()}
         className={[
-          "relative w-full max-w-[1080px] max-h-[88vh] overflow-hidden",
+          "relative w-full max-w-[1080px] max-h-[78vh] overflow-hidden",
           "bg-bg border border-rule-strong",
           // Narrow the card when there's no right column at all so the
           // lone left column doesn't look stranded inside an empty
@@ -130,7 +134,7 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
               {pathogen.name}
             </h3>
             {pathogen.common && (
-              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.28em] text-faint">
+              <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
                 {pathogen.common}
               </p>
             )}
@@ -145,7 +149,7 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
             </div>
 
             {isNih && (
-              <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.22em] text-faint">
+              <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
                 Model ·{" "}
                 <a
                   href={pathogen.source.nih3dEntryUrl}
@@ -249,7 +253,7 @@ function PaperRow({ paper }: { paper: PathogenPaper }) {
           </span>
           <span
             className={[
-              "font-mono text-[10px] uppercase tracking-[0.22em] truncate",
+              "font-mono text-[11px] uppercase tracking-[0.22em] truncate",
               // Author name carries the affordance — fades to alert-red
               // on row hover. Replaces the old explicit "Read paper →"
               // chip (removed 2026-05-24) so the row reads cleaner.
@@ -263,7 +267,7 @@ function PaperRow({ paper }: { paper: PathogenPaper }) {
           {paper.title}
         </p>
         {paper.journal && (
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-faint italic">
+          <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-faint italic">
             {paper.journal}
           </p>
         )}

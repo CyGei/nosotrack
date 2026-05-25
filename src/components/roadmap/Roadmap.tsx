@@ -5,9 +5,10 @@
  * Structure:
  *   <section id="roadmap" class="section-padding">
  *     <div class="container">
- *       <span class="section-tag">tag</span>            ← mono 11/0.22em INK, mb 28
  *       <h2 class="section-title">title</h2>            ← clamp 2.4-3.75rem, mb 32, max-w 20ch
  *       <p class="roadmap-intro">intro</p>              ← 16/1.7, max-w 860, mb 64
+ *       (Section eyebrow tag removed 2026-05-25 — see TYPOGRAPHY.md
+ *        "Don'ts": sections lead with the H2.)
  *       <div class="roadmap-timeline">                  ← rail at left:16, flex column, pl-40
  *         <div class="roadmap-phase">                   ← pb-48 (last:0), align-start
  *           <div class="roadmap-node">                  ← absolute left:-36 top:6, 24×24, bg-bg
@@ -24,50 +25,50 @@
  *   </section>
  *
  * All spacing/typography numbers are verbatim from main. The optional tags
- * row is preserved for future phases that supply `tags`; current
- * content.json omits it so no row renders.
+ * row is preserved for future phases that supply `tags`; current data
+ * omits it so no row renders.
  */
 
-import { roadmap } from "@/lib/content";
-
-interface RoadmapPhase {
+type RoadmapPhase = {
   badge: string;
   title: string;
   desc: string;
   tags?: string[];
-}
+};
+
+const ROADMAP_INTRO =
+  "We are seeking collaborators and funding to validate and deploy NosoTrack in two stages.";
+
+const PHASES: RoadmapPhase[] = [
+  {
+    badge: "Phase 1",
+    title: "Simulation Study",
+    desc: "Conduct simulation studies under realistic operational constraints to determine the conditions under which NosoTrack improves outbreak control.<br>This phase will assess NosoTrack's effectiveness across pathogens, hospital settings, and levels of data availability.",
+  },
+  {
+    badge: "Phase 2",
+    title: "Pilot Study",
+    desc: "Deploy the platform in real-time in a hospital environment.<br>This phase will generate real-world evidence on reduced infections, cost savings, and improved hospital capacity management.",
+  },
+];
 
 export function Roadmap() {
-  const phases = roadmap.phases as RoadmapPhase[];
-
   return (
     <section
       id="roadmap"
-      className="section-pad bg-bg"
-      aria-label={roadmap.tag}
+      className="section-pad border-t border-rule bg-bg"
+      aria-label="Roadmap"
     >
       <div className="container-page">
-        {/* SECTION TAG — mono 11/0.22em, ink, mb 28 */}
-        <span className="mb-7 inline-block font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-ink">
-          {roadmap.tag}
-        </span>
-
-        {/* SECTION TITLE — display 500, clamp 2.4-3.75rem, ink, lh 1.02, ls -.035em, max-w 20ch, mb 32 */}
-        <h2 className="mb-8 max-w-[20ch] font-display font-medium leading-[1.02] tracking-[-0.035em] text-ink text-[clamp(2.4rem,5vw,3.75rem)]">
-          {roadmap.title.map((line, i) => (
-            <span key={i} className="block">
-              {line}
-            </span>
-          ))}
+        {/* SECTION HEADING — TYPOGRAPHY.md rule 1. */}
+        <h2 className="mb-8 max-w-[20ch] font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]">
+          Next steps.
         </h2>
 
-        {/* INTRO — 16/1.7, ls -.005em, text, max-w 860, mb 64 */}
-        {roadmap.intro && (
-          <p
-            className="mb-16 max-w-[860px] text-[16px] leading-[1.7] tracking-[-0.005em] text-text"
-            dangerouslySetInnerHTML={{ __html: roadmap.intro }}
-          />
-        )}
+        {/* SUBTITLE — TYPOGRAPHY.md rule 2 (body heading / subtitle). */}
+        <p className="mb-16 max-w-[55ch] font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink">
+          {ROADMAP_INTRO}
+        </p>
 
         {/* TIMELINE — flex column, padding-left 40, vertical rail at left 16 */}
         <div className="relative flex flex-col pl-10">
@@ -77,8 +78,8 @@ export function Roadmap() {
             className="absolute bottom-0 left-4 top-0 w-px bg-rule-strong"
           />
 
-          {phases.map((phase, i) => {
-            const isLast = i === phases.length - 1;
+          {PHASES.map((phase, i) => {
+            const isLast = i === PHASES.length - 1;
             return (
               <div
                 key={i}
@@ -100,14 +101,14 @@ export function Roadmap() {
                     {phase.badge}
                   </div>
 
-                  {/* CARD TITLE — display 22/500, lh 1.25, ls -.02em, ink, mb 12 */}
-                  <h3 className="mb-3 font-display text-[22px] font-medium leading-[1.25] tracking-[-0.02em] text-ink">
+                  {/* CARD TITLE — TYPOGRAPHY.md rule 2 (body heading). */}
+                  <h3 className="mb-3 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink">
                     {phase.title}
                   </h3>
 
-                  {/* CARD DESC — 15/1.7, text, mb 20 */}
+                  {/* CARD DESC — TYPOGRAPHY.md rule 3 (body paragraph). */}
                   <p
-                    className="mb-5 text-[15px] leading-[1.7] text-text"
+                    className="mb-5 text-[17px] leading-[1.55] tracking-[-0.005em] text-mute"
                     dangerouslySetInnerHTML={{ __html: phase.desc }}
                   />
 

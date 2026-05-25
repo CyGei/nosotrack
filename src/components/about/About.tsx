@@ -23,32 +23,80 @@ import { AboutBlock } from "./AboutBlock";
 import { DetailsList } from "./DetailsList";
 import { FoundryFrame } from "./foundry/FoundryFrame";
 
+/** Inline external link — used inside detail rows. */
+function A({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="about-link"
+    >
+      {children}
+    </a>
+  );
+}
+
 export function About() {
   return (
-    <section id="about" className="bg-bg" aria-label="How NosoTrack works">
+    <section
+      id="about"
+      className="border-t border-rule bg-bg"
+      aria-label="How NosoTrack works"
+    >
       {/* 0.1 — Problem */}
       <AboutBlock
         id="0.1"
         title="Nosocomial outbreaks are deadly, costly and poorly managed."
-        subtitle="Healthcare-associated infections kill more people than malaria and HIV combined — and the case data needed to stop them sits scattered across systems that don't talk to each other."
+        subtitle="Healthcare-associated infections (HAIs) are among the most common adverse events in healthcare delivery."
         details={
           <DetailsList
             rows={[
               {
-                title: "1 in 10 patients",
-                desc: "are affected by healthcare-associated infections globally — the WHO's Hand-Hygiene-Day key statistic, unchanged for a decade.",
+                kind: "header",
+                title: "The Problem",
+              },
+              {
+                title: "1 in 10 patients develop an HAI",
+                desc: (
+                  <>
+                    A{" "}
+                    <A href="https://www.who.int/campaigns/world-hand-hygiene-day/key-facts-and-figures">
+                      WHO
+                    </A>{" "}
+                    global estimate that has not improved in over 15 years.
+                  </>
+                ),
               },
               {
                 title: "136M antibiotic-resistant HAIs / year",
-                desc: "occur worldwide every year, accelerating the antimicrobial-resistance crisis the WHO's 2024 IPC report calls a top-ten global health threat.",
+                desc: (
+                  <>
+                    HAIs are a major driver of the antimicrobial resistance
+                    (AMR) crisis, one of the{" "}
+                    <A href="https://www.who.int/news-room/spotlight/10-global-health-issues-to-track-in-2021">
+                      WHO
+                    </A>
+                    &apos;s top global health threat.
+                  </>
+                ),
               },
               {
-                title: "3.5M annual deaths without action",
-                desc: "is the WHO's projected mortality from HAIs unless infection-prevention investment scales meaningfully in the next decade.",
+                title: "3.5M annual deaths",
+                desc: (
+                  <>
+                    The{" "}
+                    <A href="https://www.who.int/campaigns/world-hand-hygiene-day/key-facts-and-figures">
+                      WHO&apos;s
+                    </A>{" "}
+                    projected mortality from HAIs unless infection-prevention
+                    investment scales meaningfully in the next decade.
+                  </>
+                ),
               },
               {
                 title: "AMR's most underrated driver",
-                desc: "Hospital outbreaks are the breeding ground for resistant strains. Stopping them earlier is the cheapest, most direct lever the system has.",
+                desc: "Hospital outbreaks are the breeding ground for resistant strains. Stopping them earlier is the cheapest and most efficent solution.",
               },
             ]}
           />
@@ -59,26 +107,26 @@ export function About() {
       <AboutBlock
         id="0.2"
         title="Integration unlocks intelligence."
-        subtitle="NosoTrack stacks three live data layers — clinical, lab and hardware — onto a single hospital ontology, with the forensics engine sitting underneath. The streams aren't reports: they're the substrate for inference."
+        subtitle= "Current tools work in silos. NosoTrack fuses their data streams into a unified analytical engine."
         video={<FoundryFrame scene="integration" />}
         details={
           <DetailsList
             rows={[
               {
-                title: "Layer 1 — data streams",
-                desc: "EHR feeds, microbiology and full-length sequencing, plus minute-level Bluetooth / RTLS contact data flow into the engine through HL7 / FHIR connectors.",
+                kind: "header",
+                title: "The 3 I's",
               },
               {
-                title: "Layer 2 — the live hospital",
-                desc: "Every event is projected onto a digital twin of the building: patients in beds, staff between wards, contacts on the floor — all keyed to the same identity graph.",
+                title: "Integration",
+                desc: "Electionic Health Records (EHR), diagnostic lab results and Real-Time Location Systems (RTLS) unified into a single engine.",
               },
               {
-                title: "Layer 3 — the NosoTrack engine",
-                desc: "Underneath the building sits the Bayesian forensics layer that watches the population in real time, ready to fire when a transmission signal crosses threshold.",
+                title: "Inference",
+                desc: "Bayesian inference reconstructs who-infected-whom, and who is at risk.",
               },
               {
-                title: "One ontology, many questions",
-                desc: "Because the layers share an ontology, the same fact base answers contact-tracing, surveillance and IPC-committee questions without bespoke pipelines.",
+                title: "Intervention",
+                desc: "An AI co-pilot scores intervention scenarios in seconds, ranked by containment, cost, and bed-days saved.",
               },
             ]}
           />
@@ -89,31 +137,42 @@ export function About() {
       <AboutBlock
         id="0.3"
         title="Outbreak forensics, end to end."
-        subtitle="When the engine fires, the IPC team gets a complete forensic view: the inferred transmission tree, the patients and staff involved, and the next intervention queued up — one click away from the source data."
+        subtitle="NosoTrack infers who-infected-whom in real-time, enabling infection prevention and control teams to identify how infections spread and design targeted interventions before outbreaks escalate"
         video={<FoundryFrame scene="endtoend" />}
         details={
           <DetailsList
             rows={[
               {
-                title: "Bayesian transmission engine",
-                desc: "Built on the outbreaker2 lineage, the engine fuses genetic distance, contact proximity and admission timing into a posterior over plausible transmission trees.",
+                kind: "header",
+                title: "The Solution",
               },
               {
-                title: "Posterior probabilities, not point estimates",
-                desc: "Every edge carries a confidence score. IPC teams see not just the most-likely chain, but how strong the evidence is for each link.",
+                title: "Actionable intelligence, for every outbreak",
+                desc: "Identifies patient 0, superspreaders, undetected cases, imported cases, estimates the dates of infection and individuals at risk.",
               },
               {
-                title: "Super-spreader detection",
-                desc: "Hosts with anomalously high secondary transmissions are flagged automatically — like patient A3 in the demo, whose chain seeded both wards.",
+                title: "Probabilities, not point estimates",
+                desc: "Every transmission chain carries a confidence score indicative of how strong the evidence is for each link.",
               },
               {
-                title: "IPC co-pilot",
-                desc: "A retrieval-augmented agent reads the inferred tree, your local IPC protocols and current guidelines, then surfaces the next intervention with a containment score — human approved, fully audited.",
+              title: "Your protocols, your call",
+              desc: "The IPC co-pilot incorporates your guidelines and operational constraints to simulate interventions and identify optimal control strategies.",
               },
             ]}
           />
         }
       />
+
+      {/* Inline-link styling for `<A>` inside detail rows — inherits the
+          surrounding text color, just adds an underline so it's recognisable. */}
+      <style>{`
+        .about-link {
+          color: inherit;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          text-decoration-thickness: 1px;
+        }
+      `}</style>
     </section>
   );
 }

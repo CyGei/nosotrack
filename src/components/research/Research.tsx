@@ -43,27 +43,32 @@ export function Research() {
       aria-label="Pathogen"
     >
       <div className="container-page">
-        <h2 className="font-display font-medium leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]">
+        <h2 className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]">
           Pathogen agnostic, ready for disease X.
         </h2>
 
         <div className="mt-12 grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-16 md:items-center">
-          <p className="text-text text-[clamp(15px,1.05vw,17px)] leading-relaxed md:col-span-7">
-            NosoTrack builds on over a decade of research in outbreak
-            forensics, focusing on the integration of epidemiological,
-            genomic and contact data to infer transmission trees. Our team
-            and collaborators have published extensively on methodological
-            advances, including the outbreaker2 R package and the linktree
-            method for inferring transmission patterns between staff and
-            patients. These methods have been applied to real outbreak
-            data, including SARS-CoV-2 nosocomial outbreaks in Switzerland
-            and the UK, MRSA in neonatal intensive care units in the UK,
-            Klebsiella pneumoniae in a Nepali neonatal unit, Acinetobacter
-            baumannii in hospitals in North Carolina, and Ebola outbreaks
-            in the DRC. We are committed to open science, with all
-            software freely available and publications accessible to the
-            public.
-          </p>
+          <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink md:col-span-7 text-justify hyphens-auto [text-wrap:pretty]">
+            <p>
+              NosoTrack builds on over a decade of research in outbreak
+              forensics, focusing on the integration of epidemiological,
+              genomic and contact data to infer transmission trees.
+            </p>
+            <p>
+              Our team and collaborators have published extensively on
+              methodological advances, including the <em>outbreaker2</em> R
+              package and the <em>linktree</em> method for inferring
+              transmission patterns between staff and patients. These
+              methods have been applied to real outbreak data, including
+              SARS-CoV-2 nosocomial outbreaks in Switzerland and the UK,
+              MRSA in neonatal intensive care units in the UK,{" "}
+              <em>Klebsiella pneumoniae</em> in a Nepali neonatal unit,{" "}
+              <em>Acinetobacter baumannii</em> in hospitals in North
+              Carolina, and Ebola outbreaks in the DRC. We are committed
+              to open science, with all software freely available and
+              publications accessible to the public.
+            </p>
+          </div>
 
           {spotlight && (
             <div className="md:col-span-5">
@@ -80,7 +85,7 @@ export function Research() {
           {/* Combined attribution footer — per-specimen credit lives on
               each ticker card (the name label links to the source entry).
               This line credits the upstream catalogue uniformly. */}
-          <p className="mt-16 text-center font-mono text-[10px] uppercase tracking-[0.28em] text-faint">
+          <p className="mt-16 text-center font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
             Models ·{" "}
             <a
               href="https://3d.nih.gov/"

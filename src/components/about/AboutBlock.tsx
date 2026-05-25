@@ -103,7 +103,7 @@ export function AboutBlock({
   const isDone = fractional >= title.length;
 
   return (
-    <article className="border-t border-rule">
+    <article>
       <div className="container-page section-pad">
         <StepIndicator activeId={id} />
 
@@ -112,7 +112,7 @@ export function AboutBlock({
           <div className="col-span-12 md:col-span-5">
             <h2
               ref={titleRef}
-              className="font-display font-medium leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)] max-w-[14ch]"
+              className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)] max-w-[14ch]"
             >
               {visibleChars.split("").map((c, i) => {
                 // Linear per-char alpha; the chase-easing on `progress`
@@ -138,7 +138,7 @@ export function AboutBlock({
           {/* RIGHT — subtitle + (switch) + content panel */}
           <div className="col-span-12 md:col-span-7">
             {subtitle && (
-              <p className="text-text text-[clamp(15px,1.05vw,17px)] leading-relaxed max-w-[55ch]">
+              <p className="font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink max-w-[55ch]">
                 {subtitle}
               </p>
             )}
@@ -153,7 +153,7 @@ export function AboutBlock({
 
             <div
               className={cn(
-                "rounded-[14px] border border-rule bg-bg overflow-hidden",
+                "rounded-[14px] border border-rule-strongest bg-bg overflow-hidden",
                 hasVideo ? "mt-6" : subtitle ? "mt-8" : "mt-0",
               )}
             >

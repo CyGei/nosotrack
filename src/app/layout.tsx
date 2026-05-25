@@ -1,23 +1,25 @@
 import type { Metadata, Viewport } from "next";
 import { interTight, jetBrainsMono } from "@/lib/fonts";
-import { meta } from "@/lib/content";
 import "./globals.css";
 
+const SITE_TITLE = "NosoTrack";
+const SITE_DESCRIPTION = "Outbreak forensics for healthcare facilities.";
+
 export const metadata: Metadata = {
-  title: meta.title,
-  description: meta.description,
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   metadataBase: new URL("https://nosotrack.com"),
   openGraph: {
-    title: meta.title,
-    description: meta.description,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     url: "https://nosotrack.com",
-    siteName: meta.title,
+    siteName: SITE_TITLE,
     images: [
       {
         url: "/images/og-card.png",
         width: 1200,
         height: 630,
-        alt: meta.title,
+        alt: SITE_TITLE,
       },
     ],
     locale: "en_GB",

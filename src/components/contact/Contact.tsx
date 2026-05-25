@@ -20,7 +20,19 @@
 
 import { useState } from "react";
 import { Github, Linkedin } from "lucide-react";
-import { contact } from "@/lib/content";
+
+const CONTACT_TITLE = ["Let's Work", "Together"];
+const CONTACT_SUBTITLE =
+  "We are actively seeking collaborations and funding. Please reach out!";
+const GITHUB = {
+  label: "github.com/CyGei",
+  url: "https://github.com/CyGei",
+};
+const LINKEDIN = {
+  label: "linkedin.com/in/cyril-geismar",
+  url: "https://www.linkedin.com/in/cyril-geismar-900926240/",
+};
+const FORM_ACTION = "https://formspree.io/f/maqdqzqw";
 
 type State = "idle" | "sending" | "sent" | "error";
 
@@ -33,7 +45,7 @@ export function Contact() {
     setState("sending");
     try {
       const data = new FormData(form);
-      const res = await fetch(contact.formAction, {
+      const res = await fetch(FORM_ACTION, {
         method: "POST",
         body: data,
         headers: { Accept: "application/json" },
@@ -57,38 +69,35 @@ export function Contact() {
         <div className="grid grid-cols-1 gap-y-14 md:grid-cols-2 md:gap-x-24">
           {/* LEFT — heading, subtitle, social channels */}
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-inv-hi">
-              {contact.tag}
-            </p>
-            <h2 className="mt-4 font-display font-medium leading-[1.04] tracking-[-0.035em] text-inv-hi text-[clamp(2.4rem,4.5vw,3.5rem)] max-w-[16ch]">
-              {contact.title.map((line, i) => (
+            <h2 className="font-display font-normal leading-[1.05] tracking-tight text-inv-hi text-[clamp(32px,3.6vw,56px)] max-w-[16ch]">
+              {CONTACT_TITLE.map((line, i) => (
                 <span key={i} className="block">
                   {line}
                 </span>
               ))}
             </h2>
-            <p className="mt-8 max-w-[640px] text-[16px] leading-[1.7] tracking-[-0.005em] text-inv">
-              {contact.subtitle}
+            <p className="mt-8 max-w-[55ch] font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-inv-hi">
+              {CONTACT_SUBTITLE}
             </p>
 
             <div className="mt-14 flex flex-wrap items-center gap-x-10 gap-y-5">
               <a
-                href={contact.github.url}
+                href={GITHUB.url}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-inv-mute transition-colors hover:text-inv-hi"
               >
                 <Github className="h-[20px] w-[20px]" strokeWidth={1.6} />
-                {contact.github.label}
+                {GITHUB.label}
               </a>
               <a
-                href={contact.linkedin.url}
+                href={LINKEDIN.url}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-inv-mute transition-colors hover:text-inv-hi"
               >
                 <Linkedin className="h-[20px] w-[20px]" strokeWidth={1.6} />
-                {contact.linkedin.label}
+                {LINKEDIN.label}
               </a>
             </div>
           </div>
@@ -96,29 +105,14 @@ export function Contact() {
           {/* RIGHT — Formspree form */}
           <div>
             <form
-              action={contact.formAction}
+              action={FORM_ACTION}
               method="POST"
               onSubmit={handleSubmit}
               className="contact-form-dark"
             >
-              <Field
-                label={contact.formLabels.name}
-                name="name"
-                type="text"
-                required
-              />
-              <Field
-                label={contact.formLabels.email}
-                name="email"
-                type="email"
-                required
-              />
-              <Field
-                label={contact.formLabels.message}
-                name="message"
-                as="textarea"
-                required
-              />
+              <Field label="Name" name="name" type="text" required />
+              <Field label="Email" name="email" type="email" required />
+              <Field label="Message" name="message" as="textarea" required />
 
               <div className="mt-3 flex items-center gap-5">
                 <button
@@ -126,9 +120,7 @@ export function Contact() {
                   disabled={state === "sending"}
                   className="inline-flex items-center gap-2 border border-inv-hi bg-inv-hi px-6 py-3 font-mono text-[11px] uppercase tracking-[0.22em] text-bg-ink transition-colors duration-[var(--transition-duration-fast)] hover:bg-transparent hover:text-inv-hi disabled:opacity-50"
                 >
-                  {state === "sending"
-                    ? "Transmitting…"
-                    : contact.formButtons.submit}
+                  {state === "sending" ? "Transmitting…" : "Send Message"}
                   <span aria-hidden>↗</span>
                 </button>
                 <button
@@ -136,7 +128,7 @@ export function Contact() {
                   className="font-mono text-[11px] uppercase tracking-[0.22em] text-inv-mute underline-offset-4 hover:text-inv-hi hover:underline"
                   onClick={() => setState("idle")}
                 >
-                  {contact.formButtons.reset}
+                  Reset
                 </button>
               </div>
 

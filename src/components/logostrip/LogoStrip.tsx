@@ -1,19 +1,19 @@
 /**
  * Logo strip — DESIGN_BRIEF §7.4
  *
- * A quiet, single-row band of institutional names. The legacy content
- * carries names only (no images), so each entry is rendered as a mono
- * word-mark, all caps, with the same letter-spacing as the eyebrow tags.
+ * A quiet, single-row band of institutional names. Names only, no images,
+ * rendered as mono word-marks, all caps, matching the eyebrow tags.
  *
- * The strip sits on the cream canvas, separated from neighbouring
- * sections by a single hairline rule top and bottom.
+ * Sits on the cream canvas with a single hairline rule top and bottom.
  */
 
-import { logoStrip } from "@/lib/content";
+const AFFILIATIONS = [
+  "Johns Hopkins University",
+  "Imperial College London",
+  "R Epidemics Consortium",
+];
 
 export function LogoStrip() {
-  if (!logoStrip?.length) return null;
-
   return (
     <section
       id="affiliations"
@@ -22,12 +22,12 @@ export function LogoStrip() {
     >
       <div className="container-page py-10">
         <ul className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
-          {logoStrip.map((logo, i) => (
+          {AFFILIATIONS.map((name) => (
             <li
-              key={i}
+              key={name}
               className="font-mono text-[11px] uppercase tracking-[0.22em] text-text"
             >
-              {logo.name as string}
+              {name}
             </li>
           ))}
         </ul>

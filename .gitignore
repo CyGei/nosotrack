@@ -11,6 +11,7 @@ out/
 # OS / editor
 .idea/
 .vscode/
+.Rhistory
 
 # Pathogen-pipeline intermediates (kept out of git — only the
 # optimized public/models/<slug>.glb gets shipped).

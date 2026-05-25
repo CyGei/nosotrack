@@ -22,8 +22,19 @@
  * compressed too tightly when the credit row was empty.
  */
 
-import { footer } from "@/lib/content";
 import { BrandWordmark } from "@/components/BrandWordmark";
+
+const FOOTER_LINKS: { label: string; href: string }[] = [
+  { label: "About", href: "#about" },
+  { label: "Research", href: "#research" },
+  { label: "Team", href: "#team" },
+  { label: "Roadmap", href: "#roadmap" },
+  { label: "Contact", href: "#contact" },
+  { label: "Pitch", href: "/pitch/" },
+  { label: "Privacy", href: "/privacy/" },
+  { label: "Terms", href: "/terms/" },
+];
+const FOOTER_COPY = "2026 Cyril Geismar. All rights reserved";
 
 export function Footer() {
   return (
@@ -67,7 +78,7 @@ export function Footer() {
           </div>
 
           <ul className="footer-links flex list-none flex-wrap items-center gap-6">
-            {footer.links.map((link) => (
+            {FOOTER_LINKS.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
@@ -84,13 +95,8 @@ export function Footer() {
             below the brand band and 32 px above the copy. */}
         <div className="mt-16 flex flex-wrap items-center justify-between gap-3 border-t border-rule-inv pt-8">
           <p className="footer-copy font-mono text-[11px] tracking-[0.1em] text-inv-mute">
-            © {footer.copy}
+            © {FOOTER_COPY}
           </p>
-          {footer.credit ? (
-            <p className="footer-credit font-mono text-[10px] uppercase leading-[1.6] tracking-[0.14em] text-inv-faint">
-              {footer.credit}
-            </p>
-          ) : null}
         </div>
       </div>
     </footer>

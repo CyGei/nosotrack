@@ -35,6 +35,7 @@
   /* ============ RULES / BORDERS ============ */
   --color-rule: rgba(30, 30, 43, 0.12);
   --color-rule-strong: rgba(30, 30, 43, 0.24);
+  --color-rule-strongest: rgba(30, 30, 43, 0.42);
   --color-rule-inv: rgba(239, 238, 239, 0.14);
   --color-rule-inv-strong: rgba(239, 238, 239, 0.28);
 
@@ -55,7 +56,7 @@
   /* ============ LAYOUT ============ */
   --container-page: 1240px;
   --spacing-pad: clamp(20px, 3vw, 40px);
-  --spacing-section: clamp(96px, 12vw, 168px);
+  --spacing-section: clamp(72px, 8vw, 112px);
 
   /* 8pt spacing scale (Tailwind already gives us 4-based; these are aliases
      for designer-readable names per the brief) */
@@ -203,13 +204,20 @@ html {
   padding-block: var(--spacing-section);
 }
 
-.on-dark {
-  background: var(--color-bg-ink);
-  color: var(--color-inv);
-}
+/* Wrapped in @layer base so Tailwind utilities (in @layer utilities)
+   can override the inherited cream color — otherwise classes like
+   `text-bg-ink` on a CTA button inside the dark Hero silently lose
+   the cascade fight and render cream-on-cream. Same lesson as the
+   memory note on the Tailwind reset. */
+@layer base {
+  .on-dark {
+    background: var(--color-bg-ink);
+    color: var(--color-inv);
+  }
 
-.on-dark strong {
-  color: var(--color-inv-hi);
+  .on-dark strong {
+    color: var(--color-inv-hi);
+  }
 }
 
 /* Hide scrollbar but keep scroll behaviour — used by the pathogen ticker

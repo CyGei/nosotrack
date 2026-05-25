@@ -16,21 +16,48 @@
  */
 
 import Image from "next/image";
-import { team } from "@/lib/content";
-import type { TeamPerson } from "@/types/content";
+
+type TeamPerson = {
+  name: string;
+  role: string;
+  photo: string;
+  bio: string;
+};
+
+const FOUNDER: TeamPerson = {
+  name: "Dr Cyril Geismar",
+  role: "Johns Hopkins University",
+  photo: "images/cyril.jpg",
+  bio: 'Postdoctoral research fellow. PhD in mathematical modelling of infectious diseases at Imperial College London, focused on SARS-CoV-2 outbreak forensics. Executive board member and developer for the <a href="https://www.repidemicsconsortium.org/" target="_blank">R Epidemics Consortium</a>. Teaches outbreak analytics at <a href="https://sismid.sph.emory.edu/online-modules/recon-tools/index.html" target="_blank">Emory University</a> and <a href="https://data.org/our-work/epiverse/training-africa/course/" target="_blank">LSHTM</a>.',
+};
+
+const ADVISORS: TeamPerson[] = [
+  {
+    name: "Dr Anne Cori",
+    role: "Imperial College London",
+    photo: "images/anne.jpg",
+    bio: 'Associate Professor specialising in real-time outbreak analysis and epidemiological parameters. Lead author of <a href="https://academic.oup.com/aje/article/178/9/1505/89262" target="_blank">EpiEstim</a> and co-author of <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457" target="_blank">outbreaker</a>. Develops statistical methods for outbreak forensics and rapid transmissibility assessment.',
+  },
+  {
+    name: "Dr Thibaut Jombart",
+    role: "Imperial College London",
+    photo: "images/thibaut.jpg",
+    bio: 'Associate Professor specialising in outbreak response analytics, biostatistics, population genetics, and R programming. Lead author of <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457" target="_blank">outbreaker</a> and founder of the <a href="https://www.repidemicsconsortium.org/" target="_blank">R Epidemics Consortium</a>. Field experience in Ebola deployments in the Democratic Republic of the Congo.',
+  },
+];
 
 export function Team() {
   return (
     <section
       id="team"
       className="section-pad border-t border-rule bg-bg"
-      aria-label={team.tag}
+      aria-label="Team"
     >
       <div className="container-page">
-        {/* Section tag */}
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
-          {team.tag}
-        </p>
+        {/* Section heading — matches Research §"Pathogen agnostic…" */}
+        <h2 className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]">
+          A team of experts.
+        </h2>
 
         {/* Founder | divider | Advisors */}
         <div className="mt-12 grid grid-cols-1 gap-y-10 md:grid-cols-[1fr_1px_2fr] md:gap-x-12 md:gap-y-0 md:items-start">
@@ -39,7 +66,7 @@ export function Team() {
             <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.22em] text-mute">
               Founder
             </p>
-            <TeamCard person={team.founder} />
+            <TeamCard person={FOUNDER} />
           </div>
 
           {/* Divider — vertical on md+, horizontal on mobile */}
@@ -52,10 +79,10 @@ export function Team() {
           {/* ADVISORS column — 2-up grid inside */}
           <div>
             <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.22em] text-mute">
-              {team.advisorsLabel}
+              Advisors
             </p>
             <ul className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2">
-              {team.advisors.map((person, i) => (
+              {ADVISORS.map((person, i) => (
                 <li key={i}>
                   <TeamCard person={person} />
                 </li>
@@ -108,7 +135,7 @@ function TeamCard({ person }: { person: TeamPerson }) {
           {person.role}
         </p>
         <p
-          className="team-bio mt-3 text-[14px] leading-[1.7] text-text"
+          className="team-bio mt-3 text-[15px] leading-[1.7] text-text"
           dangerouslySetInnerHTML={{ __html: person.bio }}
         />
       </div>

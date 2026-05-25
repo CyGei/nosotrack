@@ -4,11 +4,12 @@
 // foundry-demo/index.html (which pulled ~3 MB of Babel and a slow per-file
 // transform on every page load). Run via `npm run build:demo`.
 //
-// Source-of-truth lives in `public/foundry-demo/`. Next's static export
-// copies everything under `public/` to `out/`, so the iframe at
-// `/foundry-demo/index.html` is served straight from there. Edit the .jsx
-// files in `public/foundry-demo/` and re-run this script to regenerate
-// the bundle alongside them.
+// Source-of-truth lives in `foundry-demo-src/` at repo root — kept OUT
+// of `public/` so the ~178 KB of JSX isn't shipped to GitHub Pages on
+// every deploy. The script reads the .jsx files from there and writes
+// the compiled bundle.js into `public/foundry-demo/bundle.js`, which
+// pairs with the static `public/foundry-demo/index.html` that the host
+// iframe loads.
 
 import { build } from 'esbuild';
 import { writeFileSync } from 'node:fs';
@@ -17,7 +18,8 @@ import { dirname, resolve } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
-const demoDir = resolve(root, 'public/foundry-demo');
+const srcDir = resolve(root, 'foundry-demo-src');
+const outDir = resolve(root, 'public/foundry-demo');
 
 // Order matters — later files reference globals defined in earlier ones.
 const sources = [
@@ -30,7 +32,7 @@ const sources = [
 
 async function transform(file) {
     const result = await build({
-        entryPoints: [resolve(demoDir, file)],
+        entryPoints: [resolve(srcDir, file)],
         bundle: false,
         write: false,
         loader: { '.jsx': 'jsx' },
@@ -54,7 +56,7 @@ const wrapped = parts.map((code, i) =>
     `// ── ${sources[i]} ──\n(function(){\n${code}\n})();\n`
 );
 const bundle = banner + wrapped.join('\n');
-writeFileSync(resolve(demoDir, 'bundle.js'), bundle, 'utf8');
+writeFileSync(resolve(outDir, 'bundle.js'), bundle, 'utf8');
 
 const sizeKB = (Buffer.byteLength(bundle, 'utf8') / 1024).toFixed(1);
 console.log(`✓ wrote public/foundry-demo/bundle.js (${sizeKB} KB)`);

@@ -51,14 +51,35 @@ export function PathogenTicker({ pathogens }: Props) {
     let paused = false;
     let wheelLockUntil = 0;
 
+    // Fractional accumulator — `Element.scrollLeft` is read back as an
+    // integer in most browsers, so directly doing `scrollLeft += 0.47`
+    // every frame rounds to 0 each time and the strip never moves.
+    // We keep the true sub-pixel position here and only assign the
+    // rounded value to `scrollLeft`.
+    let offset = el.scrollLeft;
+
+    // Resync the accumulator whenever the user (or wheel scroll) jumps
+    // the strip themselves, so we don't fight their input.
+    const onScroll = () => {
+      // If the rendered scrollLeft drifts noticeably from our accumulator
+      // (user dragged / wheeled), snap the accumulator to the real value.
+      if (Math.abs(el.scrollLeft - offset) > 1) offset = el.scrollLeft;
+    };
+
     const onEnter = () => {
       paused = true;
     };
     const onLeave = () => {
       paused = false;
     };
-    const onWheel = () => {
-      wheelLockUntil = performance.now() + WHEEL_RESUME_MS;
+    const onWheel = (e: WheelEvent) => {
+      // Only treat as a "user is scrolling the strip" gesture when the
+      // wheel has a meaningful horizontal component. Vertical page-scroll
+      // wheels passing over the strip used to lock the drift for 1.5s
+      // each tick, effectively freezing it whenever the cursor was nearby.
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        wheelLockUntil = performance.now() + WHEEL_RESUME_MS;
+      }
     };
 
     const tick = (now: number) => {
@@ -69,15 +90,15 @@ export function PathogenTicker({ pathogens }: Props) {
       if (driving) {
         const max = el.scrollWidth - el.clientWidth;
         if (max > 0) {
-          let next = el.scrollLeft + direction * DRIFT_PX_PER_SEC * dt;
-          if (next >= max) {
-            next = max;
+          offset += direction * DRIFT_PX_PER_SEC * dt;
+          if (offset >= max) {
+            offset = max;
             direction = -1;
-          } else if (next <= 0) {
-            next = 0;
+          } else if (offset <= 0) {
+            offset = 0;
             direction = 1;
           }
-          el.scrollLeft = next;
+          el.scrollLeft = Math.round(offset);
         }
       }
 
@@ -89,6 +110,7 @@ export function PathogenTicker({ pathogens }: Props) {
     el.addEventListener("focusin", onEnter);
     el.addEventListener("focusout", onLeave);
     el.addEventListener("wheel", onWheel, { passive: true });
+    el.addEventListener("scroll", onScroll, { passive: true });
 
     raf = requestAnimationFrame(tick);
 
@@ -99,6 +121,7 @@ export function PathogenTicker({ pathogens }: Props) {
       el.removeEventListener("focusin", onEnter);
       el.removeEventListener("focusout", onLeave);
       el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("scroll", onScroll);
     };
   }, []);
 
@@ -140,7 +163,7 @@ export function PathogenTicker({ pathogens }: Props) {
                 rel="noreferrer"
                 onClick={(e) => e.stopPropagation()}
                 className={[
-                  "mt-3 block text-center font-mono text-[10px] uppercase",
+                  "mt-3 block text-center font-mono text-[11px] uppercase",
                   "tracking-[0.22em] text-faint",
                   "underline-offset-4 hover:text-text hover:underline",
                 ].join(" ")}

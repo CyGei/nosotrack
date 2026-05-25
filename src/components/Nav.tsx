@@ -30,9 +30,17 @@
    ========================================================================= */
 
 import { useEffect, useState } from "react";
-import { nav } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { BrandWordmark } from "@/components/BrandWordmark";
+
+const NAV_LOGO = "NosoTrack";
+const NAV_LINKS: { label: string; href: string }[] = [
+  { label: "About", href: "#about" },
+  { label: "Research", href: "#research" },
+  { label: "Team", href: "#team" },
+  { label: "Roadmap", href: "#roadmap" },
+  { label: "Contact", href: "#contact" },
+];
 
 // Verbatim from main.js: nav becomes "scrolled" at scrollY > 60, and the
 // dark/inverted theme drops once scrollY > hero.offsetHeight - 80.
@@ -119,7 +127,7 @@ export function Nav() {
           </span>
           <a
             href="#top"
-            aria-label={`${nav.logo} — home`}
+            aria-label={`${NAV_LOGO} — home`}
             className="nav-logo text-[17px] leading-none transition-colors duration-[var(--transition-duration-fast)]"
           >
             <BrandWordmark />
@@ -131,7 +139,7 @@ export function Nav() {
           className="nav-links hidden list-none items-center gap-9 md:flex"
           role="list"
         >
-          {nav.links.map((link) => (
+          {NAV_LINKS.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
@@ -181,7 +189,7 @@ export function Nav() {
           )}
         >
           <ul className="container-page flex list-none flex-col py-6">
-            {nav.links.map((link) => (
+            {NAV_LINKS.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}

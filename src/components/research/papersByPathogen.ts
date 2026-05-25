@@ -1,10 +1,10 @@
 /**
  * Per-pathogen paper lookup for the Research-section dossier.
  *
- * The lookup is built at module load by reverse-mapping
- * `content.json > research.timeline[]` — every timeline entry already
- * declares which pathogens it applied to, so we get a per-pathogen
- * paper list for free without duplicating data. Manual additions cover
+ * The lookup is built at module load by reverse-mapping the
+ * `TIMELINE` array in `src/data/timeline.ts` — every timeline entry
+ * already declares which pathogens it applied to, so we get a per-
+ * pathogen paper list for free without duplicating data. Manual additions cover
  * the six grid pathogens that have no timeline entries (influenza, HIV,
  * rhinovirus, enterococcus, C. auris, Disease X), sourced via a focused
  * literature pass on 2026-05-24 — see project_pathogen_registry memory.
@@ -24,7 +24,7 @@
  * dossier reads chronologically (methods → applications).
  */
 
-import { research } from "@/lib/content";
+import { TIMELINE } from "@/data/timeline";
 
 /* ─────────────────────────────────────────────────────── types ── */
 
@@ -262,8 +262,8 @@ function build(): Record<string, PathogenPaper[]> {
   };
 
   // Walk the timeline, assigning each paper to the matching grid ids.
-  // We prefer the verbatim published `fullTitle` (added to content.json
-  // 2026-05-24) over the method nickname (`method`), so the dossier
+  // We prefer the verbatim published `fullTitle` over the method
+  // nickname (`method`), so the dossier
   // shows real paper titles rather than tool names. Falling back to
   // `method` keeps the lookup robust against future entries that haven't
   // been title-enriched yet.
@@ -271,7 +271,7 @@ function build(): Record<string, PathogenPaper[]> {
   // `journal` was added to every timeline entry in the 2026-05-24
   // consistency audit so all papers — derived + manual — render with
   // the publication name underneath the title.
-  for (const entry of research.timeline) {
+  for (const entry of TIMELINE) {
     const paper: PathogenPaper = {
       year: parseInt(entry.year, 10) || 0,
       authors: entry.authors,
