@@ -170,6 +170,9 @@ export interface ResearchTimelineEntry {
   year: string;
   type: string;
   method: string;
+  /** Verbatim published paper title — preferred display name in the
+   *  pathogen dossier. Falls back to `method` if absent. */
+  fullTitle?: string;
   authors: string;
   description: string;
   pathogens: ResearchTimelinePathogen[];

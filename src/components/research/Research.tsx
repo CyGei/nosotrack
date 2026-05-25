@@ -1,23 +1,30 @@
+"use client";
+
 /**
- * Research — pathogen specimen section (rev. 7, 2026-05-24).
+ * Research — pathogen specimen section.
  *
- * Stripped down to a single centred 3D specimen. The catalogue grid,
- * callouts, and SVG procedural pathogens are gone — we'll build the
- * lineup back up one pathogen at a time. SARS-CoV-2 ships first.
+ * Renders the entire pathogen catalogue at once as a responsive grid
+ * (see <PathogenGrid>). Each cell is a smaller auto-rotating 3D viewer,
+ * so the whole catalogue floats on the page with no interaction needed.
+ *
+ * The catalogue is declarative: `./pathogens/index.ts`. Adding a new
+ * specimen is a registry edit, not a component edit.
  *
  * Layout:
  *   - Section title (display, large) — "Pathogen agnostic, ready for
  *     disease X."
- *   - Centred 3D virion (raw Three.js, auto-rotates, palette grey body
- *     with red-shaded S-protein spikes).
- *
- * Per Cy 2026-05-24: no caption, no metadata, no copy. Visual only. We
- * layer on identity / data / refs in later passes.
+ *   - PathogenGrid (all specimens, smaller viewers, auto-rotating)
+ *   - Combined attribution footer (links the catalogue back to NIH 3D
+ *     Print Exchange / NIAID Visual & Medical Arts; per-specimen
+ *     attribution is preserved as a link on each name label).
  */
 
-import { Virion3D } from "./Virion3D";
+import { PathogenGrid } from "./PathogenGrid";
+import { PATHOGENS } from "./pathogens";
 
 export function Research() {
+  if (PATHOGENS.length === 0) return null;
+
   return (
     <section
       id="research"
@@ -30,21 +37,22 @@ export function Research() {
         </h2>
 
         <div className="mt-20">
-          <Virion3D />
-          {/* CC-BY 4.0 attribution — the GLB asset is the NIAID Visual &
-              Medical Arts virion (NIH 3D entry 3DPX-013323). License
-              requires visible credit. */}
-          <p className="mt-10 text-center font-mono text-[10px] uppercase tracking-[0.28em] text-faint">
-            Model ·{" "}
+          <PathogenGrid pathogens={PATHOGENS} />
+
+          {/* Combined attribution footer — per-specimen credit lives on
+              each grid card (the name label links to the source entry).
+              This line credits the upstream catalogue uniformly. */}
+          <p className="mt-16 text-center font-mono text-[10px] uppercase tracking-[0.28em] text-faint">
+            Models ·{" "}
             <a
-              href="https://3d.nih.gov/entries/3dpx-013323"
+              href="https://3d.nih.gov/"
               target="_blank"
               rel="noreferrer"
               className="underline-offset-4 hover:text-text hover:underline"
             >
-              NIAID Visual &amp; Medical Arts
+              NIH 3D Print Exchange
             </a>{" "}
-            · CC-BY 4.0
+            · NIAID Visual &amp; Medical Arts · CC-BY 4.0 / Public Domain
           </p>
         </div>
       </div>

@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "build:demo": "node scripts/build-demo.mjs"
+    "build:demo": "node scripts/build-demo.mjs",
+    "fetch:pathogen": "node scripts/fetch-pathogen.mjs",
+    "clean:pathogen-intermediates": "node scripts/clean-pathogen-intermediates.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
