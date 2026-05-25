@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NosoTrack Foundry Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    /* Embed-aware reset.
+       When loaded with ?embed=1 (from the parent site iframe) we drop the
+       fixed black centring layout and let the parent's frame paint around
+       us, so the demo blends into the host section.                       */
+    html, body {
+      margin: 0; padding: 0;
+      background: #fafafa;
+      color: #efeeef;
+      font-family: 'Inter Tight', sans-serif;
+      height: 100%;
+      overflow: hidden;
+    }
+    body { display: flex; align-items: center; justify-content: center; }
+    #root { width: 100vw; height: 100vh; }
+
+    /* Embed mode — invoked via ?embed=1 on the iframe src. */
+    body.embed { background: transparent; }
+
+    @keyframes fdyPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.4); }
+    }
+    @keyframes fdyDash {
+      to { stroke-dashoffset: -24; }
+    }
+    @keyframes fdyRingOut {
+      0% { transform: scale(0.4); opacity: 0.7; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+  </style>
+
+  <!-- Pre-boot: when embedded, mark <body class="embed"> so embed-only CSS
+       (transparent background) takes effect immediately. The play/pause/
+       seek/speed/restart bridge between this iframe and the host page is
+       owned by the Stage component in animations.jsx — see STAGE_EMBED. -->
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      if (!params.has('embed')) return;
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.classList.add('embed');
+      });
+    })();
+  </script>
+
+  <!-- React production builds (development used to pull development.js, which
+       is ~3× larger and runs slower). bundle.js is pre-compiled from the .jsx
+       sources by `npm run build:demo` — no in-browser Babel transform. -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Pre-compiled bundle: animations + common + foundry + dashboard + main, in order. -->
+  <script src="bundle.js"></script>
+</body>
+</html>

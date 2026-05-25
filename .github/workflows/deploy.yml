@@ -1,0 +1,71 @@
+name: Deploy to GitHub Pages
+
+# Build the Next.js static export and publish to GitHub Pages.
+# Trigger: every push to `main` (production) plus a manual button on the
+# Actions tab. PRs build but do NOT deploy — keeps preview pollution off
+# the live domain.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Pages-deploy requires write to id-token + pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deploy at a time; in-flight runs get cancelled by newer pushes.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build foundry-demo bundle
+        run: npm run build:demo
+
+      - name: Build Next.js static export
+        run: npm run build
+
+      - name: Copy CNAME into out/
+        # Required for the apex domain (nosotrack.com) to bind correctly.
+        # Pages strips a stale CNAME between deploys, so we re-emit it
+        # every build instead of relying on a hand-placed file.
+        run: cp CNAME out/CNAME
+
+      - name: Add .nojekyll
+        # GitHub Pages otherwise treats underscore-prefixed paths
+        # (Next.js writes `_next/`) as Jekyll directives and 404s them.
+        run: touch out/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

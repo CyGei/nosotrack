@@ -1,100 +1,104 @@
-# Deploy checklist — 2026-05-25 audit
+# Deploy checklist — 2026-05-25
 
-Run from the repo root. The sandbox can't `rm` files inside the mounted
-repo (overlay / uid mapping), so all delete + git operations are below.
+## 1. Pitch route fix (do this on `redesign-v4` before merging)
 
-## 1. Remove orphan files
+The old `public/pitch/` directory clashed with the `/pitch/` URL —
+Next's routing layer intercepts the trailing-slash path before public
+files resolve, so visitors hit a 404. The deck has been republished at
+`public/pitch-deck/`, and `src/app/pitch/page.tsx` now hosts it in a
+full-viewport iframe.
+
+Remove the old copy:
 
 ```bash
-# unused images
-rm public/images/shaun.jpg
-rm public/images/og-card.svg          # source SVG; .png is what layout.tsx ships
-
-# session-scratch left behind
-rm .Rhistory
-rm tsconfig.tsbuildinfo
-
-# one-shot script already executed
-rm scripts/cleanup-audit-2026-05-25.sh
-
-# sed backup from the pitch path-rewrite
-rm public/pitch/index.html.bak
-
-# stale build output (gitignored, but cleaning the working tree)
-rm -rf out/ .next/
+rm -rf public/pitch/         # contents have been duplicated into public/pitch-deck/
 ```
 
-## 2. Move source-only assets out of `public/`
-
-The website never references `public/brand/` (Nav is inline SVG,
-`<BrandWordmark />` is rendered text). The website never loads the
-foundry-demo `*.jsx` either — only `bundle.js`. Both were shipping ~320 KB
-of dead weight to GitHub Pages on every deploy.
-
-Canonical copies now live at repo root `/brand/` and `/foundry-demo-src/`
-(already in place, with a README in `/brand/`). Remove the public dupes:
+Then rebuild + smoke-test locally:
 
 ```bash
-rm -rf public/brand/
-rm public/foundry-demo/animations.jsx
-rm public/foundry-demo/common.jsx
-rm public/foundry-demo/dashboard.jsx
-rm public/foundry-demo/foundry.jsx
-rm public/foundry-demo/main.jsx
+npm run build
+npx serve out                # or any static server, e.g. python -m http.server -d out 8000
+# open http://localhost:3000/pitch/   — should now load the deck
 ```
 
-`public/foundry-demo/` will be left with just `index.html` + `bundle.js`,
-which is all the iframe actually needs.
+## 2. Merge to main
 
-## 3. Verify
-
-```bash
-npx tsc --noEmit            # should exit 0
-npm run build:demo          # rebuilds bundle.js from foundry-demo-src/
-npm run build               # produces ./out for GH Pages
-```
-
-Quick sanity checks once `out/` is built:
+Once `/pitch/` works locally:
 
 ```bash
-ls out/foundry-demo/                  # only index.html + bundle.js
-ls out/brand/ 2>/dev/null && echo "BAD — brand/ still being shipped"
-ls out/pitch/                         # index.html + styles.css + playbar.js + assets/
-```
-
-## 4. Commit
-
-```bash
-rm -f .git/index.lock                 # in case a stale lock is hanging around
+git checkout redesign-v4
 git add -A
-git status                            # eyeball the diff
-git commit -m "chore: pre-deploy audit — slim public/, add /privacy /terms /pitch routes"
+git commit -m "fix: serve pitch deck via Next route to avoid /pitch/ 404"
 git push origin redesign-v4
+
+git checkout main
+git merge redesign-v4
+git push origin main
 ```
 
-## What changed in this pass
+## 3. One-time GH Pages setup (only the first time after merging)
 
-**New:**
-- `src/app/privacy/page.tsx` — legal page, Next.js route, v4 design tokens
-- `src/app/terms/page.tsx` — legal page, Next.js route
-- `public/pitch/` — full ITCAI pitch deck rehydrated as static HTML (66 KB
-  HTML + 66 KB CSS + 8 KB JS + 140 KB image)
-- `/brand/` (repo root) — canonical brand lockups + icons, kept in git
-  but not deployed
-- `/foundry-demo-src/` (repo root) — JSX source for the demo iframe,
-  edited here, compiled to `public/foundry-demo/bundle.js`
-- `/brand/README.md` — explains why the brand files moved
-- `DEPLOY_CHECKLIST.md` — this file
+A new GitHub Actions workflow handles the deploy:
+`.github/workflows/deploy.yml`. It runs on every push to `main`, builds
+the Next.js static export, copies `CNAME` into `out/`, adds `.nojekyll`
+(so Pages doesn't 404 the `_next/` chunks), and publishes.
 
-**Edited:**
-- `scripts/build-demo.mjs` — reads from `foundry-demo-src/`, writes
-  bundle.js to `public/foundry-demo/`
-- `src/components/footer/Footer.tsx` — footer links now point to
-  `/privacy/`, `/terms/`, `/pitch/` (were `privacy.html` / `terms.html`)
-- `.gitignore` — added `.Rhistory`
+Before it can run successfully, configure the repository once:
 
-**Net deploy-size delta:**
-- −320 KB (foundry-demo `*.jsx` + `public/brand/` out of `public/`)
-- −172 KB (shaun.jpg + og-card.svg)
-- +352 KB (pitch deck restored)
-- Total: ~140 KB *smaller* deploy footprint, plus three pages back.
+1. Open the repo on github.com → **Settings → Pages**
+2. Under **Source**, choose **GitHub Actions** (NOT "Deploy from a
+   branch"). This is the change — the old setup served from `main`
+   root, but Next puts everything in `out/`, so we have to deploy via
+   Actions instead.
+3. Save.
+
+That's it. Push to `main` and the workflow will deploy.
+
+## 4. Watch the first deploy
+
+After the merge push:
+
+1. Open the repo → **Actions** tab
+2. Click the running "Deploy to GitHub Pages" workflow
+3. The `build` job takes ~2 min, `deploy` takes ~30 s
+4. When it goes green, https://nosotrack.com should serve the new build
+   within a minute (Pages caches briefly)
+
+If the workflow fails, the log says exactly which step broke. Most
+common issues:
+- **`npm ci` fails** — `package-lock.json` out of sync with
+  `package.json`. Run `npm install` locally and commit the lockfile.
+- **Build fails** — same error you'd see locally. Run `npm run build`
+  on your machine, fix the issue, push.
+- **Deploy step succeeds but the site shows the old version** — Pages
+  caches at the CDN for ~60 s. Wait and reload.
+
+## 5. After-merge sanity check (~2 min after deploy)
+
+Visit each route on https://nosotrack.com :
+- `/` — home
+- `/privacy/` — privacy policy
+- `/terms/` — terms of use
+- `/pitch/` — ITCAI pitch deck (vertical scroll-snap; arrow keys / pgup / pgdn)
+- `/foundry-demo/index.html?embed=1` — the iframe demo (shouldn't be visited directly, but worth confirming it loads)
+
+If anything 404s on production but works locally, double-check that
+`CNAME` made it into `out/` (the workflow's "Copy CNAME" step) and
+that the Pages settings point to **GitHub Actions**, not a branch.
+
+—
+
+## Reference: what changed in this audit pass
+
+**Deploy footprint (post-cleanup):** ~12 MB total, ~8.5 MB of which is
+the pathogen `.glb` library you knowingly ship. Application + pitch +
+foundry-demo + new legal routes account for the remaining ~3.5 MB.
+
+**New routes:** `/privacy/`, `/terms/`, `/pitch/`.
+
+**Source-only directories now living OUTSIDE `public/`** (kept in git,
+not deployed):
+- `/brand/` — canonical lockup PNGs + SVGs
+- `/foundry-demo-src/` — JSX source for the demo iframe (compiled by
+  `npm run build:demo` into `public/foundry-demo/bundle.js`)
