@@ -15,6 +15,7 @@ import type { PathogenSpec } from "./types";
 export const CDIFF: PathogenSpec = {
   id: "cdiff",
   name: "C. difficile",
+  common: "C. difficile infection (CDI)",
   shortLabel: "C. diff",
   modelUrl: "/models/c-diff.glb",
   framing: { cameraZ: 6.5, tiltX: 0.18 },

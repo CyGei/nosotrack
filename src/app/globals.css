@@ -212,6 +212,16 @@ html {
   color: var(--color-inv-hi);
 }
 
+/* Hide scrollbar but keep scroll behaviour — used by the pathogen ticker
+   so the auto-drifting strip doesn't show a horizontal scrollbar under
+   a row of floating specimens. */
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chromium, Safari */
+}
+
 /* =========================================================================
    Nav link underline — grows from 0 to 100% width on hover, ported from
    main branch legacy/styles.css §nav `.nav-links a:not(.nav-cta)::after`.

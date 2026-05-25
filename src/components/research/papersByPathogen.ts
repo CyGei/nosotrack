@@ -40,8 +40,11 @@ export type PathogenPaper = {
    */
   kind: "method" | "application";
   /**
-   * Optional journal name for the secondary line — only set on manually-
-   * curated entries; timeline-derived entries leave this undefined.
+   * Journal name shown on the secondary line. Populated for every entry
+   * (timeline-derived and manually curated) as of the 2026-05-24 audit
+   * pass — the dossier looks inconsistent when some papers carry a
+   * journal and others don't, so the type still permits `undefined`
+   * but the lookup itself fills every paper.
    */
   journal?: string;
 };
@@ -264,6 +267,10 @@ function build(): Record<string, PathogenPaper[]> {
   // shows real paper titles rather than tool names. Falling back to
   // `method` keeps the lookup robust against future entries that haven't
   // been title-enriched yet.
+  //
+  // `journal` was added to every timeline entry in the 2026-05-24
+  // consistency audit so all papers — derived + manual — render with
+  // the publication name underneath the title.
   for (const entry of research.timeline) {
     const paper: PathogenPaper = {
       year: parseInt(entry.year, 10) || 0,
@@ -271,6 +278,7 @@ function build(): Record<string, PathogenPaper[]> {
       title: entry.fullTitle ?? entry.method,
       url: entry.reference_url,
       kind: entry.type === "application" ? "application" : "method",
+      journal: entry.journal,
     };
 
     const hasBroadcast = entry.pathogens.some(

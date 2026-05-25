@@ -11,8 +11,11 @@
  *       · body   — left: pathogen viewer + name (+ optional disease
  *                  subtitle) + NIH attribution where applicable.
  *                  right: scrollable paper list (year · authors · title ·
- *                  journal). Single-column layout when papers is empty
- *                  (e.g. Disease X) — the right column is omitted entirely.
+ *                  journal). For Disease X the right column instead
+ *                  shows the WHO R&D Blueprint definition + priority-
+ *                  diseases context + source link (see <DiseaseXBody>).
+ *                  Single-column layout only when neither papers nor a
+ *                  special right body apply.
  *
  * Interaction:
  *   - Esc closes
@@ -38,9 +41,16 @@ type Props = {
   onClose: () => void;
 };
 
+const WHO_DISEASE_X_URL =
+  "https://www.who.int/activities/prioritizing-diseases-for-research-and-development-in-emergency-contexts";
+
 export function PathogenDossier({ pathogen, onClose }: Props) {
   const papers = papersFor(pathogen.id);
   const hasPapers = papers.length > 0;
+  const isDiseaseX = pathogen.id === "disease-x";
+  // The right column is present whenever there's papers OR a special
+  // per-pathogen body (Disease X).
+  const hasRightBody = hasPapers || isDiseaseX;
   // Real NIH 3D entries — show source link. AI specimens are hidden.
   const isNih = pathogen.source.nih3dEntryId.startsWith("3DPX-");
 
@@ -75,10 +85,11 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
         className={[
           "relative w-full max-w-[1080px] max-h-[88vh] overflow-hidden",
           "bg-bg border border-rule-strong",
-          // When there are no papers (Disease X), narrow the card so the
-          // lone left column doesn't look stranded inside an empty 1080px
-          // shell.
-          hasPapers ? "" : "max-w-[560px]",
+          // Narrow the card when there's no right column at all so the
+          // lone left column doesn't look stranded inside an empty
+          // 1080px shell. Disease X gets the WHO body in the right
+          // column, so it keeps the full width.
+          hasRightBody ? "" : "max-w-[560px]",
           "grid grid-rows-[auto_1fr]",
           "animate-[dossierIn_240ms_cubic-bezier(0.16,1,0.3,1)]",
         ].join(" ")}
@@ -103,14 +114,14 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
         <div
           className={[
             "overflow-hidden grid grid-cols-1",
-            hasPapers ? "md:grid-cols-[minmax(280px,420px)_1fr]" : "",
+            hasRightBody ? "md:grid-cols-[minmax(280px,420px)_1fr]" : "",
           ].join(" ")}
         >
           {/* Left — viewer + name */}
           <div
             className={[
               "p-6 flex flex-col",
-              hasPapers
+              hasRightBody
                 ? "border-b md:border-b-0 md:border-r border-rule"
                 : "",
             ].join(" ")}
@@ -149,7 +160,7 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
             )}
           </div>
 
-          {/* Right — papers (omitted when none) */}
+          {/* Right — papers, or the Disease X / WHO callout. */}
           {hasPapers && (
             <div className="overflow-y-auto p-6 sm:p-8">
               <ul className="list-none p-0">
@@ -157,6 +168,11 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
                   <PaperRow key={p.url} paper={p} />
                 ))}
               </ul>
+            </div>
+          )}
+          {!hasPapers && isDiseaseX && (
+            <div className="overflow-y-auto p-6 sm:p-8">
+              <DiseaseXBody />
             </div>
           )}
         </div>
@@ -180,6 +196,41 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
 
 /* ────────────────────────────────────────────── components ── */
 
+/**
+ * DiseaseXBody — WHO R&D Blueprint definition, priority-diseases
+ * context, and source link. Renders in the right column of the dossier
+ * for the special-case `disease-x` pathogen (which has no paper list).
+ */
+function DiseaseXBody() {
+  return (
+    <div>
+      <blockquote className="font-display font-medium text-ink leading-[1.25] text-[clamp(18px,1.6vw,24px)] tracking-tight">
+        “Disease X represents the knowledge that a serious international
+        epidemic could be caused by a pathogen currently unknown to cause
+        human disease.”
+      </blockquote>
+      <p className="mt-7 text-text text-[14px] leading-[1.65]">
+        Listed alongside COVID-19, Ebola and Marburg, Lassa fever, MERS-CoV
+        and SARS, Nipah, Rift Valley fever, and Zika as priority pathogens
+        for emergency research and development.
+      </p>
+      <a
+        href={WHO_DISEASE_X_URL}
+        target="_blank"
+        rel="noreferrer"
+        className={[
+          "mt-7 inline-flex items-center gap-2",
+          "font-mono text-[11px] uppercase tracking-[0.22em] text-text",
+          "underline-offset-4 hover:text-[var(--color-alert)] hover:underline",
+        ].join(" ")}
+      >
+        WHO source
+        <span aria-hidden>→</span>
+      </a>
+    </div>
+  );
+}
+
 function PaperRow({ paper }: { paper: PathogenPaper }) {
   return (
     <li className="border-b border-rule">
@@ -196,7 +247,15 @@ function PaperRow({ paper }: { paper: PathogenPaper }) {
           <span className="font-mono text-[11px] tracking-[0.18em] text-ink">
             {paper.year}
           </span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-faint truncate">
+          <span
+            className={[
+              "font-mono text-[10px] uppercase tracking-[0.22em] truncate",
+              // Author name carries the affordance — fades to alert-red
+              // on row hover. Replaces the old explicit "Read paper →"
+              // chip (removed 2026-05-24) so the row reads cleaner.
+              "text-faint group-hover:text-[var(--color-alert)] transition-colors",
+            ].join(" ")}
+          >
             {paper.authors}
           </span>
         </div>
@@ -208,15 +267,6 @@ function PaperRow({ paper }: { paper: PathogenPaper }) {
             {paper.journal}
           </p>
         )}
-        <span
-          aria-hidden
-          className={[
-            "mt-2 inline-block font-mono text-[10px] uppercase tracking-[0.28em]",
-            "text-faint group-hover:text-[var(--color-alert)] transition-colors",
-          ].join(" ")}
-        >
-          Read paper →
-        </span>
       </a>
     </li>
   );

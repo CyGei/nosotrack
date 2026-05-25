@@ -15,6 +15,7 @@ import type { PathogenSpec } from "./types";
 export const ENTEROCOCCUS: PathogenSpec = {
   id: "enterococcus",
   name: "Enterococcus",
+  common: "VRE & enterococcal infection",
   shortLabel: "Enterococcus",
   modelUrl: "/models/enterococcus.glb",
   framing: { cameraZ: 6.2, tiltX: 0.18 },

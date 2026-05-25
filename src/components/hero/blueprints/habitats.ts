@@ -50,8 +50,18 @@ import {
   SHIP_ATRIUM,
   SHIP_DINING,
 } from "./CruiseShip";
+import {
+  FARM_PASTURE,
+  FARM_STALLS,
+  FARM_HOLDING,
+  FARM_PARLOR,
+  FARM_CALVES,
+  FARM_MILK_ROOM,
+  FARM_ALLEY,
+} from "./Farm";
 
 export type HabitatMotion = "corridor-h" | "corridor-v";
+export type HabitatShape = "circle" | "square" | "triangle";
 
 export type Habitat = {
   id: string;
@@ -63,6 +73,10 @@ export type Habitat = {
   neighbours: string[];
   /** When set, particles here behave as corridor walkers. */
   motion?: HabitatMotion;
+  /** When set, every particle in this habitat renders as this shape
+   *  (overrides the rotating shape pool). Used to mark a population
+   *  semantically — e.g. farm staff are always triangles. */
+  forceShape?: HabitatShape;
 };
 
 /* ─────────────────────────  HOSPITAL  ───────────────────────── */
@@ -327,3 +341,117 @@ ship.push({
 });
 
 export const SHIP_HABITATS: Habitat[] = ship;
+
+/* ─────────────────────────  FARM  ─────────────────────────
+ * Six habitat zones + one corridor:
+ *   · pasture (big, ~25 cattle clustering — index population)
+ *   · free stalls (top barn row)
+ *   · holding pen   ─┐
+ *   · milking parlor ─┤  bottleneck for transmission
+ *   · calf housing
+ *   · milk room (no cattle — equipment only)
+ *   · service alley (corridor-h, triangles = staff)
+ *
+ * Pasture and the service alley share a long edge, so staff walking
+ * past the paddock can carry contact into the barn. The parlor is
+ * downstream of holding, mirroring the real-world bottleneck.
+ */
+
+const FARM_INSET = 14;
+const FARM_TITLE_INSET = 30; // extra top inset under zone labels
+
+const PASTURE_ID = "farm-pasture";
+const STALLS_ID = "farm-stalls";
+const HOLDING_ID = "farm-holding";
+const PARLOR_ID = "farm-parlor";
+const CALVES_ID = "farm-calves";
+const MILK_ROOM_ID = "farm-milkroom";
+const ALLEY_ID = "farm-alley";
+
+const farm: Habitat[] = [
+  {
+    id: PASTURE_ID,
+    x: FARM_PASTURE.x + FARM_INSET,
+    y: FARM_PASTURE.y + FARM_TITLE_INSET,
+    w: FARM_PASTURE.w - FARM_INSET * 2,
+    h: FARM_PASTURE.h - FARM_TITLE_INSET - FARM_INSET,
+    count: 24,
+    neighbours: [STALLS_ID, ALLEY_ID],
+  },
+  {
+    id: STALLS_ID,
+    x: FARM_STALLS.x + FARM_INSET,
+    y: FARM_STALLS.y + FARM_TITLE_INSET,
+    w: FARM_STALLS.w - FARM_INSET * 2,
+    h: FARM_STALLS.h - FARM_TITLE_INSET - FARM_INSET,
+    count: 6,
+    neighbours: [HOLDING_ID, ALLEY_ID],
+  },
+  {
+    id: HOLDING_ID,
+    x: FARM_HOLDING.x + FARM_INSET,
+    y: FARM_HOLDING.y + FARM_TITLE_INSET,
+    w: FARM_HOLDING.w - FARM_INSET * 2,
+    h: FARM_HOLDING.h - FARM_TITLE_INSET - FARM_INSET,
+    count: 5,
+    neighbours: [STALLS_ID, PARLOR_ID, ALLEY_ID],
+  },
+  {
+    id: PARLOR_ID,
+    x: FARM_PARLOR.x + FARM_INSET,
+    y: FARM_PARLOR.y + FARM_TITLE_INSET,
+    w: FARM_PARLOR.w - FARM_INSET * 2,
+    h: FARM_PARLOR.h - FARM_TITLE_INSET - FARM_INSET,
+    count: 3,
+    neighbours: [HOLDING_ID, MILK_ROOM_ID, ALLEY_ID],
+  },
+  {
+    id: CALVES_ID,
+    x: FARM_CALVES.x + FARM_INSET,
+    y: FARM_CALVES.y + FARM_TITLE_INSET,
+    w: FARM_CALVES.w - FARM_INSET * 2,
+    h: FARM_CALVES.h - FARM_TITLE_INSET - FARM_INSET,
+    count: 6,
+    neighbours: [ALLEY_ID, MILK_ROOM_ID],
+  },
+  {
+    id: MILK_ROOM_ID,
+    x: FARM_MILK_ROOM.x + FARM_INSET,
+    y: FARM_MILK_ROOM.y + FARM_TITLE_INSET,
+    w: FARM_MILK_ROOM.w - FARM_INSET * 2,
+    h: FARM_MILK_ROOM.h - FARM_TITLE_INSET - FARM_INSET,
+    // Milk room is equipment-only — no cattle live here. Still kept as a
+    // habitat so it can act as a neighbour relay between parlor + calves.
+    count: 0,
+    neighbours: [PARLOR_ID, CALVES_ID, ALLEY_ID],
+  },
+  {
+    id: ALLEY_ID,
+    x: FARM_ALLEY.x + 12,
+    y: FARM_ALLEY.y + 10,
+    w: FARM_ALLEY.w - 24,
+    h: FARM_ALLEY.h - 20,
+    count: 5,
+    motion: "corridor-h",
+    forceShape: "triangle",
+    neighbours: [
+      PASTURE_ID,
+      STALLS_ID,
+      HOLDING_ID,
+      PARLOR_ID,
+      CALVES_ID,
+      MILK_ROOM_ID,
+    ],
+  },
+];
+
+export const FARM_HABITATS: Habitat[] = farm;
+export const FARM_IDS = {
+  PASTURE: PASTURE_ID,
+  STALLS: STALLS_ID,
+  HOLDING: HOLDING_ID,
+  PARLOR: PARLOR_ID,
+  CALVES: CALVES_ID,
+  MILK_ROOM: MILK_ROOM_ID,
+  ALLEY: ALLEY_ID,
+} as const;

@@ -246,7 +246,8 @@ export function HospitalBlueprint({ className, style }: Props) {
         <line x1={890} y1={500} x2={890} y2={570} stroke={strokeFaint} />
       </g>
 
-      {/* Title — primary line + dimmed sub-line */}
+      {/* Title — primary line (top-left) + dimmed sub-line (top-right).
+          Split so the metadata never overlays the floor plan below. */}
       <g fontFamily="var(--font-mono)">
         <text
           x="60"
@@ -259,8 +260,9 @@ export function HospitalBlueprint({ className, style }: Props) {
           ACUTE CARE HOSPITAL
         </text>
         <text
-          x="60"
-          y="74"
+          x="940"
+          y="52"
+          textAnchor="end"
           fontSize="11"
           letterSpacing="0.22em"
           fill={textFaint}

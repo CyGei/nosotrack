@@ -177,6 +177,11 @@ export interface ResearchTimelineEntry {
   description: string;
   pathogens: ResearchTimelinePathogen[];
   reference_url: string;
+  /** Journal of publication — surfaced as a secondary line under the
+   *  title in the pathogen dossier. Every timeline entry should set
+   *  this so the per-pathogen paper list reads consistently with the
+   *  manually-curated additions in `papersByPathogen.ts`. */
+  journal?: string;
 }
 
 // The new pathogen-grid spec from DESIGN_BRIEF §8. Hand-authored or built

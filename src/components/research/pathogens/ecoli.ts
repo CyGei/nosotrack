@@ -21,6 +21,7 @@ import type { PathogenSpec } from "./types";
 export const ECOLI: PathogenSpec = {
   id: "ecoli",
   name: "E. coli",
+  common: "Diarrhoeal & urinary tract infection",
   shortLabel: "E. coli",
   modelUrl: "/models/ecoli.glb",
   framing: {

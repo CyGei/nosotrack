@@ -14,6 +14,7 @@ import type { PathogenSpec } from "./types";
 export const CAURIS: PathogenSpec = {
   id: "cauris",
   name: "C. auris",
+  common: "Invasive candidiasis",
   shortLabel: "C. auris",
   modelUrl: "/models/c-auris.glb",
   framing: { cameraZ: 6.2, tiltX: 0.18 },

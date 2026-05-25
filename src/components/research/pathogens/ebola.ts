@@ -21,6 +21,7 @@ import type { PathogenSpec } from "./types";
 export const EBOLA: PathogenSpec = {
   id: "ebola",
   name: "Ebola virus",
+  common: "Ebola virus disease",
   shortLabel: "Ebola",
   modelUrl: "/models/ebola-virion.glb",
   framing: { tiltX: 0.28 },

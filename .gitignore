@@ -11,3 +11,10 @@ out/
 # OS / editor
 .idea/
 .vscode/
+
+# Pathogen-pipeline intermediates (kept out of git — only the
+# optimized public/models/<slug>.glb gets shipped).
+public/models/*.raw.*
+public/models/*.small.*
+public/models/*.converted.glb
+public/models/*.original.glb

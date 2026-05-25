@@ -14,6 +14,7 @@ import type { PathogenSpec } from "./types";
 export const NOROVIRUS: PathogenSpec = {
   id: "norovirus",
   name: "Norovirus",
+  common: "Acute gastroenteritis",
   shortLabel: "Norovirus",
   modelUrl: "/models/norovirus.glb",
   framing: { cameraZ: 6.0, tiltX: 0.2 },

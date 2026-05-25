@@ -16,6 +16,7 @@ import type { PathogenSpec } from "./types";
 export const KLEBSIELLA: PathogenSpec = {
   id: "klebsiella",
   name: "K. pneumoniae",
+  common: "Pneumonia & bloodstream infection",
   shortLabel: "K. pneumoniae",
   modelUrl: "/models/k-pneumoniae.glb",
   framing: { cameraZ: 6.5, tiltX: 0.18 },

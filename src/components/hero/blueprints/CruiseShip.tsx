@@ -77,7 +77,9 @@ export function CruiseShipBlueprint({ className, style }: Props) {
       style={style}
       aria-hidden="true"
     >
-      {/* ───────────────  TITLE  ─────────────── */}
+      {/* ───────────────  TITLE  ───────────────
+           Primary line (top-left) + dimmed sub-line (top-right), so the
+           metadata never crowds into the deck plan below. */}
       <g fontFamily="var(--font-mono)">
         <text
           x="60"
@@ -90,8 +92,9 @@ export function CruiseShipBlueprint({ className, style }: Props) {
           CARIBBEAN CRUISE
         </text>
         <text
-          x="60"
-          y="74"
+          x="940"
+          y="52"
+          textAnchor="end"
           fontSize="11"
           letterSpacing="0.22em"
           fill={textFaint}

@@ -25,11 +25,15 @@
 import { useEffect, useRef, useState } from "react";
 import { HospitalBlueprint } from "./blueprints/Hospital";
 import { CruiseShipBlueprint } from "./blueprints/CruiseShip";
+import { FarmBlueprint } from "./blueprints/Farm";
 import {
   HOSPITAL_HABITATS,
   SHIP_HABITATS,
+  FARM_HABITATS,
+  FARM_IDS,
   type Habitat,
   type HabitatMotion,
+  type HabitatShape,
 } from "./blueprints/habitats";
 
 const SCENE_MS = 14_000;
@@ -45,7 +49,7 @@ const SEED_AFTER_MS = 800;
 const CROSS_HAB_EVERY_MS = 2200;
 const CORRIDOR_SPEED = 0.55; // viewBox units / frame — gentle walking pace
 
-type Shape = "circle" | "square" | "triangle";
+type Shape = HabitatShape;
 
 type Particle = {
   x: number;
@@ -64,8 +68,14 @@ const COLOR_INFECT = "rgba(255,7,58,0.98)";
 const COLOR_EDGE = "rgba(239,238,239,0.22)";
 const COLOR_EDGE_HOT = "rgba(255,7,58,0.78)";
 
-type SceneId = "hospital" | "ship";
-const SCENES: SceneId[] = ["hospital", "ship"];
+type SceneId = "hospital" | "ship" | "farm";
+const SCENES: SceneId[] = ["hospital", "ship", "farm"];
+
+const HABITATS_BY_SCENE: Record<SceneId, Habitat[]> = {
+  hospital: HOSPITAL_HABITATS,
+  ship: SHIP_HABITATS,
+  farm: FARM_HABITATS,
+};
 
 export function HeroBackdrop() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -94,7 +104,7 @@ export function HeroBackdrop() {
 
   // Build particle population + neighbour lookup when scene changes.
   useEffect(() => {
-    const habitats = scene === "hospital" ? HOSPITAL_HABITATS : SHIP_HABITATS;
+    const habitats = HABITATS_BY_SCENE[scene];
     const neighSet = new Map<string, Set<string>>();
     for (const h of habitats) {
       neighSet.set(h.id, new Set([h.id, ...h.neighbours]));
@@ -102,12 +112,12 @@ export function HeroBackdrop() {
     neighbourSetRef.current = neighSet;
     const ps = makeParticles(habitats);
 
-    // Hospital — pre-seed a visible outbreak cluster in adjacent south
-    // rooms so the scene opens on a recognisable hotspot, not a vague
-    // single dot. Cross-corridor transmission gives one north-room
-    // contact + a corridor walker carrying the chain.
+    // Pre-seed a visible outbreak cluster so every scene opens on a
+    // recognisable hotspot rather than a vague single dot.
     if (scene === "hospital") {
       seedHospitalCluster(ps);
+    } else if (scene === "farm") {
+      seedFarmCluster(ps);
     }
 
     particlesRef.current = ps;
@@ -343,6 +353,15 @@ export function HeroBackdrop() {
       >
         <CruiseShipBlueprint className="h-full w-full" />
       </div>
+      <div
+        className="absolute inset-0 transition-opacity ease-[var(--ease-nt)]"
+        style={{
+          opacity: scene === "farm" ? 1 : 0,
+          transitionDuration: `${FADE_MS}ms`,
+        }}
+      >
+        <FarmBlueprint className="h-full w-full" />
+      </div>
       <canvas
         ref={canvasRef}
         className="absolute inset-0"
@@ -436,6 +455,9 @@ function makeParticles(habitats: Habitat[]): Particle[] {
       const dir = i % 2 === 0 ? 1 : -1;
       const vx = isCorrH ? dir * CORRIDOR_SPEED : (Math.random() - 0.5) * 0.35;
       const vy = isCorrV ? dir * CORRIDOR_SPEED : (Math.random() - 0.5) * 0.35;
+      // Shape: respect habitat-level override (e.g. farm staff are
+      // always triangles); otherwise fall back to the rotating pool.
+      const shape: Shape = hab.forceShape ?? pickShape(seed++);
       out.push({
         x,
         y,
@@ -444,10 +466,43 @@ function makeParticles(habitats: Habitat[]): Particle[] {
         infected: false,
         habitat: hab,
         habitatId: hab.id,
-        shape: pickShape(seed++),
+        shape,
         corridor: hab.motion,
       });
     }
   }
   return out;
+}
+
+/**
+ * Pre-seed a small outbreak in the dairy scene.
+ * Strategy:
+ *   - Infect a couple of cattle in the holding pen (where the herd
+ *     congregates before milking — a real-world bottleneck).
+ *   - Infect a couple in the parlor (next step in the flow), implying
+ *     transmission already crossed via shared equipment.
+ *   - Infect one service-alley staff member (triangle) as the index
+ *     vector linking the barn back to the pasture.
+ */
+function seedFarmCluster(ps: Particle[]) {
+  const ROOM_TARGETS = new Set<string>([FARM_IDS.HOLDING, FARM_IDS.PARLOR]);
+  for (const p of ps) {
+    if (ROOM_TARGETS.has(p.habitatId)) p.infected = true;
+  }
+  // Pick the staff walker currently nearest the holding pen — they're
+  // the index case carrying the pathogen between paddock and barn.
+  const staff = ps.filter((p) => p.habitatId === FARM_IDS.ALLEY);
+  if (staff.length > 0) {
+    const targetX = 640; // roughly under the holding pen
+    let nearest = staff[0];
+    let best = Math.abs(nearest.x - targetX);
+    for (const s of staff) {
+      const d = Math.abs(s.x - targetX);
+      if (d < best) {
+        nearest = s;
+        best = d;
+      }
+    }
+    nearest.infected = true;
+  }
 }

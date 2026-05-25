@@ -36,9 +36,10 @@ function makeCursorPath(logoX, logoY) {
     // begins.
     { t: 0.0,  x: 1400, y: 800 },
     // Cursor pops into view just below-right of the logo, then makes a
-    // very short hop to click. Total visible walk ≈ 0.4 s.
-    { t: 1.1,  x: logoX + 180, y: logoY + 140 },
-    { t: 1.5,  x: logoX, y: logoY, click: true },  // arrive + click logo
+    // short hop to click. Whole intro (3 alerts + hop + click) wraps
+    // inside ~2 s of stage time.
+    { t: 1.4,  x: logoX + 180, y: logoY + 140 },
+    { t: 2.0,  x: logoX, y: logoY, click: true },  // arrive + click logo
     { t: 4.0,  x: logoX, y: logoY },               // hold while collapse + expand
     // Drill into A3.
     { t: 6.5,  x: 470,  y: 400 },
@@ -257,11 +258,11 @@ function DashboardScene({ logoX = LOGO_X, logoY = LOGO_Y } = {}) {
   const { localTime: t } = useSprite();
 
   // Cursor stays hidden until ~lt 1.0 — it only appears for the brief
-  // hop to the logo, no long approach. Fade in over 0.2 s; hidden check
+  // hop to the logo, no long approach. Fade in over 0.3 s; hidden check
   // below trips at cursorVisP >= 0.5.
-  const cursorVisP   = clamp((t - 1.0) / 0.2, 0, 1);
-  // Dashboard frame expands FROM (LOGO_X, LOGO_Y) starting at lt 2.0
-  const dashOpen     = clamp((t - 2.0) / 1.8, 0, 1);
+  const cursorVisP   = clamp((t - 1.0) / 0.3, 0, 1);
+  // Dashboard frame expands FROM (LOGO_X, LOGO_Y) starting at lt 2.4
+  const dashOpen     = clamp((t - 2.4) / 1.8, 0, 1);
   const treeP        = clamp((t - 4.5) / 2.4, 0, 1);
   const popupP       = clamp((t - 8.7) / 0.8, 0, 1);
   const popupOutP    = clamp((t - 13.0) / 0.6, 0, 1);
@@ -1041,9 +1042,10 @@ function StrategyDrawer({ p, deployClickP }) {
 function NotificationLogo({ logoX = 640, logoY = 360 } = {}) {
   const { localTime: t } = useSprite();
 
-  // Notification counter — starts at 0, increments through 1..4.
-  // 0.6 s apart so all four alerts land before the cursor reaches the logo.
-  const incrementTimes = [0.3, 0.9, 1.5, 2.1];
+  // Notification counter — starts at 0, increments through 1..3.
+  // Paced so the three alerts breathe inside a ~2-second intro and the
+  // cursor click lands shortly after the third badge.
+  const incrementTimes = [0.2, 0.8, 1.4];
   let count = 0;
   for (let i = 0; i < incrementTimes.length; i++) {
     if (t >= incrementTimes[i]) count = i + 1;
@@ -1055,18 +1057,19 @@ function NotificationLogo({ logoX = 640, logoY = 360 } = {}) {
     badgeScale = 1 + 0.35 * Math.exp(-dt * 8);
   }
 
-  // Synchronise with DashboardScene cursor: cursor clicks at its lt 1.5,
-  // which in EndToEndLoop is stage_t = 6.5. NotificationLogo's Sprite
-  // starts at stage_t = 0 so its lt 6.5 = the click moment.
-  const CLICK_T = 6.5;
+  // Synchronise with DashboardScene cursor: cursor clicks at its lt 2.0,
+  // which in EndToEndLoop is stage_t = 2.0 (DashboardScene starts at
+  // stage_t 0). NotificationLogo's Sprite starts at stage_t = 0 so its
+  // lt 2.0 = the click moment.
+  const CLICK_T = 2.0;
   const networkSpin = t > CLICK_T
     ? Easing.easeInOutCubic(clamp((t - CLICK_T) / 1.0, 0, 1)) * 360
     : 0;
 
-  // Collapse begins ~1 s after the click, matching the original
-  // FoundryStack collapse (lt 22 vs click at lt 21).
-  const COLLAPSE_T = 7.5;
-  const collapseP = clamp((t - COLLAPSE_T) / 1.5, 0, 1);
+  // Collapse begins just after the click — the whole intro (3 alerts +
+  // click + collapse) wraps inside ~3 s of stage time.
+  const COLLAPSE_T = 2.2;
+  const collapseP = clamp((t - COLLAPSE_T) / 1.2, 0, 1);
   const collapseScale = 1 - collapseP * 0.95;
   const collapseOp = 1 - collapseP;
 

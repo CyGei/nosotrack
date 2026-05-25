@@ -288,7 +288,8 @@
             "icon": "🐄"
           }
         ],
-        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2599933/"
+        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2599933/",
+        "journal": "Proceedings of the Royal Society B"
       },
       {
         "year": "2011",
@@ -319,7 +320,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3183872/"
+        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3183872/",
+        "journal": "Heredity"
       },
       {
         "year": "2012",
@@ -335,7 +337,8 @@
             "icon": "🐔"
           }
         ],
-        "reference_url": "https://pubmed.ncbi.nlm.nih.gov/23230058/"
+        "reference_url": "https://pubmed.ncbi.nlm.nih.gov/23230058/",
+        "journal": "Proceedings of the Royal Society B"
       },
       {
         "year": "2013",
@@ -351,7 +354,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://royalsocietypublishing.org/doi/10.1098/rsif.2012.0955"
+        "reference_url": "https://royalsocietypublishing.org/doi/10.1098/rsif.2012.0955",
+        "journal": "Journal of the Royal Society Interface"
       },
       {
         "year": "2014",
@@ -382,7 +386,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457"
+        "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003457",
+        "journal": "PLOS Computational Biology"
       },
       {
         "year": "2015",
@@ -403,7 +408,8 @@
             "icon": "🐔"
           }
         ],
-        "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004613"
+        "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004613",
+        "journal": "PLOS Computational Biology"
       },
       {
         "year": "2015",
@@ -429,7 +435,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://academic.oup.com/inthealth/article/7/2/130/663364"
+        "reference_url": "https://academic.oup.com/inthealth/article/7/2/130/663364",
+        "journal": "International Health"
       },
       {
         "year": "2017",
@@ -460,7 +467,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://academic.oup.com/mbe/article/34/4/997/2919386"
+        "reference_url": "https://academic.oup.com/mbe/article/34/4/997/2919386",
+        "journal": "Molecular Biology and Evolution"
       },
       {
         "year": "2017",
@@ -491,7 +499,8 @@
             "icon": "🐔"
           }
         ],
-        "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005495"
+        "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005495",
+        "journal": "PLOS Computational Biology"
       },
       {
         "year": "2018",
@@ -517,7 +526,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2330-z"
+        "reference_url": "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2330-z",
+        "journal": "BMC Bioinformatics"
       },
       {
         "year": "2018",
@@ -533,7 +543,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://journals.plos.org/plospathogens/article?id=10.1371/journal.ppat.1006885"
+        "reference_url": "https://journals.plos.org/plospathogens/article?id=10.1371/journal.ppat.1006885",
+        "journal": "PLOS Pathogens"
       },
       {
         "year": "2019",
@@ -559,7 +570,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006930"
+        "reference_url": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006930",
+        "journal": "PLOS Computational Biology"
       },
       {
         "year": "2020",
@@ -575,7 +587,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://academic.oup.com/bioinformatics/article/36/Supplement_1/i362/5870507"
+        "reference_url": "https://academic.oup.com/bioinformatics/article/36/Supplement_1/i362/5870507",
+        "journal": "Bioinformatics"
       },
       {
         "year": "2020",
@@ -596,7 +609,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8212962/"
+        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8212962/",
+        "journal": "Statistical Applications in Genetics and Molecular Biology"
       },
       {
         "year": "2021",
@@ -612,7 +626,8 @@
             "icon": "[Spike]"
           }
         ],
-        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8393517/"
+        "reference_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8393517/",
+        "journal": "Journal of Hospital Infection"
       },
       {
         "year": "2022",
@@ -628,7 +643,8 @@
             "icon": "[Spike]"
           }
         ],
-        "reference_url": "https://www.nature.com/articles/s41467-022-28291-y"
+        "reference_url": "https://www.nature.com/articles/s41467-022-28291-y",
+        "journal": "Nature Communications"
       },
       {
         "year": "2022",
@@ -644,7 +660,8 @@
             "icon": "[Spike]"
           }
         ],
-        "reference_url": "https://elifesciences.org/articles/76854"
+        "reference_url": "https://elifesciences.org/articles/76854",
+        "journal": "eLife"
       },
       {
         "year": "2023",
@@ -660,7 +677,8 @@
             "icon": "[Spike]"
           }
         ],
-        "reference_url": "https://pubmed.ncbi.nlm.nih.gov/37579586/"
+        "reference_url": "https://pubmed.ncbi.nlm.nih.gov/37579586/",
+        "journal": "Epidemics"
       },
       {
         "year": "2024",
@@ -676,7 +694,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037"
+        "reference_url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0313037",
+        "journal": "PLOS ONE"
       },
       {
         "year": "2025",
@@ -692,7 +711,8 @@
             "icon": "🦠"
           }
         ],
-        "reference_url": "https://arxiv.org/html/2511.20819v1"
+        "reference_url": "https://arxiv.org/html/2511.20819v1",
+        "journal": "arXiv (preprint)"
       }
     ],
     "pathogens": [

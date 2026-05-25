@@ -15,6 +15,7 @@ import type { PathogenSpec } from "./types";
 export const INFLUENZA: PathogenSpec = {
   id: "influenza",
   name: "Influenza",
+  common: "Seasonal & pandemic flu",
   shortLabel: "Influenza",
   modelUrl: "/models/influenza-virion.glb",
   framing: {

@@ -29,13 +29,12 @@ const DURATION_FULL = 48.5;
 const DURATION_STEADY = 22;
 
 // End-to-end: total loop ≈ 30 s. Plays as:
-//   • Phase A (0 – 6.5 s): NotificationLogo — centred brand mark with
-//     iOS-style notification badge counting 1 → 4.
-//   • Phase B (6.5 – 9):   Cursor click + network spin + collapse.
-//   • Phase C (5 – 30):    DashboardScene (cursor entry at lt 0 = stage 5,
-//                          click at lt 1.5 = stage 6.5, expand from
-//                          (640, 360), tree → A3 popup → IPC chat →
-//                          strategies → deploy).
+//   • Phase A (0 – 2.0 s): NotificationLogo — centred brand mark with
+//     iOS-style notification badge counting 1 → 3.
+//   • Phase B (2.0 – 3.4): Cursor click + network spin + collapse.
+//   • Phase C (0 – 30):    DashboardScene (cursor entry at lt 1.0, click
+//                          at lt 2.0, expand from (640, 360), tree → A3
+//                          popup → IPC chat → strategies → deploy).
 // Logo position for this scene is stage centre, so we pass logoX/logoY
 // into DashboardScene to redirect the cursor's click target and the
 // dashboard frame's transform-origin.
@@ -54,17 +53,18 @@ function IntegrationLoop() {
 }
 
 function EndToEndLoop() {
-  // NotificationLogo runs from stage_t 0..9 (its lt 6.5 = click moment,
-  // matching DashboardScene's cursor click at its own lt 1.5 = stage_t 6.5).
-  // DashboardScene starts at stage_t 5 so its cursor enters the frame just
-  // before the click; logoX/logoY redirect both the cursor target and the
-  // dashboard transform-origin to stage centre.
+  // NotificationLogo runs from stage_t 0..4 (its lt 2.0 = click moment,
+  // matching DashboardScene's cursor click at its own lt 2.0 = stage_t 2.0).
+  // DashboardScene starts at stage_t 0 alongside it; the cursor stays
+  // hidden until lt 1.0, then hops in and clicks the logo. logoX/logoY
+  // redirect both the cursor target and the dashboard transform-origin
+  // to stage centre.
   return (
     <Stage width={1280} height={720} duration={DURATION_ENDTOEND} background="#fafafa" loop={true}>
-      <Sprite start={0} end={9}>
+      <Sprite start={0} end={4}>
         <NotificationLogo logoX={ENDTOEND_LOGO_X} logoY={ENDTOEND_LOGO_Y} />
       </Sprite>
-      <Sprite start={5} end={DURATION_ENDTOEND}>
+      <Sprite start={0} end={DURATION_ENDTOEND}>
         <DashboardScene logoX={ENDTOEND_LOGO_X} logoY={ENDTOEND_LOGO_Y} />
       </Sprite>
     </Stage>

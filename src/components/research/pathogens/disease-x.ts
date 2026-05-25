@@ -15,11 +15,14 @@ import type { PathogenSpec } from "./types";
  */
 export const DISEASE_X: PathogenSpec = {
   id: "disease-x",
-  // Both the grid card and the dossier display this as a bare "?" —
-  // the question-mark IS the statement (we don't know what's coming,
-  // but we're ready). See the WHO Disease X priority list.
-  name: "?",
-  shortLabel: "?",
+  // The dossier displays "Disease X" as the heading; the right-hand
+  // column of the dossier is populated with the WHO R&D Blueprint
+  // definition + priority-diseases context (see PathogenDossier.tsx).
+  // Disease X is featured on the homepage via <PathogenSpotlight> and
+  // filtered out of the auto-drifting <PathogenTicker> so it isn't
+  // shown twice.
+  name: "Disease X",
+  shortLabel: "Disease X",
   modelUrl: "/models/disease-x.glb",
   framing: { cameraZ: 6.0, tiltX: 0.22 },
   source: {

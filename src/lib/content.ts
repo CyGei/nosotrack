@@ -14,16 +14,15 @@ import type { Content } from "@/types/content";
 export const content: Content = contentJson as unknown as Content;
 
 // Convenience accessors. Each section component imports its slice via
-// these to keep the import surface tight. (Retired sections — demo /
-// solution / platform — still exist in content.json but are no longer
-// exposed here; the JSON keys are kept in case a future rebuild re-uses
-// them.)
+// these. Retired sections (demo / solution / platform / about) still
+// exist in content.json but are not exposed here — the About section
+// uses inline copy now. Re-add accessors here only when a component
+// actually reads the slice.
 export const meta = content.meta;
 export const nav = content.nav;
 export const hero = content.hero;
 export const logoStrip = content.logoStrip;
 export const marquee = content.marquee;
-export const about = content.about;
 export const research = content.research;
 export const team = content.team;
 export const roadmap = content.roadmap;

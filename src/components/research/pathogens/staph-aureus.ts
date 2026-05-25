@@ -14,6 +14,7 @@ import type { PathogenSpec } from "./types";
 export const STAPH_AUREUS: PathogenSpec = {
   id: "staph-aureus",
   name: "S. aureus",
+  common: "MRSA & staph infection",
   shortLabel: "S. aureus",
   modelUrl: "/models/staph-aureus.glb",
   framing: { cameraZ: 6.2, tiltX: 0.18 },
