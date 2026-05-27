@@ -14,7 +14,10 @@
 
 import { HeroBackdrop } from "./HeroBackdrop";
 
-const HERO_EYEBROW = "Outbreak Forensics for Healthcare Facilities";
+// Note: the product descriptor ("Outbreak forensics · Healthcare
+// facilities") lives in the Nav as a brand-lockup tagline now, so the
+// hero deliberately opens with the H1 — no eyebrow to compete with the
+// "Track. Intervene. Protect." moment.
 const HERO_TITLE = ["Track.", "Intervene.", "Protect."];
 const HERO_SUBTITLE =
   "NosoTrack infers who infected whom in near real-time, enabling hospital control teams to stop outbreaks before they escalate.";
@@ -40,13 +43,11 @@ export function Hero() {
       <div className="container-page relative z-10 grid min-h-[100svh] grid-cols-12 gap-6 pb-16 pt-32 md:pb-20 md:pt-28">
         {/* LEFT — headline, vertically centred */}
         <div className="col-span-12 flex flex-col justify-center md:col-span-7 lg:col-span-6">
-          <p className="font-mono text-[14px] font-medium uppercase tracking-[0.22em] text-inv-hi">
-            {HERO_EYEBROW}
-          </p>
-
           {/* Hero title — JetBrains Mono per main branch legacy/styles.css §8.
-              "Protect." picks up the breathing cream halo via .hero-accent. */}
-          <h1 className="mt-12 font-mono font-normal leading-[1.02] tracking-[-0.025em] text-inv-hi text-[clamp(2.6rem,7vw,6.4rem)] max-w-[20ch]">
+              "Protect." picks up the breathing cream halo via .hero-accent.
+              No top margin: the H1 is the first child of the centred column
+              so the headline lands where the eye expects it. */}
+          <h1 className="font-mono font-normal leading-[1.02] tracking-[-0.025em] text-inv-hi text-[clamp(2.6rem,7vw,6.4rem)] max-w-[20ch]">
             {HERO_TITLE.map((line, i) => {
               const isLast = i === HERO_TITLE.length - 1;
               return (

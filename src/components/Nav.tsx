@@ -34,6 +34,12 @@ import { cn } from "@/lib/utils";
 import { BrandWordmark } from "@/components/BrandWordmark";
 
 const NAV_LOGO = "NosoTrack";
+// Brand-lockup tagline — the product category descriptor that previously
+// lived as the hero eyebrow. Pinned under the wordmark so it's visible on
+// every page (defence-tech lockup pattern: Anduril/Shield AI). Hidden on
+// mobile to avoid crowding the hamburger; the wordmark alone carries the
+// brand on narrow screens.
+const NAV_TAGLINE = "Outbreak forensics for healthcare facilities";
 const NAV_LINKS: { label: string; href: string }[] = [
   { label: "About", href: "#about" },
   { label: "Research", href: "#research" },
@@ -97,8 +103,12 @@ export function Nav() {
       aria-label="Primary"
     >
       <div className="nav-inner container-page flex h-[72px] items-center justify-between">
-        {/* ── BRAND: mark + wordmark, mark NOT inside the link ── */}
-        <div className="nav-brand flex items-center gap-[10px]">
+        {/* ── BRAND lockup: mark + (wordmark over tagline) ──
+            The tagline pins the product descriptor underneath the wordmark
+            so it persists across every page. Mark and lockup are vertically
+            centred against each other; the lockup column stacks the
+            (linked) wordmark with a small mono caption. */}
+        <div className="nav-brand flex items-center gap-[12px]">
           <span
             aria-hidden
             className="nav-mark inline-flex h-10 w-10 shrink-0 items-center justify-center transition-colors duration-[var(--transition-duration-fast)]"
@@ -125,13 +135,21 @@ export function Nav() {
               </g>
             </svg>
           </span>
-          <a
-            href="#top"
-            aria-label={`${NAV_LOGO} — home`}
-            className="nav-logo text-[17px] leading-none transition-colors duration-[var(--transition-duration-fast)]"
-          >
-            <BrandWordmark />
-          </a>
+          <div className="flex flex-col">
+            <a
+              href="#top"
+              aria-label={`${NAV_LOGO} — home`}
+              className="nav-logo text-[17px] leading-none transition-colors duration-[var(--transition-duration-fast)]"
+            >
+              <BrandWordmark />
+            </a>
+            <span
+              aria-hidden
+              className="nav-tagline mt-[5px] hidden whitespace-nowrap font-mono text-[10px] font-normal leading-none tracking-[0.04em] transition-colors duration-[var(--transition-duration-fast)] md:block"
+            >
+              {NAV_TAGLINE}
+            </span>
+          </div>
         </div>
 
         {/* ── DESKTOP nav-links UL ── */}

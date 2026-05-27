@@ -261,6 +261,11 @@ nav.main-nav[data-theme="dark"] .nav-mark,
 nav.main-nav[data-theme="dark"] .nav-logo {
   color: var(--color-inv-hi);
 }
+nav.main-nav[data-theme="dark"] .nav-tagline {
+  /* Muted cream — subordinate to the wordmark but clearly readable
+     against the dark hero. Same token the .nav-links rest-state uses. */
+  color: var(--color-inv);
+}
 nav.main-nav[data-theme="dark"] .nav-links a {
   color: var(--color-inv);
 }
@@ -274,6 +279,10 @@ nav.main-nav[data-theme="dark"] .nav-hamburger span {
 nav.main-nav[data-theme="light"] .nav-mark,
 nav.main-nav[data-theme="light"] .nav-logo {
   color: var(--color-ink);
+}
+nav.main-nav[data-theme="light"] .nav-tagline {
+  /* Muted ink — supportive caption tone on the cream/scrolled nav. */
+  color: var(--color-mute);
 }
 nav.main-nav[data-theme="light"] .nav-links a {
   color: var(--color-mute);
