@@ -19,3 +19,4 @@ public/models/*.raw.*
 public/models/*.small.*
 public/models/*.converted.glb
 public/models/*.original.glb
+.claude/

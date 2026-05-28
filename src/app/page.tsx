@@ -20,14 +20,14 @@
 
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/hero/Hero";
-import { LogoStrip } from "@/components/logostrip/LogoStrip";
-import { Marquee } from "@/components/marquee/Marquee";
+import { LogoStrip } from "@/components/LogoStrip";
+import { Marquee } from "@/components/Marquee";
 import { About } from "@/components/about/About";
 import { Research } from "@/components/research/Research";
-import { Team } from "@/components/team/Team";
-import { Roadmap } from "@/components/roadmap/Roadmap";
-import { Contact } from "@/components/contact/Contact";
-import { Footer } from "@/components/footer/Footer";
+import { Team } from "@/components/Team";
+import { Roadmap } from "@/components/Roadmap";
+import { Contact } from "@/components/Contact";
+import { Footer } from "@/components/Footer";
 
 export default function HomePage() {
   return (
