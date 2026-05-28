@@ -43,9 +43,9 @@
  *     (e.g. hard refresh while scrolled to #contact); we only commit
  *     completion AFTER the first real scroll event from the user.
  *
- * Mobile (< 768px) bypasses both the sticky scroll and the completion
- * lock entirely — frames render as four stacked 100svh blocks, paced
- * by the user's thumb.
+ * Mobile uses the same code path. `100svh` already accounts for the
+ * iOS/Android address bar resize, and touch-scroll triggers the same
+ * scroll events the rAF loop is listening to. One swipe ≈ one frame.
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -114,7 +114,7 @@ const FADE_MS = 500;
 const BRAND_SCENE = SCENES.find((s) => s.id === "brand")!;
 
 export function Hero() {
-  const { wrapperRef, activeScene, isMobile } = useActiveScene(SCENE_COUNT);
+  const { wrapperRef, activeScene } = useActiveScene(SCENE_COUNT);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [hasCompleted, setHasCompleted] = useState(false);
   const [hasUserScrolled, setHasUserScrolled] = useState(false);
@@ -131,14 +131,13 @@ export function Hero() {
      event before allowing completion to be committed.
      ───────────────────────────────────────────────────────────── */
   useEffect(() => {
-    if (isMobile) return;
     const onFirstScroll = () => setHasUserScrolled(true);
     window.addEventListener("scroll", onFirstScroll, {
       once: true,
       passive: true,
     });
     return () => window.removeEventListener("scroll", onFirstScroll);
-  }, [isMobile]);
+  }, []);
 
   /* ─────────────────────────────────────────────────────────────
      Completion detector. The sentinel sits at the very bottom of the
@@ -147,7 +146,7 @@ export function Hero() {
      wrapper bottom, which is the natural pin-release point.
      ───────────────────────────────────────────────────────────── */
   useEffect(() => {
-    if (hasCompleted || isMobile || !hasUserScrolled) return;
+    if (hasCompleted || !hasUserScrolled) return;
     const sentinel = sentinelRef.current;
     const wrapper = wrapperRef.current;
     if (!sentinel || !wrapper) return;
@@ -165,7 +164,7 @@ export function Hero() {
     );
     io.observe(sentinel);
     return () => io.disconnect();
-  }, [hasCompleted, isMobile, hasUserScrolled, wrapperRef]);
+  }, [hasCompleted, hasUserScrolled, wrapperRef]);
 
   /* ─────────────────────────────────────────────────────────────
      Scroll compensation. Runs synchronously AFTER React has committed
@@ -191,39 +190,7 @@ export function Hero() {
   }, [hasCompleted]);
 
   /* ─────────────────────────────────────────────────────────────
-     Render branch 1: mobile — stacked frames, no sticky, no lock.
-     ───────────────────────────────────────────────────────────── */
-  if (isMobile) {
-    return (
-      <section
-        id="hero"
-        className="on-dark relative isolate bg-[var(--color-bg-ink)]"
-      >
-        {SCENES.map((scene) => (
-          <div
-            key={scene.id}
-            className="relative isolate flex min-h-[100svh] items-center overflow-hidden"
-          >
-            <SceneBackground scene={scene} active={true} forceImmediate />
-            {!scene.selfContained && scene.id !== "blueprints" && (
-              <HeadlineScrim />
-            )}
-            {!scene.selfContained && (
-              <SceneCopy
-                lines={scene.lines}
-                haloLastLine={scene.haloLastLine}
-                active={true}
-                forceImmediate
-              />
-            )}
-          </div>
-        ))}
-      </section>
-    );
-  }
-
-  /* ─────────────────────────────────────────────────────────────
-     Render branch 2: completed — the locked final composition. One
+     Render branch 1: completed — the locked final composition. One
      100svh section, no sticky, no scene indicator, no choreography.
      Scrolling past it (in either direction) is native page scroll.
      ───────────────────────────────────────────────────────────── */
@@ -239,7 +206,8 @@ export function Hero() {
   }
 
   /* ─────────────────────────────────────────────────────────────
-     Render branch 3: desktop, active — sticky scroll cinematic.
+     Render branch 2: active — sticky-scroll cinematic. Same path on
+     desktop and mobile.
      ───────────────────────────────────────────────────────────── */
   return (
     <section
