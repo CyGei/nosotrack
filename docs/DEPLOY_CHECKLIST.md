@@ -100,5 +100,5 @@ foundry-demo + new legal routes account for the remaining ~3.5 MB.
 **Source-only directories now living OUTSIDE `public/`** (kept in git,
 not deployed):
 - `/brand/` — canonical lockup PNGs + SVGs
-- `/foundry-demo-src/` — JSX source for the demo iframe (compiled by
-  `npm run build:demo` into `public/foundry-demo/bundle.js`)
+- `/scripts/foundry-demo-src/` — JSX source for the demo iframe (compiled
+  by `npm run build:demo` into `public/foundry-demo/bundle.js`)

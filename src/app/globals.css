@@ -362,6 +362,37 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
 }
 
 /* =========================================================================
+   Hero v2 — one-time entrance spin for the closing brand frame.
+   Mirrors the .brand-mark-network hover rotation used by the nav and
+   footer logos: the four corner brackets stay fixed (the "frame")
+   while the inner network rotates a full turn around the SVG centre
+   (16,16). Applied via animation rather than transition so it auto-
+   plays on mount/key-change instead of needing a state toggle.
+   ========================================================================= */
+
+@keyframes heroBrandSpin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+/* =========================================================================
+   Hero v2 — scroll-to-explore cue.
+   Small mono label + chevron beneath the FIELD frame headline that bobs
+   gently to invite the user to scroll. Fades out as soon as the user
+   leaves scene 0 (whether by scrolling or by clicking a SceneIndicator
+   dot). The bob is intentionally subtle (~5px) — louder than that turns
+   it into a marketing bounce instead of a Palantir-restrained hint.
+   ========================================================================= */
+@keyframes heroScrollCueBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(5px); }
+}
+
+.hero-scroll-cue-bob {
+  animation: heroScrollCueBob 1.8s ease-in-out infinite;
+}
+
+/* =========================================================================
    Foundry-demo keyframes — referenced by embedded foundry visuals.
    Ported from foundry-demo/index.html so the React-embedded versions
    animate identically.

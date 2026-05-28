@@ -3,7 +3,7 @@ import { interTight, jetBrainsMono } from "@/lib/fonts";
 import "./globals.css";
 
 const SITE_TITLE = "NosoTrack";
-const SITE_DESCRIPTION = "Outbreak forensics for healthcare facilities.";
+const SITE_DESCRIPTION = "Outbreak forensics and control.";
 
 export const metadata: Metadata = {
   title: SITE_TITLE,

@@ -23,6 +23,7 @@
  */
 
 import { BrandWordmark } from "@/components/BrandWordmark";
+import { BrandMark } from "@/components/BrandMark";
 
 const FOOTER_LINKS: { label: string; href: string }[] = [
   { label: "About", href: "#about" },
@@ -50,27 +51,7 @@ export function Footer() {
               aria-hidden
               className="footer-mark inline-flex h-10 w-10 shrink-0 items-center justify-center text-inv-hi"
             >
-              <svg
-                viewBox="0 0 32 32"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="square"
-                className="block h-full w-full"
-              >
-                <path d="M3 8 L3 3 L8 3" strokeWidth="1.2" />
-                <path d="M24 3 L29 3 L29 8" strokeWidth="1.2" />
-                <path d="M29 24 L29 29 L24 29" strokeWidth="1.2" />
-                <path d="M8 29 L3 29 L3 24" strokeWidth="1.2" />
-                <g className="brand-mark-network" strokeLinecap="round">
-                  <line x1="16.00" y1="11.20" x2="16.00" y2="15.60" strokeWidth="0.55" />
-                  <line x1="11.31" y1="19.30" x2="15.13" y2="17.10" strokeWidth="0.55" />
-                  <line x1="20.69" y1="19.30" x2="16.87" y2="17.10" strokeWidth="0.55" />
-                  <circle cx="16" cy="9" r="2.2" strokeWidth="0.35" />
-                  <circle cx="9.4" cy="20.4" r="2.2" strokeWidth="0.35" />
-                  <circle cx="22.6" cy="20.4" r="2.2" strokeWidth="0.35" />
-                  <circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none" />
-                </g>
-              </svg>
+              <BrandMark className="block h-full w-full" />
             </span>
             <div className="footer-logo text-[16px] leading-none text-inv-hi">
               <BrandWordmark />

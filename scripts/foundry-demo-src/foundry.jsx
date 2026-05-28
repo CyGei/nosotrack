@@ -90,7 +90,7 @@ function BrandIntro() {
           fontFamily: FONT_MONO, fontSize: 13, letterSpacing: '0.22em',
           textTransform: 'uppercase', color: COLOR.mute,
         }}>
-          Outbreak Forensics for Healthcare Facilities
+          Outbreak Forensics and Control
         </div>
       </div>
     </div>

@@ -32,6 +32,7 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { BrandWordmark } from "@/components/BrandWordmark";
+import { BrandMark } from "@/components/BrandMark";
 
 const NAV_LOGO = "NosoTrack";
 // Brand-lockup tagline — the product category descriptor that previously
@@ -39,7 +40,7 @@ const NAV_LOGO = "NosoTrack";
 // every page (defence-tech lockup pattern: Anduril/Shield AI). Hidden on
 // mobile to avoid crowding the hamburger; the wordmark alone carries the
 // brand on narrow screens.
-const NAV_TAGLINE = "Outbreak forensics for healthcare facilities";
+const NAV_TAGLINE = "Outbreak forensics and control";
 const NAV_LINKS: { label: string; href: string }[] = [
   { label: "About", href: "#about" },
   { label: "Research", href: "#research" },
@@ -87,7 +88,18 @@ export function Nav() {
     };
   }, []);
 
-  const dark = overHero && !scrolled;
+  // Nav theme: dark (cream text on transparent) whenever the user is
+  // still over the hero, light (dark text on cream backdrop) once
+  // they've scrolled past it. Note the change from main-branch behavior:
+  // we no longer drop to light mode the instant `scrolled` becomes
+  // true. With hero-v2 being (N+1)*100svh tall, the "scrolled but still
+  // over hero" state is no longer momentary — it lasts ~4 viewport
+  // heights — so the nav must stay dark for the whole hero ride.
+  const dark = overHero;
+  // The cream backdrop + blur kick in only AFTER the hero is fully
+  // behind us. While over the hero we keep the nav transparent so the
+  // dark canvas reads through cleanly.
+  const showScrolledStyle = scrolled && !overHero;
   const closeMobile = () => setMobileOpen(false);
 
   return (
@@ -95,7 +107,7 @@ export function Nav() {
       className={cn(
         "main-nav fixed inset-x-0 top-0 z-[1000] border-b",
         "transition-[background-color,border-color] duration-[var(--transition-duration-base)] ease-[var(--ease-nt)]",
-        scrolled
+        showScrolledStyle
           ? "border-rule bg-[rgba(239,238,239,0.92)] backdrop-blur-[8px] backdrop-saturate-[140%]"
           : "border-transparent bg-transparent",
       )}
@@ -113,27 +125,7 @@ export function Nav() {
             aria-hidden
             className="nav-mark inline-flex h-10 w-10 shrink-0 items-center justify-center transition-colors duration-[var(--transition-duration-fast)]"
           >
-            <svg
-              viewBox="0 0 32 32"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="square"
-              className="block h-full w-full"
-            >
-              <path d="M3 8 L3 3 L8 3" strokeWidth="1.2" />
-              <path d="M24 3 L29 3 L29 8" strokeWidth="1.2" />
-              <path d="M29 24 L29 29 L24 29" strokeWidth="1.2" />
-              <path d="M8 29 L3 29 L3 24" strokeWidth="1.2" />
-              <g className="brand-mark-network" strokeLinecap="round">
-                <line x1="16.00" y1="11.20" x2="16.00" y2="15.60" strokeWidth="0.55" />
-                <line x1="11.31" y1="19.30" x2="15.13" y2="17.10" strokeWidth="0.55" />
-                <line x1="20.69" y1="19.30" x2="16.87" y2="17.10" strokeWidth="0.55" />
-                <circle cx="16" cy="9" r="2.2" strokeWidth="0.35" />
-                <circle cx="9.4" cy="20.4" r="2.2" strokeWidth="0.35" />
-                <circle cx="22.6" cy="20.4" r="2.2" strokeWidth="0.35" />
-                <circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none" />
-              </g>
-            </svg>
+            <BrandMark className="block h-full w-full" />
           </span>
           <div className="flex flex-col">
             <a

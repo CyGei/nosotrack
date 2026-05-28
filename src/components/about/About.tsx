@@ -21,7 +21,7 @@
 
 import { AboutBlock } from "./AboutBlock";
 import { DetailsList } from "./DetailsList";
-import { FoundryFrame } from "./foundry/FoundryFrame";
+import { FoundryFrame } from "./FoundryFrame";
 
 /** Inline external link — used inside detail rows. */
 function A({ href, children }: { href: string; children: React.ReactNode }) {

@@ -23,6 +23,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "@/lib/hooks";
 import { HospitalBlueprint } from "./blueprints/Hospital";
 import { CruiseShipBlueprint } from "./blueprints/CruiseShip";
 import { FarmBlueprint } from "./blueprints/Farm";
@@ -49,6 +50,19 @@ const SEED_AFTER_MS = 800;
 const CROSS_HAB_EVERY_MS = 2200;
 const CORRIDOR_SPEED = 0.55; // viewBox units / frame — gentle walking pace
 
+/** Maximum fraction of the population that can ever be infected in a
+ *  given scene. Cy locked at 20% on 2026-05-27 — previously the seed
+ *  clusters + cross-habitat dynamics could push toward 40–50%, which
+ *  read as "everything's on fire." 20% reads as "outbreak in progress,
+ *  intervention possible." All three infection paths (initial seed,
+ *  cross-habitat timer, edge transmission) honour this cap. */
+const MAX_INFECTED_RATIO = 0.2;
+
+/** Initial-seed target for pre-seeded clusters (hospital, farm). We
+ *  start at ~12% so the cross-habitat dynamics have headroom to grow
+ *  toward the 20% steady state. */
+const SEED_CLUSTER_RATIO = 0.12;
+
 type Shape = HabitatShape;
 
 type Particle = {
@@ -68,8 +82,15 @@ const COLOR_INFECT = "rgba(255,7,58,0.98)";
 const COLOR_EDGE = "rgba(239,238,239,0.22)";
 const COLOR_EDGE_HOT = "rgba(255,7,58,0.78)";
 
-type SceneId = "hospital" | "ship" | "farm";
+export type SceneId = "hospital" | "ship" | "farm";
 const SCENES: SceneId[] = ["hospital", "ship", "farm"];
+
+export type HeroBackdropProps = {
+  /** If provided, pin the backdrop to a single scene and disable the
+   *  hospital→ship→farm rotation. Used by hero-v2's blueprints frame,
+   *  which renders three locked instances side-by-side. */
+  lockedScene?: SceneId;
+};
 
 const HABITATS_BY_SCENE: Record<SceneId, Habitat[]> = {
   hospital: HOSPITAL_HABITATS,
@@ -77,30 +98,29 @@ const HABITATS_BY_SCENE: Record<SceneId, Habitat[]> = {
   farm: FARM_HABITATS,
 };
 
-export function HeroBackdrop() {
+export function HeroBackdrop({ lockedScene }: HeroBackdropProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
   const particlesRef = useRef<Particle[]>([]);
   const neighbourSetRef = useRef<Map<string, Set<string>>>(new Map());
-  const [scene, setScene] = useState<SceneId>("hospital");
-  const [reduce, setReduce] = useState(false);
+  const [scene, setScene] = useState<SceneId>(lockedScene ?? "hospital");
+  const reduce = useReducedMotion();
+
+  // If the caller pinned us to a single scene, keep state in sync if
+  // they ever change it (shouldn't happen in our usage, but cheap to
+  // support) and skip the cycling timer entirely.
+  useEffect(() => {
+    if (lockedScene) setScene(lockedScene);
+  }, [lockedScene]);
 
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduce(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReduce(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  useEffect(() => {
-    if (reduce) return;
+    if (reduce || lockedScene) return;
     const id = setInterval(() => {
       setScene((s) => SCENES[(SCENES.indexOf(s) + 1) % SCENES.length]);
     }, SCENE_MS);
     return () => clearInterval(id);
-  }, [reduce]);
+  }, [reduce, lockedScene]);
 
   // Build particle population + neighbour lookup when scene changes.
   useEffect(() => {
@@ -141,6 +161,8 @@ export function HeroBackdrop() {
       const ps = particlesRef.current;
       const infected = ps.filter((p) => p.infected);
       if (infected.length === 0) return;
+      // Hard cap — stop jumping once we hit the steady-state ceiling.
+      if (infected.length >= ps.length * MAX_INFECTED_RATIO) return;
       const a = infected[Math.floor(Math.random() * infected.length)];
       const targetIds = a.habitat.neighbours;
       if (targetIds.length === 0) return;
@@ -278,6 +300,14 @@ export function HeroBackdrop() {
       }
 
       // ── Draw edges + handle transmission ──
+      // Track infected count for this frame so the 20% cap is honoured
+      // by edge transmission too. We count once up front and increment
+      // locally on each new infection — cheap and avoids an O(N) scan
+      // per transmission event.
+      const infectionCap = ps.length * MAX_INFECTED_RATIO;
+      let infectedNow = 0;
+      for (const p of ps) if (p.infected) infectedNow++;
+
       for (const { i, j, d, hot } of pairs) {
         const a = ps[i];
         const b = ps[j];
@@ -296,9 +326,15 @@ export function HeroBackdrop() {
         ctx.stroke();
         ctx.globalAlpha = 1;
 
-        if (hot && a.infected !== b.infected && Math.random() < INFECT_P) {
+        if (
+          hot &&
+          a.infected !== b.infected &&
+          Math.random() < INFECT_P &&
+          infectedNow < infectionCap
+        ) {
           a.infected = true;
           b.infected = true;
+          infectedNow++;
         }
       }
 
@@ -406,19 +442,22 @@ function pickShape(seed: number): Shape {
 /**
  * Pre-seed a small but visible outbreak cluster in the hospital scene.
  * Strategy:
- *   - Infect every occupant of three adjacent south-wing rooms (S2/S3/S4)
- *   - Infect one north-room contact across the corridor (N3) — implies
- *     transmission has already jumped wings
- *   - Infect the corridor walker currently nearest the cluster — they're
- *     the index case who carried it across
- * Total: ~6 infected at scene start, clearly localised to one floor area.
+ *   - Fill priority rooms (S3 first — densest centre of the cluster —
+ *     then S2 to its left, S4 to its right) until ~SEED_CLUSTER_RATIO
+ *     of the population is infected.
+ *   - Always infect the E-W corridor walker nearest the cluster — they
+ *     carried it through the corridor. Counts toward the budget.
+ *
+ * Cap of SEED_CLUSTER_RATIO (12%) keeps the opening composition under
+ * the global 20% ceiling so the cross-habitat dynamics can still grow.
  */
 function seedHospitalCluster(ps: Particle[]) {
-  const ROOM_TARGETS = new Set(["hosp-S2", "hosp-S3", "hosp-S4", "hosp-N3"]);
-  for (const p of ps) {
-    if (ROOM_TARGETS.has(p.habitatId)) p.infected = true;
-  }
-  // E-W corridor walker nearest the south cluster (roughly x=440)
+  const budget = Math.max(2, Math.floor(ps.length * SEED_CLUSTER_RATIO));
+  const ROOM_ORDER = ["hosp-S3", "hosp-S2", "hosp-S4"];
+  let count = 0;
+
+  // Always seed the corridor walker first — they're the index case who
+  // ferried the pathogen along the corridor. Always counts.
   const walkers = ps.filter((p) => p.habitatId === "hosp-corr-EW");
   if (walkers.length > 0) {
     const targetX = 444;
@@ -432,6 +471,19 @@ function seedHospitalCluster(ps: Particle[]) {
       }
     }
     nearest.infected = true;
+    count++;
+  }
+
+  // Fill the priority rooms in order until we exhaust the budget.
+  for (const roomId of ROOM_ORDER) {
+    if (count >= budget) break;
+    for (const p of ps) {
+      if (count >= budget) break;
+      if (p.habitatId === roomId && !p.infected) {
+        p.infected = true;
+        count++;
+      }
+    }
   }
 }
 
@@ -477,23 +529,23 @@ function makeParticles(habitats: Habitat[]): Particle[] {
 /**
  * Pre-seed a small outbreak in the dairy scene.
  * Strategy:
- *   - Infect a couple of cattle in the holding pen (where the herd
- *     congregates before milking — a real-world bottleneck).
- *   - Infect a couple in the parlor (next step in the flow), implying
- *     transmission already crossed via shared equipment.
- *   - Infect one service-alley staff member (triangle) as the index
- *     vector linking the barn back to the pasture.
+ *   - Always seed the staff walker nearest the holding pen (index case
+ *     ferrying between paddock and barn).
+ *   - Fill the holding pen first, then the parlor, until
+ *     SEED_CLUSTER_RATIO of the population is infected.
+ *
+ * Cap of SEED_CLUSTER_RATIO (12%) keeps the opening under the global
+ * 20% ceiling.
  */
 function seedFarmCluster(ps: Particle[]) {
-  const ROOM_TARGETS = new Set<string>([FARM_IDS.HOLDING, FARM_IDS.PARLOR]);
-  for (const p of ps) {
-    if (ROOM_TARGETS.has(p.habitatId)) p.infected = true;
-  }
-  // Pick the staff walker currently nearest the holding pen — they're
-  // the index case carrying the pathogen between paddock and barn.
+  const budget = Math.max(2, Math.floor(ps.length * SEED_CLUSTER_RATIO));
+  const ROOM_ORDER: string[] = [FARM_IDS.HOLDING, FARM_IDS.PARLOR];
+  let count = 0;
+
+  // Always seed the staff walker first.
   const staff = ps.filter((p) => p.habitatId === FARM_IDS.ALLEY);
   if (staff.length > 0) {
-    const targetX = 640; // roughly under the holding pen
+    const targetX = 640;
     let nearest = staff[0];
     let best = Math.abs(nearest.x - targetX);
     for (const s of staff) {
@@ -504,5 +556,17 @@ function seedFarmCluster(ps: Particle[]) {
       }
     }
     nearest.infected = true;
+    count++;
+  }
+
+  for (const roomId of ROOM_ORDER) {
+    if (count >= budget) break;
+    for (const p of ps) {
+      if (count >= budget) break;
+      if (p.habitatId === roomId && !p.infected) {
+        p.infected = true;
+        count++;
+      }
+    }
   }
 }
