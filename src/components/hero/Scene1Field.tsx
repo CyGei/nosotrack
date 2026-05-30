@@ -43,8 +43,8 @@ type Clip = {
 
 // id → public/hero/<id>.mp4. Order is the rotation sequence.
 const CLIPS: Clip[] = [
-  { id: "liberia-labs", durationS: 4,  description: "U.S. military standing up biocontainment labs during the 2014 Liberia Ebola response." },
   { id: "covid-field",  durationS: 10, description: "Field workers in full PPE during a COVID-19 response operation." },
+  { id: "liberia-labs", durationS: 4,  description: "U.S. military standing up biocontainment labs during the 2014 Liberia Ebola response." },
   { id: "cdc-donning",  durationS: 5,  description: "CDC Ebola training — donning Level-A PPE." },
   { id: "cdc-buddy",    durationS: 11, description: "CDC Ebola training — buddy-team patient simulation." },
   { id: "cdc-doffing",  durationS: 8,  description: "CDC Ebola training — controlled doffing under supervision." },

@@ -44,20 +44,24 @@ const OUT_DIR = join(__dirname, "..", "public", "hero");
 // seconds into the SOURCE file; only that window is downloaded + kept.
 // All sources are public-domain or CC-BY field-response / PPE footage.
 // ─────────────────────────────────────────────────────────────────────
+// NOTE: order here mirrors the on-screen rotation in Scene1Field and
+// drives which clip the poster is extracted from (the first SUCCESSFUL
+// entry). Keep `covid-field` first — its opening frame is the cleanest
+// hold-frame for the dark hero.
 const SOURCES = [
-  {
-    id: "liberia-labs",
-    url: "https://upload.wikimedia.org/wikipedia/commons/d/d1/U.S._Military_Stands_Up_Labs%2C_Hospital_in_Liberia_141016-A-AB123-015.webm",
-    start: 27,
-    end: 31,
-    note: "Wikimedia / U.S. Army (PD) — Liberia Ebola biocontainment labs.",
-  },
   {
     id: "covid-field",
     url: "https://upload.wikimedia.org/wikipedia/commons/3/33/Covid-19-_Desconfinamento_deve_ser_por_fases_e_sem_precipita%C3%A7%C3%B5es_-_especialista.webm",
     start: 132,
     end: 142,
     note: "Wikimedia (CC-BY) — COVID-19 PPE field work.",
+  },
+  {
+    id: "liberia-labs",
+    url: "https://upload.wikimedia.org/wikipedia/commons/d/d1/U.S._Military_Stands_Up_Labs%2C_Hospital_in_Liberia_141016-A-AB123-015.webm",
+    start: 27,
+    end: 31,
+    note: "Wikimedia / U.S. Army (PD) — Liberia Ebola biocontainment labs.",
   },
   {
     id: "cdc-donning",
@@ -201,6 +205,7 @@ function main() {
       "-ss", "0.3",
       "-i", src,
       "-frames:v", "1",
+      "-update", "1", // ffmpeg 8.x: explicit single-image-output flag
       "-vf", `scale=${WIDTH}:-2`,
       "-q:v", "4",
       join(OUT_DIR, "poster.jpg"),
@@ -209,6 +214,7 @@ function main() {
       // 0.3s may be past a very short clip; retry from the first frame.
       run("ffmpeg", [
         "-y", "-i", src, "-frames:v", "1",
+        "-update", "1",
         "-vf", `scale=${WIDTH}:-2`, "-q:v", "4",
         join(OUT_DIR, "poster.jpg"),
       ]);
