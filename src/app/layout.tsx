@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { interTight, jetBrainsMono } from "@/lib/fonts";
+import { LenisProvider } from "@/components/LenisProvider";
 import "./globals.css";
 
 const SITE_TITLE = "NosoTrack";
@@ -41,7 +42,9 @@ export default function RootLayout({
       lang="en"
       className={`${interTight.variable} ${jetBrainsMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <LenisProvider>{children}</LenisProvider>
+      </body>
     </html>
   );
 }

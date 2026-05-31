@@ -49,6 +49,7 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLenis } from "lenis/react";
 import { useActiveScene } from "./useActiveScene";
 import { TypingHeadline } from "./TypingHeadline";
 import { Scene1Field } from "./Scene1Field";
@@ -115,6 +116,12 @@ const BRAND_SCENE = SCENES.find((s) => s.id === "brand")!;
 
 export function Hero() {
   const { wrapperRef, activeScene } = useActiveScene(SCENE_COUNT);
+  // Lenis tracks its own internal scroll target independent of
+  // `window.scrollY`. When the completion-lock shrinks the wrapper we
+  // need to move BOTH in lock-step, otherwise Lenis's stale target
+  // makes the next wheel input rocket the page across the shrunk delta.
+  // Null on the server / before mount; the completion effect guards.
+  const lenis = useLenis();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [hasCompleted, setHasCompleted] = useState(false);
   const [hasUserScrolled, setHasUserScrolled] = useState(false);
@@ -169,25 +176,35 @@ export function Hero() {
   /* ─────────────────────────────────────────────────────────────
      Scroll compensation. Runs synchronously AFTER React has committed
      the DOM change (wrapper shrunk from WRAPPER_VH×svh to 100svh) but
-     BEFORE the browser paints. Scrolling up by the same delta the
-     wrapper lost keeps the user's viewport content visually static
-     at the moment of release — no jump.
+     BEFORE the browser paints. We move the scroll up by the same delta
+     the wrapper lost so the user's viewport content stays visually
+     static at the moment of release.
+
+     Lenis is the source of truth for scroll. `lenis.scrollTo` with
+     `immediate: true` and `force: true` sets BOTH `window.scrollY` AND
+     Lenis's internal target in one call, keeping the two in sync —
+     otherwise the next wheel input gets added to Lenis's stale target
+     and rockets the page across the shrunk delta. We also call
+     `lenis.resize()` so Lenis re-measures the now-shorter document.
+     If Lenis isn't ready yet (SSR / pre-mount), fall back to native.
      ───────────────────────────────────────────────────────────── */
   useLayoutEffect(() => {
     if (!hasCompleted) return;
     const delta = completionShrinkRef.current;
-    if (delta > 0) {
-      // `behavior: "instant"` (vs default "auto") side-steps any user-
-      // preferred smooth-scroll setting; we need this to land in one
-      // paint, not animate.
+    if (delta <= 0) return;
+    const targetY = Math.max(0, window.scrollY - delta);
+    if (lenis) {
+      lenis.resize();
+      lenis.scrollTo(targetY, { immediate: true, force: true });
+    } else {
       window.scrollBy({
         top: -delta,
         left: 0,
         behavior: "instant" as ScrollBehavior,
       });
-      completionShrinkRef.current = 0;
     }
-  }, [hasCompleted]);
+    completionShrinkRef.current = 0;
+  }, [hasCompleted, lenis]);
 
   /* ─────────────────────────────────────────────────────────────
      Render branch 1: completed — the locked final composition. One

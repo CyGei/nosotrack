@@ -108,8 +108,14 @@ export function AboutBlock({
         <StepIndicator activeId={id} />
 
         <div className="mt-14 grid grid-cols-12 gap-x-8 gap-y-10">
-          {/* LEFT — title (typed in lockstep with scroll position) */}
-          <div className="col-span-12 md:col-span-5">
+          {/* LEFT — title (typed in lockstep with scroll position).
+              Width sized to fit the longest title (~32 chars wrapped to
+              2 lines at clamp(32px,3.6vw,56px) under max-w-[14ch]). The
+              right column gets the remaining 8/12 so the embedded video
+              renders at ~820 × 460 on a 1240px container — comfortably
+              above the "perceivable motion content" threshold most
+              accessibility audits flag below ~400px height. */}
+          <div className="col-span-12 md:col-span-4">
             <h2
               ref={titleRef}
               className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)] max-w-[14ch]"
@@ -136,7 +142,7 @@ export function AboutBlock({
           </div>
 
           {/* RIGHT — subtitle + (switch) + content panel */}
-          <div className="col-span-12 md:col-span-7">
+          <div className="col-span-12 md:col-span-8">
             {subtitle && (
               <p className="font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink max-w-[55ch]">
                 {subtitle}
