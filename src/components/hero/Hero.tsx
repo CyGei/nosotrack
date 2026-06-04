@@ -441,18 +441,18 @@ function SceneCopy({
 
 /* ───────────────────────────────────────────────────────────────
    Advance cue — the "how do I move to the next frame?" hint.
-   Sits just LEFT of the vertical scene-indicator rail (see
-   SceneIndicator) and is vertically centred to align with it. A small
-   dot fades in at the top of a thin vertical track, travels DOWN into a
-   fixed down-chevron, then loops — deliberately vertical motion to
-   correct the observed behaviour of users swiping left↔right instead of
-   scrolling/swiping down to advance.
+   On desktop it sits just LEFT of the vertical scene-indicator rail
+   (see SceneIndicator), vertically centred to align with it. On mobile
+   the rail-adjacent centre would collide with the overlaid headline, so
+   the cue drops to bottom-centre (matching ScrollCue's placement; the
+   two never show at once). The chevron always points DOWN — deliberately
+   vertical motion to correct the observed behaviour of users swiping
+   left↔right instead of scrolling down to advance.
 
-   The "scroll down" / "swipe down" label disappears once the user has
-   scrolled for the first time (`hasScrolled`) — by then they've learnt
-   the gesture, so only the quiet arrow remains as a direction reminder
-   on the remaining frames. The verb adapts to the input device,
-   resolved after mount to avoid an SSR/client text mismatch. Purely
+   The "scroll down" label disappears once the user has scrolled for the
+   first time (`hasScrolled`) — by then they've learnt the gesture, so
+   only the quiet arrow remains as a direction reminder on the remaining
+   frames. The label reads "Scroll down" on every platform. Purely
    decorative — aria-hidden.
    ─────────────────────────────────────────────────────────────── */
 function AdvanceCue({
@@ -462,19 +462,10 @@ function AdvanceCue({
   visible: boolean;
   hasScrolled: boolean;
 }) {
-  const [isTouch, setIsTouch] = useState(false);
-
-  useEffect(() => {
-    setIsTouch(
-      typeof window !== "undefined" &&
-        window.matchMedia("(pointer: coarse)").matches,
-    );
-  }, []);
-
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute right-16 top-1/2 z-20 -translate-y-1/2"
+      className="pointer-events-none absolute bottom-20 left-1/2 z-20 -translate-x-1/2 md:bottom-auto md:left-auto md:right-16 md:top-1/2 md:translate-x-0 md:-translate-y-1/2"
       style={{
         opacity: visible ? 1 : 0,
         transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
@@ -491,7 +482,7 @@ function AdvanceCue({
             transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
           }}
         >
-          {isTouch ? "Swipe down" : "Scroll down"}
+          Scroll down
         </span>
         {/* Bold double-chevron sliding downward — the clearly-visible
             direction signal, immediately left of the indicator rail. */}
