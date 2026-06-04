@@ -50,6 +50,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
+import Snap from "lenis/snap";
 import { useActiveScene } from "./useActiveScene";
 import { TypingHeadline } from "./TypingHeadline";
 import { Scene1Field } from "./Scene1Field";
@@ -123,6 +124,11 @@ export function Hero() {
   // Null on the server / before mount; the completion effect guards.
   const lenis = useLenis();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  // One marker per scene, sitting at the centre of that scene's scroll
+  // band. They feed BOTH snap mechanisms — Lenis's Snap addon on desktop
+  // (below) and CSS scroll-snap on touch (globals.css). One set of
+  // anchors, two consumers.
+  const snapMarkerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [hasCompleted, setHasCompleted] = useState(false);
   const [hasUserScrolled, setHasUserScrolled] = useState(false);
   // Captured at the moment we commit completion so the layout-effect
@@ -207,6 +213,31 @@ export function Hero() {
   }, [hasCompleted, lenis]);
 
   /* ─────────────────────────────────────────────────────────────
+     Frame snapping — desktop / pointer devices.
+     Lenis's own Snap addon snaps the wheel to each scene's band centre
+     so one scroll lands cleanly on one frame. `proximity` (not
+     `mandatory`) keeps it from trapping the user on the final frame —
+     once they scroll decisively past it, the completion-lock fires and
+     this effect tears the Snap down. Touch is intentionally skipped:
+     Lenis Snap ignores touchmove by design, so phones use native CSS
+     scroll-snap instead (see globals.css). Re-runs if the Lenis
+     instance arrives late or the hero completes.
+     ───────────────────────────────────────────────────────────── */
+  useEffect(() => {
+    if (!lenis || hasCompleted) return;
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    const markers = snapMarkerRefs.current.filter(Boolean) as HTMLElement[];
+    if (markers.length === 0) return;
+
+    const snap = new Snap(lenis, { type: "proximity", distanceThreshold: "60%" });
+    const removers = markers.map((el) => snap.addElement(el, { align: ["start"] }));
+    return () => {
+      removers.forEach((remove) => remove());
+      snap.destroy();
+    };
+  }, [lenis, hasCompleted]);
+
+  /* ─────────────────────────────────────────────────────────────
      Render branch 1: completed — the locked final composition. One
      100svh section, no sticky, no scene indicator, no choreography.
      Scrolling past it (in either direction) is native page scroll.
@@ -284,8 +315,33 @@ export function Hero() {
           wrapperRef={wrapperRef}
         />
 
+        <AdvanceCue
+          visible={activeScene < SCENE_COUNT - 1}
+          hasScrolled={hasUserScrolled}
+        />
         <ScrollCue visible={activeScene === SCENE_COUNT - 1} />
       </div>
+
+      {/* Snap anchors — one per scene at the centre of its scroll band.
+          Direct children of the wrapper (NOT the sticky stage) so they
+          hold fixed document offsets instead of pinning. Zero-size and
+          non-interactive; they exist only to give the two snap systems
+          (Lenis Snap on desktop, CSS scroll-snap on touch) a target. */}
+      {SCENES.map((_, i) => (
+        <div
+          key={`snap-${i}`}
+          ref={(el) => {
+            snapMarkerRefs.current[i] = el;
+          }}
+          data-hero-snap
+          aria-hidden
+          className="pointer-events-none absolute left-0 h-px w-px"
+          style={{
+            top: `calc((${i} + 0.5) * 100svh)`,
+            scrollSnapAlign: "start",
+          }}
+        />
+      ))}
 
       {/* Sentinel — 1px tall, at the absolute bottom of the wrapper.
           When this crosses into the viewport from below, the user has
@@ -384,6 +440,91 @@ function SceneCopy({
 }
 
 /* ───────────────────────────────────────────────────────────────
+   Advance cue — the "how do I move to the next frame?" hint.
+   Sits just LEFT of the vertical scene-indicator rail (see
+   SceneIndicator) and is vertically centred to align with it. A small
+   dot fades in at the top of a thin vertical track, travels DOWN into a
+   fixed down-chevron, then loops — deliberately vertical motion to
+   correct the observed behaviour of users swiping left↔right instead of
+   scrolling/swiping down to advance.
+
+   The "scroll down" / "swipe down" label disappears once the user has
+   scrolled for the first time (`hasScrolled`) — by then they've learnt
+   the gesture, so only the quiet arrow remains as a direction reminder
+   on the remaining frames. The verb adapts to the input device,
+   resolved after mount to avoid an SSR/client text mismatch. Purely
+   decorative — aria-hidden.
+   ─────────────────────────────────────────────────────────────── */
+function AdvanceCue({
+  visible,
+  hasScrolled,
+}: {
+  visible: boolean;
+  hasScrolled: boolean;
+}) {
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    setIsTouch(
+      typeof window !== "undefined" &&
+        window.matchMedia("(pointer: coarse)").matches,
+    );
+  }, []);
+
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute right-16 top-1/2 z-20 -translate-y-1/2"
+      style={{
+        opacity: visible ? 1 : 0,
+        transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
+        color: "var(--color-inv-hi)",
+      }}
+    >
+      <div className="flex flex-row items-center gap-3">
+        {/* Label — bright + legible, fades out for good after the user's
+            first scroll but keeps its space so the arrow stays put. */}
+        <span
+          className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-[0.2em]"
+          style={{
+            opacity: hasScrolled ? 0 : 1,
+            transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
+          }}
+        >
+          {isTouch ? "Swipe down" : "Scroll down"}
+        </span>
+        {/* Bold double-chevron sliding downward — the clearly-visible
+            direction signal, immediately left of the indicator rail. */}
+        <svg
+          width="26"
+          height="34"
+          viewBox="0 0 26 34"
+          fill="none"
+          aria-hidden
+        >
+          <polyline
+            className="hero-arrow-chevron"
+            points="4 6 13 15 22 6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <polyline
+            className="hero-arrow-chevron hero-arrow-chevron-2"
+            points="4 16 13 25 22 16"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+/* ───────────────────────────────────────────────────────────────
    Scroll cue — small mono label + chevron sitting just above the
    scene-indicator dots on the FINAL (brand) frame. Signals "you've
    reached the end of the cinematic, keep scrolling for the rest of
@@ -397,13 +538,13 @@ function ScrollCue({ visible }: { visible: boolean }) {
       aria-hidden
       className="pointer-events-none absolute bottom-20 left-1/2 z-20 -translate-x-1/2"
       style={{
-        opacity: visible ? 0.7 : 0,
+        opacity: visible ? 1 : 0,
         transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
-        color: "var(--color-inv-faint)",
+        color: "var(--color-inv-hi)",
       }}
     >
       <div className="hero-scroll-cue-bob flex flex-col items-center gap-2">
-        <span className="font-mono text-[10px] uppercase tracking-[0.22em]">
+        <span className="font-mono text-[11px] font-medium uppercase tracking-[0.2em]">
           Scroll to explore
         </span>
         <svg
@@ -424,10 +565,13 @@ function ScrollCue({ visible }: { visible: boolean }) {
 }
 
 /* ───────────────────────────────────────────────────────────────
-   Scene indicator dots — clicking jumps you to a scene.
-   Hidden in completed mode (single frame, nothing to jump to) and
-   on mobile (no sticky stage). Math still works with the new
-   wrapper height because we read `rect.height` at click time.
+   Scene indicator rail — a VERTICAL column of dots pinned to the right
+   edge of the hero, vertically centred. Clicking a dot jumps you to
+   that scene. The vertical orientation reinforces that frames advance
+   downward (a horizontal row read like a carousel and invited sideways
+   swipes). The active dot stretches into a tall pill; the AdvanceCue
+   arrow sits immediately to its left. Math still works with the wrapper
+   height because we read `rect.height` at click time.
    ─────────────────────────────────────────────────────────────── */
 function SceneIndicator({
   count,
@@ -449,8 +593,8 @@ function SceneIndicator({
   };
 
   return (
-    <div className="pointer-events-auto absolute bottom-8 left-1/2 z-20 -translate-x-1/2">
-      <div className="flex items-center gap-2">
+    <div className="pointer-events-auto absolute right-8 top-1/2 z-20 -translate-y-1/2">
+      <div className="flex flex-col items-center gap-3">
         {Array.from({ length: count }).map((_, i) => {
           const isActive = i === activeScene;
           return (
@@ -465,8 +609,8 @@ function SceneIndicator({
                 aria-hidden
                 className="absolute left-1/2 top-1/2 block -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-[var(--transition-duration-base)]"
                 style={{
-                  height: isActive ? "8px" : "5px",
-                  width: isActive ? "24px" : "5px",
+                  width: "5px",
+                  height: isActive ? "24px" : "5px",
                   background: isActive
                     ? "var(--color-inv-hi)"
                     : "var(--color-inv-faint)",

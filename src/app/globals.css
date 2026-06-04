@@ -191,6 +191,23 @@ html {
 }
 
 /* =========================================================================
+   Hero frame-snapping on touch devices.
+   On phones/tablets (coarse pointer) the page scroller snaps to each hero
+   frame, so one swipe lands cleanly on one frame instead of parking
+   half-way between two. `proximity` (not `mandatory`) and the `:has()`
+   guard keep this scoped: it only engages on a page that actually
+   contains the hero, and only near the hero's snap anchors — the rest of
+   the page, and other routes, scroll normally. The final frame still
+   releases to the content below. Desktop uses Lenis's JS Snap addon
+   instead (see Hero.tsx), which is why this is coarse-pointer only.
+   ========================================================================= */
+@media (pointer: coarse) {
+  html:has([data-hero-snap]) {
+    scroll-snap-type: y proximity;
+  }
+}
+
+/* =========================================================================
    3. Section primitives — see DESIGN_BRIEF §4 layout system.
    ========================================================================= */
 
@@ -390,6 +407,37 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
 
 .hero-scroll-cue-bob {
   animation: heroScrollCueBob 1.8s ease-in-out infinite;
+}
+
+/* =========================================================================
+   Hero v2 — frame-advance cue.
+   A pair of bold down-chevrons that slide downward in sequence beside the
+   indicator rail, making the "scroll / swipe DOWN to advance" gesture
+   unmistakable (users were swiping sideways). Bright and clearly visible by
+   design — this is an instruction, not a whisper. The two chevrons share
+   one slide animation; the lower one is delayed so the motion reads as a
+   continuous downward flow.
+   ========================================================================= */
+@keyframes heroArrowSlide {
+  0%   { transform: translateY(-5px); opacity: 0; }
+  30%  { opacity: 1; }
+  60%  { opacity: 1; }
+  100% { transform: translateY(7px);  opacity: 0; }
+}
+
+.hero-arrow-chevron {
+  animation: heroArrowSlide 1.5s var(--ease-nt) infinite;
+}
+
+.hero-arrow-chevron-2 {
+  animation-delay: 0.22s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-arrow-chevron {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 /* =========================================================================

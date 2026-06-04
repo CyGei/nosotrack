@@ -38,8 +38,8 @@ import { BrandWordmark } from "@/components/BrandWordmark";
 import { BrandMark } from "@/components/BrandMark";
 import { useReducedMotion } from "@/lib/hooks";
 
-const SPIN_MS = 1_600;
-const SETTLE_MS = 120;       // tiny breath between spin end and slide start
+const SPIN_MS = 1_300;       // spin ends a touch sooner (was 1600)
+const SETTLE_MS = 80;        // tiny breath between spin end and slide start
 const SLIDE_MS = 700;
 
 // Lockup positions. The lockup `left` transitions between these in
