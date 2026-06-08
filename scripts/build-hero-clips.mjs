@@ -57,13 +57,6 @@ const SOURCES = [
     note: "Wikimedia (CC-BY) — COVID-19 PPE field work.",
   },
   {
-    id: "liberia-labs",
-    url: "https://upload.wikimedia.org/wikipedia/commons/d/d1/U.S._Military_Stands_Up_Labs%2C_Hospital_in_Liberia_141016-A-AB123-015.webm",
-    start: 27,
-    end: 31,
-    note: "Wikimedia / U.S. Army (PD) — Liberia Ebola biocontainment labs.",
-  },
-  {
     id: "cdc-donning",
     url: "https://www.cdc.gov/media/video/b-roll/EbolaTrainCDCAL.mp4",
     start: 80,

@@ -1,5 +1,5 @@
 /**
- * Farm — Sunrise Dairy · Barn 02 · Milking Shift digital twin.
+ * Dairy Farm · Barn 02 · Milking Shift digital twin.
  *
  * Minimal architectural blueprint of a dairy cattle facility. The farm
  * reads as: a large PASTURE on the left where the herd loafs, and a
@@ -54,7 +54,7 @@ export function FarmBlueprint({ className, style }: Props) {
           letterSpacing="0.12em"
           fill="rgba(239,238,239,0.95)"
         >
-          SUNRISE DAIRY
+          DAIRY FARM
         </text>
         <text
           x="940"

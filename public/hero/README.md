@@ -18,5 +18,5 @@ To change the collage, edit `SOURCES` in `scripts/build-hero-clips.mjs`
 (the clip `id`s must match `CLIPS` in `src/components/hero/Scene1Field.tsx`),
 then re-run.
 
-Expected files: `liberia-labs.mp4`, `covid-field.mp4`, `cdc-donning.mp4`,
-`cdc-buddy.mp4`, `cdc-doffing.mp4`, `poster.jpg`.
+Expected files: `covid-field.mp4`, `cdc-donning.mp4`, `cdc-buddy.mp4`,
+`cdc-doffing.mp4`, `poster.jpg`.

@@ -318,6 +318,9 @@ export function Hero() {
         <AdvanceCue
           visible={activeScene < SCENE_COUNT - 1}
           hasScrolled={hasUserScrolled}
+          activeScene={activeScene}
+          count={SCENE_COUNT}
+          wrapperRef={wrapperRef}
         />
         <ScrollCue visible={activeScene === SCENE_COUNT - 1} />
       </div>
@@ -440,6 +443,28 @@ function SceneCopy({
 }
 
 /* ───────────────────────────────────────────────────────────────
+   Scroll helpers — shared by the indicator dots and the clickable
+   cues. `scrollToScene` smooth-scrolls so a scene's band centre
+   reaches the top of the viewport, advancing exactly one frame. It
+   reads rect.height at call time so the math holds whether the
+   wrapper is full-height or mid-completion, and honours
+   prefers-reduced-motion to match globals.css's scroll-behavior rule.
+   ─────────────────────────────────────────────────────────────── */
+function scrollToScene(
+  wrapper: HTMLElement | null,
+  index: number,
+  count: number,
+) {
+  if (!wrapper) return;
+  const rect = wrapper.getBoundingClientRect();
+  const totalScroll = rect.height - window.innerHeight;
+  const targetP = (index + 0.5) / count;
+  const y = window.scrollY + rect.top + totalScroll * targetP;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
+}
+
+/* ───────────────────────────────────────────────────────────────
    Advance cue — the "how do I move to the next frame?" hint.
    On desktop it sits just LEFT of the vertical scene-indicator rail
    (see SceneIndicator), vertically centred to align with it. On mobile
@@ -452,19 +477,28 @@ function SceneCopy({
    The "scroll down" label disappears once the user has scrolled for the
    first time (`hasScrolled`) — by then they've learnt the gesture, so
    only the quiet arrow remains as a direction reminder on the remaining
-   frames. The label reads "Scroll down" on every platform. Purely
-   decorative — aria-hidden.
+   frames. The label reads "Scroll down" on every platform.
+
+   Now interactive: the chevron is a real button — click or tap
+   advances exactly one frame (reusing the indicator-dot scroll math),
+   and it's keyboard-focusable with an aria-label. It only accepts
+   input while visible; on the final frame it's inert and aria-hidden.
    ─────────────────────────────────────────────────────────────── */
 function AdvanceCue({
   visible,
   hasScrolled,
+  activeScene,
+  count,
+  wrapperRef,
 }: {
   visible: boolean;
   hasScrolled: boolean;
+  activeScene: number;
+  count: number;
+  wrapperRef: React.RefObject<HTMLDivElement | null>;
 }) {
   return (
     <div
-      aria-hidden
       className="pointer-events-none absolute bottom-20 left-1/2 z-20 -translate-x-1/2 md:bottom-auto md:left-auto md:right-16 md:top-1/2 md:translate-x-0 md:-translate-y-1/2"
       style={{
         opacity: visible ? 1 : 0,
@@ -472,7 +506,22 @@ function AdvanceCue({
         color: "var(--color-inv-hi)",
       }}
     >
-      <div className="flex flex-row items-center gap-3">
+      {/* Real button so the chevron is clickable / tappable / focusable.
+          `-m-3 p-3` grows the touch target ~12px on every side without
+          shifting the chevron a pixel. Pointer + focus are switched off
+          while the cue is hidden so the final frame can't trap a tab
+          stop or a stray tap. */}
+      <button
+        type="button"
+        aria-label="Go to next frame"
+        aria-hidden={!visible}
+        tabIndex={visible ? 0 : -1}
+        onClick={() =>
+          scrollToScene(wrapperRef.current, activeScene + 1, count)
+        }
+        className="group -m-3 flex cursor-pointer flex-row items-center gap-3 rounded-md p-3 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
+        style={{ pointerEvents: visible ? "auto" : "none" }}
+      >
         {/* Label — bright + legible, fades out for good after the user's
             first scroll but keeps its space so the arrow stays put. */}
         <span
@@ -485,13 +534,14 @@ function AdvanceCue({
           Scroll down
         </span>
         {/* Bold double-chevron sliding downward — the clearly-visible
-            direction signal, immediately left of the indicator rail. */}
+            direction signal; nudges further down on hover / press. */}
         <svg
           width="26"
           height="34"
           viewBox="0 0 26 34"
           fill="none"
           aria-hidden
+          className="transition-transform duration-[var(--transition-duration-fast)] group-hover:translate-y-0.5 group-active:translate-y-1"
         >
           <polyline
             className="hero-arrow-chevron"
@@ -510,7 +560,7 @@ function AdvanceCue({
             strokeLinejoin="round"
           />
         </svg>
-      </div>
+      </button>
     </div>
   );
 }
@@ -520,13 +570,16 @@ function AdvanceCue({
    scene-indicator dots on the FINAL (brand) frame. Signals "you've
    reached the end of the cinematic, keep scrolling for the rest of
    the site." Hidden on every other scene; the entire hero re-renders
-   without it once `hasCompleted` flips and the pin releases. Purely
-   decorative — aria-hidden.
+   without it once `hasCompleted` flips and the pin releases.
+
+   Now interactive: it's an anchor to #about, so a click / tap leaves
+   the cinematic and continues to the first content section — the same
+   native smooth-scroll path the nav links use. Inert + aria-hidden
+   whenever it isn't the active frame.
    ─────────────────────────────────────────────────────────────── */
 function ScrollCue({ visible }: { visible: boolean }) {
   return (
     <div
-      aria-hidden
       className="pointer-events-none absolute bottom-20 left-1/2 z-20 -translate-x-1/2"
       style={{
         opacity: visible ? 1 : 0,
@@ -534,7 +587,18 @@ function ScrollCue({ visible }: { visible: boolean }) {
         color: "var(--color-inv-hi)",
       }}
     >
-      <div className="hero-scroll-cue-bob flex flex-col items-center gap-2">
+      {/* Anchor (not button) so it reuses the site's proven nav path:
+          native smooth-scroll to the first content section, leaving the
+          pinned cinematic behind. `-m-3 p-3` enlarges the tap target in
+          place; pointer + focus are off unless this is the live frame. */}
+      <a
+        href="#about"
+        aria-label="Continue past the hero to the rest of the site"
+        aria-hidden={!visible}
+        tabIndex={visible ? 0 : -1}
+        className="hero-scroll-cue-bob group -m-3 flex cursor-pointer flex-col items-center gap-2 rounded-md p-3 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
+        style={{ pointerEvents: visible ? "auto" : "none" }}
+      >
         <span className="font-mono text-[11px] font-medium uppercase tracking-[0.2em]">
           Scroll to explore
         </span>
@@ -547,10 +611,12 @@ function ScrollCue({ visible }: { visible: boolean }) {
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-hidden
+          className="transition-transform duration-[var(--transition-duration-fast)] group-hover:translate-y-0.5 group-active:translate-y-1"
         >
           <polyline points="1 1 7 7 13 1" />
         </svg>
-      </div>
+      </a>
     </div>
   );
 }
@@ -573,15 +639,7 @@ function SceneIndicator({
   activeScene: number;
   wrapperRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  const jumpTo = (i: number) => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const totalScroll = rect.height - window.innerHeight;
-    const targetP = (i + 0.5) / count;
-    const y = window.scrollY + rect.top + totalScroll * targetP;
-    window.scrollTo({ top: y, behavior: "smooth" });
-  };
+  const jumpTo = (i: number) => scrollToScene(wrapperRef.current, i, count);
 
   return (
     <div className="pointer-events-auto absolute right-8 top-1/2 z-20 -translate-y-1/2">

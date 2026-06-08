@@ -44,7 +44,6 @@ type Clip = {
 // id → public/hero/<id>.mp4. Order is the rotation sequence.
 const CLIPS: Clip[] = [
   { id: "covid-field",  durationS: 10, description: "Field workers in full PPE during a COVID-19 response operation." },
-  { id: "liberia-labs", durationS: 4,  description: "U.S. military standing up biocontainment labs during the 2014 Liberia Ebola response." },
   { id: "cdc-donning",  durationS: 5,  description: "CDC Ebola training — donning Level-A PPE." },
   { id: "cdc-buddy",    durationS: 11, description: "CDC Ebola training — buddy-team patient simulation." },
   { id: "cdc-doffing",  durationS: 8,  description: "CDC Ebola training — controlled doffing under supervision." },
@@ -119,8 +118,8 @@ export function Scene1Field({ active }: Scene1FieldProps) {
 
   // Per-clip rotation: schedule the next cut based on the CURRENT clip's
   // actual file duration (see `displayMsFor`). A single fixed interval
-  // doesn't work because durations range from 4s (liberia) to 11s (cdc-
-  // buddy) — anything below the interval native-loops mid-display, and
+  // doesn't work because durations range from 5s (cdc-donning) to 11s
+  // (cdc-buddy) — anything below the interval native-loops mid-display, and
   // anything above gets cut short. The `idx` dependency reschedules on
   // every advance, giving each clip its own dwell time.
   useEffect(() => {
