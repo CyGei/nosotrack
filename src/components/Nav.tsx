@@ -41,7 +41,13 @@ const NAV_LOGO = "NosoTrack";
 // mobile to avoid crowding the hamburger; the wordmark alone carries the
 // brand on narrow screens.
 const NAV_TAGLINE = "Outbreak forensics and control";
-const NAV_LINKS: { label: string; href: string }[] = [
+// "Platform" jumps straight to the live MVP dashboard (Render-hosted),
+// opened in a new tab so the marketing site stays put behind it. Placed
+// first to mirror Palantir's nav, where Platform leads. The ↗ glyph
+// (rendered in the markup) signals the off-site jump; every other link is
+// an in-page section anchor.
+const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
+  { label: "Platform", href: "https://nosotrack.onrender.com", external: true },
   { label: "About", href: "#about" },
   { label: "Research", href: "#research" },
   { label: "Team", href: "#team" },
@@ -153,9 +159,17 @@ export function Nav() {
             <li key={link.href}>
               <a
                 href={link.href}
+                {...(link.external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 className="nav-link-underline relative font-mono text-[11px] uppercase tracking-[0.18em] transition-colors duration-[var(--transition-duration-fast)]"
               >
                 {link.label}
+                {link.external && (
+                  <span aria-hidden className="ml-[0.35em]">
+                    ↗
+                  </span>
+                )}
               </a>
             </li>
           ))}
@@ -204,6 +218,9 @@ export function Nav() {
                 <a
                   href={link.href}
                   onClick={closeMobile}
+                  {...(link.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
                   className={cn(
                     "block border-b py-3 font-mono text-[11px] uppercase tracking-[0.18em]",
                     dark
@@ -212,6 +229,11 @@ export function Nav() {
                   )}
                 >
                   {link.label}
+                  {link.external && (
+                    <span aria-hidden className="ml-[0.35em]">
+                      ↗
+                    </span>
+                  )}
                 </a>
               </li>
             ))}
