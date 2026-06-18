@@ -5,7 +5,7 @@
  *
  * Three editorial blocks:
  *
- *   0.1  Nosocomial outbreaks are deadly, costly and poorly managed.
+ *   0.1  Nosocomial outbreaks are deadly, costly and difficult to manage.
  *        → Details-only (no video toggle). The Problem is established
  *          with WHO/CDC figures alone.
  *
@@ -47,7 +47,7 @@ export function About() {
       {/* 0.1 — Problem */}
       <AboutBlock
         id="0.1"
-        title="Nosocomial outbreaks are deadly, costly and poorly managed."
+        title="Nosocomial outbreaks are deadly, costly and difficult to manage."
         subtitle="Healthcare-associated infections (HAIs) are among the most common adverse events in healthcare delivery."
         details={
           <DetailsList
