@@ -64,7 +64,13 @@ export function FoundryFrame({ scene }: { scene: Scene }) {
         src={`/foundry-demo/index.html?embed=1&scene=${scene}`}
         title={`NosoTrack — ${scene === "integration" ? "Integration" : "Outbreak forensics"}`}
         loading="lazy"
-        className="absolute inset-0 h-full w-full border-0"
+        // The demo is a scripted, auto-playing animation — there's nothing to
+        // click. Making the iframe pointer-transparent guarantees a wheel /
+        // trackpad gesture over it always reaches the page scroller (Lenis)
+        // instead of dead-ending in the iframe's document and stalling the
+        // scroll. Complements Lenis's own `.lenis-smooth iframe` rule, and
+        // also covers the first wheel tick before that class engages.
+        className="pointer-events-none absolute inset-0 h-full w-full border-0"
         // The demo is first-party; sandbox left open so postMessage works
         allow="autoplay"
       />

@@ -28,6 +28,14 @@
  *   - `smoothWheel: true` — the whole point on desktop.
  *   - `syncTouch: false` — keep iOS Safari's native momentum. Hijacking
  *     touch typically feels worse than native, not better.
+ *   - `anchors: true` — route same-page `#section` link clicks (the nav
+ *     links, the hero "scroll to explore" cue) through Lenis itself.
+ *     Without this they fall back to the browser's native
+ *     `scroll-behavior: smooth`, which moves `scrollY` but leaves Lenis's
+ *     internal target stale — so the FIRST wheel notch after a nav click
+ *     lurches the page back toward the pre-click position. Lenis only
+ *     intercepts same-host/same-path hash links, so the external
+ *     "Platform" link and the /privacy, /terms routes are unaffected.
  */
 
 import { ReactLenis } from "lenis/react";
@@ -40,6 +48,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         lerp: 0.12,
         smoothWheel: true,
         syncTouch: false,
+        anchors: true,
       }}
     >
       {children}

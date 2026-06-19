@@ -1,6 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import { interTight, jetBrainsMono } from "@/lib/fonts";
 import { LenisProvider } from "@/components/LenisProvider";
+// Lenis's own stylesheet is REQUIRED alongside the JS, not optional. It
+// supplies the rules that keep the smooth-scroll honest — most importantly
+// `.lenis.lenis-smooth iframe { pointer-events: none }`, which lets wheel
+// events that land over an <iframe> (the foundry-demo embeds in About) reach
+// Lenis instead of being swallowed by the iframe's own document. Without it,
+// scrolling stalls whenever the cursor is over an embed and then jumps once
+// it leaves — the "jumpy after the hero" symptom. Also sizes the root for
+// root-mode scrolling and wires `data-lenis-prevent` overscroll containment.
+import "lenis/dist/lenis.css";
 import "./globals.css";
 
 const SITE_TITLE = "NosoTrack";
