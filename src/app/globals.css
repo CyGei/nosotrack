@@ -393,23 +393,6 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
 }
 
 /* =========================================================================
-   Hero v2 — scroll-to-explore cue.
-   Small mono label + chevron beneath the FIELD frame headline that bobs
-   gently to invite the user to scroll. Fades out as soon as the user
-   leaves scene 0 (whether by scrolling or by clicking a SceneIndicator
-   dot). The bob is intentionally subtle (~5px) — louder than that turns
-   it into a marketing bounce instead of a Palantir-restrained hint.
-   ========================================================================= */
-@keyframes heroScrollCueBob {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(5px); }
-}
-
-.hero-scroll-cue-bob {
-  animation: heroScrollCueBob 1.8s ease-in-out infinite;
-}
-
-/* =========================================================================
    Hero v2 — frame-advance cue.
    A pair of bold down-chevrons that slide downward in sequence beside the
    indicator rail, making the "scroll / swipe DOWN to advance" gesture

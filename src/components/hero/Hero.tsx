@@ -115,6 +115,16 @@ const FADE_MS = 500;
 
 const BRAND_SCENE = SCENES.find((s) => s.id === "brand")!;
 
+/** Smooth-scroll to the About section — through Lenis when it's mounted
+ *  (so its internal target stays in sync), native scrollIntoView as the
+ *  pre-mount fallback. */
+function scrollToAbout(lenis: ReturnType<typeof useLenis>) {
+  const about = document.getElementById("about");
+  if (!about) return;
+  if (lenis) lenis.scrollTo(about);
+  else about.scrollIntoView({ behavior: "smooth" });
+}
+
 export function Hero() {
   const { wrapperRef, activeScene } = useActiveScene(SCENE_COUNT);
   // Lenis tracks its own internal scroll target independent of
@@ -135,6 +145,10 @@ export function Hero() {
   // below can compensate for the wrapper-height shrink WITHOUT having
   // to re-query DOM after the React state has flipped.
   const completionShrinkRef = useRef(0);
+  // Set by the brand-frame "Scroll to learn more" cue so the completion
+  // layout-effect knows to glide to About once the hero has collapsed
+  // to its locked height (see goToAbout).
+  const pendingAboutRef = useRef(false);
 
   /* ─────────────────────────────────────────────────────────────
      "Has the user actually scrolled?" guard. Without this, the IO
@@ -197,19 +211,29 @@ export function Hero() {
   useLayoutEffect(() => {
     if (!hasCompleted) return;
     const delta = completionShrinkRef.current;
-    if (delta <= 0) return;
-    const targetY = Math.max(0, window.scrollY - delta);
-    if (lenis) {
-      lenis.resize();
-      lenis.scrollTo(targetY, { immediate: true, force: true });
-    } else {
-      window.scrollBy({
-        top: -delta,
-        left: 0,
-        behavior: "instant" as ScrollBehavior,
-      });
-    }
     completionShrinkRef.current = 0;
+    if (delta > 0) {
+      const targetY = Math.max(0, window.scrollY - delta);
+      if (lenis) {
+        lenis.resize();
+        lenis.scrollTo(targetY, { immediate: true, force: true });
+      } else {
+        window.scrollBy({
+          top: -delta,
+          left: 0,
+          behavior: "instant" as ScrollBehavior,
+        });
+      }
+    }
+    // Deferred "Scroll to learn more": the cue forces completion first
+    // (so About sits at its final position), then we glide down to it
+    // here — after compensation has pinned the brand at the top. Doing
+    // it post-collapse sidesteps the anchor-vs-completion race that
+    // otherwise stranded the click mid-page.
+    if (pendingAboutRef.current) {
+      pendingAboutRef.current = false;
+      scrollToAbout(lenis);
+    }
   }, [hasCompleted, lenis]);
 
   /* ─────────────────────────────────────────────────────────────
@@ -236,6 +260,28 @@ export function Hero() {
       snap.destroy();
     };
   }, [lenis, hasCompleted]);
+
+  /* ─────────────────────────────────────────────────────────────
+     "Scroll to learn more" — the brand-frame cue's handler. A plain
+     #about anchor races the completion lock: the lock collapses the
+     wrapper mid-scroll and its compensation overrides the in-flight
+     anchor scroll, stranding the click. So we force completion NOW
+     (capturing the same shrink delta the IO path uses, so the viewport
+     stays static through the collapse) and defer the glide to About to
+     the completion layout-effect, by which point About is at its final
+     position. The already-completed branch is a defensive fallback —
+     the cue only renders pre-completion.
+     ───────────────────────────────────────────────────────────── */
+  const goToAbout = () => {
+    const wrapper = wrapperRef.current;
+    if (!hasCompleted && wrapper) {
+      completionShrinkRef.current = wrapper.offsetHeight - window.innerHeight;
+      pendingAboutRef.current = true;
+      setHasCompleted(true);
+    } else {
+      scrollToAbout(lenis);
+    }
+  };
 
   /* ─────────────────────────────────────────────────────────────
      Render branch 1: completed — the locked final composition. One
@@ -322,7 +368,10 @@ export function Hero() {
           count={SCENE_COUNT}
           wrapperRef={wrapperRef}
         />
-        <ScrollCue visible={activeScene === SCENE_COUNT - 1} />
+        <BrandOutro
+          visible={activeScene === SCENE_COUNT - 1}
+          onLearnMore={goToAbout}
+        />
       </div>
 
       {/* Snap anchors — one per scene at the centre of its scroll band.
@@ -469,7 +518,7 @@ function scrollToScene(
    On desktop it sits just LEFT of the vertical scene-indicator rail
    (see SceneIndicator), vertically centred to align with it. On mobile
    the rail-adjacent centre would collide with the overlaid headline, so
-   the cue drops to bottom-centre (matching ScrollCue's placement; the
+   the cue drops to bottom-centre (matching BrandOutro's placement; the
    two never show at once). The chevron always points DOWN — deliberately
    vertical motion to correct the observed behaviour of users swiping
    left↔right instead of scrolling down to advance.
@@ -566,57 +615,109 @@ function AdvanceCue({
 }
 
 /* ───────────────────────────────────────────────────────────────
-   Scroll cue — small mono label + chevron sitting just above the
-   scene-indicator dots on the FINAL (brand) frame. Signals "you've
-   reached the end of the cinematic, keep scrolling for the rest of
-   the site." Hidden on every other scene; the entire hero re-renders
-   without it once `hasCompleted` flips and the pin releases.
+   Brand outro — the two ways out of the cinematic, shown only on the
+   FINAL (brand) frame as a matched pair sitting SIDE-BY-SIDE at
+   bottom-centre. Identical treatment (mono cream label + arrow on the
+   transparent dark hero); they differ only in where the arrow points:
 
-   Now interactive: it's an anchor to #about, so a click / tap leaves
-   the cinematic and continues to the first content section — the same
-   native smooth-scroll path the nav links use. Inert + aria-hidden
-   whenever it isn't the active frame.
+     • "Explore the platform" → arrow OUTWARD (↗). Off-site jump to the
+       live MVP dashboard, opened in a new tab (same target + rel as the
+       nav "Platform" link) so the marketing site stays put behind it.
+     • "Scroll to learn more" → arrow DOWN (↓). Releases the cinematic
+       (forces the completion lock) then glides down to the About
+       section — see `onLearnMore` / `goToAbout` in <Hero>.
+
+   Cream-on-transparent (not a filled button) keeps both legible on the
+   dark canvas without a background that could swallow the label. Both
+   are inert + aria-hidden whenever this isn't the active frame; the
+   whole hero re-renders without them once `hasCompleted` flips and the
+   pin releases.
    ─────────────────────────────────────────────────────────────── */
-function ScrollCue({ visible }: { visible: boolean }) {
+function BrandOutro({
+  visible,
+  onLearnMore,
+}: {
+  visible: boolean;
+  /** Releases the cinematic and scrolls to About; wired from <Hero>. */
+  onLearnMore: () => void;
+}) {
+  // One shared treatment so the two read as a matched pair — only the
+  // label + arrow direction differ. `-m-3 p-3` enlarges the tap target
+  // in place; pointer + focus gate on `visible` so neither is
+  // interactive off the final frame.
+  const itemClass =
+    "group -m-3 flex cursor-pointer flex-col items-center gap-2 rounded-md p-3 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]";
+  const labelClass =
+    "font-mono text-[10px] font-medium uppercase tracking-[0.2em] sm:text-[11px]";
+  const gate = {
+    "aria-hidden": !visible,
+    tabIndex: visible ? 0 : -1,
+    style: { pointerEvents: visible ? ("auto" as const) : ("none" as const) },
+  };
+
   return (
     <div
-      className="pointer-events-none absolute bottom-20 left-1/2 z-20 -translate-x-1/2"
+      className="pointer-events-none absolute bottom-16 left-1/2 z-20 flex -translate-x-1/2 flex-row items-start justify-center gap-6 sm:gap-12"
       style={{
         opacity: visible ? 1 : 0,
         transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
         color: "var(--color-inv-hi)",
       }}
     >
-      {/* Anchor (not button) so it reuses the site's proven nav path:
-          native smooth-scroll to the first content section, leaving the
-          pinned cinematic behind. `-m-3 p-3` enlarges the tap target in
-          place; pointer + focus are off unless this is the live frame. */}
+      {/* Platform — outward arrow (↗), off-site jump in a new tab. */}
       <a
-        href="#about"
-        aria-label="Continue past the hero to the rest of the site"
-        aria-hidden={!visible}
-        tabIndex={visible ? 0 : -1}
-        className="hero-scroll-cue-bob group -m-3 flex cursor-pointer flex-col items-center gap-2 rounded-md p-3 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
-        style={{ pointerEvents: visible ? "auto" : "none" }}
+        href="https://nosotrack.onrender.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Explore the NosoTrack platform (opens in a new tab)"
+        className={itemClass}
+        {...gate}
       >
-        <span className="font-mono text-[11px] font-medium uppercase tracking-[0.2em]">
-          Scroll to explore
-        </span>
+        <span className={labelClass}>Explore the platform</span>
         <svg
           width="14"
-          height="8"
-          viewBox="0 0 14 8"
+          height="14"
+          viewBox="0 0 14 14"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden
-          className="transition-transform duration-[var(--transition-duration-fast)] group-hover:translate-y-0.5 group-active:translate-y-1"
+          className="transition-transform duration-[var(--transition-duration-fast)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
         >
-          <polyline points="1 1 7 7 13 1" />
+          <line x1="3" y1="11" x2="11" y2="3" />
+          <polyline points="4.5 3 11 3 11 9.5" />
         </svg>
       </a>
+
+      {/* Scroll — down arrow (↓). A button (not a #about anchor) so its
+          handler can force the completion lock BEFORE scrolling; a raw
+          anchor scroll races that lock and lands mid-page. */}
+      <button
+        type="button"
+        onClick={onLearnMore}
+        aria-label="Scroll to learn more about NosoTrack"
+        className={itemClass}
+        {...gate}
+      >
+        <span className={labelClass}>Scroll to learn more</span>
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+          className="transition-transform duration-[var(--transition-duration-fast)] group-hover:translate-y-0.5"
+        >
+          <line x1="7" y1="2.5" x2="7" y2="11" />
+          <polyline points="3 7 7 11 11 7" />
+        </svg>
+      </button>
     </div>
   );
 }
