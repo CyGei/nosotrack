@@ -23,10 +23,11 @@ const SCENE = PARAMS.get('scene');
 
 const DURATION_FULL = 48.5;
 
-// Integration: ~22 s loop. FoundryStack in steady mode plays the infection
-// chain on a fixed cycle. Long enough to see A3 → A1/A2/SD1 → B2 → B1/B3,
-// A3 turning gold, then resetting cleanly.
-const DURATION_STEADY = 22;
+// Integration: 26 s loop. IntegrationScene plays the surveillance narrative
+// on one live hospital — EHR flag → LAB genomic match → RTLS contacts →
+// NosoTrack fuses the three streams → transmission tree + superspreader,
+// then resets cleanly.
+const DURATION_STEADY = 26;
 
 // End-to-end: total loop ≈ 30 s. Plays as:
 //   • Phase A (0 – 2.0 s): NotificationLogo — centred brand mark with
@@ -46,7 +47,7 @@ function IntegrationLoop() {
   return (
     <Stage width={1280} height={720} duration={DURATION_STEADY} background="#fafafa" loop={true}>
       <Sprite start={0} end={DURATION_STEADY}>
-        <FoundryStack mode="steady" />
+        <IntegrationScene />
       </Sprite>
     </Stage>
   );

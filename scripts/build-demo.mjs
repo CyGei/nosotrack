@@ -25,6 +25,7 @@ const outDir = resolve(root, 'public/foundry-demo');
 const sources = [
     'animations.jsx',  // Stage, Sprite, Timeline, easing helpers
     'common.jsx',      // BrandIntro and shared component primitives
+    'integration.jsx', // IntegrationScene (About 0.2)
     'foundry.jsx',     // FoundryStack
     'dashboard.jsx',   // DashboardScene
     'main.jsx'         // root render
