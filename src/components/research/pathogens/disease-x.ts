@@ -28,7 +28,7 @@ export const DISEASE_X: PathogenSpec = {
   source: {
     nih3dEntryId: "nosotrack/disease-x",
     nih3dEntryUrl: "https://www.who.int/activities/prioritizing-diseases-for-research-and-development-in-emergency-contexts",
-    creator: "NosoTrack (AI-assisted image-to-3D)",
+    creator: "Nosotrack (AI-assisted image-to-3D)",
     license: "Public Domain",
   },
 };

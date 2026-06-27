@@ -91,7 +91,7 @@ const CRF = 28;
 // User-Agent — anonymous library UAs like ffmpeg's default "Lavf/.." get
 // rate-limited with HTTP 429. See https://meta.wikimedia.org/wiki/User-Agent_policy
 const USER_AGENT =
-  "NosoTrackHeroBuild/1.0 (https://nosotrack.org; hero clip build script)";
+  "NosotrackHeroBuild/1.0 (https://nosotrack.org; hero clip build script)";
 const MAX_ATTEMPTS = 3;
 const RETRY_BACKOFF_MS = 4000;
 

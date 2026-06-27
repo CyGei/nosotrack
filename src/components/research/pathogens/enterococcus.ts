@@ -22,7 +22,7 @@ export const ENTEROCOCCUS: PathogenSpec = {
   source: {
     nih3dEntryId: "nosotrack/enterococcus",
     nih3dEntryUrl: "https://www.cdc.gov/healthcare-associated-infections/about/vre.html",
-    creator: "NosoTrack (AI-assisted image-to-3D)",
+    creator: "Nosotrack (AI-assisted image-to-3D)",
     license: "Public Domain",
   },
 };

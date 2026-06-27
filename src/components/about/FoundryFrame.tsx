@@ -62,7 +62,7 @@ export function FoundryFrame({ scene }: { scene: Scene }) {
       <iframe
         ref={frameRef}
         src={`/foundry-demo/index.html?embed=1&scene=${scene}`}
-        title={`NosoTrack — ${scene === "integration" ? "Integration" : "Outbreak forensics"}`}
+        title={`Nosotrack — ${scene === "integration" ? "Integration" : "Outbreak forensics"}`}
         loading="lazy"
         // The demo is a scripted, auto-playing animation — there's nothing to
         // click. Making the iframe pointer-transparent guarantees a wheel /

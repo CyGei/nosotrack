@@ -1,5 +1,5 @@
 /**
- * BrandMark — the canonical NosoTrack icon, ported verbatim from the
+ * BrandMark — the canonical Nosotrack icon, ported verbatim from the
  * original SVG that previously lived inline in Nav / Footer / SceneBrand.
  *
  * Structure:

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NosoTrack · ITCAI Pitch</title>
+    <title>Nosotrack · ITCAI Pitch</title>
 
     <!-- Same favicon as the main site -->
     <link rel="icon" type="image/svg+xml"
@@ -855,7 +855,7 @@
                         <span class="accent">Protect.</span>
                     </h1>
                     <aside class="hero-side">
-                        <p>NosoTrack infers who infected whom in near real-time, enabling hospital control teams to stop outbreaks before they escalate.</p>
+                        <p>Nosotrack infers who infected whom in near real-time, enabling hospital control teams to stop outbreaks before they escalate.</p>
                         <div class="hero-author">
                             <strong>Cyril Geismar</strong><br>
                             Postdoctoral Research Fellow<br>
@@ -963,7 +963,7 @@
                         <div class="slide-eyebrow">Ecosystem</div>
                         <h2 class="slide-title">Integration unlocks intelligence.</h2>
                         <p class="slide-lead">
-                            Current tools work in silos. NosoTrack fuses their data into a unified analytical engine.
+                            Current tools work in silos. Nosotrack fuses their data into a unified analytical engine.
                         </p>
 
                         <div class="eco-inputs">
@@ -1033,7 +1033,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <span class="eb-tag">NosoTrack Engine</span>
+                                <span class="eb-tag">Nosotrack Engine</span>
                                 <span class="eb-name">Outbreak control engine</span>
                             </div>
                         </div>
@@ -1094,7 +1094,7 @@
             </header>
 
             <div class="slide-body">
-                <div class="slide-eyebrow">NosoTrack Engine · Live Demo</div>
+                <div class="slide-eyebrow">Nosotrack Engine · Live Demo</div>
                 <h2 class="slide-title">Outbreak forensics, end-to-end.</h2>
 
                 <div class="demo-block">
@@ -1104,7 +1104,7 @@
                         <div class="demo-stage-light">
                             <iframe id="demoIframe"
                                     src="/foundry-demo/index.html?embed=1"
-                                    title="NosoTrack Foundry product walkthrough"
+                                    title="Nosotrack Foundry product walkthrough"
                                     loading="lazy"
                                     allow="autoplay; fullscreen"
                                     allowfullscreen
@@ -1285,7 +1285,7 @@
                 <div class="slide-eyebrow">The Ask</div>
                 <h2 class="slide-title">From validated science to first pilot deployment.</h2>
                 <p class="slide-lead">
-                    We are seeking funding and partner facilities to validate and deploy NosoTrack, turning Bayesian outbreak forensics into a working product on a real hospital floor.
+                    We are seeking funding and partner facilities to validate and deploy Nosotrack, turning Bayesian outbreak forensics into a working product on a real hospital floor.
                 </p>
 
                 <div class="ask-grid">
@@ -1351,7 +1351,7 @@
     window.addEventListener('DOMContentLoaded', function () {
         const mount = document.getElementById('demoPlaybar');
         const frame = document.getElementById('demoIframe');
-        if (!mount || !frame || !window.NosoTrack || !window.NosoTrack.createPlaybar) return;
+        if (!mount || !frame || !window.Nosotrack || !window.Nosotrack.createPlaybar) return;
 
         // Track local state so we can drive `bar.update()` from `tick` events.
         let state = { time: 0, duration: 1, playing: true, speed: 1 };
@@ -1362,7 +1362,7 @@
             } catch (_) { /* iframe might not be ready yet */ }
         }
 
-        const bar = window.NosoTrack.createPlaybar(mount, {
+        const bar = window.Nosotrack.createPlaybar(mount, {
             variant: 'light',
             speeds: [1, 1.5, 2, 3],
             initialSpeedIdx: 0,

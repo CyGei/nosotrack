@@ -2,7 +2,7 @@
 // animations.jsx
 // Reusable animation starter: Stage, Timeline, Sprite, easing helpers.
 //
-// EMBED MODE — when this file is loaded by the host site (NosoTrack
+// EMBED MODE — when this file is loaded by the host site (Nosotrack
 // marketing page) inside an iframe with ?embed=1, the Stage:
 //   • hides its built-in playback bar (the host renders an external one
 //     styled to match the engine card on the platform section);

@@ -8,7 +8,7 @@
 // elements. Press Escape to exit.
 //
 // Usage:
-//   const bar = NosoTrack.createPlaybar(mountEl, {
+//   const bar = Nosotrack.createPlaybar(mountEl, {
 //     variant: 'light' | 'dark',         // colour scheme
 //     trackLabel: 'OUTBREAK',            // small mono caption (optional)
 //     speeds: [1, 1.5, 2, 3, 5],         // speed cycle
@@ -161,6 +161,6 @@
         };
     }
 
-    window.NosoTrack = window.NosoTrack || {};
-    window.NosoTrack.createPlaybar = createPlaybar;
+    window.Nosotrack = window.Nosotrack || {};
+    window.Nosotrack.createPlaybar = createPlaybar;
 })();

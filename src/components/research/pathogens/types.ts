@@ -1,7 +1,7 @@
 /**
  * PathogenSpec — declarative configuration for a single 3D specimen.
  *
- * Every pathogen visual in NosoTrack's Research section is described by
+ * Every pathogen visual in Nosotrack's Research section is described by
  * one of these objects. The shared <PathogenViewer> renders any spec;
  * adding a new pathogen is purely a registry edit.
  *

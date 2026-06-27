@@ -25,7 +25,7 @@ const DURATION_FULL = 48.5;
 
 // Integration: 26 s loop. IntegrationScene plays the surveillance narrative
 // on one live hospital — EHR flag → LAB genomic match → RTLS contacts →
-// NosoTrack fuses the three streams → transmission tree + superspreader,
+// Nosotrack fuses the three streams → transmission tree + superspreader,
 // then resets cleanly.
 const DURATION_STEADY = 26;
 
@@ -72,7 +72,7 @@ function EndToEndLoop() {
   );
 }
 
-function NosoTrackFoundryDemo() {
+function NosotrackFoundryDemo() {
   if (SCENE === 'integration') return <IntegrationLoop />;
   if (SCENE === 'endtoend')    return <EndToEndLoop />;
 
@@ -88,4 +88,4 @@ function NosoTrackFoundryDemo() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<NosoTrackFoundryDemo />);
+ReactDOM.createRoot(document.getElementById('root')).render(<NosotrackFoundryDemo />);

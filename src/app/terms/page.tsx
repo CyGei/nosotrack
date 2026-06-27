@@ -10,9 +10,9 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Terms of Use — NosoTrack",
+  title: "Terms of Use — Nosotrack",
   description:
-    "NosoTrack terms of use — rules for accessing and using the website.",
+    "Nosotrack terms of use — rules for accessing and using the website.",
   robots: { index: true, follow: true },
 };
 
@@ -29,7 +29,7 @@ export default function TermsPage() {
             href="/"
             className="mb-8 inline-block font-mono text-[12px] text-mute transition-colors hover:text-ink"
           >
-            ← Back to NosoTrack
+            ← Back to Nosotrack
           </Link>
 
           <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-mute">
@@ -47,7 +47,7 @@ export default function TermsPage() {
           <Prose>
             <p>
               These Terms of Use (the &ldquo;Terms&rdquo;) govern your
-              access to and use of the NosoTrack website at{" "}
+              access to and use of the Nosotrack website at{" "}
               <A href="https://nosotrack.com">nosotrack.com</A> (the
               &ldquo;Site&rdquo;), which is operated by Cyril Geismar
               (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;).
@@ -57,7 +57,7 @@ export default function TermsPage() {
 
             <H2>1. About the Site</H2>
             <p>
-              The Site presents information about NosoTrack, a
+              The Site presents information about Nosotrack, a
               research-stage outbreak-forensics platform. The Site is
               informational only. It does not provide medical, clinical,
               epidemiological, legal, or other professional advice, and
@@ -68,7 +68,7 @@ export default function TermsPage() {
             <H2>2. Intellectual property</H2>
             <p>
               The Site and all of its contents &mdash; including the
-              NosoTrack name and wordmark, the source code, designs,
+              Nosotrack name and wordmark, the source code, designs,
               graphics, text, illustrations, layouts, and any other
               materials &mdash; are owned by Cyril Geismar and are protected
               by copyright, trademark, and other intellectual-property
@@ -80,7 +80,7 @@ export default function TermsPage() {
               .
             </p>
             <p>
-              NosoTrack&trade; is an unregistered trademark of Cyril
+              Nosotrack&trade; is an unregistered trademark of Cyril
               Geismar.
             </p>
 

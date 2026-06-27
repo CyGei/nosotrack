@@ -14,15 +14,15 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "NosoTrack · Pitch",
-  description: "NosoTrack ITCAI pitch deck.",
+  title: "Nosotrack · Pitch",
+  description: "Nosotrack ITCAI pitch deck.",
 };
 
 export default function PitchPage() {
   return (
     <iframe
       src="/pitch-deck/index.html"
-      title="NosoTrack pitch deck"
+      title="Nosotrack pitch deck"
       style={{
         position: "fixed",
         inset: 0,

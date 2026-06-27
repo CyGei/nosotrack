@@ -21,7 +21,7 @@ export const STAPH_AUREUS: PathogenSpec = {
   source: {
     nih3dEntryId: "nosotrack/staph-aureus",
     nih3dEntryUrl: "https://www.cdc.gov/mrsa/index.html",
-    creator: "NosoTrack (AI-assisted image-to-3D)",
+    creator: "Nosotrack (AI-assisted image-to-3D)",
     license: "Public Domain",
   },
 };

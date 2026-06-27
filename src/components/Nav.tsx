@@ -34,7 +34,7 @@ import { cn } from "@/lib/utils";
 import { BrandWordmark } from "@/components/BrandWordmark";
 import { BrandMark } from "@/components/BrandMark";
 
-const NAV_LOGO = "NosoTrack";
+const NAV_LOGO = "Nosotrack";
 // Brand-lockup tagline — the product category descriptor that previously
 // lived as the hero eyebrow. Pinned under the wordmark so it's visible on
 // every page (defence-tech lockup pattern: Anduril/Shield AI). Hidden on

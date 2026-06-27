@@ -1,4 +1,4 @@
-# NosoTrack Typography Rules
+# Nosotrack Typography Rules
 
 Single source of truth for type styles across the site. When in doubt,
 match these classes verbatim — that's the whole point of writing them

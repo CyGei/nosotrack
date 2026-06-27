@@ -13,9 +13,9 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — NosoTrack",
+  title: "Privacy Policy — Nosotrack",
   description:
-    "NosoTrack privacy policy — what we collect, why, and how to contact us.",
+    "Nosotrack privacy policy — what we collect, why, and how to contact us.",
   robots: { index: true, follow: true },
 };
 
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
             href="/"
             className="mb-8 inline-block font-mono text-[12px] text-mute transition-colors hover:text-ink"
           >
-            ← Back to NosoTrack
+            ← Back to Nosotrack
           </Link>
 
           <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-mute">
@@ -50,7 +50,7 @@ export default function PrivacyPage() {
           <Prose>
             <p>
               This Privacy Policy explains what personal information is
-              collected when you use the NosoTrack website at{" "}
+              collected when you use the Nosotrack website at{" "}
               <A href="https://nosotrack.com">nosotrack.com</A> (the
               &ldquo;Site&rdquo;), how that information is used, and the
               choices you have. The Site is operated by Cyril Geismar

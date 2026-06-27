@@ -12,7 +12,7 @@ import { LenisProvider } from "@/components/LenisProvider";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
-const SITE_TITLE = "NosoTrack";
+const SITE_TITLE = "Nosotrack";
 const SITE_DESCRIPTION = "Outbreak forensics and control.";
 
 export const metadata: Metadata = {

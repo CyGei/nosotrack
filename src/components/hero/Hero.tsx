@@ -12,7 +12,7 @@
  *   3. BLUEPRINTS   — hospital | ship | farm       "Deployable
  *                     side-by-side, all three       anywhere."
  *                     particle networks live
- *   4. BRAND        — NosoTrack lockup with a      "Track. Intervene.
+ *   4. BRAND        — Nosotrack lockup with a      "Track. Intervene.
  *                     one-time entrance spin       Protect."
  *                     + slide-left choreography
  *
@@ -669,7 +669,7 @@ function BrandOutro({
         href="https://nosotrack.onrender.com"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Explore the NosoTrack platform (opens in a new tab)"
+        aria-label="Explore the Nosotrack platform (opens in a new tab)"
         className={itemClass}
         {...gate}
       >
@@ -697,7 +697,7 @@ function BrandOutro({
       <button
         type="button"
         onClick={onLearnMore}
-        aria-label="Scroll to learn more about NosoTrack"
+        aria-label="Scroll to learn more about Nosotrack"
         className={itemClass}
         {...gate}
       >

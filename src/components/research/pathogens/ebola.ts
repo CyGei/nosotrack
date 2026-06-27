@@ -15,7 +15,7 @@ import type { PathogenSpec } from "./types";
  * this model — bump up to 0.15 if Cy wants more red, drop to 0.06 if
  * less.
  *
- * License: CC-BY-NC 4.0. NosoTrack ships this for research / preview
+ * License: CC-BY-NC 4.0. Nosotrack ships this for research / preview
  * use; commercial use would require contacting the author.
  */
 export const EBOLA: PathogenSpec = {

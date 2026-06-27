@@ -21,7 +21,7 @@ export const CAURIS: PathogenSpec = {
   source: {
     nih3dEntryId: "nosotrack/c-auris",
     nih3dEntryUrl: "https://www.cdc.gov/candida-auris/index.html",
-    creator: "NosoTrack (AI-assisted image-to-3D)",
+    creator: "Nosotrack (AI-assisted image-to-3D)",
     license: "Public Domain",
   },
 };

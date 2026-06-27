@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Scene "Brand" — closing frame: NosoTrack mark + motto.
+ * Scene "Brand" — closing frame: Nosotrack mark + motto.
  *
  * Choreographed sequence (Pattern C) on desktop:
  *
@@ -142,7 +142,7 @@ export function SceneBrand({
   return (
     <div className="absolute inset-0 overflow-hidden bg-[var(--color-bg-ink)]">
       <div className="container-page relative z-10 h-full">
-        {/* LOCKUP — icon + "NosoTrack" wordmark stacked as one unit,
+        {/* LOCKUP — icon + "Nosotrack" wordmark stacked as one unit,
             following the nav/footer brand convention. The whole
             lockup translates together via `left`; `translate(-50%,
             -50%)` keeps the lockup's centre aligned with the `left`
@@ -193,7 +193,7 @@ export function SceneBrand({
 
 /* ───────────────────────────────────────────────────────────────
    BrandLockup — vertical stack of the spinning mark above the
-   "NosoTrack" wordmark. Same lockup pattern the nav and footer use,
+   "Nosotrack" wordmark. Same lockup pattern the nav and footer use,
    just at hero scale. Renders as one unit so the slide animation
    moves both together.
    ─────────────────────────────────────────────────────────────── */
@@ -219,7 +219,7 @@ function BrandLockup({
         className={iconClassName}
       />
       {/* BrandWordmark uses em-relative sizing, so this wrapper's
-          font-size drives how big "NosoTrack" reads. text-inv-hi
+          font-size drives how big "Nosotrack" reads. text-inv-hi
           gives the cream colour to "Noso"; "Track" picks up red from
           the wordmark's own .text-alert class. */}
       <span

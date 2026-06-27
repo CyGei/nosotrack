@@ -2,12 +2,12 @@
 //
 // Vertical hierarchy that re-wires at integration:
 //   TOP     3 data-stream logos (EHR / LAB / RTLS)
-//   MIDDLE  NosoTrack logo (appears at integration)
+//   MIDDLE  Nosotrack logo (appears at integration)
 //   BOTTOM  the live hospital platform
 //
 // Per stream: a detailed card appears, its logo slides UP to dock at the
 // top trailing an information edge to the hospital PLATFORM. At integration
-// those edges lift off the platform and re-route into the NosoTrack logo,
+// those edges lift off the platform and re-route into the Nosotrack logo,
 // which sends ONE edge to the platform; the transmission tree draws there.
 //
 // Reuses (window): React, COLOR, FONT_DISPLAY, FONT_MONO, Easing, clamp,
@@ -25,8 +25,8 @@ const T = {
 
 const DOCK_Y = 76;
 const HEADER_Y = 124;
-const NT = [640, 208];           // NosoTrack hub
-const PLAT_CENTER = [640, 372];  // NosoTrack → hospital landing point
+const NT = [640, 208];           // Nosotrack hub
+const PLAT_CENTER = [640, 372];  // Nosotrack → hospital landing point
 
 // description placement: the open block opposite each card
 const BOX_R = { x: 808, y: 168, w: 432 };  // right (for left/centre cards)
@@ -121,7 +121,7 @@ const CAPS = [
   { text: 'Electronic Health Records inform on patient status, admission dates, transfers, and ward allocations.', a: T.ehrCard, b: T.labCard, box: BOX_R },
   { text: 'Lab results inform on pathogen relatedness.', a: T.labCard, b: T.rtlsCard, box: BOX_R },
   { text: 'Real-Time Location System informs on contacts.', a: T.rtlsCard, b: T.integ, box: BOX_L },
-  { text: 'NosoTrack fuses the data streams into a unified analytical engine.', a: T.integ, b: T.treeStart + 2.0, box: BOX_R },
+  { text: 'Nosotrack fuses the data streams into a unified analytical engine.', a: T.integ, b: T.treeStart + 2.0, box: BOX_R },
 ];
 
 // ── helpers ─
@@ -414,7 +414,7 @@ function IntegrationScene() {
       {SP.map((p) => <DetailCard key={p.s.key} s={p.s} op={p.cardOp} fastaN={fastaN} />)}
       {SP.map((p) => <DockLogo key={p.s.key} pos={p.logoPos} kind={p.s.glyph} op={p.logoOp} />)}
 
-      {/* ============ NosoTrack hub ============ */}
+      {/* ============ Nosotrack hub ============ */}
       {markOp > 0.01 && (
         <div style={{ position: 'absolute', left: NT[0], top: NT[1], transform: 'translate(-50%, -50%)', opacity: markOp }}>
           <FdyBrandMark size={56} pulse networkSpin={spin} />

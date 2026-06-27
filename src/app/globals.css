@@ -1,5 +1,5 @@
 /* =========================================================================
-   NosoTrack — redesign-v4
+   Nosotrack — redesign-v4
    Global styles + Tailwind v4 theme tokens.
 
    ALL colour/typography tokens are lifted verbatim from DESIGN_BRIEF.md §2–§4.
@@ -71,7 +71,7 @@
   --spacing-s12: 96px;
 
   /* ============ MOTION ============ */
-  --ease-nt: cubic-bezier(0.2, 0, 0, 1);          /* the NosoTrack curve */
+  --ease-nt: cubic-bezier(0.2, 0, 0, 1);          /* the Nosotrack curve */
   --transition-duration-fast: 160ms;
   --transition-duration-base: 320ms;
   --transition-duration-slow: 800ms;

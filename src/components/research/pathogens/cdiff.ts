@@ -22,7 +22,7 @@ export const CDIFF: PathogenSpec = {
   source: {
     nih3dEntryId: "nosotrack/c-diff",
     nih3dEntryUrl: "https://www.cdc.gov/c-diff/index.html",
-    creator: "NosoTrack (AI-assisted image-to-3D)",
+    creator: "Nosotrack (AI-assisted image-to-3D)",
     license: "Public Domain",
   },
 };

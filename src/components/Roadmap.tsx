@@ -37,13 +37,13 @@ type RoadmapPhase = {
 };
 
 const ROADMAP_INTRO =
-  "We are seeking collaborators and funding to validate and deploy NosoTrack in two stages.";
+  "We are seeking collaborators and funding to validate and deploy Nosotrack in two stages.";
 
 const PHASES: RoadmapPhase[] = [
   {
     badge: "Phase 1",
     title: "Simulation Study",
-    desc: "Conduct simulation studies under realistic operational constraints to determine the conditions under which NosoTrack improves outbreak control.<br>This phase will assess NosoTrack's effectiveness across pathogens, hospital settings, and levels of data availability.",
+    desc: "Conduct simulation studies under realistic operational constraints to determine the conditions under which Nosotrack improves outbreak control.<br>This phase will assess Nosotrack's effectiveness across pathogens, hospital settings, and levels of data availability.",
   },
   {
     badge: "Phase 2",

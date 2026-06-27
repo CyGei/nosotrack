@@ -1,4 +1,4 @@
-// common.jsx — Shared design helpers for the NosoTrack Foundry demo
+// common.jsx — Shared design helpers for the Nosotrack Foundry demo
 
 const COLOR = {
   bg:        '#fafafa',
@@ -68,7 +68,7 @@ function FdyBrandMark({
   );
 }
 
-// "NosoTrack" wordmark
+// "Nosotrack" wordmark
 function FdyWordmark({ size = 24 }) {
   return (
     <span style={{
@@ -76,7 +76,7 @@ function FdyWordmark({ size = 24 }) {
       letterSpacing: '-0.03em', lineHeight: 1, whiteSpace: 'nowrap',
     }}>
       <span style={{ color: COLOR.ink }}>Noso</span>
-      <span style={{ color: COLOR.alert }}>Track</span>
+      <span style={{ color: COLOR.alert }}>track</span>
     </span>
   );
 }
@@ -265,7 +265,7 @@ function FdyBluetooth({ cx, cy, size = 28, color = COLOR.ink, opacity = 1, pulse
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// DNAViz — sliding helix bars (ported from /Users/cy/Downloads/NosoTrack)
+// DNAViz — sliding helix bars (ported from /Users/cy/Downloads/Nosotrack)
 // Used on the Diagnostic Lab platform (genomic sequencing card)
 // ─────────────────────────────────────────────────────────────────────────
 function FdyDNAViz({ t, w = 200, h = 70 }) {

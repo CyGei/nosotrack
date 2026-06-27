@@ -7,7 +7,7 @@
  *   - Section title (display, large) — "Pathogen agnostic, ready for
  *     disease X."
  *   - Two-column block under the heading:
- *       · left  — lead paragraph framing NosoTrack's research provenance
+ *       · left  — lead paragraph framing Nosotrack's research provenance
  *                 (outbreaker2, linktree, applied outbreak history).
  *       · right — Disease X spotlight (large clickable 3D specimen).
  *                 Pairs with the "…ready for disease X." line in the
@@ -50,7 +50,7 @@ export function Research() {
         <div className="mt-12 grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-16 md:items-center">
           <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink md:col-span-7 text-justify hyphens-auto [text-wrap:pretty]">
             <p>
-              NosoTrack builds on over a decade of research in outbreak
+              Nosotrack builds on over a decade of research in outbreak
               forensics, focusing on the integration of epidemiological,
               genomic and contact data to infer transmission trees.
             </p>

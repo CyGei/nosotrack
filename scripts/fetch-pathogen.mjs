@@ -33,7 +33,7 @@
  *
  * Requirements:
  *   - `gltfpack` on PATH (else falls back to `npx gltfpack`).
- *   - `three`, `jsdom` in node_modules — already in NosoTrack's deps.
+ *   - `three`, `jsdom` in node_modules — already in Nosotrack's deps.
  */
 
 import { writeFileSync, mkdirSync, existsSync, statSync, unlinkSync } from "node:fs";

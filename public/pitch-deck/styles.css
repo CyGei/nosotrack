@@ -1,5 +1,5 @@
 /* =========================================================================
-   NosoTrack — Design v2 (Palantir-inspired)
+   Nosotrack — Design v2 (Palantir-inspired)
    Branch: designv2
 
    Organization
@@ -810,10 +810,10 @@ body.has-playbar-fs .dark-band { z-index: 9998; }
 .about-text p:last-child { margin-bottom: 0; }
 
 /* ── BRAND WORDMARK ────────────────────────────────────────────────────────
-   Any occurrence of "NosoTrack" is rendered as a two-span wordmark:
+   Any occurrence of "Nosotrack" is rendered as a two-span wordmark:
      <span class="brand">
        <span class="brand-noso">Noso</span>
-       <span class="brand-track">Track</span>
+       <span class="brand-track">track</span>
      </span>
    The wordmark uses JetBrains Mono across the site. Red "Track" is scoped to
    the nav and footer logos only (brand chrome), leaving body copy neutral. */

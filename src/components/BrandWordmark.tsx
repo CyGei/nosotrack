@@ -1,19 +1,19 @@
 /**
- * BrandWordmark — the canonical NosoTrack lockup, ported verbatim from
+ * BrandWordmark — the canonical Nosotrack lockup, ported verbatim from
  * main branch legacy/styles.css `.brand`, `.brand-track`, `.brand-tm`
  * and the brandify() helper in content-loader.js.
  *
  * Structure:
  *   <span.brand>
  *     Noso
- *     <span.brand-track>Track</span>   ← always rendered in --alert red
+ *     <span.brand-track>track</span>   ← always rendered in --alert red
  *   </span.brand>
  *   <sup.brand-tm>™</sup>              ← tiny superscript trademark
  *
  * The component renders em-relative sizes so the parent's font-size
  * controls the overall scale:
- *   - Nav parent  17 px → "NosoTrack" ≈ 16 px, ™ ≈ 9 px
- *   - Footer parent 16 px → "NosoTrack" ≈ 15 px, ™ ≈ 9 px
+ *   - Nav parent  17 px → "Nosotrack" ≈ 16 px, ™ ≈ 9 px
+ *   - Footer parent 16 px → "Nosotrack" ≈ 15 px, ™ ≈ 9 px
  *
  * "Track" always uses --color-alert (red is reserved for outbreak signal,
  * but the brand chrome is the one exception per the main DESIGN_BRIEF).
@@ -25,7 +25,7 @@ export function BrandWordmark() {
   return (
     <>
       <span className="whitespace-nowrap font-mono text-[0.94em] font-medium tracking-[-0.02em]">
-        Noso<span className="text-alert">Track</span>
+        Noso<span className="text-alert">track</span>
       </span>
       <sup
         aria-label="trademark"

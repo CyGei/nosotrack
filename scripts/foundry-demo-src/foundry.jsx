@@ -28,7 +28,7 @@ function BrandIntro() {
   const lockupOp = clamp((t - 1.1) / 0.4, 0, 1);
   const lockupTypeP = clamp((t - 1.2) / 0.6, 0, 1);
   const lockupChars = Math.floor(lockupTypeP * 9);
-  const noso = 'NosoTrack'.slice(0, lockupChars);
+  const noso = 'Nosotrack'.slice(0, lockupChars);
 
   const tagOp = clamp((t - 1.9) / 0.4, 0, 1);
 
@@ -385,7 +385,7 @@ function FoundryStack({ mode = 'default' }) {
         transformOrigin: `${LOGO_X}px ${LOGO_Y}px`,
         willChange: 'transform, opacity',
       }}>
-        {/* Centered NosoTrack header */}
+        {/* Centered Nosotrack header */}
         <div style={{
           position: 'absolute', left: '50%', top: 80,
           transform: `translateX(-50%) translateY(${(1 - headerOp) * -8}px)`,
@@ -569,7 +569,7 @@ function FoundryStack({ mode = 'default' }) {
             curve={0.5}
           />
 
-          {/* ========== BOTTOM PLATFORM — NosoTrack ========== */}
+          {/* ========== BOTTOM PLATFORM — Nosotrack ========== */}
           <g opacity={bottomPlatformP}
             transform={`translate(0, ${(1 - bottomPlatformP) * 14})`}>
             <FdyPlatform

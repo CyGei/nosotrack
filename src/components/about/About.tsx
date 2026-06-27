@@ -12,10 +12,10 @@
  *   0.2  Integration unlocks intelligence.
  *        → Video shows the three-layer stack: data sources, the
  *          hospital floor with patient/staff movement, and the
- *          NosoTrack analytics layer at the bottom.
+ *          Nosotrack analytics layer at the bottom.
  *
  *   0.3  Outbreak forensics, end to end.
- *        → Video walks through the cursor clicking the NosoTrack logo
+ *        → Video walks through the cursor clicking the Nosotrack logo
  *          and the dashboard expanding to the full forensics view.
  */
 
@@ -42,7 +42,7 @@ export function About() {
     <section
       id="about"
       className="border-t border-rule bg-bg"
-      aria-label="How NosoTrack works"
+      aria-label="How Nosotrack works"
     >
       {/* 0.1 — Problem */}
       <AboutBlock
@@ -107,7 +107,7 @@ export function About() {
       <AboutBlock
         id="0.2"
         title="Integration unlocks intelligence."
-        subtitle= "Current tools work in silos. NosoTrack fuses their data streams into a unified analytical engine."
+        subtitle= "Current tools work in silos. Nosotrack fuses their data streams into a unified analytical engine."
         video={<FoundryFrame scene="integration" />}
         details={
           <DetailsList
@@ -137,7 +137,7 @@ export function About() {
       <AboutBlock
         id="0.3"
         title="Outbreak forensics, end to end."
-        subtitle="NosoTrack infers who-infected-whom in real-time, enabling infection prevention and control teams to identify how infections spread and design targeted interventions before outbreaks escalate"
+        subtitle="Nosotrack infers who-infected-whom in real-time, enabling infection prevention and control teams to identify how infections spread and design targeted interventions before outbreaks escalate"
         video={<FoundryFrame scene="endtoend" />}
         details={
           <DetailsList

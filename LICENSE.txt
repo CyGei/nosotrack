@@ -2,7 +2,7 @@ PROPRIETARY SOFTWARE — ALL RIGHTS RESERVED
 
 Copyright (c) 2026 Cyril Geismar. All rights reserved.
 
-This software, the NosoTrack name and wordmark, the accompanying website
+This software, the Nosotrack name and wordmark, the accompanying website
 content, source code, designs, graphics, text, and any other materials
 contained in this repository (collectively, the "Work") are the proprietary
 and confidential property of Cyril Geismar.

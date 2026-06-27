@@ -1028,7 +1028,7 @@ function StrategyDrawer({ p, deployClickP }) {
 // ─────────────────────────────────────────────────────────────────────────
 // NotificationLogo — pre-dashboard intro for the About 0.3 (endtoend) loop.
 //
-// Shows the NosoTrack brand mark large in the centre of the stage with
+// Shows the Nosotrack brand mark large in the centre of the stage with
 // the wordmark below, plus an iOS-style red notification badge in the
 // top-right that counts 1 → 2 → 3 → 4 as alerts roll in. At lt = CLICK_T
 // (synchronised with the DashboardScene cursor click) the inner network
@@ -1148,7 +1148,7 @@ function NotificationLogo({ logoX = 640, logoY = 360 } = {}) {
             }}
           >
             <span style={{ color: COLOR.ink }}>Noso</span>
-            <span style={{ color: COLOR.alert }}>Track</span>
+            <span style={{ color: COLOR.alert }}>track</span>
           </span>
         </div>
 

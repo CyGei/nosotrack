@@ -1,4 +1,4 @@
-# NosoTrack brand assets
+# Nosotrack brand assets
 
 Canonical brand marks. **Do not regenerate these files.** They are the
 source-of-truth lockups and icons for any marketing or partner-supplied
