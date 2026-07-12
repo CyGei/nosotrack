@@ -96,7 +96,7 @@ export function About() {
               },
               {
                 title: "AMR's most underrated driver",
-                desc: "Hospital outbreaks are the breeding ground for resistant strains. Stopping them earlier is the cheapest and most efficent solution.",
+                desc: "Hospital outbreaks are the breeding ground for resistant strains. Stopping them earlier is the cheapest and most efficient solution.",
               },
             ]}
           />
@@ -118,7 +118,7 @@ export function About() {
               },
               {
                 title: "Integration",
-                desc: "Electionic Health Records (EHR), diagnostic lab results and Real-Time Location Systems (RTLS) unified into a single engine.",
+                desc: "Electronic Health Records (EHR), diagnostic lab results and Real-Time Location Systems (RTLS) unified into a single engine.",
               },
               {
                 title: "Inference",

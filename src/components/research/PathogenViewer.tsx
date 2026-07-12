@@ -251,6 +251,10 @@ export function PathogenViewer({
         }
       }
       renderer.dispose();
+      // Explicitly drop the WebGL context — browsers cap live contexts
+      // (~16), and the ticker/spotlight mount many specimens, so relying on
+      // GC to reclaim them can blank later canvases.
+      renderer.forceContextLoss();
       if (renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);
       }

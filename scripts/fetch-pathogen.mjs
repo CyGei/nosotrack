@@ -33,7 +33,7 @@
  *
  * Requirements:
  *   - `gltfpack` on PATH (else falls back to `npx gltfpack`).
- *   - `three`, `jsdom` in node_modules — already in Nosotrack's deps.
+ *   - `three` in node_modules — already in Nosotrack's deps.
  */
 
 import { writeFileSync, mkdirSync, existsSync, statSync, unlinkSync } from "node:fs";
@@ -219,12 +219,10 @@ const normLicense =
         ? "Public Domain"
         : license;
 
-// For WRL-converted meshes the classifier almost always wants radial
-// (cutaways tend to be radially symmetric virions). For named-material
-// GLBs you usually want material-name. Default the stub to radial.
-const defaultClassifier = isGlbSource
-  ? `{ kind: "radial", cutoffRatio: 0.78 }`
-  : `{ kind: "radial", cutoffRatio: 0.78 }`;
+// Virion meshes (WRL cutaways and most GLBs alike) tend to be radially
+// symmetric, so the stub defaults to the radial classifier; hand-tune per
+// specimen if a named-material split reads better.
+const defaultClassifier = `{ kind: "radial", cutoffRatio: 0.78 }`;
 
 console.log("");
 console.log(

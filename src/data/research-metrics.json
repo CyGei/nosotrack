@@ -1,0 +1,2263 @@
+{
+  "generatedAt": "2026-07-10",
+  "source": "OpenAlex (publications & citations) + cranlogs (downloads)",
+  "people": {
+    "publications": 311,
+    "citations": 46762,
+    "perPerson": [
+      {
+        "key": "jombart",
+        "name": "Thibaut Jombart",
+        "orcid": "0000-0003-2226-8692",
+        "publications": 174,
+        "citations": 35165
+      },
+      {
+        "key": "cori",
+        "name": "Anne Cori",
+        "orcid": "0000-0002-8443-9162",
+        "publications": 127,
+        "citations": 12715
+      },
+      {
+        "key": "campbell",
+        "name": "Finlay Campbell",
+        "orcid": "0000-0002-1849-1886",
+        "publications": 16,
+        "citations": 1822
+      },
+      {
+        "key": "geismar",
+        "name": "Cyril Geismar",
+        "orcid": "0000-0002-8486-5890",
+        "publications": 33,
+        "citations": 1031
+      }
+    ]
+  },
+  "tools": {
+    "count": 6,
+    "papers": 65,
+    "downloads": 312164,
+    "citations": 4046,
+    "teamCiting": 102
+  },
+  "packages": [
+    {
+      "id": "epiestim",
+      "name": "EpiEstim",
+      "crans": [
+        "EpiEstim"
+      ],
+      "repo": "https://github.com/mrc-ide/EpiEstim",
+      "blurb": "Estimates the time-varying reproduction number Rₜ from incidence and the serial interval — the standard tool for tracking transmissibility in real time.",
+      "methodsPaper": {
+        "doi": "10.1093/aje/kwt133",
+        "title": "A New Framework and Software to Estimate Time-Varying Reproduction Numbers During Epidemics",
+        "year": 2013,
+        "venue": "American Journal of Epidemiology"
+      },
+      "papers": [
+        {
+          "doi": "10.1093/aje/kwt133",
+          "title": "A New Framework and Software to Estimate Time-Varying Reproduction Numbers During Epidemics",
+          "year": 2013,
+          "venue": "American Journal of Epidemiology",
+          "role": "methods",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2019.100356",
+          "title": "Improved inference of time-varying reproduction numbers during infectious disease outbreaks",
+          "year": 2019,
+          "venue": "Epidemics",
+          "role": "methods",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1038/s41467-021-21358-2",
+          "title": "Reduction in mobility and COVID-19 transmission",
+          "year": 2021,
+          "venue": "Nature Communications",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.ppat.1006885",
+          "title": "When are pathogen genome sequences informative of transmission events?",
+          "year": 2018,
+          "venue": "PLoS Pathogens",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1098/rstb.2018.0276",
+          "title": "Outbreak analytics: a developing data science for informing the response to emerging pathogens",
+          "year": 2019,
+          "venue": "Philosophical Transactions of the Royal Society B Biological Sciences",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1126/scitranslmed.abg4262",
+          "title": "Key epidemiological drivers and impact of interventions in the 2020 SARS-CoV-2 epidemic in England",
+          "year": 2021,
+          "venue": "Science Translational Medicine",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/s0140-6736(18)31387-4",
+          "title": "Outbreak of Ebola virus disease in the Democratic Republic of the Congo, April–May, 2018: an epidemiological study",
+          "year": 2018,
+          "venue": "The Lancet",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1098/rstb.2016.0371",
+          "title": "Key data for outbreak evaluation: building on the Ebola experience",
+          "year": 2017,
+          "venue": "Philosophical Transactions of the Royal Society B Biological Sciences",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.pmed.1002170",
+          "title": "Exposure Patterns Driving Ebola Transmission in West Africa: A Retrospective Observational Study",
+          "year": 2016,
+          "venue": "PLoS Medicine",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.pcbi.1006930",
+          "title": "Bayesian inference of transmission chains using timing of symptoms, pathogen genomes and contact data",
+          "year": 2019,
+          "venue": "PLoS Computational Biology",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2017.02.012",
+          "title": "A simple approach to measure transmissibility and forecast incidence",
+          "year": 2017,
+          "venue": "Epidemics",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1038/s41746-021-00442-3",
+          "title": "Using digital surveillance tools for near real-time mapping of the risk of infectious disease spread",
+          "year": 2021,
+          "venue": "npj Digital Medicine",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.12688/f1000research.18002.1",
+          "title": "Epidemic curves made easy using the R package incidence",
+          "year": 2019,
+          "venue": "F1000Research",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.pdig.0000052",
+          "title": "Real-time estimation of the epidemic reproduction number: Scoping review of the applications and challenges",
+          "year": 2022,
+          "venue": "PLOS Digital Health",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.jhin.2021.07.013",
+          "title": "Explosive nosocomial outbreak of SARS-CoV-2 in a rehabilitation clinic: the limits of genomics for outbreak reconstruction",
+          "year": 2021,
+          "venue": "Journal of Hospital Infection",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1038/s41467-023-39661-5",
+          "title": "Epidemiological drivers of transmissibility and severity of SARS-CoV-2 in England",
+          "year": 2023,
+          "venue": "Nature Communications",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.pcbi.1011439",
+          "title": "Estimating the epidemic reproduction number from temporally aggregated incidence data: A statistical modelling approach and software tool",
+          "year": 2023,
+          "venue": "PLoS Computational Biology",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.pcbi.1006554",
+          "title": "A graph-based evidence synthesis approach to detecting outbreak clusters: An application to dog rabies",
+          "year": 2018,
+          "venue": "PLoS Computational Biology",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1093/cid/ciaa1599",
+          "title": "A Comparative Analysis of Statistical Methods to Estimate the Reproduction Number in Emerging Epidemics, With Implications for the Current Coronavirus Disease 2019 (COVID-19) Pandemic",
+          "year": 2020,
+          "venue": "Clinical Infectious Diseases",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2014.04.003",
+          "title": "OutbreakTools: A new platform for disease outbreak analysis using the R software",
+          "year": 2014,
+          "venue": "Epidemics",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1093/aje/kwaa212",
+          "title": "A Quantitative Framework for Defining the End of an Infectious Disease Outbreak: Application to Ebola Virus Disease",
+          "year": 2020,
+          "venue": "American Journal of Epidemiology",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1098/rsif.2021.0429",
+          "title": "Inferring the reproduction number using the renewal equation in heterogeneous epidemics",
+          "year": 2022,
+          "venue": "Journal of The Royal Society Interface",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1186/s12916-023-03108-x",
+          "title": "A mathematical model of Marburg virus disease outbreaks and the potential role of vaccination in control",
+          "year": 2023,
+          "venue": "BMC Medicine",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2024.100784",
+          "title": "Inference of epidemic dynamics in the COVID-19 era and beyond",
+          "year": 2024,
+          "venue": "Epidemics",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1186/s13756-022-01092-0",
+          "title": "Occupational and community risk of SARS-CoV-2 infection among employees of a long-term care facility: an observational study",
+          "year": 2022,
+          "venue": "Antimicrobial Resistance and Infection Control",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2023.100692",
+          "title": "Extending EpiEstim to estimate the transmission advantage of pathogen variants in real-time: SARS-CoV-2 as a case-study",
+          "year": 2023,
+          "venue": "Epidemics",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2024.100773",
+          "title": "A simulation-based approach for estimating the time-dependent reproduction number from temporally aggregated disease incidence time series data",
+          "year": 2024,
+          "venue": "Epidemics",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1038/s41467-024-49888-5",
+          "title": "Using real-time modelling to inform the 2017 Ebola outbreak response in DR Congo",
+          "year": 2024,
+          "venue": "Nature Communications",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2023.100713",
+          "title": "Bayesian reconstruction of SARS-CoV-2 transmissions highlights substantial proportion of negative serial intervals",
+          "year": 2023,
+          "venue": "Epidemics",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.lana.2023.100533",
+          "title": "Modeling vaccination coverage during the 2022 central Ohio measles outbreak: a cross-sectional study",
+          "year": 2023,
+          "venue": "The Lancet Regional Health - Americas",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.ijid.2024.107182",
+          "title": "Pandemic burden in low-income settings and impact of limited and delayed interventions: A granular modelling analysis of COVID-19 in Kabwe, Zambia",
+          "year": 2024,
+          "venue": "International Journal of Infectious Diseases",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.pone.0286199",
+          "title": "Retrospective evaluation of real-time estimates of global COVID-19 transmission trends and mortality forecasts",
+          "year": 2023,
+          "venue": "PLoS ONE",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.32614/cran.package.epiestim",
+          "title": "EpiEstim: Estimate Time Varying Reproduction Numbers from Epidemic Curves",
+          "year": 2012,
+          "venue": null,
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2024.01.12.24301247",
+          "title": "Estimating epidemiological delay distributions for infectious diseases",
+          "year": 2024,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2020.05.13.20101121",
+          "title": "A comparative analysis of statistical methods to estimate the reproduction number in emerging epidemics with implications for the current COVID-19 pandemic",
+          "year": 2020,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2023.09.13.23295471",
+          "title": "A simulation-based approach for estimating the time-dependent reproduction number from temporally aggregated disease incidence time series data",
+          "year": 2023,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.32614/cran.package.earlyr",
+          "title": "earlyR: Estimation of Transmissibility in the Early Stages of a Disease Outbreak",
+          "year": 2017,
+          "venue": null,
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2021.11.26.21266899",
+          "title": "A generic method and software to estimate the transmission advantage of pathogen variants in real-time : SARS-CoV-2 as a case-study",
+          "year": 2021,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2023.02.10.23285516",
+          "title": "Epidemiological drivers of transmissibility and severity of SARS-CoV-2 in England",
+          "year": 2023,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2020.02.17.20024042",
+          "title": "A quantitative framework to define the end of an outbreak: application to Ebola Virus Disease",
+          "year": 2020,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.21203/rs.3.rs-799162/v1",
+          "title": "Global predictions of short- to medium-term COVID-19 transmission trends : a retrospective assessment",
+          "year": 2021,
+          "venue": "Research Square",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2021.07.19.21260746",
+          "title": "Global predictions of short- to medium-term COVID-19 transmission trends : a retrospective assessment",
+          "year": 2021,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2022.12.08.22283241",
+          "title": "Estimating the epidemic reproduction number from temporally aggregated incidence data: a statistical modelling approach and software tool",
+          "year": 2022,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2024.10.28.24316306",
+          "title": "The R = 1 threshold can misclassify epidemic stability",
+          "year": 2024,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/19011940",
+          "title": "Using Digital Surveillance Tools for Near Real-Time Mapping of the Risk of International Infectious Disease Spread: Ebola as a Case Study",
+          "year": 2019,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2021.10.22.21265309",
+          "title": "Occupational versus community risk of SARS-CoV-2 infection among employees of a long-term care facility: an observational study",
+          "year": 2021,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.2139/ssrn.4797660",
+          "title": "Pandemic Burden in Low-Income Settings and Impact of Limited and Delayed Interventions: A Granular Modelling Analysis of COVID-19 in Kabwe, Zambia",
+          "year": 2024,
+          "venue": "SSRN Electronic Journal",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2025.10.20.25338346",
+          "title": "Forecasting COVID-19 cases in US states using reconstructed incidence data",
+          "year": 2025,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2025.07.18.25331563",
+          "title": "Revisiting the plague epidemic in Gévaudan, 1720-1722: the key roles of multiple zoonotic introductions and human-to-human transmission",
+          "year": 2025,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2025.11.17.25340271",
+          "title": "EpiControl: a data-driven tool for optimising epidemic interventions and automating scenario planning to support real-time response",
+          "year": 2025,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2026.100922",
+          "title": "A stochastic meta-population model of Ebola virus disease transmission for informing public health decisions",
+          "year": 2026,
+          "venue": "Epidemics",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.31219/osf.io/mg497",
+          "title": "Inference of epidemic dynamics in the COVID-19 era and beyond",
+          "year": 2024,
+          "venue": null,
+          "role": "application",
+          "byTeam": true
+        }
+      ],
+      "paperCount": 52,
+      "citations": 3694,
+      "downloads": 216770,
+      "downloadsMonthly": [
+        {
+          "month": "2012-10",
+          "downloads": 7
+        },
+        {
+          "month": "2012-11",
+          "downloads": 49
+        },
+        {
+          "month": "2012-12",
+          "downloads": 69
+        },
+        {
+          "month": "2013-01",
+          "downloads": 104
+        },
+        {
+          "month": "2013-02",
+          "downloads": 123
+        },
+        {
+          "month": "2013-03",
+          "downloads": 187
+        },
+        {
+          "month": "2013-04",
+          "downloads": 184
+        },
+        {
+          "month": "2013-05",
+          "downloads": 150
+        },
+        {
+          "month": "2013-06",
+          "downloads": 129
+        },
+        {
+          "month": "2013-07",
+          "downloads": 155
+        },
+        {
+          "month": "2013-08",
+          "downloads": 139
+        },
+        {
+          "month": "2013-09",
+          "downloads": 237
+        },
+        {
+          "month": "2013-10",
+          "downloads": 163
+        },
+        {
+          "month": "2013-11",
+          "downloads": 162
+        },
+        {
+          "month": "2013-12",
+          "downloads": 149
+        },
+        {
+          "month": "2014-01",
+          "downloads": 239
+        },
+        {
+          "month": "2014-02",
+          "downloads": 196
+        },
+        {
+          "month": "2014-03",
+          "downloads": 244
+        },
+        {
+          "month": "2014-04",
+          "downloads": 259
+        },
+        {
+          "month": "2014-05",
+          "downloads": 202
+        },
+        {
+          "month": "2014-06",
+          "downloads": 195
+        },
+        {
+          "month": "2014-07",
+          "downloads": 207
+        },
+        {
+          "month": "2014-08",
+          "downloads": 327
+        },
+        {
+          "month": "2014-09",
+          "downloads": 255
+        },
+        {
+          "month": "2014-10",
+          "downloads": 311
+        },
+        {
+          "month": "2014-11",
+          "downloads": 335
+        },
+        {
+          "month": "2014-12",
+          "downloads": 232
+        },
+        {
+          "month": "2015-01",
+          "downloads": 374
+        },
+        {
+          "month": "2015-02",
+          "downloads": 296
+        },
+        {
+          "month": "2015-03",
+          "downloads": 377
+        },
+        {
+          "month": "2015-04",
+          "downloads": 463
+        },
+        {
+          "month": "2015-05",
+          "downloads": 307
+        },
+        {
+          "month": "2015-06",
+          "downloads": 283
+        },
+        {
+          "month": "2015-07",
+          "downloads": 253
+        },
+        {
+          "month": "2015-08",
+          "downloads": 346
+        },
+        {
+          "month": "2015-09",
+          "downloads": 351
+        },
+        {
+          "month": "2015-10",
+          "downloads": 366
+        },
+        {
+          "month": "2015-11",
+          "downloads": 323
+        },
+        {
+          "month": "2015-12",
+          "downloads": 291
+        },
+        {
+          "month": "2016-01",
+          "downloads": 333
+        },
+        {
+          "month": "2016-02",
+          "downloads": 297
+        },
+        {
+          "month": "2016-03",
+          "downloads": 242
+        },
+        {
+          "month": "2016-04",
+          "downloads": 260
+        },
+        {
+          "month": "2016-05",
+          "downloads": 235
+        },
+        {
+          "month": "2016-06",
+          "downloads": 203
+        },
+        {
+          "month": "2016-07",
+          "downloads": 232
+        },
+        {
+          "month": "2016-08",
+          "downloads": 214
+        },
+        {
+          "month": "2016-09",
+          "downloads": 158
+        },
+        {
+          "month": "2016-10",
+          "downloads": 200
+        },
+        {
+          "month": "2016-11",
+          "downloads": 236
+        },
+        {
+          "month": "2016-12",
+          "downloads": 197
+        },
+        {
+          "month": "2017-01",
+          "downloads": 197
+        },
+        {
+          "month": "2017-02",
+          "downloads": 154
+        },
+        {
+          "month": "2017-03",
+          "downloads": 174
+        },
+        {
+          "month": "2017-04",
+          "downloads": 359
+        },
+        {
+          "month": "2017-05",
+          "downloads": 241
+        },
+        {
+          "month": "2017-06",
+          "downloads": 198
+        },
+        {
+          "month": "2017-07",
+          "downloads": 206
+        },
+        {
+          "month": "2017-08",
+          "downloads": 189
+        },
+        {
+          "month": "2017-09",
+          "downloads": 245
+        },
+        {
+          "month": "2017-10",
+          "downloads": 214
+        },
+        {
+          "month": "2017-11",
+          "downloads": 243
+        },
+        {
+          "month": "2017-12",
+          "downloads": 293
+        },
+        {
+          "month": "2018-01",
+          "downloads": 211
+        },
+        {
+          "month": "2018-02",
+          "downloads": 220
+        },
+        {
+          "month": "2018-03",
+          "downloads": 199
+        },
+        {
+          "month": "2018-04",
+          "downloads": 303
+        },
+        {
+          "month": "2018-05",
+          "downloads": 245
+        },
+        {
+          "month": "2018-06",
+          "downloads": 316
+        },
+        {
+          "month": "2018-07",
+          "downloads": 248
+        },
+        {
+          "month": "2018-08",
+          "downloads": 154
+        },
+        {
+          "month": "2018-09",
+          "downloads": 391
+        },
+        {
+          "month": "2018-10",
+          "downloads": 373
+        },
+        {
+          "month": "2018-11",
+          "downloads": 405
+        },
+        {
+          "month": "2018-12",
+          "downloads": 360
+        },
+        {
+          "month": "2019-01",
+          "downloads": 401
+        },
+        {
+          "month": "2019-02",
+          "downloads": 389
+        },
+        {
+          "month": "2019-03",
+          "downloads": 550
+        },
+        {
+          "month": "2019-04",
+          "downloads": 475
+        },
+        {
+          "month": "2019-05",
+          "downloads": 788
+        },
+        {
+          "month": "2019-06",
+          "downloads": 386
+        },
+        {
+          "month": "2019-07",
+          "downloads": 895
+        },
+        {
+          "month": "2019-08",
+          "downloads": 551
+        },
+        {
+          "month": "2019-09",
+          "downloads": 640
+        },
+        {
+          "month": "2019-10",
+          "downloads": 812
+        },
+        {
+          "month": "2019-11",
+          "downloads": 682
+        },
+        {
+          "month": "2019-12",
+          "downloads": 757
+        },
+        {
+          "month": "2020-01",
+          "downloads": 1140
+        },
+        {
+          "month": "2020-02",
+          "downloads": 884
+        },
+        {
+          "month": "2020-03",
+          "downloads": 3781
+        },
+        {
+          "month": "2020-04",
+          "downloads": 6221
+        },
+        {
+          "month": "2020-05",
+          "downloads": 6663
+        },
+        {
+          "month": "2020-06",
+          "downloads": 6198
+        },
+        {
+          "month": "2020-07",
+          "downloads": 4749
+        },
+        {
+          "month": "2020-08",
+          "downloads": 4409
+        },
+        {
+          "month": "2020-09",
+          "downloads": 4288
+        },
+        {
+          "month": "2020-10",
+          "downloads": 4222
+        },
+        {
+          "month": "2020-11",
+          "downloads": 4227
+        },
+        {
+          "month": "2020-12",
+          "downloads": 3661
+        },
+        {
+          "month": "2021-01",
+          "downloads": 4362
+        },
+        {
+          "month": "2021-02",
+          "downloads": 4314
+        },
+        {
+          "month": "2021-03",
+          "downloads": 4085
+        },
+        {
+          "month": "2021-04",
+          "downloads": 3428
+        },
+        {
+          "month": "2021-05",
+          "downloads": 3913
+        },
+        {
+          "month": "2021-06",
+          "downloads": 3623
+        },
+        {
+          "month": "2021-07",
+          "downloads": 4210
+        },
+        {
+          "month": "2021-08",
+          "downloads": 3568
+        },
+        {
+          "month": "2021-09",
+          "downloads": 3638
+        },
+        {
+          "month": "2021-10",
+          "downloads": 3480
+        },
+        {
+          "month": "2021-11",
+          "downloads": 3651
+        },
+        {
+          "month": "2021-12",
+          "downloads": 3347
+        },
+        {
+          "month": "2022-01",
+          "downloads": 3277
+        },
+        {
+          "month": "2022-02",
+          "downloads": 3186
+        },
+        {
+          "month": "2022-03",
+          "downloads": 3303
+        },
+        {
+          "month": "2022-04",
+          "downloads": 3013
+        },
+        {
+          "month": "2022-05",
+          "downloads": 2705
+        },
+        {
+          "month": "2022-06",
+          "downloads": 2380
+        },
+        {
+          "month": "2022-07",
+          "downloads": 2102
+        },
+        {
+          "month": "2022-08",
+          "downloads": 2090
+        },
+        {
+          "month": "2022-09",
+          "downloads": 1830
+        },
+        {
+          "month": "2022-10",
+          "downloads": 1812
+        },
+        {
+          "month": "2022-11",
+          "downloads": 2224
+        },
+        {
+          "month": "2022-12",
+          "downloads": 1740
+        },
+        {
+          "month": "2023-01",
+          "downloads": 1946
+        },
+        {
+          "month": "2023-02",
+          "downloads": 1357
+        },
+        {
+          "month": "2023-03",
+          "downloads": 1729
+        },
+        {
+          "month": "2023-04",
+          "downloads": 1355
+        },
+        {
+          "month": "2023-05",
+          "downloads": 1417
+        },
+        {
+          "month": "2023-06",
+          "downloads": 1053
+        },
+        {
+          "month": "2023-07",
+          "downloads": 1062
+        },
+        {
+          "month": "2023-08",
+          "downloads": 1092
+        },
+        {
+          "month": "2023-09",
+          "downloads": 1114
+        },
+        {
+          "month": "2023-10",
+          "downloads": 1155
+        },
+        {
+          "month": "2023-11",
+          "downloads": 1261
+        },
+        {
+          "month": "2023-12",
+          "downloads": 1155
+        },
+        {
+          "month": "2024-01",
+          "downloads": 1558
+        },
+        {
+          "month": "2024-02",
+          "downloads": 885
+        },
+        {
+          "month": "2024-03",
+          "downloads": 1032
+        },
+        {
+          "month": "2024-04",
+          "downloads": 1149
+        },
+        {
+          "month": "2024-05",
+          "downloads": 1168
+        },
+        {
+          "month": "2024-06",
+          "downloads": 1199
+        },
+        {
+          "month": "2024-07",
+          "downloads": 1224
+        },
+        {
+          "month": "2024-08",
+          "downloads": 988
+        },
+        {
+          "month": "2024-09",
+          "downloads": 1221
+        },
+        {
+          "month": "2024-10",
+          "downloads": 1095
+        },
+        {
+          "month": "2024-11",
+          "downloads": 965
+        },
+        {
+          "month": "2024-12",
+          "downloads": 1096
+        },
+        {
+          "month": "2025-01",
+          "downloads": 1410
+        },
+        {
+          "month": "2025-02",
+          "downloads": 1110
+        },
+        {
+          "month": "2025-03",
+          "downloads": 1411
+        },
+        {
+          "month": "2025-04",
+          "downloads": 1319
+        },
+        {
+          "month": "2025-05",
+          "downloads": 1124
+        },
+        {
+          "month": "2025-06",
+          "downloads": 1401
+        },
+        {
+          "month": "2025-07",
+          "downloads": 1591
+        },
+        {
+          "month": "2025-08",
+          "downloads": 1098
+        },
+        {
+          "month": "2025-09",
+          "downloads": 7975
+        },
+        {
+          "month": "2025-10",
+          "downloads": 4300
+        },
+        {
+          "month": "2025-11",
+          "downloads": 2197
+        },
+        {
+          "month": "2025-12",
+          "downloads": 3036
+        },
+        {
+          "month": "2026-01",
+          "downloads": 1838
+        },
+        {
+          "month": "2026-02",
+          "downloads": 1309
+        },
+        {
+          "month": "2026-03",
+          "downloads": 1120
+        },
+        {
+          "month": "2026-04",
+          "downloads": 1189
+        },
+        {
+          "month": "2026-05",
+          "downloads": 1149
+        },
+        {
+          "month": "2026-06",
+          "downloads": 1155
+        },
+        {
+          "month": "2026-07",
+          "downloads": 728
+        }
+      ]
+    },
+    {
+      "id": "outbreaker2",
+      "name": "outbreaker2",
+      "crans": [
+        "outbreaker2",
+        "outbreaker"
+      ],
+      "repo": "https://github.com/reconhub/outbreaker2",
+      "blurb": "A modular, extensible platform for outbreak reconstruction — consolidating the original outbreaker (2014) and its ground-up rewrite (2018).",
+      "methodsPaper": {
+        "doi": "10.1186/s12859-018-2330-z",
+        "title": "outbreaker2: a modular platform for outbreak reconstruction",
+        "year": 2018,
+        "venue": "BMC Bioinformatics"
+      },
+      "papers": [
+        {
+          "doi": "10.1186/s12859-018-2330-z",
+          "title": "outbreaker2: a modular platform for outbreak reconstruction",
+          "year": 2018,
+          "venue": "BMC Bioinformatics",
+          "role": "methods",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.pcbi.1003457",
+          "title": "Bayesian Reconstruction of Disease Outbreaks by Combining Epidemiologic and Genomic Data",
+          "year": 2014,
+          "venue": "PLoS Computational Biology",
+          "role": "methods",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1038/s41467-022-28291-y",
+          "title": "Characterising within-hospital SARS-CoV-2 transmission events using epidemiological and viral genomic data across two pandemic waves",
+          "year": 2022,
+          "venue": "Nature Communications",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.jhin.2021.07.013",
+          "title": "Explosive nosocomial outbreak of SARS-CoV-2 in a rehabilitation clinic: the limits of genomics for outbreak reconstruction",
+          "year": 2021,
+          "venue": "Journal of Hospital Infection",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2024.100784",
+          "title": "Inference of epidemic dynamics in the COVID-19 era and beyond",
+          "year": 2024,
+          "venue": "Epidemics",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2023.100713",
+          "title": "Bayesian reconstruction of SARS-CoV-2 transmissions highlights substantial proportion of negative serial intervals",
+          "year": 2023,
+          "venue": "Epidemics",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.pcbi.1008800",
+          "title": "Measuring the unknown: An estimator and simulation study for assessing case reporting during epidemics",
+          "year": 2022,
+          "venue": "PLoS Computational Biology",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2021.07.15.21260537",
+          "title": "Characterising within-hospital SARS-CoV-2 transmission events: a retrospective analysis integrating epidemiological and viral genomic data from a UK tertiary care setting across two pandemic waves",
+          "year": 2021,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2021.02.17.431606",
+          "title": "Measuring the unknown: an estimator and simulation study for assessing case reporting during epidemics",
+          "year": 2021,
+          "venue": "bioRxiv (Cold Spring Harbor Laboratory)",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2022.01.07.22268729",
+          "title": "Reconstructing transmission chains of SARS-CoV-2 amid multiple outbreaks in a geriatric acute-care hospital",
+          "year": 2022,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.ppat.1006885",
+          "title": "When are pathogen genome sequences informative of transmission events?",
+          "year": 2018,
+          "venue": "PLoS Pathogens",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1098/rstb.2018.0276",
+          "title": "Outbreak analytics: a developing data science for informing the response to emerging pathogens",
+          "year": 2019,
+          "venue": "Philosophical Transactions of the Royal Society B Biological Sciences",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1098/rstb.2016.0371",
+          "title": "Key data for outbreak evaluation: building on the Ebola experience",
+          "year": 2017,
+          "venue": "Philosophical Transactions of the Royal Society B Biological Sciences",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.pcbi.1006930",
+          "title": "Bayesian inference of transmission chains using timing of symptoms, pathogen genomes and contact data",
+          "year": 2019,
+          "venue": "PLoS Computational Biology",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1371/journal.pcbi.1006554",
+          "title": "A graph-based evidence synthesis approach to detecting outbreak clusters: An application to dog rabies",
+          "year": 2018,
+          "venue": "PLoS Computational Biology",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2014.04.003",
+          "title": "OutbreakTools: A new platform for disease outbreak analysis using the R software",
+          "year": 2014,
+          "venue": "Epidemics",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1186/s13756-022-01092-0",
+          "title": "Occupational and community risk of SARS-CoV-2 infection among employees of a long-term care facility: an observational study",
+          "year": 2022,
+          "venue": "Antimicrobial Resistance and Infection Control",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2024.03.13.24304225",
+          "title": "Sorting out assortativity: when can we assess the contributions of different population groups to epidemic transmission?",
+          "year": 2024,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.32614/cran.package.outbreaker2",
+          "title": "outbreaker2: Bayesian Reconstruction of Disease Outbreaks by Combining Epidemiologic and Genomic Data",
+          "year": 2017,
+          "venue": null,
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1101/2021.10.22.21265309",
+          "title": "Occupational versus community risk of SARS-CoV-2 infection among employees of a long-term care facility: an observational study",
+          "year": 2021,
+          "venue": "medRxiv",
+          "role": "application",
+          "byTeam": true
+        }
+      ],
+      "paperCount": 20,
+      "citations": 977,
+      "downloads": 84359,
+      "downloadsMonthly": [
+        {
+          "month": "2013-02",
+          "downloads": 25
+        },
+        {
+          "month": "2013-03",
+          "downloads": 101
+        },
+        {
+          "month": "2013-04",
+          "downloads": 139
+        },
+        {
+          "month": "2013-05",
+          "downloads": 105
+        },
+        {
+          "month": "2013-06",
+          "downloads": 135
+        },
+        {
+          "month": "2013-07",
+          "downloads": 122
+        },
+        {
+          "month": "2013-08",
+          "downloads": 117
+        },
+        {
+          "month": "2013-09",
+          "downloads": 185
+        },
+        {
+          "month": "2013-10",
+          "downloads": 175
+        },
+        {
+          "month": "2013-11",
+          "downloads": 172
+        },
+        {
+          "month": "2013-12",
+          "downloads": 164
+        },
+        {
+          "month": "2014-01",
+          "downloads": 246
+        },
+        {
+          "month": "2014-02",
+          "downloads": 180
+        },
+        {
+          "month": "2014-03",
+          "downloads": 222
+        },
+        {
+          "month": "2014-04",
+          "downloads": 236
+        },
+        {
+          "month": "2014-05",
+          "downloads": 268
+        },
+        {
+          "month": "2014-06",
+          "downloads": 185
+        },
+        {
+          "month": "2014-07",
+          "downloads": 189
+        },
+        {
+          "month": "2014-08",
+          "downloads": 338
+        },
+        {
+          "month": "2014-09",
+          "downloads": 241
+        },
+        {
+          "month": "2014-10",
+          "downloads": 262
+        },
+        {
+          "month": "2014-11",
+          "downloads": 326
+        },
+        {
+          "month": "2014-12",
+          "downloads": 330
+        },
+        {
+          "month": "2015-01",
+          "downloads": 400
+        },
+        {
+          "month": "2015-02",
+          "downloads": 400
+        },
+        {
+          "month": "2015-03",
+          "downloads": 488
+        },
+        {
+          "month": "2015-04",
+          "downloads": 485
+        },
+        {
+          "month": "2015-05",
+          "downloads": 382
+        },
+        {
+          "month": "2015-06",
+          "downloads": 404
+        },
+        {
+          "month": "2015-07",
+          "downloads": 303
+        },
+        {
+          "month": "2015-08",
+          "downloads": 334
+        },
+        {
+          "month": "2015-09",
+          "downloads": 302
+        },
+        {
+          "month": "2015-10",
+          "downloads": 385
+        },
+        {
+          "month": "2015-11",
+          "downloads": 343
+        },
+        {
+          "month": "2015-12",
+          "downloads": 419
+        },
+        {
+          "month": "2016-01",
+          "downloads": 373
+        },
+        {
+          "month": "2016-02",
+          "downloads": 295
+        },
+        {
+          "month": "2016-03",
+          "downloads": 228
+        },
+        {
+          "month": "2016-04",
+          "downloads": 199
+        },
+        {
+          "month": "2016-05",
+          "downloads": 176
+        },
+        {
+          "month": "2016-06",
+          "downloads": 175
+        },
+        {
+          "month": "2016-07",
+          "downloads": 230
+        },
+        {
+          "month": "2016-08",
+          "downloads": 216
+        },
+        {
+          "month": "2016-09",
+          "downloads": 249
+        },
+        {
+          "month": "2016-10",
+          "downloads": 315
+        },
+        {
+          "month": "2016-11",
+          "downloads": 409
+        },
+        {
+          "month": "2016-12",
+          "downloads": 304
+        },
+        {
+          "month": "2017-01",
+          "downloads": 337
+        },
+        {
+          "month": "2017-02",
+          "downloads": 238
+        },
+        {
+          "month": "2017-03",
+          "downloads": 314
+        },
+        {
+          "month": "2017-04",
+          "downloads": 503
+        },
+        {
+          "month": "2017-05",
+          "downloads": 321
+        },
+        {
+          "month": "2017-06",
+          "downloads": 297
+        },
+        {
+          "month": "2017-07",
+          "downloads": 327
+        },
+        {
+          "month": "2017-08",
+          "downloads": 866
+        },
+        {
+          "month": "2017-09",
+          "downloads": 407
+        },
+        {
+          "month": "2017-10",
+          "downloads": 412
+        },
+        {
+          "month": "2017-11",
+          "downloads": 502
+        },
+        {
+          "month": "2017-12",
+          "downloads": 366
+        },
+        {
+          "month": "2018-01",
+          "downloads": 496
+        },
+        {
+          "month": "2018-02",
+          "downloads": 518
+        },
+        {
+          "month": "2018-03",
+          "downloads": 493
+        },
+        {
+          "month": "2018-04",
+          "downloads": 601
+        },
+        {
+          "month": "2018-05",
+          "downloads": 523
+        },
+        {
+          "month": "2018-06",
+          "downloads": 366
+        },
+        {
+          "month": "2018-07",
+          "downloads": 437
+        },
+        {
+          "month": "2018-08",
+          "downloads": 335
+        },
+        {
+          "month": "2018-09",
+          "downloads": 737
+        },
+        {
+          "month": "2018-10",
+          "downloads": 680
+        },
+        {
+          "month": "2018-11",
+          "downloads": 714
+        },
+        {
+          "month": "2018-12",
+          "downloads": 698
+        },
+        {
+          "month": "2019-01",
+          "downloads": 776
+        },
+        {
+          "month": "2019-02",
+          "downloads": 690
+        },
+        {
+          "month": "2019-03",
+          "downloads": 876
+        },
+        {
+          "month": "2019-04",
+          "downloads": 877
+        },
+        {
+          "month": "2019-05",
+          "downloads": 1537
+        },
+        {
+          "month": "2019-06",
+          "downloads": 843
+        },
+        {
+          "month": "2019-07",
+          "downloads": 1188
+        },
+        {
+          "month": "2019-08",
+          "downloads": 768
+        },
+        {
+          "month": "2019-09",
+          "downloads": 895
+        },
+        {
+          "month": "2019-10",
+          "downloads": 881
+        },
+        {
+          "month": "2019-11",
+          "downloads": 826
+        },
+        {
+          "month": "2019-12",
+          "downloads": 1076
+        },
+        {
+          "month": "2020-01",
+          "downloads": 1693
+        },
+        {
+          "month": "2020-02",
+          "downloads": 1443
+        },
+        {
+          "month": "2020-03",
+          "downloads": 1273
+        },
+        {
+          "month": "2020-04",
+          "downloads": 1414
+        },
+        {
+          "month": "2020-05",
+          "downloads": 1457
+        },
+        {
+          "month": "2020-06",
+          "downloads": 898
+        },
+        {
+          "month": "2020-07",
+          "downloads": 894
+        },
+        {
+          "month": "2020-08",
+          "downloads": 858
+        },
+        {
+          "month": "2020-09",
+          "downloads": 971
+        },
+        {
+          "month": "2020-10",
+          "downloads": 831
+        },
+        {
+          "month": "2020-11",
+          "downloads": 853
+        },
+        {
+          "month": "2020-12",
+          "downloads": 888
+        },
+        {
+          "month": "2021-01",
+          "downloads": 658
+        },
+        {
+          "month": "2021-02",
+          "downloads": 1142
+        },
+        {
+          "month": "2021-03",
+          "downloads": 955
+        },
+        {
+          "month": "2021-04",
+          "downloads": 733
+        },
+        {
+          "month": "2021-05",
+          "downloads": 756
+        },
+        {
+          "month": "2021-06",
+          "downloads": 806
+        },
+        {
+          "month": "2021-07",
+          "downloads": 789
+        },
+        {
+          "month": "2021-08",
+          "downloads": 750
+        },
+        {
+          "month": "2021-09",
+          "downloads": 628
+        },
+        {
+          "month": "2021-10",
+          "downloads": 808
+        },
+        {
+          "month": "2021-11",
+          "downloads": 969
+        },
+        {
+          "month": "2021-12",
+          "downloads": 638
+        },
+        {
+          "month": "2022-01",
+          "downloads": 414
+        },
+        {
+          "month": "2022-02",
+          "downloads": 611
+        },
+        {
+          "month": "2022-03",
+          "downloads": 691
+        },
+        {
+          "month": "2022-04",
+          "downloads": 584
+        },
+        {
+          "month": "2022-05",
+          "downloads": 687
+        },
+        {
+          "month": "2022-06",
+          "downloads": 645
+        },
+        {
+          "month": "2022-07",
+          "downloads": 693
+        },
+        {
+          "month": "2022-08",
+          "downloads": 609
+        },
+        {
+          "month": "2022-09",
+          "downloads": 473
+        },
+        {
+          "month": "2022-10",
+          "downloads": 503
+        },
+        {
+          "month": "2022-11",
+          "downloads": 456
+        },
+        {
+          "month": "2022-12",
+          "downloads": 356
+        },
+        {
+          "month": "2023-01",
+          "downloads": 370
+        },
+        {
+          "month": "2023-02",
+          "downloads": 437
+        },
+        {
+          "month": "2023-03",
+          "downloads": 601
+        },
+        {
+          "month": "2023-04",
+          "downloads": 493
+        },
+        {
+          "month": "2023-05",
+          "downloads": 480
+        },
+        {
+          "month": "2023-06",
+          "downloads": 424
+        },
+        {
+          "month": "2023-07",
+          "downloads": 392
+        },
+        {
+          "month": "2023-08",
+          "downloads": 441
+        },
+        {
+          "month": "2023-09",
+          "downloads": 377
+        },
+        {
+          "month": "2023-10",
+          "downloads": 388
+        },
+        {
+          "month": "2023-11",
+          "downloads": 440
+        },
+        {
+          "month": "2023-12",
+          "downloads": 395
+        },
+        {
+          "month": "2024-01",
+          "downloads": 667
+        },
+        {
+          "month": "2024-02",
+          "downloads": 330
+        },
+        {
+          "month": "2024-03",
+          "downloads": 407
+        },
+        {
+          "month": "2024-04",
+          "downloads": 387
+        },
+        {
+          "month": "2024-05",
+          "downloads": 481
+        },
+        {
+          "month": "2024-06",
+          "downloads": 395
+        },
+        {
+          "month": "2024-07",
+          "downloads": 494
+        },
+        {
+          "month": "2024-08",
+          "downloads": 458
+        },
+        {
+          "month": "2024-09",
+          "downloads": 495
+        },
+        {
+          "month": "2024-10",
+          "downloads": 460
+        },
+        {
+          "month": "2024-11",
+          "downloads": 440
+        },
+        {
+          "month": "2024-12",
+          "downloads": 381
+        },
+        {
+          "month": "2025-01",
+          "downloads": 506
+        },
+        {
+          "month": "2025-02",
+          "downloads": 564
+        },
+        {
+          "month": "2025-03",
+          "downloads": 416
+        },
+        {
+          "month": "2025-04",
+          "downloads": 419
+        },
+        {
+          "month": "2025-05",
+          "downloads": 322
+        },
+        {
+          "month": "2025-06",
+          "downloads": 416
+        },
+        {
+          "month": "2025-07",
+          "downloads": 385
+        },
+        {
+          "month": "2025-08",
+          "downloads": 464
+        },
+        {
+          "month": "2025-09",
+          "downloads": 1064
+        },
+        {
+          "month": "2025-10",
+          "downloads": 691
+        },
+        {
+          "month": "2025-11",
+          "downloads": 392
+        },
+        {
+          "month": "2025-12",
+          "downloads": 618
+        },
+        {
+          "month": "2026-01",
+          "downloads": 382
+        },
+        {
+          "month": "2026-02",
+          "downloads": 441
+        },
+        {
+          "month": "2026-03",
+          "downloads": 420
+        },
+        {
+          "month": "2026-04",
+          "downloads": 336
+        },
+        {
+          "month": "2026-05",
+          "downloads": 312
+        },
+        {
+          "month": "2026-06",
+          "downloads": 570
+        },
+        {
+          "month": "2026-07",
+          "downloads": 183
+        }
+      ]
+    },
+    {
+      "id": "o2ools",
+      "name": "o2ools",
+      "crans": [
+        "o2ools"
+      ],
+      "repo": "https://github.com/CyGei/o2ools",
+      "blurb": "Helper tools for post-processing, summarising and visualising outbreaker2 output.",
+      "methodsPaper": null,
+      "papers": [],
+      "paperCount": 0,
+      "citations": 0,
+      "downloads": 6882,
+      "downloadsMonthly": [
+        {
+          "month": "2025-06",
+          "downloads": 316
+        },
+        {
+          "month": "2025-07",
+          "downloads": 565
+        },
+        {
+          "month": "2025-08",
+          "downloads": 382
+        },
+        {
+          "month": "2025-09",
+          "downloads": 527
+        },
+        {
+          "month": "2025-10",
+          "downloads": 600
+        },
+        {
+          "month": "2025-11",
+          "downloads": 440
+        },
+        {
+          "month": "2025-12",
+          "downloads": 529
+        },
+        {
+          "month": "2026-01",
+          "downloads": 536
+        },
+        {
+          "month": "2026-02",
+          "downloads": 548
+        },
+        {
+          "month": "2026-03",
+          "downloads": 611
+        },
+        {
+          "month": "2026-04",
+          "downloads": 587
+        },
+        {
+          "month": "2026-05",
+          "downloads": 541
+        },
+        {
+          "month": "2026-06",
+          "downloads": 526
+        },
+        {
+          "month": "2026-07",
+          "downloads": 174
+        }
+      ]
+    },
+    {
+      "id": "seqtrack",
+      "name": "SeqTrack",
+      "crans": [],
+      "repo": null,
+      "blurb": "A graph approach to reconstructing who-infected-whom from pathogen genetic data — the genetic backbone of outbreak reconstruction.",
+      "methodsPaper": {
+        "doi": "10.1038/hdy.2010.78",
+        "title": "Reconstructing disease outbreaks from genetic data: a graph approach",
+        "year": 2010,
+        "venue": "Heredity"
+      },
+      "papers": [
+        {
+          "doi": "10.1038/hdy.2010.78",
+          "title": "Reconstructing disease outbreaks from genetic data: a graph approach",
+          "year": 2010,
+          "venue": "Heredity",
+          "role": "methods",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1098/rstb.2018.0276",
+          "title": "Outbreak analytics: a developing data science for informing the response to emerging pathogens",
+          "year": 2019,
+          "venue": "Philosophical Transactions of the Royal Society B Biological Sciences",
+          "role": "application",
+          "byTeam": true
+        },
+        {
+          "doi": "10.1016/j.epidem.2014.04.003",
+          "title": "OutbreakTools: A new platform for disease outbreak analysis using the R software",
+          "year": 2014,
+          "venue": "Epidemics",
+          "role": "application",
+          "byTeam": true
+        }
+      ],
+      "paperCount": 3,
+      "citations": 381,
+      "downloads": null,
+      "downloadsMonthly": []
+    },
+    {
+      "id": "linktree",
+      "name": "linktree",
+      "crans": [
+        "linktree"
+      ],
+      "repo": "https://github.com/CyGei/linktree",
+      "blurb": "Estimates transmission assortativity — the tendency to transmit within vs. across groups (e.g. staff ↔ patient).",
+      "methodsPaper": {
+        "doi": "10.1371/journal.pone.0313037",
+        "title": "Sorting out assortativity: When can we assess the contributions of different population groups to epidemic transmission?",
+        "year": 2024,
+        "venue": "PLoS ONE"
+      },
+      "papers": [
+        {
+          "doi": "10.1371/journal.pone.0313037",
+          "title": "Sorting out assortativity: When can we assess the contributions of different population groups to epidemic transmission?",
+          "year": 2024,
+          "venue": "PLoS ONE",
+          "role": "methods",
+          "byTeam": true
+        },
+        {
+          "doi": "10.32614/cran.package.linktree",
+          "title": "linktree: Estimate Transmission Assortativity Coefficients",
+          "year": 2025,
+          "venue": null,
+          "role": "application",
+          "byTeam": true
+        }
+      ],
+      "paperCount": 2,
+      "citations": 3,
+      "downloads": 1252,
+      "downloadsMonthly": [
+        {
+          "month": "2025-12",
+          "downloads": 135
+        },
+        {
+          "month": "2026-01",
+          "downloads": 125
+        },
+        {
+          "month": "2026-02",
+          "downloads": 174
+        },
+        {
+          "month": "2026-03",
+          "downloads": 234
+        },
+        {
+          "month": "2026-04",
+          "downloads": 162
+        },
+        {
+          "month": "2026-05",
+          "downloads": 133
+        },
+        {
+          "month": "2026-06",
+          "downloads": 204
+        },
+        {
+          "month": "2026-07",
+          "downloads": 85
+        }
+      ]
+    },
+    {
+      "id": "mixtree",
+      "name": "mixtree",
+      "crans": [
+        "mixtree"
+      ],
+      "repo": "https://github.com/CyGei/mixtree",
+      "blurb": "A statistical framework for comparing epidemic forests — sets of transmission trees.",
+      "methodsPaper": {
+        "doi": "10.1371/journal.pcbi.1014271",
+        "title": "A statistical framework for comparing epidemic forests",
+        "year": 2026,
+        "venue": "PLoS Computational Biology"
+      },
+      "papers": [
+        {
+          "doi": "10.1371/journal.pcbi.1014271",
+          "title": "A statistical framework for comparing epidemic forests",
+          "year": 2026,
+          "venue": "PLoS Computational Biology",
+          "role": "methods",
+          "byTeam": true
+        }
+      ],
+      "paperCount": 1,
+      "citations": 0,
+      "downloads": 2901,
+      "downloadsMonthly": [
+        {
+          "month": "2025-03",
+          "downloads": 240
+        },
+        {
+          "month": "2025-04",
+          "downloads": 209
+        },
+        {
+          "month": "2025-05",
+          "downloads": 143
+        },
+        {
+          "month": "2025-06",
+          "downloads": 162
+        },
+        {
+          "month": "2025-07",
+          "downloads": 190
+        },
+        {
+          "month": "2025-08",
+          "downloads": 146
+        },
+        {
+          "month": "2025-09",
+          "downloads": 173
+        },
+        {
+          "month": "2025-10",
+          "downloads": 197
+        },
+        {
+          "month": "2025-11",
+          "downloads": 110
+        },
+        {
+          "month": "2025-12",
+          "downloads": 129
+        },
+        {
+          "month": "2026-01",
+          "downloads": 153
+        },
+        {
+          "month": "2026-02",
+          "downloads": 158
+        },
+        {
+          "month": "2026-03",
+          "downloads": 223
+        },
+        {
+          "month": "2026-04",
+          "downloads": 189
+        },
+        {
+          "month": "2026-05",
+          "downloads": 158
+        },
+        {
+          "month": "2026-06",
+          "downloads": 229
+        },
+        {
+          "month": "2026-07",
+          "downloads": 92
+        }
+      ]
+    }
+  ]
+}

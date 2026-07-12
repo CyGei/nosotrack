@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { Prose, H2, A } from "@/components/legal/Prose";
 
 export const metadata: Metadata = {
   title: "Terms of Use — Nosotrack",
@@ -201,35 +202,5 @@ export default function TermsPage() {
 
       <Footer />
     </>
-  );
-}
-
-function Prose({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="space-y-4 text-[15px] leading-[1.7] text-text [&_strong]:font-medium [&_strong]:text-ink">
-      {children}
-    </div>
-  );
-}
-
-function H2({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="mb-3 mt-10 font-display text-[18px] font-semibold leading-[1.3] tracking-[-0.01em] text-ink">
-      {children}
-    </h2>
-  );
-}
-
-function A({ href, children }: { href: string; children: React.ReactNode }) {
-  const external = href.startsWith("http");
-  return (
-    <a
-      href={href}
-      target={external ? "_blank" : undefined}
-      rel={external ? "noopener noreferrer" : undefined}
-      className="underline underline-offset-[3px] transition-colors hover:text-alert"
-    >
-      {children}
-    </a>
   );
 }

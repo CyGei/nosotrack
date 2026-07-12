@@ -47,7 +47,7 @@ export function Research() {
           Pathogen agnostic, ready for disease X.
         </h2>
 
-        <div className="mt-12 grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-16 md:items-center">
+        <div className="mt-10 grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-16 md:items-center">
           <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink md:col-span-7 text-justify hyphens-auto [text-wrap:pretty]">
             <p>
               Nosotrack builds on over a decade of research in outbreak
@@ -81,22 +81,6 @@ export function Research() {
 
         <div className="mt-20">
           <PathogenTicker pathogens={tickerPathogens} />
-
-          {/* Combined attribution footer — per-specimen credit lives on
-              each ticker card (the name label links to the source entry).
-              This line credits the upstream catalogue uniformly. */}
-          <p className="mt-16 text-center font-mono text-[11px] uppercase tracking-[0.22em] text-faint">
-            Models ·{" "}
-            <a
-              href="https://3d.nih.gov/"
-              target="_blank"
-              rel="noreferrer"
-              className="underline-offset-4 hover:text-text hover:underline"
-            >
-              NIH 3D Print Exchange
-            </a>{" "}
-            · NIAID Visual &amp; Medical Arts · CC-BY 4.0 / Public Domain
-          </p>
         </div>
       </div>
     </section>

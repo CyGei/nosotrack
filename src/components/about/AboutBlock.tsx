@@ -20,10 +20,11 @@
  * to animate.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useScrollReveal } from "@/lib/hooks";
 
-export type StepNumber = "0.1" | "0.2" | "0.3";
+type StepNumber = "0.1" | "0.2" | "0.3";
 
 const ALL_STEPS: StepNumber[] = ["0.1", "0.2", "0.3"];
 
@@ -47,52 +48,12 @@ export function AboutBlock({
   const [tab, setTab] = useState<Tab>(hasVideo ? "video" : "details");
 
   // Trigger-on-entry typewriter — fires once when the title scrolls into
-  // view, then types at a fixed pace. The rAF loop drives a fractional
-  // character count from elapsed-since-start, so the rendered alphas vary
-  // smoothly even inside a single character (per-char fade window = 1).
-  // IntersectionObserver disconnects after first hit so the animation
-  // never repeats on re-scroll.
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const [fractional, setFractional] = useState(0);
-
-  useEffect(() => {
-    const el = titleRef.current;
-    if (!el) return;
-
-    const CPS = 32; // characters per second — relaxed, elegant pace
-    let raf = 0;
-    let started = false;
-    let startTs = 0;
-
-    const animate = (now: number) => {
-      if (!startTs) startTs = now;
-      const elapsedSec = (now - startTs) / 1000;
-      const next = Math.min(title.length, elapsedSec * CPS);
-      setFractional(next);
-      if (next < title.length) {
-        raf = requestAnimationFrame(animate);
-      }
-    };
-
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started) {
-          started = true;
-          raf = requestAnimationFrame(animate);
-          obs.disconnect();
-        }
-      },
-      // Fire when the title is comfortably inside the viewport (not when
-      // just its bottom pixel pokes in).
-      { rootMargin: "0px 0px -18% 0px", threshold: 0 },
-    );
-    obs.observe(el);
-
-    return () => {
-      obs.disconnect();
-      cancelAnimationFrame(raf);
-    };
-  }, [title]);
+  // view, then types at a relaxed 32 cps. `fractional` is a smooth char
+  // count so per-character alphas fade rather than hard-step.
+  const { ref: titleRef, fractional } = useScrollReveal<HTMLHeadingElement>(
+    title.length,
+    32,
+  );
 
   // Each char fades in over a 1-char-wide window of `fractional`, so the
   // leading edge is a soft fade instead of a hard step.
@@ -121,8 +82,8 @@ export function AboutBlock({
               className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)] max-w-[14ch]"
             >
               {visibleChars.split("").map((c, i) => {
-                // Linear per-char alpha; the chase-easing on `progress`
-                // is what gives the overall motion its smoothness.
+                // Per-char alpha derived from the shared `fractional` clock,
+                // so the character at the leading edge fades in as it arrives.
                 const alpha = Math.max(0, Math.min(1, fractional - i));
                 return (
                   <span key={i} style={{ opacity: alpha }}>
@@ -190,13 +151,6 @@ export function AboutBlock({
 /* -------------------------------------------------------------------------- */
 
 function StepIndicator({ activeId }: { activeId: StepNumber }) {
-  // Scroll-triggered reveal — mirrors the title typewriter so the
-  // indicator and title feel like a single staged motion. Each step
-  // label fades in char-by-char and each separator rule "draws" from
-  // left to right via scaleX on the same fractional clock.
-  const ref = useRef<HTMLOListElement>(null);
-  const [fractional, setFractional] = useState(0);
-
   // Pre-render labels (active gets square brackets), then compute each
   // step's start offset in the reveal sequence:
   //   step0_chars · 1-unit separator · step1_chars · 1-unit separator · step2_chars
@@ -209,40 +163,11 @@ function StepIndicator({ activeId }: { activeId: StepNumber }) {
   }, []);
   const total = lengths.reduce((a, b) => a + b, 0) + (ALL_STEPS.length - 1);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const CPS = 40; // slightly snappier than the title (32 cps)
-    let raf = 0;
-    let started = false;
-    let startTs = 0;
-
-    const animate = (now: number) => {
-      if (!startTs) startTs = now;
-      const elapsedSec = (now - startTs) / 1000;
-      const next = Math.min(total, elapsedSec * CPS);
-      setFractional(next);
-      if (next < total) raf = requestAnimationFrame(animate);
-    };
-
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started) {
-          started = true;
-          raf = requestAnimationFrame(animate);
-          obs.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -18% 0px", threshold: 0 },
-    );
-    obs.observe(el);
-
-    return () => {
-      obs.disconnect();
-      cancelAnimationFrame(raf);
-    };
-  }, [total]);
+  // Scroll-triggered reveal — mirrors the title typewriter (at a slightly
+  // snappier 40 cps) so the indicator and title read as one staged motion.
+  // Each step label fades in char-by-char and each separator "draws" from
+  // left to right via scaleX on the same fractional clock.
+  const { ref, fractional } = useScrollReveal<HTMLOListElement>(total, 40);
 
   return (
     <ol

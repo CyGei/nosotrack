@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Hero v2 — sticky-scroll cinematic, four-frame edition.
+ * Hero v2 — sticky-scroll cinematic, five-frame edition.
  *
  * Frame order (top → bottom of the wrapper):
  *   1. FIELD        — PPE video collage,           "outbreak forensics
@@ -9,10 +9,12 @@
  *                     + CDC public-domain footage   and control"
  *   2. TREE         — transmission tree auto-      "Reconstruct the chain
  *                     drawing on entry              of transmission."
- *   3. BLUEPRINTS   — hospital | ship | farm       "Deployable
+ *   3. STOP         — intervention "stop the        "Stop
+ *                     spread" motif                  the spread."
+ *   4. BLUEPRINTS   — hospital | ship | farm       "Deployable
  *                     side-by-side, all three       anywhere."
  *                     particle networks live
- *   4. BRAND        — Nosotrack lockup with a      "Track. Intervene.
+ *   5. BRAND        — Nosotrack lockup with a      "Track. Intervene.
  *                     one-time entrance spin       Protect."
  *                     + slide-left choreography
  *
@@ -105,7 +107,7 @@ const SCENE_COUNT = SCENES.length;
 // Wrapper height: (N + 1) × 100svh. With the sticky inner pinned at
 // 100svh, that gives totalScroll = N × 100svh and each scene gets
 // exactly 100svh of dwell. The "+1" is critical — without it each
-// scene only gets (N−1)/N × 100svh = 75svh for N=4 and the pacing
+// scene only gets (N−1)/N × 100svh = 80svh for N=5 and the pacing
 // feels rushed / skip-y on fast scrolls.
 const WRAPPER_VH = (SCENE_COUNT + 1) * 100;
 
@@ -416,29 +418,21 @@ export function Hero() {
 function SceneBackground({
   scene,
   active,
-  forceImmediate = false,
 }: {
   scene: SceneSpec;
   active: boolean;
-  forceImmediate?: boolean;
 }) {
   switch (scene.id) {
     case "field":
       return <Scene1Field active={active} />;
     case "tree":
-      return <Scene3Tree active={active} forceImmediate={forceImmediate} />;
+      return <Scene3Tree active={active} />;
     case "stop":
-      return <Scene4Stop active={active} forceImmediate={forceImmediate} />;
+      return <Scene4Stop active={active} />;
     case "blueprints":
       return <SceneBlueprints />;
     case "brand":
-      return (
-        <SceneBrand
-          active={active}
-          lines={scene.lines}
-          forceImmediate={forceImmediate}
-        />
-      );
+      return <SceneBrand active={active} lines={scene.lines} />;
   }
 }
 
@@ -471,12 +465,10 @@ function SceneCopy({
   lines,
   haloLastLine,
   active,
-  forceImmediate = false,
 }: {
   lines: string[];
   haloLastLine?: boolean;
   active: boolean;
-  forceImmediate?: boolean;
 }) {
   return (
     <div className="container-page relative z-10 flex h-full flex-col justify-center">
@@ -484,7 +476,6 @@ function SceneCopy({
         lines={lines}
         haloLastLine={haloLastLine}
         active={active}
-        forceImmediate={forceImmediate}
         className="font-mono font-normal leading-[1.04] tracking-[-0.025em] text-inv-hi text-[clamp(2.4rem,6.4vw,5.8rem)] max-w-[22ch]"
       />
     </div>

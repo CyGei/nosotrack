@@ -13,6 +13,7 @@ import { useState } from "react";
 import type { PathogenSpec } from "./pathogens/types";
 import { PathogenViewer } from "./PathogenViewer";
 import { PathogenDossier } from "./PathogenDossier";
+import { specimenButtonClass } from "./specimenButton";
 
 type Props = {
   pathogen: PathogenSpec;
@@ -27,13 +28,7 @@ export function PathogenSpotlight({ pathogen }: Props) {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`Open dossier for ${pathogen.name}`}
-        className={[
-          "group relative block w-full cursor-pointer",
-          "outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-alert)]",
-          "border border-transparent transition-colors duration-200",
-          "hover:border-[var(--color-alert)]/40",
-          "focus-visible:border-[var(--color-alert)]/60",
-        ].join(" ")}
+        className={specimenButtonClass("w-full")}
       >
         <PathogenViewer
           pathogen={pathogen}

@@ -167,7 +167,3 @@ export const TREE_NODE_BY_ID: Record<string, TreeNode> = Object.fromEntries(
 export const SUSC_BY_ID: Record<string, Susceptible> = Object.fromEntries(
   SUSCEPTIBLES.map((s) => [s.id, s]),
 );
-
-export const TARGET_IDS: Set<string> = new Set(
-  PROJECTIONS.map((p) => p.toSuscId),
-);

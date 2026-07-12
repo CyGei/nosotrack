@@ -1,0 +1,62 @@
+name: Refresh research metrics
+
+# Regenerate the research-impact database (publications, citations,
+# downloads) from OpenAlex + cranlogs and commit it. The committed JSON is
+# what the site ships, so git history doubles as the metric time-series.
+#
+# A GITHUB_TOKEN-authored push does NOT retrigger other workflows (GitHub's
+# recursion guard), so after committing we explicitly dispatch the Pages
+# deploy. Weekly, plus a manual button on the Actions tab.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: refresh-metrics
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Fetch metrics + commit if changed
+        id: refresh
+        run: |
+          npm run fetch:metrics
+          npm run fetch:geo
+          FILES="src/data/research-metrics.json src/data/research-geo.json"
+          if git diff --quiet -- $FILES; then
+            echo "No metric changes."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add $FILES
+            git commit -m "chore(metrics): weekly research-impact refresh"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger Pages deploy
+        if: steps.refresh.outputs.changed == 'true'
+        run: gh workflow run deploy.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

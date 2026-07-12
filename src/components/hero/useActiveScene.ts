@@ -14,27 +14,17 @@
  * What this hook returns:
  *   - `wrapperRef`   — attach to the outer (tall) wrapper element
  *   - `activeScene`  — current scene index (0..SCENE_COUNT - 1)
- *   - `progress`     — 0..1 progress THROUGH the active scene; resets
- *                      at each scene boundary. Useful for scroll-driven
- *                      effects within a scene (e.g. tree-draw).
  *
- * The hook handles its own rAF throttle and ResizeObserver so consumers
- * can read these values every frame without performance worry.
+ * The hook handles its own rAF throttle and ResizeObserver, and only
+ * re-renders when the active scene index actually changes (a handful of
+ * times across the whole hero), never on sub-scene scroll progress.
  */
 
 import { useEffect, useRef, useState } from "react";
 
-type ScrollState = {
-  activeScene: number;
-  progress: number;
-};
-
 export function useActiveScene(sceneCount: number) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const [state, setState] = useState<ScrollState>({
-    activeScene: 0,
-    progress: 0,
-  });
+  const [activeScene, setActiveScene] = useState(0);
 
   useEffect(() => {
     const el = wrapperRef.current;
@@ -50,7 +40,7 @@ export function useActiveScene(sceneCount: number) {
       // the viewport (the sticky stage hits its top edge after this).
       const totalScroll = rect.height - window.innerHeight;
       if (totalScroll <= 0) {
-        setState({ activeScene: 0, progress: 0 });
+        setActiveScene((prev) => (prev === 0 ? prev : 0));
         return;
       }
       // -rect.top is how many pixels we've scrolled INTO the wrapper.
@@ -59,18 +49,9 @@ export function useActiveScene(sceneCount: number) {
       const overallP = scrolled / totalScroll;
       // Slice overall progress into N equal scene buckets.
       const sceneFloat = overallP * sceneCount;
-      const activeScene = Math.min(sceneCount - 1, Math.floor(sceneFloat));
-      const progress = Math.min(1, Math.max(0, sceneFloat - activeScene));
-      setState((prev) => {
-        // Avoid re-render thrash when nothing meaningful changed.
-        if (
-          prev.activeScene === activeScene &&
-          Math.abs(prev.progress - progress) < 0.005
-        ) {
-          return prev;
-        }
-        return { activeScene, progress };
-      });
+      const next = Math.min(sceneCount - 1, Math.floor(sceneFloat));
+      // Only re-render on an actual scene change.
+      setActiveScene((prev) => (prev === next ? prev : next));
     };
 
     const onScrollOrResize = () => {
@@ -89,5 +70,5 @@ export function useActiveScene(sceneCount: number) {
     };
   }, [sceneCount]);
 
-  return { wrapperRef, activeScene: state.activeScene, progress: state.progress };
+  return { wrapperRef, activeScene };
 }

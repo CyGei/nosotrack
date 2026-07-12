@@ -9,12 +9,17 @@
  *                       → Inference → Co-pilot) with foundry visuals
  *                       embedded as React
  *   5. Research       — pathogen catalogue (fixed shapes + side hover)
- *   6. Team           — founder + advisors
- *   7. Roadmap        — funding phases
- *   8. Contact        — Formspree form
- *   9. Footer         — lockup + fine print
+ *   6. Impact         — "Impact & adoption": the four count-up metrics
+ *                       (publications, citations, downloads, tools) in two
+ *                       whitespace movements; Downloads fans to a per-tool arc
+ *   7. Team           — founder + advisors
+ *   8. Roadmap        — funding phases
+ *   9. Contact        — Formspree form
+ *  10. Footer         — lockup + fine print
  *
- * Retired: standalone Solution iframe section, DemoCallout video modal.
+ * Retired: standalone Solution iframe section, DemoCallout video modal. The
+ * four research/impact figures are consolidated into <ImpactAdoption> (they
+ * previously lived as inline tallies in Research + Team).
  */
 
 import { Nav } from "@/components/Nav";
@@ -22,6 +27,7 @@ import { Hero } from "@/components/hero/Hero";
 import { Marquee } from "@/components/Marquee";
 import { About } from "@/components/about/About";
 import { Research } from "@/components/research/Research";
+import { ImpactAdoption } from "@/components/impact/ImpactAdoption";
 import { Team } from "@/components/Team";
 import { Roadmap } from "@/components/Roadmap";
 import { Contact } from "@/components/Contact";
@@ -37,6 +43,7 @@ export default function HomePage() {
         <Marquee />
         <About />
         <Research />
+        <ImpactAdoption />
         <Team />
         <Roadmap />
         <Contact />

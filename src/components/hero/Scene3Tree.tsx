@@ -20,8 +20,7 @@
  * the node + edge data.
  */
 
-import { useEffect, useState } from "react";
-import { useReducedMotion } from "@/lib/hooks";
+import { useDrawProgress } from "@/lib/hooks";
 import { TreeStage, TreeStageDefs } from "./TreeStage";
 
 /** How long the full tree takes to draw, ms. Tuned so the last edge
@@ -31,40 +30,12 @@ const DRAW_DURATION_MS = 2_500;
 export type Scene3TreeProps = {
   /** Whether the tree scene is the active one. */
   active: boolean;
-  /** If true, draw the final state immediately (mobile / reduced-motion). */
-  forceImmediate?: boolean;
 };
 
-export function Scene3Tree({ active, forceImmediate = false }: Scene3TreeProps) {
-  const reduce = useReducedMotion();
-  // Internal time-based progress 0..1. Driven by rAF when scene is active.
-  const [t, setT] = useState(0);
-
-  // Drive `t` from 0 → 1 when the scene becomes active. We cancel and
-  // reset on deactivation so re-entry replays the animation cleanly.
-  useEffect(() => {
-    if (!active || forceImmediate || reduce) return;
-    setT(0);
-    let rafId = 0;
-    let start: number | null = null;
-    const tick = (now: number) => {
-      if (start === null) start = now;
-      const elapsed = now - start;
-      const next = Math.min(1, elapsed / DRAW_DURATION_MS);
-      setT(next);
-      if (next < 1) {
-        rafId = requestAnimationFrame(tick);
-      }
-    };
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [active, forceImmediate, reduce]);
-
-  // p ∈ [0, 1] — what progress level should the tree be drawn at?
-  //   - When inactive: 0 (next entry will replay).
-  //   - When active: rAF-driven internal `t`.
-  //   - When forced/reduced: full 1.
-  const p = forceImmediate || reduce ? 1 : active ? t : 0;
+export function Scene3Tree({ active }: Scene3TreeProps) {
+  // p ∈ [0, 1] — rAF-driven while active, 1 under reduced motion, 0 when
+  // inactive (so re-entering the scene replays the draw).
+  const p = useDrawProgress(active, DRAW_DURATION_MS);
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-[var(--color-bg-ink)]">

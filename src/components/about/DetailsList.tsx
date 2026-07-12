@@ -15,7 +15,7 @@
 
 import type { ReactNode } from "react";
 
-export type DetailRow = {
+type DetailRow = {
   title: string;
   desc?: ReactNode;
   kind?: "header";

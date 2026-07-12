@@ -1,0 +1,1080 @@
+{
+  "generatedAt": "2026-07-11",
+  "source": "OpenAlex (author countries citing the methods papers, all-time) + RStudio CRAN logs (installs by country, recent window)",
+  "citationCountryCount": 127,
+  "downloadCountryCount": 92,
+  "downloadWindow": {
+    "days": 30,
+    "from": "2026-06-10",
+    "to": "2026-07-09",
+    "total": 2408
+  },
+  "maxCitations": 814,
+  "maxDownloads": 1267,
+  "countries": [
+    {
+      "code": "US",
+      "name": "United States",
+      "citations": 814,
+      "downloads": 1267,
+      "lat": 39.8,
+      "lon": -98.6
+    },
+    {
+      "code": "GB",
+      "name": "United Kingdom",
+      "citations": 594,
+      "downloads": 98,
+      "lat": 54,
+      "lon": -2.4
+    },
+    {
+      "code": "CN",
+      "name": "China",
+      "citations": 269,
+      "downloads": 128,
+      "lat": 35.9,
+      "lon": 104.2
+    },
+    {
+      "code": "FR",
+      "name": "France",
+      "citations": 181,
+      "downloads": 26,
+      "lat": 46.6,
+      "lon": 2.4
+    },
+    {
+      "code": "CA",
+      "name": "Canada",
+      "citations": 147,
+      "downloads": 95,
+      "lat": 56.1,
+      "lon": -106.3
+    },
+    {
+      "code": "IT",
+      "name": "Italy",
+      "citations": 142,
+      "downloads": 9,
+      "lat": 42.8,
+      "lon": 12.6
+    },
+    {
+      "code": "CH",
+      "name": "Switzerland",
+      "citations": 138,
+      "downloads": 14,
+      "lat": 46.8,
+      "lon": 8.2
+    },
+    {
+      "code": "HK",
+      "name": "Hong Kong",
+      "citations": 134,
+      "downloads": 35,
+      "lat": 22.4,
+      "lon": 114.1
+    },
+    {
+      "code": "BR",
+      "name": "Brazil",
+      "citations": 92,
+      "downloads": 28,
+      "lat": -14.2,
+      "lon": -51.9
+    },
+    {
+      "code": "DE",
+      "name": "Germany",
+      "citations": 88,
+      "downloads": 42,
+      "lat": 51.2,
+      "lon": 10.4
+    },
+    {
+      "code": "AU",
+      "name": "Australia",
+      "citations": 81,
+      "downloads": 12,
+      "lat": -25.3,
+      "lon": 133.8
+    },
+    {
+      "code": "KR",
+      "name": "South Korea",
+      "citations": 79,
+      "downloads": 66,
+      "lat": 36.5,
+      "lon": 127.9
+    },
+    {
+      "code": "JP",
+      "name": "Japan",
+      "citations": 78,
+      "downloads": 139,
+      "lat": 36.2,
+      "lon": 138.3
+    },
+    {
+      "code": "NL",
+      "name": "Netherlands",
+      "citations": 76,
+      "downloads": 12,
+      "lat": 52.1,
+      "lon": 5.3
+    },
+    {
+      "code": "ES",
+      "name": "Spain",
+      "citations": 74,
+      "downloads": 7,
+      "lat": 40.2,
+      "lon": -3.7
+    },
+    {
+      "code": "IN",
+      "name": "India",
+      "citations": 67,
+      "downloads": 20,
+      "lat": 22.6,
+      "lon": 79.6
+    },
+    {
+      "code": "SE",
+      "name": "Sweden",
+      "citations": 50,
+      "downloads": 29,
+      "lat": 62.2,
+      "lon": 15.6
+    },
+    {
+      "code": "ZA",
+      "name": "South Africa",
+      "citations": 40,
+      "downloads": 28,
+      "lat": -30.6,
+      "lon": 22.9
+    },
+    {
+      "code": "BE",
+      "name": "Belgium",
+      "citations": 40,
+      "downloads": 6,
+      "lat": 50.6,
+      "lon": 4.6
+    },
+    {
+      "code": "SG",
+      "name": "Singapore",
+      "citations": 37,
+      "downloads": 3,
+      "lat": 1.35,
+      "lon": 103.8
+    },
+    {
+      "code": "MX",
+      "name": "Mexico",
+      "citations": 36,
+      "downloads": 19,
+      "lat": 23.6,
+      "lon": -102.5
+    },
+    {
+      "code": "NO",
+      "name": "Norway",
+      "citations": 34,
+      "downloads": 3,
+      "lat": 64.6,
+      "lon": 12.6
+    },
+    {
+      "code": "CL",
+      "name": "Chile",
+      "citations": 33,
+      "downloads": 4,
+      "lat": -35.7,
+      "lon": -71.5
+    },
+    {
+      "code": "IL",
+      "name": "Israel",
+      "citations": 31,
+      "downloads": 9,
+      "lat": 31,
+      "lon": 34.9
+    },
+    {
+      "code": "AT",
+      "name": "Austria",
+      "citations": 29,
+      "downloads": 8,
+      "lat": 47.6,
+      "lon": 14.1
+    },
+    {
+      "code": "TW",
+      "name": "Taiwan",
+      "citations": 26,
+      "downloads": 3,
+      "lat": 23.7,
+      "lon": 121
+    },
+    {
+      "code": "IE",
+      "name": "Ireland",
+      "citations": 24,
+      "downloads": 3,
+      "lat": 53.2,
+      "lon": -8
+    },
+    {
+      "code": "DK",
+      "name": "Denmark",
+      "citations": 23,
+      "downloads": 2,
+      "lat": 56.1,
+      "lon": 9.5
+    },
+    {
+      "code": "SK",
+      "name": "Slovakia",
+      "citations": 21,
+      "downloads": 1,
+      "lat": 48.7,
+      "lon": 19.7
+    },
+    {
+      "code": "NZ",
+      "name": "New Zealand",
+      "citations": 21,
+      "downloads": 1,
+      "lat": -40.9,
+      "lon": 174.9
+    },
+    {
+      "code": "NG",
+      "name": "Nigeria",
+      "citations": 21,
+      "downloads": 0,
+      "lat": 9.1,
+      "lon": 8.7
+    },
+    {
+      "code": "PT",
+      "name": "Portugal",
+      "citations": 20,
+      "downloads": 6,
+      "lat": 39.6,
+      "lon": -8
+    },
+    {
+      "code": "CO",
+      "name": "Colombia",
+      "citations": 18,
+      "downloads": 18,
+      "lat": 4.6,
+      "lon": -74.3
+    },
+    {
+      "code": "TH",
+      "name": "Thailand",
+      "citations": 18,
+      "downloads": 6,
+      "lat": 15.9,
+      "lon": 100.9
+    },
+    {
+      "code": "ID",
+      "name": "Indonesia",
+      "citations": 16,
+      "downloads": 28,
+      "lat": -2.5,
+      "lon": 118
+    },
+    {
+      "code": "IR",
+      "name": "Iran",
+      "citations": 16,
+      "downloads": 2,
+      "lat": 32.4,
+      "lon": 53.7
+    },
+    {
+      "code": "PH",
+      "name": "Philippines",
+      "citations": 15,
+      "downloads": 12,
+      "lat": 12.9,
+      "lon": 121.8
+    },
+    {
+      "code": "UA",
+      "name": "Ukraine",
+      "citations": 15,
+      "downloads": 9,
+      "lat": 48.4,
+      "lon": 31.2
+    },
+    {
+      "code": "MY",
+      "name": "Malaysia",
+      "citations": 15,
+      "downloads": 9,
+      "lat": 4.2,
+      "lon": 101.9
+    },
+    {
+      "code": "RU",
+      "name": "Russia",
+      "citations": 15,
+      "downloads": 4,
+      "lat": 61.5,
+      "lon": 105.3
+    },
+    {
+      "code": "GR",
+      "name": "Greece",
+      "citations": 15,
+      "downloads": 1,
+      "lat": 39.1,
+      "lon": 22
+    },
+    {
+      "code": "TR",
+      "name": "Turkey",
+      "citations": 14,
+      "downloads": 11,
+      "lat": 39,
+      "lon": 35.2
+    },
+    {
+      "code": "FI",
+      "name": "Finland",
+      "citations": 14,
+      "downloads": 2,
+      "lat": 64.9,
+      "lon": 26.1
+    },
+    {
+      "code": "VN",
+      "name": "Vietnam",
+      "citations": 13,
+      "downloads": 1,
+      "lat": 14.1,
+      "lon": 108.3
+    },
+    {
+      "code": "SA",
+      "name": "Saudi Arabia",
+      "citations": 12,
+      "downloads": 11,
+      "lat": 23.9,
+      "lon": 45.1
+    },
+    {
+      "code": "KE",
+      "name": "Kenya",
+      "citations": 11,
+      "downloads": 3,
+      "lat": 0,
+      "lon": 37.9
+    },
+    {
+      "code": "TN",
+      "name": "Tunisia",
+      "citations": 11,
+      "downloads": 1,
+      "lat": 33.9,
+      "lon": 9.6
+    },
+    {
+      "code": "BD",
+      "name": "Bangladesh",
+      "citations": 10,
+      "downloads": 3,
+      "lat": 23.7,
+      "lon": 90.4
+    },
+    {
+      "code": "SN",
+      "name": "Senegal",
+      "citations": 10,
+      "downloads": 2,
+      "lat": 14.5,
+      "lon": -14.5
+    },
+    {
+      "code": "HU",
+      "name": "Hungary",
+      "citations": 9,
+      "downloads": 0,
+      "lat": 47.2,
+      "lon": 19.5
+    },
+    {
+      "code": "EG",
+      "name": "Egypt",
+      "citations": 8,
+      "downloads": 10,
+      "lat": 26.8,
+      "lon": 30.8
+    },
+    {
+      "code": "CZ",
+      "name": "Czechia",
+      "citations": 8,
+      "downloads": 3,
+      "lat": 49.8,
+      "lon": 15.5
+    },
+    {
+      "code": "LK",
+      "name": "Sri Lanka",
+      "citations": 8,
+      "downloads": 1,
+      "lat": 7.9,
+      "lon": 80.8
+    },
+    {
+      "code": "CD",
+      "name": "DR Congo",
+      "citations": 8,
+      "downloads": 0,
+      "lat": -4,
+      "lon": 21.8
+    },
+    {
+      "code": "CG",
+      "name": "Congo",
+      "citations": 8,
+      "downloads": 0,
+      "lat": -0.7,
+      "lon": 15.8
+    },
+    {
+      "code": "PA",
+      "name": "Panama",
+      "citations": 8,
+      "downloads": 0,
+      "lat": 8.5,
+      "lon": -80.8
+    },
+    {
+      "code": "PL",
+      "name": "Poland",
+      "citations": 7,
+      "downloads": 31,
+      "lat": 51.9,
+      "lon": 19.1
+    },
+    {
+      "code": "AE",
+      "name": "United Arab Emirates",
+      "citations": 7,
+      "downloads": 4,
+      "lat": 23.4,
+      "lon": 53.8
+    },
+    {
+      "code": "NP",
+      "name": "Nepal",
+      "citations": 7,
+      "downloads": 4,
+      "lat": 28.4,
+      "lon": 84.1
+    },
+    {
+      "code": "CR",
+      "name": "Costa Rica",
+      "citations": 7,
+      "downloads": 2,
+      "lat": 9.7,
+      "lon": -83.8
+    },
+    {
+      "code": "SS",
+      "name": "South Sudan",
+      "citations": 7,
+      "downloads": 0,
+      "lat": 7.9,
+      "lon": 29.7
+    },
+    {
+      "code": "PE",
+      "name": "Peru",
+      "citations": 7,
+      "downloads": 0,
+      "lat": -9.2,
+      "lon": -75
+    },
+    {
+      "code": "CY",
+      "name": "Cyprus",
+      "citations": 6,
+      "downloads": 0,
+      "lat": 35.1,
+      "lon": 33.4
+    },
+    {
+      "code": "EC",
+      "name": "Ecuador",
+      "citations": 6,
+      "downloads": 0,
+      "lat": -1.8,
+      "lon": -78.2
+    },
+    {
+      "code": "MN",
+      "name": "Mongolia",
+      "citations": 6,
+      "downloads": 0,
+      "lat": 46.9,
+      "lon": 103.8
+    },
+    {
+      "code": "ET",
+      "name": "Ethiopia",
+      "citations": 6,
+      "downloads": 0,
+      "lat": 9.1,
+      "lon": 40.5
+    },
+    {
+      "code": "TZ",
+      "name": "Tanzania",
+      "citations": 6,
+      "downloads": 0,
+      "lat": -6.4,
+      "lon": 34.9
+    },
+    {
+      "code": "BY",
+      "name": "Belarus",
+      "citations": 6,
+      "downloads": 0,
+      "lat": 53.7,
+      "lon": 27.9
+    },
+    {
+      "code": "AR",
+      "name": "Argentina",
+      "citations": 5,
+      "downloads": 15,
+      "lat": -38.4,
+      "lon": -63.6
+    },
+    {
+      "code": "IQ",
+      "name": "Iraq",
+      "citations": 5,
+      "downloads": 3,
+      "lat": 33.2,
+      "lon": 43.7
+    },
+    {
+      "code": "UG",
+      "name": "Uganda",
+      "citations": 5,
+      "downloads": 2,
+      "lat": 1.4,
+      "lon": 32.3
+    },
+    {
+      "code": "GH",
+      "name": "Ghana",
+      "citations": 5,
+      "downloads": 0,
+      "lat": 7.9,
+      "lon": -1
+    },
+    {
+      "code": "PK",
+      "name": "Pakistan",
+      "citations": 4,
+      "downloads": 2,
+      "lat": 30.4,
+      "lon": 69.3
+    },
+    {
+      "code": "BN",
+      "name": "Brunei",
+      "citations": 4,
+      "downloads": 0,
+      "lat": 4.5,
+      "lon": 114.7
+    },
+    {
+      "code": "CF",
+      "name": "Central African Republic",
+      "citations": 4,
+      "downloads": 0,
+      "lat": 6.6,
+      "lon": 20.9
+    },
+    {
+      "code": "GM",
+      "name": "Gambia",
+      "citations": 4,
+      "downloads": 0,
+      "lat": 13.4,
+      "lon": -15.3
+    },
+    {
+      "code": "IS",
+      "name": "Iceland",
+      "citations": 4,
+      "downloads": 0,
+      "lat": 64.9,
+      "lon": -19
+    },
+    {
+      "code": "MW",
+      "name": "Malawi",
+      "citations": 4,
+      "downloads": 0,
+      "lat": -13.3,
+      "lon": 34.3
+    },
+    {
+      "code": "ZM",
+      "name": "Zambia",
+      "citations": 3,
+      "downloads": 11,
+      "lat": -13.1,
+      "lon": 27.8
+    },
+    {
+      "code": "UY",
+      "name": "Uruguay",
+      "citations": 3,
+      "downloads": 1,
+      "lat": -32.5,
+      "lon": -55.8
+    },
+    {
+      "code": "PY",
+      "name": "Paraguay",
+      "citations": 3,
+      "downloads": 1,
+      "lat": -23.4,
+      "lon": -58.4
+    },
+    {
+      "code": "BF",
+      "name": "Burkina Faso",
+      "citations": 3,
+      "downloads": 0,
+      "lat": 12.2,
+      "lon": -1.6
+    },
+    {
+      "code": "MO",
+      "name": "Macao",
+      "citations": 3,
+      "downloads": 0,
+      "lat": 22.2,
+      "lon": 113.5
+    },
+    {
+      "code": "SI",
+      "name": "Slovenia",
+      "citations": 3,
+      "downloads": 0,
+      "lat": 46.2,
+      "lon": 15
+    },
+    {
+      "code": "CM",
+      "name": "Cameroon",
+      "citations": 3,
+      "downloads": 0,
+      "lat": 7.4,
+      "lon": 12.4
+    },
+    {
+      "code": "LR",
+      "name": "Liberia",
+      "citations": 3,
+      "downloads": 0,
+      "lat": 6.4,
+      "lon": -9.4
+    },
+    {
+      "code": "SZ",
+      "name": "Eswatini",
+      "citations": 3,
+      "downloads": 0,
+      "lat": -26.5,
+      "lon": 31.5
+    },
+    {
+      "code": "GN",
+      "name": "Guinea",
+      "citations": 2,
+      "downloads": 8,
+      "lat": 9.9,
+      "lon": -11
+    },
+    {
+      "code": "BO",
+      "name": "Bolivia",
+      "citations": 2,
+      "downloads": 2,
+      "lat": -16.3,
+      "lon": -63.6
+    },
+    {
+      "code": "MA",
+      "name": "Morocco",
+      "citations": 2,
+      "downloads": 2,
+      "lat": 31.8,
+      "lon": -7.1
+    },
+    {
+      "code": "BA",
+      "name": "Bosnia & Herzegovina",
+      "citations": 2,
+      "downloads": 1,
+      "lat": 43.9,
+      "lon": 17.7
+    },
+    {
+      "code": "LB",
+      "name": "Lebanon",
+      "citations": 2,
+      "downloads": 1,
+      "lat": 33.9,
+      "lon": 35.9
+    },
+    {
+      "code": "HR",
+      "name": "Croatia",
+      "citations": 2,
+      "downloads": 1,
+      "lat": 45.1,
+      "lon": 15.2
+    },
+    {
+      "code": "AD",
+      "name": "Andorra",
+      "citations": 2,
+      "downloads": 0,
+      "lat": 42.5,
+      "lon": 1.6
+    },
+    {
+      "code": "BH",
+      "name": "Bahrain",
+      "citations": 2,
+      "downloads": 0,
+      "lat": 26,
+      "lon": 50.5
+    },
+    {
+      "code": "CU",
+      "name": "Cuba",
+      "citations": 2,
+      "downloads": 0,
+      "lat": 21.5,
+      "lon": -77.8
+    },
+    {
+      "code": "MG",
+      "name": "Madagascar",
+      "citations": 2,
+      "downloads": 0,
+      "lat": -18.8,
+      "lon": 46.9
+    },
+    {
+      "code": "QA",
+      "name": "Qatar",
+      "citations": 2,
+      "downloads": 0,
+      "lat": 25.3,
+      "lon": 51.2
+    },
+    {
+      "code": "YE",
+      "name": "Yemen",
+      "citations": 2,
+      "downloads": 0,
+      "lat": 15.6,
+      "lon": 48
+    },
+    {
+      "code": "MV",
+      "name": "Maldives",
+      "citations": 2,
+      "downloads": 0,
+      "lat": 3.2,
+      "lon": 73.2
+    },
+    {
+      "code": "NE",
+      "name": "Niger",
+      "citations": 2,
+      "downloads": 0,
+      "lat": 17.6,
+      "lon": 8.1
+    },
+    {
+      "code": "NI",
+      "name": "Nicaragua",
+      "citations": 2,
+      "downloads": 0,
+      "lat": 12.9,
+      "lon": -85.2
+    },
+    {
+      "code": "TD",
+      "name": "Chad",
+      "citations": 2,
+      "downloads": 0,
+      "lat": 15.5,
+      "lon": 18.7
+    },
+    {
+      "code": "NC",
+      "name": "New Caledonia",
+      "citations": 2,
+      "downloads": 0,
+      "lat": -20.9,
+      "lon": 165.6
+    },
+    {
+      "code": "RE",
+      "name": "Réunion",
+      "citations": 2,
+      "downloads": 0,
+      "lat": -21.1,
+      "lon": 55.5
+    },
+    {
+      "code": "SD",
+      "name": "Sudan",
+      "citations": 1,
+      "downloads": 6,
+      "lat": 12.9,
+      "lon": 30.2
+    },
+    {
+      "code": "LT",
+      "name": "Lithuania",
+      "citations": 1,
+      "downloads": 5,
+      "lat": 55.2,
+      "lon": 23.9
+    },
+    {
+      "code": "LU",
+      "name": "Luxembourg",
+      "citations": 1,
+      "downloads": 5,
+      "lat": 49.8,
+      "lon": 6.1
+    },
+    {
+      "code": "RO",
+      "name": "Romania",
+      "citations": 1,
+      "downloads": 3,
+      "lat": 45.9,
+      "lon": 24.9
+    },
+    {
+      "code": "VE",
+      "name": "Venezuela",
+      "citations": 1,
+      "downloads": 3,
+      "lat": 6.4,
+      "lon": -66.6
+    },
+    {
+      "code": "KH",
+      "name": "Cambodia",
+      "citations": 1,
+      "downloads": 2,
+      "lat": 12.6,
+      "lon": 104.9
+    },
+    {
+      "code": "BG",
+      "name": "Bulgaria",
+      "citations": 1,
+      "downloads": 1,
+      "lat": 42.7,
+      "lon": 25.5
+    },
+    {
+      "code": "DO",
+      "name": "Dominican Republic",
+      "citations": 1,
+      "downloads": 1,
+      "lat": 18.7,
+      "lon": -70.2
+    },
+    {
+      "code": "RS",
+      "name": "Serbia",
+      "citations": 1,
+      "downloads": 1,
+      "lat": 44,
+      "lon": 21
+    },
+    {
+      "code": "RW",
+      "name": "Rwanda",
+      "citations": 1,
+      "downloads": 1,
+      "lat": -1.9,
+      "lon": 29.9
+    },
+    {
+      "code": "BI",
+      "name": "Burundi",
+      "citations": 1,
+      "downloads": 0,
+      "lat": -3.4,
+      "lon": 29.9
+    },
+    {
+      "code": "FJ",
+      "name": "Fiji",
+      "citations": 1,
+      "downloads": 0,
+      "lat": -17.7,
+      "lon": 178
+    },
+    {
+      "code": "FO",
+      "name": "Faroe Islands",
+      "citations": 1,
+      "downloads": 0,
+      "lat": 62,
+      "lon": -6.8
+    },
+    {
+      "code": "KW",
+      "name": "Kuwait",
+      "citations": 1,
+      "downloads": 0,
+      "lat": 29.3,
+      "lon": 47.5
+    },
+    {
+      "code": "LA",
+      "name": "Laos",
+      "citations": 1,
+      "downloads": 0,
+      "lat": 19.9,
+      "lon": 102.5
+    },
+    {
+      "code": "MK",
+      "name": "North Macedonia",
+      "citations": 1,
+      "downloads": 0,
+      "lat": 41.6,
+      "lon": 21.7
+    },
+    {
+      "code": "MM",
+      "name": "Myanmar",
+      "citations": 1,
+      "downloads": 0,
+      "lat": 21.9,
+      "lon": 95.96
+    },
+    {
+      "code": "OM",
+      "name": "Oman",
+      "citations": 1,
+      "downloads": 0,
+      "lat": 21.5,
+      "lon": 55.9
+    },
+    {
+      "code": "ST",
+      "name": "São Tomé & Príncipe",
+      "citations": 1,
+      "downloads": 0,
+      "lat": 0.2,
+      "lon": 6.6
+    },
+    {
+      "code": "SV",
+      "name": "El Salvador",
+      "citations": 1,
+      "downloads": 0,
+      "lat": 13.8,
+      "lon": -88.9
+    },
+    {
+      "code": "GP",
+      "name": "Guadeloupe",
+      "citations": 1,
+      "downloads": 0,
+      "lat": 16.2,
+      "lon": -61.6
+    },
+    {
+      "code": "PR",
+      "name": "Puerto Rico",
+      "citations": 1,
+      "downloads": 0,
+      "lat": 18.2,
+      "lon": -66.4
+    },
+    {
+      "code": "GT",
+      "name": "Guatemala",
+      "citations": 0,
+      "downloads": 5,
+      "lat": 15.8,
+      "lon": -90.2
+    },
+    {
+      "code": "JO",
+      "name": "Jordan",
+      "citations": 0,
+      "downloads": 4,
+      "lat": 30.6,
+      "lon": 36.2
+    },
+    {
+      "code": "AZ",
+      "name": "Azerbaijan",
+      "citations": 0,
+      "downloads": 2,
+      "lat": 40.1,
+      "lon": 47.6
+    },
+    {
+      "code": "AM",
+      "name": "Armenia",
+      "citations": 0,
+      "downloads": 1,
+      "lat": 40.1,
+      "lon": 45
+    },
+    {
+      "code": "UZ",
+      "name": "Uzbekistan",
+      "citations": 0,
+      "downloads": 1,
+      "lat": 41.4,
+      "lon": 64.6
+    },
+    {
+      "code": "LV",
+      "name": "Latvia",
+      "citations": 0,
+      "downloads": 1,
+      "lat": 56.9,
+      "lon": 24.6
+    }
+  ]
+}

@@ -60,7 +60,7 @@ export function Team() {
         </h2>
 
         {/* Founder | divider | Advisors */}
-        <div className="mt-12 grid grid-cols-1 gap-y-10 md:grid-cols-[1fr_1px_2fr] md:gap-x-12 md:gap-y-0 md:items-start">
+        <div className="mt-10 grid grid-cols-1 gap-y-10 md:grid-cols-[1fr_1px_2fr] md:gap-x-12 md:gap-y-0 md:items-start">
           {/* FOUNDER column */}
           <div>
             <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.22em] text-mute">
@@ -115,7 +115,7 @@ export function Team() {
 /* -------------------------------------------------------------------------- */
 
 function TeamCard({ person }: { person: TeamPerson }) {
-  const src = person.photo.startsWith("/") ? person.photo : `/${person.photo}`;
+  const src = `/${person.photo}`;
   return (
     <article className="team-card">
       <div className="relative aspect-square w-full overflow-hidden bg-bg-tint">

@@ -52,5 +52,3 @@ export const PATHOGENS: PathogenSpec[] = [
   ENTEROCOCCUS, // AI · Public Domain · VRE / cocci pairs
   CAURIS, // AI · Public Domain · multidrug-resistant yeast
 ];
-
-export { type PathogenSpec } from "./types";

@@ -26,6 +26,7 @@
  *      outline visible.
  */
 
+import { clamp01 } from "@/lib/utils";
 import {
   TREE_NODES,
   TREE_EDGES,
@@ -44,10 +45,6 @@ const COLOR_INK = "var(--color-bg-ink)";
  *  transition. */
 const GREY_RADIUS = 7;
 const GREY_OPACITY = 0.85;
-
-function clamp01(n: number) {
-  return Math.max(0, Math.min(1, n));
-}
 
 function baseRadius(kind: TreeNode["kind"]) {
   if (kind === "p0") return 14;

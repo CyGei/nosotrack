@@ -34,12 +34,6 @@ export type PathogenPaper = {
   title: string;
   url: string;
   /**
-   * `method` flags a methodology paper (the tool / framework itself);
-   * `application` flags a paper that USES one of those methods on this
-   * pathogen. Drives subtle styling in the dossier (mono tag).
-   */
-  kind: "method" | "application";
-  /**
    * Journal name shown on the secondary line. Populated for every entry
    * (timeline-derived and manually curated) as of the 2026-05-24 audit
    * pass — the dossier looks inconsistent when some papers carry a
@@ -101,7 +95,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "Evolutionary Analysis of Inter-Farm Transmission Dynamics in a Highly Pathogenic Avian Influenza Epidemic",
       journal: "PLoS Pathogens",
       url: "https://journals.plos.org/plospathogens/article?id=10.1371/journal.ppat.1002094",
-      kind: "application",
     },
     {
       year: 2012,
@@ -110,7 +103,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "Unravelling transmission trees of infectious diseases by combining genetic and epidemiological data",
       journal: "Proceedings of the Royal Society B",
       url: "https://royalsocietypublishing.org/doi/10.1098/rspb.2011.0913",
-      kind: "method",
     },
     {
       year: 2016,
@@ -119,7 +111,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "Quantifying influenza virus diversity and transmission in humans",
       journal: "Nature Genetics",
       url: "https://www.nature.com/articles/ng.3479",
-      kind: "application",
     },
   ],
   hiv: [
@@ -130,7 +121,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "Dispersion of the HIV-1 Epidemic in Men Who Have Sex with Men in the Netherlands: A Combined Mathematical Model and Phylogenetic Analysis",
       journal: "PLoS Medicine",
       url: "https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1001898",
-      kind: "application",
     },
     {
       year: 2018,
@@ -139,7 +129,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "HIV-TRACE (TRAnsmission Cluster Engine): a Tool for Large Scale Molecular Epidemiology of HIV-1 and Other Rapidly Evolving Pathogens",
       journal: "Molecular Biology and Evolution",
       url: "https://academic.oup.com/mbe/article/35/7/1812/4833215",
-      kind: "method",
     },
     {
       year: 2019,
@@ -148,7 +137,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "Inferring HIV-1 transmission networks and sources of epidemic spread in Africa with deep-sequence phylogenetic analysis",
       journal: "Nature Communications",
       url: "https://www.nature.com/articles/s41467-019-09139-4",
-      kind: "application",
     },
   ],
   rhinovirus: [
@@ -159,7 +147,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "Evidence of nosocomial transmission of human rhinovirus in a neonatal intensive care unit",
       journal: "American Journal of Infection Control",
       url: "https://pubmed.ncbi.nlm.nih.gov/26775935/",
-      kind: "application",
     },
     // Sparse literature on WGS-based rhinovirus transmission inference —
     // fall back to the general-purpose methods trio so the dossier still
@@ -173,7 +160,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "Whole-genome sequencing reveals transmission of vancomycin-resistant Enterococcus faecium in a healthcare network",
       journal: "Genome Medicine",
       url: "https://link.springer.com/article/10.1186/s13073-015-0259-7",
-      kind: "application",
     },
     {
       year: 2017,
@@ -182,7 +168,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "Complex Routes of Nosocomial Vancomycin-Resistant Enterococcus faecium Transmission Revealed by Genome Sequencing",
       journal: "Clinical Infectious Diseases",
       url: "https://academic.oup.com/cid/article/64/7/886/3051757",
-      kind: "application",
     },
     {
       year: 2021,
@@ -191,7 +176,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "Quantifying acquisition and transmission of Enterococcus faecium using genomic surveillance",
       journal: "Nature Microbiology",
       url: "https://www.nature.com/articles/s41564-020-00806-7",
-      kind: "application",
     },
   ],
   // Note: the registry id is "cauris" (no hyphen), not "c-auris" — must
@@ -205,7 +189,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "First hospital outbreak of the globally emerging Candida auris in a European hospital",
       journal: "Antimicrobial Resistance & Infection Control",
       url: "https://pubmed.ncbi.nlm.nih.gov/27777756/",
-      kind: "application",
     },
     {
       year: 2017,
@@ -214,7 +197,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "Simultaneous Emergence of Multidrug-Resistant Candida auris on 3 Continents Confirmed by Whole-Genome Sequencing and Epidemiological Analyses",
       journal: "Clinical Infectious Diseases",
       url: "https://academic.oup.com/cid/article/64/2/134/2706620",
-      kind: "application",
     },
     {
       year: 2018,
@@ -223,7 +205,6 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
         "A Candida auris Outbreak and Its Control in an Intensive Care Setting",
       journal: "New England Journal of Medicine",
       url: "https://www.nejm.org/doi/full/10.1056/NEJMoa1714373",
-      kind: "application",
     },
   ],
   // Disease X is WHO's placeholder for an unknown future pathogen.
@@ -277,7 +258,6 @@ function build(): Record<string, PathogenPaper[]> {
       authors: entry.authors,
       title: entry.fullTitle ?? entry.method,
       url: entry.reference_url,
-      kind: entry.type === "application" ? "application" : "method",
       journal: entry.journal,
     };
 

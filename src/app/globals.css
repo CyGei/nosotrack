@@ -41,12 +41,6 @@
 
   /* ============ SIGNAL — outbreak alert red (product viz only) ============ */
   --color-alert: #ff073a;
-  --color-alert-dim: rgba(255, 7, 58, 0.12);
-
-  /* ============ WARD SIGNALS (desaturated, for dataviz) ============ */
-  --color-ward-a: #6b7d8f;
-  --color-ward-b: #8a7966;
-  --color-ward-c: #7a8a70;
 
   /* ============ TYPOGRAPHY ============
      Font family vars are set by next/font in layout.tsx → :root. */
@@ -58,23 +52,10 @@
   --spacing-pad: clamp(20px, 3vw, 40px);
   --spacing-section: clamp(72px, 8vw, 112px);
 
-  /* 8pt spacing scale (Tailwind already gives us 4-based; these are aliases
-     for designer-readable names per the brief) */
-  --spacing-s1: 8px;
-  --spacing-s2: 16px;
-  --spacing-s3: 24px;
-  --spacing-s4: 32px;
-  --spacing-s5: 40px;
-  --spacing-s6: 48px;
-  --spacing-s8: 64px;
-  --spacing-s10: 80px;
-  --spacing-s12: 96px;
-
   /* ============ MOTION ============ */
   --ease-nt: cubic-bezier(0.2, 0, 0, 1);          /* the Nosotrack curve */
   --transition-duration-fast: 160ms;
   --transition-duration-base: 320ms;
-  --transition-duration-slow: 800ms;
 }
 
 /* =========================================================================
@@ -421,26 +402,6 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
     animation: none;
     opacity: 1;
   }
-}
-
-/* =========================================================================
-   Foundry-demo keyframes — referenced by embedded foundry visuals.
-   Ported from foundry-demo/index.html so the React-embedded versions
-   animate identically.
-   ========================================================================= */
-
-@keyframes fdyDash {
-  to { stroke-dashoffset: -24; }
-}
-
-@keyframes fdyPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.4; transform: scale(1.4); }
-}
-
-@keyframes fdyRingOut {
-  0%   { transform: scale(0.4); opacity: 0.7; }
-  100% { transform: scale(1.4); opacity: 0; }
 }
 
 /* =========================================================================

@@ -23,8 +23,8 @@
  * final state.
  */
 
-import { useEffect, useState } from "react";
-import { useReducedMotion } from "@/lib/hooks";
+import { useDrawProgress } from "@/lib/hooks";
+import { clamp01 } from "@/lib/utils";
 import { TreeStage, TreeStageDefs } from "./TreeStage";
 import {
   PROJECTIONS,
@@ -44,40 +44,13 @@ const PROJECTION_REVEAL_SPAN = 0.15;
 /** Dim opacity for the carried-over Frame 2 composition. */
 const DIM_OPACITY = 0.45;
 
-function clamp01(n: number) {
-  return Math.max(0, Math.min(1, n));
-}
-
 export type Scene4StopProps = {
   /** Whether the stop scene is the active one. */
   active: boolean;
-  /** If true, render the final state immediately (mobile / reduced-motion). */
-  forceImmediate?: boolean;
 };
 
-export function Scene4Stop({ active, forceImmediate = false }: Scene4StopProps) {
-  const reduce = useReducedMotion();
-  const [t2, setT2] = useState(0);
-
-  useEffect(() => {
-    if (!active || forceImmediate || reduce) return;
-    setT2(0);
-    let rafId = 0;
-    let start: number | null = null;
-    const tick = (now: number) => {
-      if (start === null) start = now;
-      const elapsed = now - start;
-      const next = Math.min(1, elapsed / DRAW_DURATION_MS);
-      setT2(next);
-      if (next < 1) {
-        rafId = requestAnimationFrame(tick);
-      }
-    };
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [active, forceImmediate, reduce]);
-
-  const p2 = forceImmediate || reduce ? 1 : active ? t2 : 0;
+export function Scene4Stop({ active }: Scene4StopProps) {
+  const p2 = useDrawProgress(active, DRAW_DURATION_MS);
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-[var(--color-bg-ink)]">

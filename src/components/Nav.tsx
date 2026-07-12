@@ -22,11 +22,10 @@
        </div>
      </nav>
 
-   Theme toggles independently of scroll:
-     overHero  — hero element overlaps the nav band → cream text
-     scrolled  — page scrolled > 8 px → cream backdrop + blur + border
-   Inverted text only when (overHero && !scrolled), exactly matching
-   main's `body.nav-on-dark nav.main-nav:not(.scrolled)` cascade.
+   A single flag drives the theme: `overHero` is true while the hero still
+   overlaps the nav band. Over the hero the nav is transparent with cream
+   text; once past it, the nav flips to a cream backdrop (blur + border)
+   with dark text.
    ========================================================================= */
 
 import { useEffect, useState } from "react";
@@ -55,14 +54,11 @@ const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "Contact", href: "#contact" },
 ];
 
-// Verbatim from main.js: nav becomes "scrolled" at scrollY > 60, and the
-// dark/inverted theme drops once scrollY > hero.offsetHeight - 80.
-const SCROLLED_THRESHOLD = 60;
+// The dark/inverted theme drops once scrollY > hero.offsetHeight - 80.
 const PAST_HERO_PAD = 80;
 
 export function Nav() {
   const [overHero, setOverHero] = useState(true);
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // One single scroll handler that mirrors main.js — both flags driven
@@ -72,7 +68,6 @@ export function Nav() {
   // is near the top, so the "Noso" wordmark stays cream on the dark hero.
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > SCROLLED_THRESHOLD);
       const hero = document.getElementById("hero");
       const heroH = hero?.offsetHeight ?? 0;
       if (heroH > 0) {
@@ -95,17 +90,14 @@ export function Nav() {
   }, []);
 
   // Nav theme: dark (cream text on transparent) whenever the user is
-  // still over the hero, light (dark text on cream backdrop) once
-  // they've scrolled past it. Note the change from main-branch behavior:
-  // we no longer drop to light mode the instant `scrolled` becomes
-  // true. With hero-v2 being (N+1)*100svh tall, the "scrolled but still
-  // over hero" state is no longer momentary — it lasts ~4 viewport
-  // heights — so the nav must stay dark for the whole hero ride.
+  // still over the hero, light (dark text on cream backdrop) once they've
+  // scrolled past it. With hero-v2 being (N+1)*100svh tall, the nav must
+  // stay dark for the whole hero ride — so both the text theme and the
+  // cream backdrop key off the same `overHero` flag. (A separate scrollY
+  // threshold is redundant: by the time the hero is behind us the page is
+  // already scrolled several viewports.)
   const dark = overHero;
-  // The cream backdrop + blur kick in only AFTER the hero is fully
-  // behind us. While over the hero we keep the nav transparent so the
-  // dark canvas reads through cleanly.
-  const showScrolledStyle = scrolled && !overHero;
+  const showScrolledStyle = !overHero;
   const closeMobile = () => setMobileOpen(false);
 
   return (

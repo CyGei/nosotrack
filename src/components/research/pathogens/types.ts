@@ -53,7 +53,13 @@ export type PathogenSource = {
   nih3dEntryId: string;
   /** Direct link to the entry page on 3d.nih.gov (or the model's origin URL). */
   nih3dEntryUrl: string;
-  /** Creator label (typically a NIAID unit or named contributor). */
+  /**
+   * Creator label (typically a NIAID unit or named contributor). Retained
+   * as licensing/attribution provenance for each GLB; intentionally not
+   * rendered in the UI. Every spec (and the fetch-pathogen generator) sets
+   * it, so removing it would be a coordinated multi-file change that the
+   * next generated spec would immediately reintroduce.
+   */
   creator: string;
   license: PathogenLicense;
 };
