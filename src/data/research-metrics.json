@@ -1,45 +1,45 @@
 {
-  "generatedAt": "2026-07-10",
+  "generatedAt": "2026-07-13",
   "source": "OpenAlex (publications & citations) + cranlogs (downloads)",
   "people": {
     "publications": 311,
-    "citations": 46762,
+    "citations": 46785,
     "perPerson": [
       {
         "key": "jombart",
         "name": "Thibaut Jombart",
         "orcid": "0000-0003-2226-8692",
         "publications": 174,
-        "citations": 35165
+        "citations": 35183
       },
       {
         "key": "cori",
         "name": "Anne Cori",
         "orcid": "0000-0002-8443-9162",
         "publications": 127,
-        "citations": 12715
+        "citations": 12720
       },
       {
         "key": "campbell",
         "name": "Finlay Campbell",
         "orcid": "0000-0002-1849-1886",
         "publications": 16,
-        "citations": 1822
+        "citations": 1823
       },
       {
         "key": "geismar",
         "name": "Cyril Geismar",
         "orcid": "0000-0002-8486-5890",
         "publications": 33,
-        "citations": 1031
+        "citations": 1032
       }
     ]
   },
   "tools": {
     "count": 6,
     "papers": 65,
-    "downloads": 312164,
-    "citations": 4046,
+    "downloads": 312275,
+    "citations": 4047,
     "teamCiting": 102
   },
   "packages": [
@@ -476,8 +476,8 @@
         }
       ],
       "paperCount": 52,
-      "citations": 3694,
-      "downloads": 216770,
+      "citations": 3695,
+      "downloads": 216807,
       "downloadsMonthly": [
         {
           "month": "2012-10",
@@ -1141,7 +1141,7 @@
         },
         {
           "month": "2026-07",
-          "downloads": 728
+          "downloads": 765
         }
       ]
     },
@@ -1324,7 +1324,7 @@
       ],
       "paperCount": 20,
       "citations": 977,
-      "downloads": 84359,
+      "downloads": 84380,
       "downloadsMonthly": [
         {
           "month": "2013-02",
@@ -1972,7 +1972,7 @@
         },
         {
           "month": "2026-07",
-          "downloads": 183
+          "downloads": 204
         }
       ]
     },
@@ -1988,7 +1988,7 @@
       "papers": [],
       "paperCount": 0,
       "citations": 0,
-      "downloads": 6882,
+      "downloads": 6890,
       "downloadsMonthly": [
         {
           "month": "2025-06",
@@ -2044,7 +2044,7 @@
         },
         {
           "month": "2026-07",
-          "downloads": 174
+          "downloads": 182
         }
       ]
     },
@@ -2125,7 +2125,7 @@
       ],
       "paperCount": 2,
       "citations": 3,
-      "downloads": 1252,
+      "downloads": 1279,
       "downloadsMonthly": [
         {
           "month": "2025-12",
@@ -2157,7 +2157,7 @@
         },
         {
           "month": "2026-07",
-          "downloads": 85
+          "downloads": 112
         }
       ]
     },
@@ -2187,7 +2187,7 @@
       ],
       "paperCount": 1,
       "citations": 0,
-      "downloads": 2901,
+      "downloads": 2919,
       "downloadsMonthly": [
         {
           "month": "2025-03",
@@ -2255,7 +2255,7 @@
         },
         {
           "month": "2026-07",
-          "downloads": 92
+          "downloads": 110
         }
       ]
     }

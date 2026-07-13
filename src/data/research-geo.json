@@ -1,30 +1,30 @@
 {
-  "generatedAt": "2026-07-11",
+  "generatedAt": "2026-07-13",
   "source": "OpenAlex (author countries citing the methods papers, all-time) + RStudio CRAN logs (installs by country, recent window)",
   "citationCountryCount": 127,
-  "downloadCountryCount": 92,
+  "downloadCountryCount": 93,
   "downloadWindow": {
     "days": 30,
-    "from": "2026-06-10",
-    "to": "2026-07-09",
-    "total": 2408
+    "from": "2026-06-12",
+    "to": "2026-07-11",
+    "total": 2344
   },
-  "maxCitations": 814,
-  "maxDownloads": 1267,
+  "maxCitations": 815,
+  "maxDownloads": 1207,
   "countries": [
     {
       "code": "US",
       "name": "United States",
-      "citations": 814,
-      "downloads": 1267,
+      "citations": 815,
+      "downloads": 1207,
       "lat": 39.8,
       "lon": -98.6
     },
     {
       "code": "GB",
       "name": "United Kingdom",
-      "citations": 594,
-      "downloads": 98,
+      "citations": 596,
+      "downloads": 83,
       "lat": 54,
       "lon": -2.4
     },
@@ -32,7 +32,7 @@
       "code": "CN",
       "name": "China",
       "citations": 269,
-      "downloads": 128,
+      "downloads": 125,
       "lat": 35.9,
       "lon": 104.2
     },
@@ -40,23 +40,23 @@
       "code": "FR",
       "name": "France",
       "citations": 181,
-      "downloads": 26,
+      "downloads": 27,
       "lat": 46.6,
       "lon": 2.4
     },
     {
       "code": "CA",
       "name": "Canada",
-      "citations": 147,
-      "downloads": 95,
+      "citations": 148,
+      "downloads": 94,
       "lat": 56.1,
       "lon": -106.3
     },
     {
       "code": "IT",
       "name": "Italy",
-      "citations": 142,
-      "downloads": 9,
+      "citations": 143,
+      "downloads": 15,
       "lat": 42.8,
       "lon": 12.6
     },
@@ -64,7 +64,7 @@
       "code": "CH",
       "name": "Switzerland",
       "citations": 138,
-      "downloads": 14,
+      "downloads": 16,
       "lat": 46.8,
       "lon": 8.2
     },
@@ -72,7 +72,7 @@
       "code": "HK",
       "name": "Hong Kong",
       "citations": 134,
-      "downloads": 35,
+      "downloads": 36,
       "lat": 22.4,
       "lon": 114.1
     },
@@ -80,7 +80,7 @@
       "code": "BR",
       "name": "Brazil",
       "citations": 92,
-      "downloads": 28,
+      "downloads": 29,
       "lat": -14.2,
       "lon": -51.9
     },
@@ -104,7 +104,7 @@
       "code": "KR",
       "name": "South Korea",
       "citations": 79,
-      "downloads": 66,
+      "downloads": 62,
       "lat": 36.5,
       "lon": 127.9
     },
@@ -112,7 +112,7 @@
       "code": "JP",
       "name": "Japan",
       "citations": 78,
-      "downloads": 139,
+      "downloads": 138,
       "lat": 36.2,
       "lon": 138.3
     },
@@ -120,7 +120,7 @@
       "code": "NL",
       "name": "Netherlands",
       "citations": 76,
-      "downloads": 12,
+      "downloads": 11,
       "lat": 52.1,
       "lon": 5.3
     },
@@ -128,7 +128,7 @@
       "code": "ES",
       "name": "Spain",
       "citations": 74,
-      "downloads": 7,
+      "downloads": 8,
       "lat": 40.2,
       "lon": -3.7
     },
@@ -136,7 +136,7 @@
       "code": "IN",
       "name": "India",
       "citations": 67,
-      "downloads": 20,
+      "downloads": 17,
       "lat": 22.6,
       "lon": 79.6
     },
@@ -151,8 +151,8 @@
     {
       "code": "ZA",
       "name": "South Africa",
-      "citations": 40,
-      "downloads": 28,
+      "citations": 41,
+      "downloads": 27,
       "lat": -30.6,
       "lon": 22.9
     },
@@ -176,7 +176,7 @@
       "code": "MX",
       "name": "Mexico",
       "citations": 36,
-      "downloads": 19,
+      "downloads": 18,
       "lat": 23.6,
       "lon": -102.5
     },
@@ -192,7 +192,7 @@
       "code": "CL",
       "name": "Chile",
       "citations": 33,
-      "downloads": 4,
+      "downloads": 5,
       "lat": -35.7,
       "lon": -71.5
     },
@@ -216,7 +216,7 @@
       "code": "TW",
       "name": "Taiwan",
       "citations": 26,
-      "downloads": 3,
+      "downloads": 4,
       "lat": 23.7,
       "lon": 121
     },
@@ -224,7 +224,7 @@
       "code": "IE",
       "name": "Ireland",
       "citations": 24,
-      "downloads": 3,
+      "downloads": 4,
       "lat": 53.2,
       "lon": -8
     },
@@ -232,9 +232,17 @@
       "code": "DK",
       "name": "Denmark",
       "citations": 23,
-      "downloads": 2,
+      "downloads": 1,
       "lat": 56.1,
       "lon": 9.5
+    },
+    {
+      "code": "NZ",
+      "name": "New Zealand",
+      "citations": 21,
+      "downloads": 2,
+      "lat": -40.9,
+      "lon": 174.9
     },
     {
       "code": "SK",
@@ -243,14 +251,6 @@
       "downloads": 1,
       "lat": 48.7,
       "lon": 19.7
-    },
-    {
-      "code": "NZ",
-      "name": "New Zealand",
-      "citations": 21,
-      "downloads": 1,
-      "lat": -40.9,
-      "lon": 174.9
     },
     {
       "code": "NG",
@@ -272,7 +272,7 @@
       "code": "CO",
       "name": "Colombia",
       "citations": 18,
-      "downloads": 18,
+      "downloads": 19,
       "lat": 4.6,
       "lon": -74.3
     },
@@ -280,7 +280,7 @@
       "code": "TH",
       "name": "Thailand",
       "citations": 18,
-      "downloads": 6,
+      "downloads": 7,
       "lat": 15.9,
       "lon": 100.9
     },
@@ -301,6 +301,14 @@
       "lon": 53.7
     },
     {
+      "code": "GR",
+      "name": "Greece",
+      "citations": 16,
+      "downloads": 1,
+      "lat": 39.1,
+      "lon": 22
+    },
+    {
       "code": "PH",
       "name": "Philippines",
       "citations": 15,
@@ -312,7 +320,7 @@
       "code": "UA",
       "name": "Ukraine",
       "citations": 15,
-      "downloads": 9,
+      "downloads": 10,
       "lat": 48.4,
       "lon": 31.2
     },
@@ -320,7 +328,7 @@
       "code": "MY",
       "name": "Malaysia",
       "citations": 15,
-      "downloads": 9,
+      "downloads": 10,
       "lat": 4.2,
       "lon": 101.9
     },
@@ -328,23 +336,15 @@
       "code": "RU",
       "name": "Russia",
       "citations": 15,
-      "downloads": 4,
+      "downloads": 5,
       "lat": 61.5,
       "lon": 105.3
-    },
-    {
-      "code": "GR",
-      "name": "Greece",
-      "citations": 15,
-      "downloads": 1,
-      "lat": 39.1,
-      "lon": 22
     },
     {
       "code": "TR",
       "name": "Turkey",
       "citations": 14,
-      "downloads": 11,
+      "downloads": 12,
       "lat": 39,
       "lon": 35.2
     },
@@ -384,7 +384,7 @@
       "code": "TN",
       "name": "Tunisia",
       "citations": 11,
-      "downloads": 1,
+      "downloads": 2,
       "lat": 33.9,
       "lon": 9.6
     },
@@ -469,20 +469,20 @@
       "lon": 19.1
     },
     {
+      "code": "NP",
+      "name": "Nepal",
+      "citations": 7,
+      "downloads": 5,
+      "lat": 28.4,
+      "lon": 84.1
+    },
+    {
       "code": "AE",
       "name": "United Arab Emirates",
       "citations": 7,
       "downloads": 4,
       "lat": 23.4,
       "lon": 53.8
-    },
-    {
-      "code": "NP",
-      "name": "Nepal",
-      "citations": 7,
-      "downloads": 4,
-      "lat": 28.4,
-      "lon": 84.1
     },
     {
       "code": "CR",
@@ -507,6 +507,14 @@
       "downloads": 0,
       "lat": -9.2,
       "lon": -75
+    },
+    {
+      "code": "BY",
+      "name": "Belarus",
+      "citations": 6,
+      "downloads": 1,
+      "lat": 53.7,
+      "lon": 27.9
     },
     {
       "code": "CY",
@@ -547,14 +555,6 @@
       "downloads": 0,
       "lat": -6.4,
       "lon": 34.9
-    },
-    {
-      "code": "BY",
-      "name": "Belarus",
-      "citations": 6,
-      "downloads": 0,
-      "lat": 53.7,
-      "lon": 27.9
     },
     {
       "code": "AR",
@@ -712,7 +712,7 @@
       "code": "GN",
       "name": "Guinea",
       "citations": 2,
-      "downloads": 8,
+      "downloads": 9,
       "lat": 9.9,
       "lon": -11
     },
@@ -741,6 +741,14 @@
       "lon": 17.7
     },
     {
+      "code": "BH",
+      "name": "Bahrain",
+      "citations": 2,
+      "downloads": 1,
+      "lat": 26,
+      "lon": 50.5
+    },
+    {
       "code": "LB",
       "name": "Lebanon",
       "citations": 2,
@@ -763,14 +771,6 @@
       "downloads": 0,
       "lat": 42.5,
       "lon": 1.6
-    },
-    {
-      "code": "BH",
-      "name": "Bahrain",
-      "citations": 2,
-      "downloads": 0,
-      "lat": 26,
-      "lon": 50.5
     },
     {
       "code": "CU",
@@ -877,6 +877,14 @@
       "lon": 6.1
     },
     {
+      "code": "VE",
+      "name": "Venezuela",
+      "citations": 1,
+      "downloads": 4,
+      "lat": 6.4,
+      "lon": -66.6
+    },
+    {
       "code": "RO",
       "name": "Romania",
       "citations": 1,
@@ -885,12 +893,12 @@
       "lon": 24.9
     },
     {
-      "code": "VE",
-      "name": "Venezuela",
+      "code": "BG",
+      "name": "Bulgaria",
       "citations": 1,
-      "downloads": 3,
-      "lat": 6.4,
-      "lon": -66.6
+      "downloads": 2,
+      "lat": 42.7,
+      "lon": 25.5
     },
     {
       "code": "KH",
@@ -899,14 +907,6 @@
       "downloads": 2,
       "lat": 12.6,
       "lon": 104.9
-    },
-    {
-      "code": "BG",
-      "name": "Bulgaria",
-      "citations": 1,
-      "downloads": 1,
-      "lat": 42.7,
-      "lon": 25.5
     },
     {
       "code": "DO",
