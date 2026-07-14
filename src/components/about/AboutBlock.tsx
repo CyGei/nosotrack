@@ -36,6 +36,7 @@ export function AboutBlock({
   subtitle,
   video,
   details,
+  bare,
 }: {
   id: StepNumber;
   title: string;
@@ -43,6 +44,8 @@ export function AboutBlock({
   /** Omit to render the details panel directly with no Video/Details switch. */
   video?: React.ReactNode;
   details: React.ReactNode;
+  /** Render `details` open (no card border/padding). Ignored when `video` is set. */
+  bare?: boolean;
 }) {
   const hasVideo = video != null;
   const [tab, setTab] = useState<Tab>(hasVideo ? "video" : "details");
@@ -118,20 +121,32 @@ export function AboutBlock({
               />
             )}
 
-            <div
-              className={cn(
-                "rounded-[14px] border border-rule-strongest bg-bg overflow-hidden",
-                hasVideo ? "mt-6" : subtitle ? "mt-8" : "mt-0",
-              )}
-            >
+            {bare && !hasVideo ? (
+              // Open, borderless treatment (the Problem block) — the card
+              // frame is reserved for blocks that house a video.
               <div
-                key={hasVideo ? tab : "details"}
-                className="animate-tab-in p-4 lg:p-6"
+                key="details"
+                className={cn("animate-tab-in", subtitle ? "mt-10" : "mt-0")}
                 aria-live="polite"
               >
-                {hasVideo && tab === "video" ? video : details}
+                {details}
               </div>
-            </div>
+            ) : (
+              <div
+                className={cn(
+                  "rounded-[14px] border border-rule-strongest bg-bg overflow-hidden",
+                  hasVideo ? "mt-6" : subtitle ? "mt-8" : "mt-0",
+                )}
+              >
+                <div
+                  key={hasVideo ? tab : "details"}
+                  className="animate-tab-in p-4 lg:p-6"
+                  aria-live="polite"
+                >
+                  {hasVideo && tab === "video" ? video : details}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

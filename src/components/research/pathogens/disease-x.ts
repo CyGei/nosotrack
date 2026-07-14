@@ -24,7 +24,11 @@ export const DISEASE_X: PathogenSpec = {
   name: "Disease X",
   shortLabel: "Disease X",
   modelUrl: "/models/disease-x.glb",
-  framing: { cameraZ: 6.0, tiltX: 0.22 },
+  // Bigger targetRadius than the arced specimens so the hero X fills its
+  // frame more (reads larger, and its arms reach up toward the heading and
+  // left toward the body text). Still inside the rotation-safe bounding
+  // sphere at the default cameraZ, so it never clips.
+  framing: { tiltX: 0.22, targetRadius: 1.5 },
   source: {
     nih3dEntryId: "nosotrack/disease-x",
     nih3dEntryUrl: "https://www.who.int/activities/prioritizing-diseases-for-research-and-development-in-emergency-contexts",

@@ -135,7 +135,7 @@ function TeamCard({ person }: { person: TeamPerson }) {
           {person.role}
         </p>
         <p
-          className="team-bio mt-3 text-[15px] leading-[1.7] text-text"
+          className="team-bio mt-3 text-[17px] leading-[1.55] tracking-[-0.005em] text-mute"
           dangerouslySetInnerHTML={{ __html: person.bio }}
         />
       </div>

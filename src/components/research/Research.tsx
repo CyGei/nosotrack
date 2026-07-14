@@ -3,84 +3,70 @@
 /**
  * Research — pathogen specimen section.
  *
- * Layout (2026-05-24 v6):
+ * Layout:
  *   - Section title (display, large) — "Pathogen agnostic, ready for
- *     disease X."
- *   - Two-column block under the heading:
- *       · left  — lead paragraph framing Nosotrack's research provenance
- *                 (outbreaker2, linktree, applied outbreak history).
- *       · right — Disease X spotlight (large clickable 3D specimen).
- *                 Pairs with the "…ready for disease X." line in the
- *                 heading. Clicking opens the standard dossier, which
- *                 is special-cased in <PathogenDossier> to show the
- *                 WHO R&D Blueprint definition + priority-diseases
- *                 context + source link.
- *   - PathogenTicker — horizontal auto-drifting strip of every other
- *     specimen. Hover pauses, wheel scrolls faster, click opens dossier.
- *   - Combined attribution footer (links the catalogue back to NIH 3D
- *     Print Exchange / NIAID Visual & Medical Arts; per-specimen
- *     attribution is preserved as a link on each ticker label).
+ *     Disease X."
+ *   - Two-column block under the heading (shares the 1fr / 1.1fr grid with
+ *     the "Validated by science" globe section below so they line up):
+ *       · left  — lead paragraph framing Nosotrack's research provenance.
+ *       · right — <PathogenArc>: a stage that mirrors the globe. Disease X
+ *                 is the hero (large, clickable) and every other specimen
+ *                 arcs off its right edge, echoing the metric labels arched
+ *                 around the globe. Clicking any specimen opens the shared
+ *                 <PathogenDossier> (special-cased for Disease X to show the
+ *                 WHO R&D Blueprint definition).
  *
  * The catalogue is declarative: `./pathogens/index.ts`. Adding a new
  * specimen is a registry edit, not a component edit.
  */
 
-import { PathogenTicker } from "./PathogenTicker";
-import { PathogenSpotlight } from "./PathogenSpotlight";
+import { PathogenArc } from "./PathogenArc";
 import { PATHOGENS } from "./pathogens";
 
 export function Research() {
   if (PATHOGENS.length === 0) return null;
 
-  // Pull Disease X out of the strip and feature it next to the paragraph.
-  const spotlight = PATHOGENS.find((p) => p.id === "disease-x") ?? null;
-  const tickerPathogens = PATHOGENS.filter((p) => p.id !== "disease-x");
+  // Disease X is the hero; every other specimen arcs off its right edge.
+  const hero = PATHOGENS.find((p) => p.id === "disease-x") ?? null;
+  const others = PATHOGENS.filter((p) => p.id !== "disease-x");
 
   return (
     <section
       id="research"
-      className="section-pad border-t border-rule bg-bg"
+      className="border-t border-rule bg-bg pt-[var(--spacing-section)] pb-[clamp(40px,5vw,72px)]"
       aria-label="Pathogen"
     >
       <div className="container-page">
         <h2 className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]">
-          Pathogen agnostic, ready for disease X.
+          Pathogen agnostic, ready for Disease X.
         </h2>
 
-        <div className="mt-10 grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-16 md:items-center">
-          <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink md:col-span-7 text-justify hyphens-auto [text-wrap:pretty]">
+        {/* Two-column block — shares the grid skeleton with the "Validated
+            by science" section below (same 1fr / 1.1fr split + gap-12) so the
+            two reading columns line up as the sections stack. The right
+            column mirrors the globe stage: Disease X hero + arched catalogue. */}
+        <div className="mt-12 grid grid-cols-1 items-start gap-12 md:mt-16 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+          <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink text-justify hyphens-auto [text-wrap:pretty]">
             <p>
-              Nosotrack builds on over a decade of research in outbreak
-              forensics, focusing on the integration of epidemiological,
-              genomic and contact data to infer transmission trees.
+              Nosotrack reconstructs transmission chains in near real-time
+              by integrating epidemiological, genomic and contact data
+              within a unified Bayesian inference framework. The platform
+              identifies the likely source of each infection and quantifies
+              the uncertainty around it.
             </p>
             <p>
-              Our team and collaborators have published extensively on
-              methodological advances, including the <em>outbreaker2</em> R
-              package and the <em>linktree</em> method for inferring
-              transmission patterns between staff and patients. These
-              methods have been applied to real outbreak data, including
-              SARS-CoV-2 nosocomial outbreaks in Switzerland and the UK,
-              MRSA in neonatal intensive care units in the UK,{" "}
-              <em>Klebsiella pneumoniae</em> in a Nepali neonatal unit,{" "}
-              <em>Acinetobacter baumannii</em> in hospitals in North
-              Carolina, and Ebola outbreaks in the DRC. We are committed
-              to open science, with all software freely available and
-              publications accessible to the public.
+              Designed to work across pathogens, healthcare settings and
+              outbreak scenarios, Nosotrack enables response teams to
+              understand how outbreaks spread, and determine when and where
+              to intervene.
             </p>
           </div>
 
-          {spotlight && (
-            <div className="md:col-span-5">
-              <div className="mx-auto w-full max-w-[420px]">
-                <PathogenSpotlight pathogen={spotlight} />
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="mt-20">
-          <PathogenTicker pathogens={tickerPathogens} />
+          {/* Lifted slightly so the tall X sits a touch higher than the
+              top-aligned paragraphs (its centre nears the text's centre). */}
+          <div className="md:-mt-8">
+            {hero && <PathogenArc hero={hero} others={others} />}
+          </div>
         </div>
       </div>
     </section>

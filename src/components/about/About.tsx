@@ -21,6 +21,7 @@
 
 import { AboutBlock } from "./AboutBlock";
 import { DetailsList } from "./DetailsList";
+import { ProblemStats } from "./ProblemStats";
 import { FoundryFrame } from "./FoundryFrame";
 
 /** Inline external link — used inside detail rows. */
@@ -49,15 +50,13 @@ export function About() {
         id="0.1"
         title="Nosocomial outbreaks are deadly, costly and difficult to manage."
         subtitle="Healthcare-associated infections (HAIs) are among the most common adverse events in healthcare delivery."
+        bare
         details={
-          <DetailsList
-            rows={[
+          <ProblemStats
+            stats={[
               {
-                kind: "header",
-                title: "The Problem",
-              },
-              {
-                title: "1 in 10 patients develop an HAI",
+                figure: "1 in 10",
+                phrase: "patients develop an HAI",
                 desc: (
                   <>
                     A{" "}
@@ -69,7 +68,8 @@ export function About() {
                 ),
               },
               {
-                title: "136M antibiotic-resistant HAIs / year",
+                figure: "136M",
+                phrase: "antibiotic-resistant HAIs / year",
                 desc: (
                   <>
                     HAIs are a major driver of the antimicrobial resistance
@@ -82,7 +82,8 @@ export function About() {
                 ),
               },
               {
-                title: "3.5M annual deaths",
+                figure: "3.5M",
+                phrase: "annual deaths",
                 desc: (
                   <>
                     The{" "}
@@ -94,11 +95,11 @@ export function About() {
                   </>
                 ),
               },
-              {
-                title: "AMR's most underrated driver",
-                desc: "Hospital outbreaks are the breeding ground for resistant strains. Stopping them earlier is the cheapest and most efficient solution.",
-              },
             ]}
+            thesis={{
+              title: "AMR's most underrated driver",
+              desc: "Hospital outbreaks are the breeding ground for resistant strains. Stopping them earlier is the cheapest and most efficient solution.",
+            }}
           />
         }
       />

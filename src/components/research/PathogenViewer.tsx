@@ -71,7 +71,7 @@ export function PathogenViewer({
 
     /* ─────────────────────────── scene / camera / renderer ─────── */
     const framing = pathogen.framing ?? {};
-    const targetRadius = framing.targetRadius ?? 1.05;
+    const targetRadius = framing.targetRadius ?? 1.35;
     const cameraZ = framing.cameraZ ?? 6.0;
     const fov = framing.fov ?? 34;
     const tiltX = framing.tiltX ?? 0.32;

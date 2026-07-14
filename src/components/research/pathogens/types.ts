@@ -21,7 +21,7 @@
 /* ─────────────────────────────────────────────────────── framing ── */
 
 export type PathogenFraming = {
-  /** Target bounding-sphere radius after centring + uniform scale. Default 1.05. */
+  /** Target bounding-sphere radius after centring + uniform scale. Default 1.35. */
   targetRadius?: number;
   /** Perspective camera distance on Z. Default 6.0. */
   cameraZ?: number;

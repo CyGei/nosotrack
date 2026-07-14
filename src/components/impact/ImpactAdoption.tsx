@@ -1,119 +1,357 @@
 "use client";
 
 /**
- * ImpactAdoption — the "Impact & adoption" section (id="impact"), between the
- * Research (pathogen) section and the Team section.
+ * ImpactAdoption — the "Impact & adoption" movement (id="impact"). It flows
+ * straight out of the Research section above (no divider) and reads as one
+ * quiet statement of global adoption.
  *
- * One hero, everything supports it. The HERO is a living globe (see <Globe>):
- * evidence that the methods behind Nosotrack have real global reach. Below it,
- * a quiet supporting row of four figures gives the quantitative validation —
- * Downloads and Citations lead (what an investor grasps instantly), Papers and
- * Tools follow. A single live-data line closes it.
+ * Composition (wide screens):
  *
- * Not a dashboard: the numbers no longer compete with each other or with the
- * globe. Every figure is live from src/data/research-metrics.json (metrics) and
- * src/data/research-geo.json (the citing/installing countries) — never
- * hand-edited.
+ *   ┌ lead paragraph ────────┐   ┌ living Globe ─────────────────┐
+ *   │ a decade of research…  │   │        (•)   Downloads  312k+ │
+ *   │ outbreaker2 · EpiEstim │   │       (•••)  Citations  46.7k │
+ *   │ · linktree …           │   │        (•)   Countries    127 │
+ *   └────────────────────────┘   │              Publications 311 │
+ *                                 └───────────────────────────────┘
+ *
+ * The globe sits to the RIGHT of the paragraph, with the aggregate metrics
+ * arched around its right edge (Downloads · Citations · Countries ·
+ * Publications). Clicking the Downloads or Citations figure drills that total
+ * into its per-package breakdown (a second arc in the same place) AND swaps the
+ * left paragraph: the lead fades out and a short methodology note fades in. A
+ * back arrow at the globe's top-left (or Esc) returns to the totals and the
+ * lead. On narrow screens the same pieces stack vertically.
+ *
+ * Every figure is live from src/data/research-metrics.json + research-geo.json.
+ * No em dashes (house rule). Typography follows docs/TYPOGRAPHY.md exactly.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import metricsData from "@/data/research-metrics.json";
 import geoData from "@/data/research-geo.json";
 import { useCountUp, fmtInt } from "@/lib/useCountUp";
-import { useInViewOnce } from "@/lib/hooks";
+import { useInViewOnce, useMediaQuery } from "@/lib/hooks";
 import { Reveal } from "./Reveal";
 
 const { people, tools } = metricsData;
 
-// The globe (d3-geo + world-atlas topojson, ~150 KB) is below the fold and
-// client-only, so it loads in its own lazy chunk — off the critical path.
 const Globe = dynamic(() => import("./Globe").then((m) => m.Globe), {
   ssr: false,
 });
 
-export function ImpactAdoption() {
-  const zoneRef = useRef<HTMLDivElement>(null);
-  const fieldRef = useRef<HTMLDivElement>(null);
-  const [globeSize, setGlobeSize] = useState(460);
+type Pkg = { name: string; value: number };
+const byValueDesc = (a: Pkg, b: Pkg) => b.value - a.value;
 
-  // Start the count-ups once the globe zone is reached — or immediately if
-  // the section already lazy-mounts on screen (mountCheck).
-  const run = useInViewOnce(zoneRef, {
+// Per-package breakdowns. Downloads sum to exactly tools.downloads; citations
+// are each method paper's own citation count (SeqTrack has citations but no
+// CRAN package, so the two sets differ).
+const DOWNLOAD_PKGS: Pkg[] = metricsData.packages
+  .filter((p) => (p.downloads ?? 0) > 0)
+  .map((p) => ({ name: p.name, value: p.downloads ?? 0 }))
+  .sort(byValueDesc);
+const CITATION_PKGS: Pkg[] = metricsData.packages
+  .filter((p) => (p.citations ?? 0) > 0)
+  .map((p) => ({ name: p.name, value: p.citations ?? 0 }))
+  .sort(byValueDesc);
+
+type Breakdown = {
+  pkgs: Pkg[];
+  unit: string;
+  caption: string;
+  eyebrow: string;
+  blurb: string;
+};
+type MetricDef = {
+  value: number;
+  label: string;
+  plus?: boolean;
+  breakdown?: Breakdown;
+};
+const METRICS: MetricDef[] = [
+  {
+    value: tools.downloads,
+    label: "Downloads",
+    plus: true,
+    breakdown: {
+      pkgs: DOWNLOAD_PKGS,
+      unit: "Downloads",
+      caption: `${fmtInt(tools.downloads)} downloads across ${DOWNLOAD_PKGS.length} packages`,
+      eyebrow: "CRAN Downloads",
+      blurb:
+        "Each count is an install of one of our open-source R packages from CRAN, the Comprehensive R Archive Network. Figures come straight from the RStudio mirror logs and refresh every week.",
+    },
+  },
+  {
+    value: people.citations,
+    label: "Citations",
+    breakdown: {
+      pkgs: CITATION_PKGS,
+      unit: "Cited",
+      caption: "Citations to each core method",
+      eyebrow: "Peer-reviewed citations",
+      blurb:
+        "Peer-reviewed papers that cite the team's research, resolved through OpenAlex. The headline spans the full body of work; the breakdown shows how often each core method's own paper is cited.",
+    },
+  },
+  { value: geoData.citationCountryCount, label: "Countries" },
+  { value: people.publications, label: "Publications" },
+];
+
+const ARC_OFFSET = 82;
+const AGG_ANGLES = [-36, -12, 12, 36];
+// Spread n items across the right arc, top → bottom.
+const arc = (n: number, maxA = 40) =>
+  Array.from({ length: n }, (_, i) =>
+    n === 1 ? 0 : -maxA + (2 * maxA * i) / (n - 1),
+  );
+
+export function ImpactAdoption() {
+  const reachRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [globeSize, setGlobeSize] = useState(340);
+  const [openLabel, setOpenLabel] = useState<string | null>(null);
+  const wide = useMediaQuery("(min-width: 1100px)");
+
+  const run = useInViewOnce(reachRef, {
     rootMargin: "0px 0px -15% 0px",
     mountCheck: true,
   });
 
+  // globeSize is derived from the column that actually holds the globe: the
+  // right grid track when wide, the full-width wrapper when stacked. Sizing off
+  // the real measured width (not a computed fraction) keeps the arched metrics
+  // inside the track regardless of the grid's gap maths. The `- 250` reserves
+  // room for the arc + figure to the globe's right.
   useEffect(() => {
-    const el = fieldRef.current;
+    const el = measureRef.current;
     if (!el) return;
-    const fit = () => setGlobeSize(Math.max(300, Math.min(520, el.clientWidth)));
+    const fit = () => {
+      const w = el.clientWidth;
+      setGlobeSize(
+        wide
+          ? Math.max(300, Math.min(380, Math.round(w - 250)))
+          : Math.max(280, Math.min(440, w)),
+      );
+    };
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [wide]);
 
-  const countries = useCountUp(geoData.citationCountryCount, run, 1500, 200);
+  const close = useCallback(() => setOpenLabel(null), []);
+  useEffect(() => {
+    if (!openLabel) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openLabel, close]);
+
+  const open = METRICS.find((m) => m.label === openLabel)?.breakdown ?? null;
+  // Keep the last breakdown mounted so the methodology note can fade OUT (and
+  // the lead fade back IN) on close without its text vanishing mid-transition.
+  const lastBreakdown = useRef<Breakdown | null>(open);
+  if (open) lastBreakdown.current = open;
+  const para = open ?? lastBreakdown.current;
+
+  // Globe is anchored to the LEFT of its stage; metrics arch off its right.
+  // Positions are px from the stage's left edge (globe centre = R, R).
+  const R = globeSize / 2;
+  const Rm = R + ARC_OFFSET;
+  const pos = (deg: number) => {
+    const a = (deg * Math.PI) / 180;
+    return {
+      left: R + Rm * Math.cos(a),
+      top: R + Rm * Math.sin(a),
+      transform: "translateY(-50%)",
+    };
+  };
+  const dlAngles = arc(DOWNLOAD_PKGS.length);
+  const ciAngles = arc(CITATION_PKGS.length);
+
+  const backArrow = openLabel && <BackArrow onClick={close} />;
+  const caption = open ? open.caption : "Live adoption map";
+
+  // The arched globe stage (globe + aggregate arc + both breakdown arcs).
+  const globeStage = (
+    <div className="relative" style={{ height: globeSize }}>
+      <div
+        className="absolute left-0 top-0"
+        style={{ width: globeSize, height: globeSize }}
+      >
+        <Globe data={geoData} size={globeSize} />
+        {backArrow}
+      </div>
+
+      {/* aggregate metrics — fade out when a breakdown is open */}
+      {METRICS.map((m, i) => (
+        <div
+          key={m.label}
+          className="absolute transition-opacity duration-[var(--transition-duration-base)]"
+          style={{
+            ...pos(AGG_ANGLES[i]),
+            opacity: openLabel ? 0 : 1,
+            pointerEvents: openLabel ? "none" : "auto",
+          }}
+        >
+          {m.breakdown ? (
+            <button
+              type="button"
+              onClick={() => setOpenLabel(m.label)}
+              aria-expanded={openLabel === m.label}
+              className="group block text-left outline-none focus-visible:ring-1 focus-visible:ring-ink"
+            >
+              <Metric metric={m} run={run} delay={i * 120} arched trigger />
+            </button>
+          ) : (
+            <Metric metric={m} run={run} delay={i * 120} arched />
+          )}
+        </div>
+      ))}
+
+      {/* downloads breakdown */}
+      {DOWNLOAD_PKGS.map((p, i) => (
+        <div
+          key={`dl-${p.name}`}
+          className="absolute transition-opacity duration-[var(--transition-duration-base)]"
+          style={{
+            ...pos(dlAngles[i]),
+            opacity: openLabel === "Downloads" ? 1 : 0,
+            pointerEvents: openLabel === "Downloads" ? "auto" : "none",
+            transitionDelay: openLabel === "Downloads" ? `${i * 55}ms` : "0ms",
+          }}
+        >
+          <PackageMetric
+            pkg={p}
+            unit="Downloads"
+            run={openLabel === "Downloads"}
+            delay={i * 70}
+          />
+        </div>
+      ))}
+
+      {/* citations breakdown */}
+      {CITATION_PKGS.map((p, i) => (
+        <div
+          key={`ci-${p.name}`}
+          className="absolute transition-opacity duration-[var(--transition-duration-base)]"
+          style={{
+            ...pos(ciAngles[i]),
+            opacity: openLabel === "Citations" ? 1 : 0,
+            pointerEvents: openLabel === "Citations" ? "auto" : "none",
+            transitionDelay: openLabel === "Citations" ? `${i * 55}ms` : "0ms",
+          }}
+        >
+          <PackageMetric
+            pkg={p}
+            unit="Cited"
+            run={openLabel === "Citations"}
+            delay={i * 70}
+          />
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <section
       id="impact"
-      className="section-pad border-t border-rule bg-bg"
+      className="scroll-mt-28 bg-bg pb-[var(--spacing-section)]"
       aria-label="Impact and adoption"
     >
       <div className="container-page">
+        {/* ── header ───────────────────────────────────────────────── */}
         <Reveal>
-          <h2 className="max-w-[24ch] font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]">
-            Built on globally adopted outbreak analytics.
+          <h2 className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]">
+            Validated by science, proven in response.
           </h2>
-          <p className="mt-6 max-w-2xl text-[16px] leading-[1.7] text-text">
-            The methods powering Nosotrack have become part of outbreak response
-            worldwide.
-          </p>
         </Reveal>
 
-        {/* ── HERO: the living globe ──────────────────────────────────── */}
-        <div
-          ref={zoneRef}
-          className="mt-14 flex flex-col items-center md:mt-20"
-        >
-          <div ref={fieldRef} className="w-full max-w-[520px]">
-            <div className="mx-auto" style={{ width: globeSize, height: globeSize }}>
-              <Globe data={geoData} size={globeSize} />
-            </div>
-          </div>
+        {/* ── paragraph + globe (with drill-down) ──────────────────── */}
+        <Reveal className="mt-12 md:mt-16">
+          <div ref={reachRef}>
+            {wide ? (
+              <div
+                className="grid items-center gap-12"
+                style={{ gridTemplateColumns: "minmax(0,1fr) minmax(0,1.1fr)" }}
+              >
+                {/* LEFT — lead ⇄ methodology */}
+                <TextSwap open={open} para={para} />
 
-          <Reveal className="mt-4 flex flex-col items-center text-center">
-            <p className="font-display leading-none tracking-tight text-ink tabular-nums text-[clamp(28px,3.2vw,44px)]">
-              {fmtInt(countries)}{" "}
-              <span className="font-normal text-mute">countries</span>
-            </p>
-            <p className="mt-3 max-w-md text-[13px] leading-relaxed text-faint">
-              Where researchers worldwide cite and download the open-source
-              methods behind Nosotrack. Citations all-time; downloads over the
-              past {geoData.downloadWindow.days} days.
-            </p>
-          </Reveal>
-        </div>
+                {/* RIGHT — globe + arched metrics */}
+                <div ref={measureRef} className="relative">
+                  {globeStage}
+                  <div
+                    className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint"
+                    style={{ width: globeSize }}
+                  >
+                    {caption}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-12">
+                {/* lead-in (stays put; methodology appears by the metrics) */}
+                <LeadCopy />
 
-        {/* ── SUPPORTING EVIDENCE: the four figures ───────────────────── */}
-        <Reveal className="mt-16 border-t border-rule pt-12 md:mt-20">
-          <div className="grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-4">
-            <Metric value={tools.downloads} label="Downloads" run={run} startDelay={0} hero />
-            <Metric value={people.citations} label="Citations" run={run} startDelay={120} hero />
-            <Metric value={people.publications} label="Papers" run={run} startDelay={240} />
-            <Metric value={tools.count} label="Tools" run={run} startDelay={360} />
+                <div ref={measureRef}>
+                  <div
+                    className="relative mx-auto"
+                    style={{ width: globeSize, height: globeSize }}
+                  >
+                    <Globe data={geoData} size={globeSize} />
+                    {backArrow}
+                  </div>
+
+                  {open && (
+                    <div className="mt-10">
+                      <Methodology para={open} />
+                    </div>
+                  )}
+
+                  {open ? (
+                    <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8">
+                      {open.pkgs.map((p, i) => (
+                        <PackageMetric
+                          key={p.name}
+                          pkg={p}
+                          unit={open.unit}
+                          run
+                          delay={i * 70}
+                          centered
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-9">
+                      {METRICS.map((m, i) =>
+                        m.breakdown ? (
+                          <button
+                            key={m.label}
+                            type="button"
+                            onClick={() => setOpenLabel(m.label)}
+                            className="group outline-none focus-visible:ring-1 focus-visible:ring-ink"
+                          >
+                            <Metric metric={m} run={run} delay={i * 120} trigger />
+                          </button>
+                        ) : (
+                          <div key={m.label}>
+                            <Metric metric={m} run={run} delay={i * 120} />
+                          </div>
+                        ),
+                      )}
+                    </div>
+                  )}
+
+                  <div className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
+                    {caption}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </Reveal>
-
-        <div className="mt-12 flex items-center justify-center gap-2 font-mono text-[11px] tracking-[0.02em] text-faint">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mute opacity-60" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mute" />
-          </span>
-          Sourced live from OpenAlex and CRAN.
-        </div>
       </div>
     </section>
   );
@@ -121,30 +359,180 @@ export function ImpactAdoption() {
 
 /* -------------------------------------------------------------------------- */
 
-function Metric({
-  value,
-  label,
-  run,
-  startDelay,
-  hero,
-}: {
-  value: number;
-  label: string;
-  run: boolean;
-  startDelay: number;
-  hero?: boolean;
-}) {
-  const v = useCountUp(value, run, hero ? 1900 : 1500, startDelay);
+/** The default lead copy — Impact's provenance statement. */
+function LeadCopy() {
   return (
-    <div className="group text-center transition-transform duration-300 ease-out hover:-translate-y-0.5">
-      {/* Reserve the height and bottom-align, so every label lines up. */}
-      <div className="flex h-[clamp(38px,4.6vw,66px)] items-end justify-center">
-        <div className="font-display font-normal leading-none tracking-tight tabular-nums text-ink opacity-90 transition-opacity duration-300 group-hover:opacity-100 text-[clamp(38px,4.6vw,66px)]">
-          {fmtInt(v)}
-        </div>
+    <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink text-justify hyphens-auto [text-wrap:pretty]">
+      <p>
+        Built on over a decade of peer-reviewed methodological research by our team and collaborators. 
+        Its inference engine is grounded in scientifically validated methods that have become part of the standard toolkit for outbreak response worldwide.
+      </p>
+      <p>
+        These methods have supported real investigations by hospitals, research
+        institutions and public health agencies, including SARS-CoV-2 nosocomial
+        outbreaks in Switzerland and the UK, MRSA transmission in UK neonatal
+        intensive care units, <em>Klebsiella pneumoniae</em> in a Nepali
+        neonatal unit, <em>Acinetobacter baumannii</em> in hospitals in North
+        Carolina, and Ebola in the Democratic Republic of the Congo.
+      </p>
+    </div>
+  );
+}
+
+/** How a drilled-down metric was collected — replaces the lead when open. */
+function Methodology({ para }: { para: Breakdown }) {
+  return (
+    <div>
+      <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-mute">
+        {para.eyebrow}
       </div>
-      <div className="mt-4 font-mono text-[11px] uppercase tracking-[0.18em] text-mute">
-        {label}
+      <p className="mt-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink">
+        {para.blurb}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * The left column on wide screens: the lead copy and the methodology note share
+ * one slot and cross-fade. The lead stays in flow (holding the slot's height so
+ * nothing jumps); the methodology overlays it, vertically centred.
+ */
+function TextSwap({
+  open,
+  para,
+}: {
+  open: Breakdown | null;
+  para: Breakdown | null;
+}) {
+  return (
+    <div className="relative">
+      <div
+        className="transition-opacity duration-[var(--transition-duration-base)]"
+        style={{ opacity: open ? 0 : 1, pointerEvents: open ? "none" : "auto" }}
+        aria-hidden={open ? true : undefined}
+      >
+        <LeadCopy />
+      </div>
+      <div
+        className="absolute inset-0 flex flex-col justify-center transition-opacity duration-[var(--transition-duration-base)]"
+        style={{ opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none" }}
+        aria-hidden={open ? undefined : true}
+      >
+        {para && <Methodology para={para} />}
+      </div>
+    </div>
+  );
+}
+
+function BackArrow({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Back to totals"
+      className="absolute left-0 top-0 z-20 flex h-9 w-9 items-center justify-center text-mute outline-none transition-colors hover:text-ink focus-visible:ring-1 focus-visible:ring-ink"
+    >
+      <svg width="21" height="14" viewBox="0 0 22 14" fill="none" aria-hidden>
+        <path
+          d="M7.5 1 L1 7 L7.5 13 M1 7 H21"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+}
+
+function Metric({
+  metric,
+  run,
+  delay,
+  arched,
+  trigger,
+}: {
+  metric: MetricDef;
+  run: boolean;
+  delay: number;
+  arched?: boolean;
+  trigger?: boolean;
+}) {
+  const v = useCountUp(metric.value, run, 1900, delay);
+  return (
+    <div
+      className={arched ? "whitespace-nowrap text-left" : "text-center"}
+      style={{
+        opacity: run ? 1 : 0,
+        transition: `opacity 640ms var(--ease-nt) ${delay}ms`,
+      }}
+    >
+      <div
+        className={`relative inline-block font-display font-normal leading-none tracking-tight tabular-nums text-ink ${arched
+            ? "text-[clamp(24px,2.6vw,34px)]"
+            : "text-[clamp(30px,4.6vw,44px)]"
+          }`}
+      >
+        {fmtInt(v)}
+        {metric.plus && <span className="text-mute">+</span>}
+        {trigger && (
+          <span
+            aria-hidden
+            className="absolute -bottom-1 left-0 h-px w-0 bg-ink transition-[width] duration-[var(--transition-duration-base)] ease-[var(--ease-nt)] group-hover:w-full"
+          />
+        )}
+      </div>
+      <div
+        className={`mt-2 flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-mute ${arched ? "" : "justify-center"
+          }`}
+      >
+        {metric.label}
+        {trigger && (
+          <svg
+            aria-hidden
+            width="9"
+            height="9"
+            viewBox="0 0 10 10"
+            className="text-faint transition-colors group-hover:text-ink"
+          >
+            <path
+              d="M2 3.5 L5 6.5 L8 3.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PackageMetric({
+  pkg,
+  unit,
+  run,
+  delay,
+  centered,
+}: {
+  pkg: Pkg;
+  unit: string;
+  run: boolean;
+  delay: number;
+  centered?: boolean;
+}) {
+  const v = useCountUp(pkg.value, run, 1500, delay);
+  return (
+    <div className={centered ? "text-center" : "whitespace-nowrap text-left"}>
+      <div className="font-mono text-[14px] leading-none text-ink">{pkg.name}</div>
+      <div className="mt-1.5 font-display text-[clamp(19px,2.2vw,26px)] font-normal leading-none tracking-tight tabular-nums text-ink">
+        {fmtInt(v)}
+      </div>
+      <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+        {unit}
       </div>
     </div>
   );

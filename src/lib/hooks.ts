@@ -17,7 +17,7 @@ import { type RefObject, useEffect, useRef, useState } from "react";
  * Example:
  *   const isMobile = useMediaQuery(`(max-width: 767px)`);
  */
-function useMediaQuery(query: string): boolean {
+export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
