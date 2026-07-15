@@ -171,7 +171,7 @@ function StepIndicator({ activeId }: { activeId: StepNumber }) {
   //   step0_chars · 1-unit separator · step1_chars · 1-unit separator · step2_chars
   const stepLabels = ALL_STEPS.map((s) => (s === activeId ? `[${s}]` : s));
   const lengths = stepLabels.map((l) => l.length);
-  const stepStarts = lengths.reduce<number[]>((acc, len, i) => {
+  const stepStarts = lengths.reduce<number[]>((acc, _len, i) => {
     const prevEnd = i === 0 ? 0 : acc[i - 1] + lengths[i - 1] + 1; // +1 for sep
     acc.push(prevEnd);
     return acc;

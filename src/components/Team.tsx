@@ -17,21 +17,21 @@
 
 import Image from "next/image";
 
-type TeamPerson = {
+export type TeamPerson = {
   name: string;
   role: string;
   photo: string;
   bio: string;
 };
 
-const FOUNDER: TeamPerson = {
+export const FOUNDER: TeamPerson = {
   name: "Dr Cyril Geismar",
   role: "Johns Hopkins University",
   photo: "images/cyril.jpg",
   bio: 'Postdoctoral research fellow. PhD in mathematical modelling of infectious diseases at Imperial College London, focused on SARS-CoV-2 outbreak forensics. Executive board member and developer for the <a href="https://www.repidemicsconsortium.org/" target="_blank">R Epidemics Consortium</a>. Teaches outbreak analytics at <a href="https://sismid.sph.emory.edu/online-modules/recon-tools/index.html" target="_blank">Emory University</a> and <a href="https://data.org/our-work/epiverse/training-africa/course/" target="_blank">LSHTM</a>.',
 };
 
-const ADVISORS: TeamPerson[] = [
+export const ADVISORS: TeamPerson[] = [
   {
     name: "Dr Anne Cori",
     role: "Imperial College London",

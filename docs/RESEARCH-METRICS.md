@@ -106,13 +106,17 @@ The raw citing-papers database (~4,000 rows) is computed only to derive the
 citation counts above; it is **not** persisted or shipped — nothing at build-
 or run-time consumes it, so writing it out would just bloat the deploy.
 
-## Automation
+## Refreshing
 
-The script runs at build time and on a scheduled GitHub Action
-(`.github/workflows/refresh-metrics.yml`) every Monday: it regenerates
-`research-metrics.json` (and, via `fetch:geo`, `research-geo.json`), commits
-them, and triggers a redeploy. Because the files are committed, their git
-history is also a free week-by-week record of how the numbers change.
+There is no automated job (the old weekly GitHub Action was removed). Run the
+scripts by hand when you want fresh figures:
+
+- `npm run fetch:metrics` regenerates `research-metrics.json`.
+- `npm run fetch:geo` regenerates `research-geo.json` (the globe's per-country
+  citation geography plus a rolling 12-month window of CRAN downloads).
+
+Commit the regenerated JSON yourself. Because the files are committed, their
+git history doubles as a record of how the numbers change over time.
 
 ## Things to keep in mind
 

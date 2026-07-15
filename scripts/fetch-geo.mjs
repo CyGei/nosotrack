@@ -218,21 +218,55 @@ const CRAN_PKGS = new Set([
   "mixtree",
 ]);
 const WINDOW_DAYS = Number(process.env.GEO_WINDOW_DAYS || 30);
+// A day's log is 50–80 MB gzipped; over plain http a slow mirror can stall.
+// Each request gets a long IDLE timeout (fires only if the socket goes quiet,
+// never while bytes are still flowing) and a few retries, so a transient stall
+// never silently drops a day from the window. Both tunable via env.
+const DAY_TIMEOUT_MS = Number(process.env.GEO_DAY_TIMEOUT_MS || 600000); // 10 min idle
+const DAY_RETRIES = Number(process.env.GEO_DAY_RETRIES || 4);
 
 const ymd = (d) => d.toISOString().slice(0, 10);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** Stream one day's gzipped log, tally our packages by country into `tally`.
- *  Resolves to the number of matching rows, or -1 if the day is unavailable. */
-function fetchDayDownloads(date, tally) {
+/** Stream one day's gzipped log and tally our packages by country into a FRESH
+ *  per-day Map (never the shared tally — so retrying after a mid-stream failure
+ *  can't double-count rows already seen on the aborted attempt). Resolves:
+ *    { rows, day }            — streamed OK
+ *    { rows: 0, day, missing } — CRAN publishes no log for that day (404); final
+ *    null                      — transient failure (bad status / socket error /
+ *                                corrupt gzip / idle-timeout); caller retries. */
+function fetchDayDownloads(date) {
   const url = `http://cran-logs.rstudio.com/${date.slice(0, 4)}/${date}.csv.gz`;
-  return new Promise((res) => {
-    const req = http.get(url, (r) => {
+  return new Promise((resolveDay) => {
+    let done = false;
+    let req;
+    const finish = (v) => {
+      if (done) return;
+      done = true;
+      if (v === null && req) req.destroy(); // tear down the socket before retry
+      resolveDay(v);
+    };
+    const fail = () => finish(null); // transient -> caller retries
+    req = http.get(url, (r) => {
+      if (r.statusCode === 404) {
+        r.resume();
+        return finish({ rows: 0, day: new Map(), missing: true });
+      }
       if (r.statusCode !== 200) {
         r.resume();
-        return res(-1);
+        return fail();
       }
-      let n = 0;
-      const rl = readline.createInterface({ input: r.pipe(zlib.createGunzip()) });
+      const day = new Map();
+      let rows = 0;
+      const gunzip = zlib.createGunzip();
+      const rl = readline.createInterface({ input: r.pipe(gunzip) });
+      // A truncated/corrupt day surfaces as a Z_BUF_ERROR. Every stream in the
+      // chain needs its own handler: readline RE-EMITS an input-stream error on
+      // the Interface, so without rl.on("error") that error is unhandled and
+      // crashes the whole process. All three route to the same retry path.
+      r.on("error", fail);
+      gunzip.on("error", fail);
+      rl.on("error", fail);
       rl.on("line", (line) => {
         // date,time,size,r_version,r_arch,r_os,package,version,country,ip_id
         const f = line.split(",");
@@ -241,17 +275,13 @@ function fetchDayDownloads(date, tally) {
         if (!CRAN_PKGS.has(pkg)) return;
         const c = f[8].replace(/"/g, "").toUpperCase();
         if (!c || c === "NA") return;
-        tally.set(c, (tally.get(c) ?? 0) + 1);
-        n++;
+        day.set(c, (day.get(c) ?? 0) + 1);
+        rows++;
       });
-      rl.on("close", () => res(n));
-      rl.on("error", () => res(0));
+      rl.on("close", () => finish({ rows, day }));
     });
-    req.on("error", () => res(-1));
-    req.setTimeout(120000, () => {
-      req.destroy();
-      res(-1);
-    });
+    req.on("error", fail);
+    req.setTimeout(DAY_TIMEOUT_MS, fail);
   });
 }
 
@@ -261,15 +291,37 @@ async function fetchDownloadsByCountry() {
   const days = [];
   for (let i = 0; i < WINDOW_DAYS; i++)
     days.push(ymd(new Date(end.getTime() - i * 864e5)));
-  let got = 0;
+  let got = 0; // days streamed OK
+  let noLog = 0; // days CRAN has no log for (404)
+  let failed = 0; // days that failed every retry
   for (const d of days) {
-    const n = await fetchDayDownloads(d, tally);
-    if (n >= 0) got++;
-    process.stdout.write(`  · ${d}: ${n < 0 ? "unavailable" : n + " installs"}\n`);
+    let result = null;
+    for (let attempt = 1; attempt <= DAY_RETRIES; attempt++) {
+      result = await fetchDayDownloads(d);
+      if (result) break;
+      if (attempt < DAY_RETRIES) {
+        process.stdout.write(`  · ${d}: attempt ${attempt}/${DAY_RETRIES} failed, retrying…\n`);
+        await sleep(2000 * attempt); // linear backoff
+      }
+    }
+    if (!result) {
+      failed++;
+      process.stdout.write(`  · ${d}: UNAVAILABLE after ${DAY_RETRIES} attempts\n`);
+      continue;
+    }
+    for (const [c, n] of result.day) tally.set(c, (tally.get(c) ?? 0) + n);
+    if (result.missing) {
+      noLog++;
+      process.stdout.write(`  · ${d}: no log published\n`);
+    } else {
+      got++;
+      process.stdout.write(`  · ${d}: ${result.rows} downloads\n`);
+    }
   }
   const total = [...tally.values()].reduce((s, n) => s + n, 0);
   process.stdout.write(
-    `> downloads: ${tally.size} countries, ${total} installs over ${got}/${WINDOW_DAYS} days\n`,
+    `> downloads: ${tally.size} countries, ${total} downloads over ${got}/${WINDOW_DAYS} days` +
+      ` (${noLog} no-log, ${failed} failed)\n`,
   );
   return { tally, daysCovered: got, from: days[days.length - 1], to: days[0], total };
 }
@@ -324,13 +376,14 @@ async function main() {
 
   const out = {
     generatedAt: new Date().toISOString().slice(0, 10),
-    source:
-      "OpenAlex (author countries citing the methods papers, all-time) + RStudio CRAN logs (installs by country, recent window)",
-    citationCountryCount: cites.size,
-    downloadCountryCount: dl.tally.size,
+    source: `OpenAlex (author countries citing the methods papers, all-time) + RStudio CRAN logs (downloads by country, ${dl.from} to ${dl.to})`,
+    // Counts of countries actually ON the globe (those we could place), not the
+    // raw tallies: a few small countries have no centroid and are dropped at the
+    // merge above, so dl.tally.size / cites.size would overstate what the map shows.
+    citationCountryCount: countries.filter((c) => c.citations > 0).length,
+    downloadCountryCount: countries.filter((c) => c.downloads > 0).length,
     downloadWindow: { days: dl.daysCovered, from: dl.from, to: dl.to, total: dl.total },
     maxCitations: Math.max(0, ...countries.map((c) => c.citations)),
-    maxDownloads: Math.max(0, ...countries.map((c) => c.downloads)),
     countries,
   };
 
@@ -338,7 +391,7 @@ async function main() {
   writeFileSync(outPath, JSON.stringify(out, null, 2) + "\n");
   process.stdout.write(
     `\n✓ ${countries.length} countries → ${outPath}\n` +
-      `  citations: ${cites.size} countries · downloads: ${dl.tally.size} countries (${dl.total} installs / ${dl.daysCovered}d)\n`,
+      `  citations: ${cites.size} countries · downloads: ${dl.tally.size} countries (${dl.total} downloads / ${dl.daysCovered}d)\n`,
   );
 }
 

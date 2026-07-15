@@ -119,33 +119,47 @@
         }
 
         /* ===== Eyebrow + title pattern (used on every slide) ===== */
+        /* Neutral mono label · TYPOGRAPHY.md rule 4. The red "section
+           eyebrow" is retired: on the site, sections lead with the H2 and
+           red is reserved for outbreak signal. This class now survives only
+           for genuine, non-redundant labels (the title-slide tagline and
+           the milestones sub-head) — never stacked above a section H2. */
         .slide-eyebrow {
             display: inline-block;
             font-family: var(--mono);
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 400;
             letter-spacing: .22em;
             text-transform: uppercase;
-            color: var(--alert);
+            color: var(--faint);
             margin-bottom: clamp(20px, 3vh, 32px);
         }
+        .on-dark .slide-eyebrow { color: var(--inv-mute); }
+
+        /* Section heading · TYPOGRAPHY.md rule 1 — Inter Tight 400. Size
+           carries the presence; weight stays restrained (never 500/600). */
         .slide-title {
             font-family: var(--display);
-            font-weight: 500;
-            font-size: clamp(2.2rem, 4.6vw, 3.6rem);
+            font-weight: 400;
+            /* Deck scale · same rule-1 system as the site, sized up one step for
+               a projected medium. Wider max-width trades line-count for glyph
+               size so long titles don't gain height. */
+            font-size: clamp(36px, 4vw, 62px);
             color: var(--ink);
-            line-height: 1.04;
-            letter-spacing: -0.035em;
+            line-height: 1.05;
+            letter-spacing: -0.025em;
             margin: 0 0 clamp(20px, 3vh, 36px);
-            max-width: 22ch;
+            max-width: 24ch;
         }
         .on-dark .slide-title { color: var(--inv-hi); }
 
+        /* Body paragraph · rule-3 system, sized up for projection legibility. */
         .slide-lead {
-            font-size: clamp(15px, 1.4vw, 17px);
-            line-height: 1.6;
-            color: var(--text);
-            max-width: 60ch;
+            font-size: clamp(18px, 1.35vw, 20px);
+            line-height: 1.5;
+            letter-spacing: -0.005em;
+            color: var(--mute);
+            max-width: 62ch;
             margin: 0 0 clamp(32px, 5vh, 64px);
         }
         .on-dark .slide-lead { color: var(--inv); }
@@ -194,6 +208,8 @@
                 0 0 8px  rgba(239, 238, 239, .22);
             animation: accent-breathe 5.2s ease-in-out infinite;
         }
+        /* Each verb on its own line so it can build in sequence (see motion). */
+        .hero-title .hw { display: block; }
         .hero-side {
             display: flex;
             flex-direction: column;
@@ -201,10 +217,10 @@
             padding-bottom: 6px;
         }
         .hero-side p {
-            font-size: clamp(15px, 1.2vw, 17px);
-            line-height: 1.6;
+            font-size: clamp(16px, 1.2vw, 19px);
+            line-height: 1.55;
             color: var(--inv);
-            max-width: 36ch;
+            max-width: 38ch;
             margin: 0;
         }
         .hero-author {
@@ -251,13 +267,13 @@
         .stat-label {
             font-family: var(--mono);
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 500;
             letter-spacing: .18em;
             text-transform: uppercase;
             color: var(--ink);
         }
         .stat-detail {
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.5;
             color: var(--text);
             max-width: 22ch;
@@ -268,7 +284,7 @@
             border-top: 1px solid var(--rule);
             font-family: var(--display);
             font-style: italic;
-            font-size: clamp(15px, 1.3vw, 18px);
+            font-size: clamp(16px, 1.4vw, 21px);
             color: var(--text);
             max-width: 90ch;
         }
@@ -324,7 +340,7 @@
         .eco-input .ei-name {
             font-family: var(--display);
             font-size: clamp(15px, 1.2vw, 17px);
-            font-weight: 600;
+            font-weight: 500;
             color: var(--ink);
             letter-spacing: -.01em;
         }
@@ -345,8 +361,7 @@
             position: absolute;
             top: -1px; left: -1px;
             width: 64px; height: 2px;
-            background: var(--alert);
-            box-shadow: 0 0 12px rgba(var(--alert-rgb), .35);
+            background: var(--mute);
         }
         .engine-badge .eb-mark {
             width: 56px; height: 56px;
@@ -362,13 +377,13 @@
             font-size: 10px;
             letter-spacing: .22em;
             text-transform: uppercase;
-            color: var(--alert);
+            color: var(--mute);
             margin-bottom: 4px;
         }
         .engine-badge .eb-name {
             font-family: var(--display);
             font-size: clamp(15px, 1.2vw, 17px);
-            font-weight: 600;
+            font-weight: 500;
             color: var(--ink);
             letter-spacing: -.01em;
         }
@@ -392,7 +407,7 @@
             font-size: 10px;
             letter-spacing: .22em;
             text-transform: uppercase;
-            color: var(--alert);
+            color: var(--mute);
             margin-bottom: 6px;
         }
         .eco-tree-text .ett-line {
@@ -498,13 +513,12 @@
             padding: 14px;
             min-height: 480px;
         }
-        .demo-frame-light::before { /* top accent rail */
+        .demo-frame-light::before { /* top accent rail · neutral, not signal */
             content: "";
             position: absolute;
             top: -1px; left: 14px;
             width: 96px; height: 2px;
-            background: var(--alert);
-            box-shadow: 0 0 12px rgba(var(--alert-rgb), .35);
+            background: var(--mute);
         }
         .demo-frame-light .br {
             position: absolute;
@@ -521,7 +535,7 @@
             display: flex;
             justify-content: space-between;
             font-family: var(--mono);
-            font-size: 10px;
+            font-size: 11px;
             letter-spacing: .22em;
             text-transform: uppercase;
             color: var(--mute);
@@ -573,64 +587,96 @@
         }
         .demo-step .ds-name {
             font-family: var(--mono);
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--alert);
-            letter-spacing: .18em;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--ink);
+            letter-spacing: .16em;
             text-transform: uppercase;
         }
         .demo-step .ds-desc {
             grid-column: 2;
-            font-size: 13.5px;
-            line-height: 1.55;
-            color: var(--text);
-            max-width: 30ch;
-        }
-
-        /* =================================================================
-           SLIDE 5 · IMPACT
-           Six benefits as line-icon + label + description, separated by
-           thin top rules. Matches the website's minimalist pattern: no
-           filled discs, just air, type, and one accent line per cell.
-           ================================================================= */
-        .impact-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: clamp(28px, 3.5vh, 44px) clamp(28px, 3vw, 56px);
-            margin-top: clamp(28px, 4vh, 48px);
-        }
-        .impact-cell {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding-top: clamp(16px, 2vh, 22px);
-            border-top: 1px solid var(--rule);
-        }
-        .impact-cell .ic-icon {
-            width: 28px; height: 28px;
-            color: var(--ink);
-            margin-bottom: 6px;
-        }
-        .impact-cell .ic-icon svg { width: 100%; height: 100%; }
-        .impact-cell .ic-name {
-            font-family: var(--display);
-            font-weight: 600;
-            font-size: clamp(16px, 1.3vw, 19px);
-            color: var(--ink);
-            letter-spacing: -.01em;
-            line-height: 1.2;
-        }
-        .impact-cell .ic-desc {
-            font-size: 13.5px;
+            font-size: 15px;
             line-height: 1.55;
             color: var(--text);
             max-width: 32ch;
         }
 
         /* =================================================================
-           SLIDE 6 · ASK / SUPPORT (dark)
+           SLIDE 5 · IMPACT
+           Three themed columns (Clinical / Economic / Strategic), each a
+           kicker + one editorial line + two supporting points. Grouped
+           instead of six equal cells — fewer, larger ideas.
+           ================================================================= */
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(28px, 3vw, 56px);
+            margin-top: clamp(32px, 5vh, 56px);
+        }
+        .impact-col {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(14px, 2vh, 20px);
+            padding-top: clamp(18px, 2.4vh, 26px);
+            border-top: 1px solid var(--rule);
+        }
+        .impact-col .ic-kicker {
+            font-family: var(--mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .22em;
+            color: var(--mute);
+        }
+        .impact-col .ic-head {
+            font-family: var(--display);
+            font-weight: 400;
+            font-size: clamp(20px, 2vw, 27px);
+            line-height: 1.12;
+            letter-spacing: -.02em;
+            color: var(--ink);
+            max-width: 16ch;
+            margin: -2px 0 clamp(4px, 1vh, 10px);
+        }
+        .impact-col .ic-point {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .impact-col .ic-pt-name {
+            font-family: var(--display);
+            font-weight: 500;
+            font-size: 16px;
+            letter-spacing: -.01em;
+            color: var(--ink);
+        }
+        .impact-col .ic-pt-desc {
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--text);
+            max-width: 34ch;
+        }
+
+        /* =================================================================
+           SLIDE 6 · ADOPTION (globe + citations, embedded from the site)
+           Full-bleed iframe of /impact-embed/ — the exact same
+           <ImpactAdoption/> component the website renders, so the deck's
+           adoption figures stay in sync with the site.
            ================================================================= */
         #slide-6 .slide-body {
+            padding: 0;
+            max-width: 100%;
+        }
+        .adoption-frame {
+            flex: 1;
+            width: 100%;
+            border: 0;
+            background: transparent;
+        }
+
+        /* =================================================================
+           SLIDE 7 · ASK / SUPPORT (dark)
+           ================================================================= */
+        #slide-7 .slide-body {
             padding-top: clamp(60px, 8vh, 120px);
         }
         .ask-grid {
@@ -657,14 +703,14 @@
         .milestone .m-num {
             font-family: var(--mono);
             font-size: 11px;
-            font-weight: 600;
-            color: var(--alert);
+            font-weight: 500;
+            color: var(--inv-mute);
             letter-spacing: .22em;
         }
         .milestone .m-text {
             font-family: var(--display);
             color: var(--inv-hi);
-            font-size: clamp(15px, 1.2vw, 17px);
+            font-size: clamp(16px, 1.3vw, 19px);
             line-height: 1.4;
             max-width: 56ch;
         }
@@ -683,19 +729,18 @@
             position: absolute;
             top: -1px; left: 16px;
             width: 64px; height: 2px;
-            background: var(--alert);
-            box-shadow: 0 0 12px rgba(var(--alert-rgb), .35);
+            background: var(--inv-mute);
         }
         .contact-card .cc-tag {
             font-family: var(--mono);
             font-size: 10px;
             letter-spacing: .22em;
             text-transform: uppercase;
-            color: var(--alert);
+            color: var(--inv-mute);
         }
         .contact-card .cc-url {
             font-family: var(--display);
-            font-weight: 600;
+            font-weight: 500;
             font-size: clamp(20px, 1.8vw, 26px);
             color: var(--inv-hi);
             letter-spacing: -.01em;
@@ -705,10 +750,10 @@
         .contact-card .cc-name {
             font-family: var(--mono);
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 500;
             letter-spacing: .22em;
             text-transform: uppercase;
-            color: var(--alert);
+            color: var(--inv-mute);
             margin-top: 4px;
         }
         .contact-card .cc-email {
@@ -720,11 +765,11 @@
         .contact-card .cc-demo {
             font-family: var(--mono);
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 500;
             letter-spacing: .22em;
             text-transform: uppercase;
-            color: var(--alert);
-            border-bottom: 1px solid var(--alert);
+            color: var(--inv-hi);
+            border-bottom: 1px solid var(--rule-inv-strong);
             padding-bottom: 4px;
             align-self: flex-start;
         }
@@ -753,7 +798,7 @@
             justify-content: flex-end;
             color: var(--faint);
             font-family: var(--mono);
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 500;
             letter-spacing: .15em;
             opacity: .55;
@@ -772,13 +817,13 @@
         }
         .nav-dots button.active::after { width: 28px; }
         .deck.on-slide-1 ~ .nav-dots button,
-        .deck.on-slide-6 ~ .nav-dots button { color: var(--inv-mute); }
+        .deck.on-slide-7 ~ .nav-dots button { color: var(--inv-mute); }
         .deck.on-slide-1 ~ .nav-dots button.active,
-        .deck.on-slide-6 ~ .nav-dots button.active { color: var(--inv-hi); }
+        .deck.on-slide-7 ~ .nav-dots button.active { color: var(--inv-hi); }
 
         /* Keyboard hint · fades after a few seconds. Positioned at the
            top-center so it never collides with the slide-bottom footer
-           that all six slides share. Subtle by design. */
+           that all seven slides share. Subtle by design. */
         .kbd-hint {
             position: fixed;
             top: 84px;
@@ -797,7 +842,89 @@
         }
         .kbd-hint.fade { opacity: 0; }
         .deck.on-slide-1 ~ .kbd-hint,
-        .deck.on-slide-6 ~ .kbd-hint { color: var(--inv-mute); }
+        .deck.on-slide-7 ~ .kbd-hint { color: var(--inv-mute); }
+
+        /* =================================================================
+           ENTRANCE MOTION · Apple-keynote reveal. Each slide's major blocks
+           rise + fade as it becomes the active slide (nav JS toggles
+           `.is-active`). Gated on `.deck.anim` (added by the JS once it runs)
+           so content is never hidden if the script fails, and switched off
+           entirely under reduced-motion.
+           ================================================================= */
+        @media (prefers-reduced-motion: no-preference) {
+            /* Level 1 · each slide's major blocks rise, settle and resolve
+               from a hair small — the Apple "ease up into place" feel. */
+            .deck.anim .slide .slide-body > * {
+                opacity: 0;
+                transform: translateY(22px) scale(.985);
+                will-change: opacity, transform;
+            }
+            .deck.anim .slide.is-active .slide-body > * {
+                opacity: 1;
+                transform: none;
+                transition: opacity .72s cubic-bezier(.2, 0, 0, 1),
+                            transform .72s cubic-bezier(.2, 0, 0, 1);
+            }
+            .deck.anim .slide.is-active .slide-body > *:nth-child(1) { transition-delay: .10s; }
+            .deck.anim .slide.is-active .slide-body > *:nth-child(2) { transition-delay: .20s; }
+            .deck.anim .slide.is-active .slide-body > *:nth-child(3) { transition-delay: .30s; }
+            .deck.anim .slide.is-active .slide-body > *:nth-child(4) { transition-delay: .40s; }
+            .deck.anim .slide.is-active .slide-body > *:nth-child(n+5) { transition-delay: .48s; }
+
+            /* Level 2 · grid items build one-by-one. Their grid container
+               reveals instantly (override) so only the items animate. */
+            .deck.anim .slide .slide-body > .stat-grid,
+            .deck.anim .slide .slide-body > .impact-grid {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+            .deck.anim .slide .stat,
+            .deck.anim .slide .impact-col,
+            .deck.anim .slide .milestone,
+            .deck.anim .slide .demo-step {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            .deck.anim .slide.is-active .stat,
+            .deck.anim .slide.is-active .impact-col,
+            .deck.anim .slide.is-active .milestone,
+            .deck.anim .slide.is-active .demo-step {
+                opacity: 1;
+                transform: none;
+                transition: opacity .6s cubic-bezier(.2, 0, 0, 1),
+                            transform .6s cubic-bezier(.2, 0, 0, 1);
+            }
+            .deck.anim .slide.is-active .stat:nth-child(1),
+            .deck.anim .slide.is-active .impact-col:nth-child(1),
+            .deck.anim .slide.is-active .milestone:nth-child(1),
+            .deck.anim .slide.is-active .demo-step:nth-child(1) { transition-delay: .36s; }
+            .deck.anim .slide.is-active .stat:nth-child(2),
+            .deck.anim .slide.is-active .impact-col:nth-child(2),
+            .deck.anim .slide.is-active .milestone:nth-child(2),
+            .deck.anim .slide.is-active .demo-step:nth-child(2) { transition-delay: .48s; }
+            .deck.anim .slide.is-active .stat:nth-child(3),
+            .deck.anim .slide.is-active .impact-col:nth-child(3),
+            .deck.anim .slide.is-active .milestone:nth-child(3),
+            .deck.anim .slide.is-active .demo-step:nth-child(3) { transition-delay: .60s; }
+            .deck.anim .slide.is-active .stat:nth-child(4) { transition-delay: .72s; }
+
+            /* Slide 1 · the three verbs type up in sequence, landing on the
+               cream-haloed "Protect." */
+            .deck.anim #slide-1 .hero-title .hw {
+                opacity: 0;
+                transform: translateY(0.16em);
+            }
+            .deck.anim #slide-1.is-active .hero-title .hw {
+                opacity: 1;
+                transform: none;
+                transition: opacity .7s cubic-bezier(.2, 0, 0, 1),
+                            transform .7s cubic-bezier(.2, 0, 0, 1);
+            }
+            .deck.anim #slide-1.is-active .hero-title .hw:nth-child(1) { transition-delay: .30s; }
+            .deck.anim #slide-1.is-active .hero-title .hw:nth-child(2) { transition-delay: .52s; }
+            .deck.anim #slide-1.is-active .hero-title .hw:nth-child(3) { transition-delay: .74s; }
+        }
 
         /* =================================================================
            RESPONSIVE · collapse multi-column grids on narrow viewports
@@ -850,12 +977,12 @@
                 <div class="slide-eyebrow">Outbreak Forensics and Control</div>
                 <div class="hero-stack">
                     <h1 class="hero-title">
-                        Track.<br>
-                        Intervene.<br>
-                        <span class="accent">Protect.</span>
+                        <span class="hw">Track.</span>
+                        <span class="hw">Intervene.</span>
+                        <span class="hw accent">Protect.</span>
                     </h1>
                     <aside class="hero-side">
-                        <p>Nosotrack infers who infected whom in near real-time, enabling hospital control teams to stop outbreaks before they escalate.</p>
+                        <p>Nosotrack infers who infected whom in near real-time, enabling control teams to stop outbreaks before they escalate.</p>
                         <div class="hero-author">
                             <strong>Cyril Geismar</strong><br>
                             Postdoctoral Research Fellow<br>
@@ -867,7 +994,7 @@
 
             <footer class="slide-bottom">
                 <span>nosotrack.com</span>
-                <span>01 / 06</span>
+                <span>01 / 07</span>
             </footer>
         </section>
 
@@ -895,12 +1022,12 @@
             </header>
 
             <div class="slide-body">
-                <div class="slide-eyebrow">The Problem</div>
                 <h2 class="slide-title">Nosocomial outbreaks are deadly, costly, and difficult to manage.</h2>
                 <p class="slide-lead">
                     Healthcare-associated infections affect <strong>1 in 10 patients worldwide</strong>. Current control measures rely on broad testing and isolation. Effective intervention requires identifying the specific drivers of an outbreak: patient zero, superspreaders, transmission routes, and undetected or imported cases.
                 </p>
 
+                <div class="slide-eyebrow" style="margin-bottom: 16px; color: var(--mute);">In the United States alone</div>
                 <div class="stat-grid">
                     <div class="stat">
                         <div class="stat-value">2M</div>
@@ -929,7 +1056,7 @@
 
             <footer class="slide-bottom">
                 <span>nosotrack.com</span>
-                <span>02 / 06</span>
+                <span>02 / 07</span>
             </footer>
         </section>
 
@@ -958,9 +1085,8 @@
 
             <div class="slide-body">
                 <div class="eco-split">
-                    <!-- LEFT: eyebrow, title, lead, three input streams, engine badge -->
+                    <!-- LEFT: title, lead, three input streams, engine badge -->
                     <div>
-                        <div class="slide-eyebrow">Ecosystem</div>
                         <h2 class="slide-title">Integration unlocks intelligence.</h2>
                         <p class="slide-lead">
                             Current tools work in silos. Nosotrack fuses their data into a unified analytical engine.
@@ -1066,7 +1192,7 @@
 
             <footer class="slide-bottom">
                 <span>nosotrack.com</span>
-                <span>03 / 06</span>
+                <span>03 / 07</span>
             </footer>
         </section>
 
@@ -1094,7 +1220,6 @@
             </header>
 
             <div class="slide-body">
-                <div class="slide-eyebrow">Nosotrack Engine · Live Demo</div>
                 <h2 class="slide-title">Outbreak forensics, end-to-end.</h2>
 
                 <div class="demo-block">
@@ -1139,7 +1264,7 @@
 
             <footer class="slide-bottom">
                 <span>nosotrack.com</span>
-                <span>04 / 06</span>
+                <span>04 / 07</span>
             </footer>
         </section>
 
@@ -1167,100 +1292,101 @@
             </header>
 
             <div class="slide-body">
-                <div class="slide-eyebrow">The Impact</div>
                 <h2 class="slide-title">Who benefits, and why it matters.</h2>
                 <p class="slide-lead">
-                    Over 400 US Academic Medical Centers already implement routine genomic surveillance. High-acuity, high-cost populations such as transplant, ICU, and immunocompromised patients carry the steepest federal penalty exposure for HAIs, with dedicated prevention teams already in place.
+                    High-acuity, high-cost populations such as transplant, ICU, and immunocompromised patients carry the greatest risk from hospital infections. The units that treat them increasingly run genomic surveillance; Nosotrack turns that surveillance into targeted outbreak control.
                 </p>
 
                 <div class="impact-grid">
-                    <div class="impact-cell">
-                        <span class="ic-icon" aria-hidden="true">
-                            <!-- Shield (Lucide) -->
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
-                            </svg>
-                        </span>
-                        <span class="ic-name">Reduced morbidity</span>
-                        <span class="ic-desc">Fewer healthcare-associated infections through earlier outbreak detection.</span>
+                    <div class="impact-col">
+                        <div class="ic-kicker">Clinical</div>
+                        <h3 class="ic-head">Fewer infections, fewer deaths.</h3>
+                        <div class="ic-point">
+                            <span class="ic-pt-name">Reduced morbidity</span>
+                            <span class="ic-pt-desc">Fewer healthcare-associated infections through earlier outbreak detection.</span>
+                        </div>
+                        <div class="ic-point">
+                            <span class="ic-pt-name">Reduced mortality</span>
+                            <span class="ic-pt-desc">Earlier containment of high-risk transmission chains saves lives.</span>
+                        </div>
                     </div>
-                    <div class="impact-cell">
-                        <span class="ic-icon" aria-hidden="true">
-                            <!-- Heart Pulse (Lucide) -->
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/>
-                                <path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/>
-                            </svg>
-                        </span>
-                        <span class="ic-name">Reduced mortality</span>
-                        <span class="ic-desc">Earlier containment of high-risk transmission chains saves lives.</span>
+                    <div class="impact-col">
+                        <div class="ic-kicker">Economic &amp; operational</div>
+                        <h3 class="ic-head">Lower cost, tighter control.</h3>
+                        <div class="ic-point">
+                            <span class="ic-pt-name">Economic savings</span>
+                            <span class="ic-pt-desc">Lower bed-day costs, fewer ward closures, reduced HAI penalties.</span>
+                        </div>
+                        <div class="ic-point">
+                            <span class="ic-pt-name">Improved operations</span>
+                            <span class="ic-pt-desc">Prevention teams shift from reactive protocols to targeted, evidence-based control.</span>
+                        </div>
                     </div>
-                    <div class="impact-cell">
-                        <span class="ic-icon" aria-hidden="true">
-                            <!-- Dollar Sign (Lucide) -->
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="12" x2="12" y1="2" y2="22"/>
-                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                            </svg>
-                        </span>
-                        <span class="ic-name">Economic savings</span>
-                        <span class="ic-desc">Lower bed-day costs, fewer ward closures, reduced federal HAI penalties.</span>
-                    </div>
-                    <div class="impact-cell">
-                        <span class="ic-icon" aria-hidden="true">
-                            <!-- Settings / Cog (Lucide) -->
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-                                <circle cx="12" cy="12" r="3"/>
-                            </svg>
-                        </span>
-                        <span class="ic-name">Improved operations</span>
-                        <span class="ic-desc">Prevention teams shift from reactive protocols to targeted, evidence-based control.</span>
-                    </div>
-                    <div class="impact-cell">
-                        <span class="ic-icon" aria-hidden="true">
-                            <!-- Bug / pathogen (Lucide) -->
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="m8 2 1.88 1.88"/>
-                                <path d="M14.12 3.88 16 2"/>
-                                <path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/>
-                                <path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/>
-                                <path d="M12 20v-9"/>
-                                <path d="M6.53 9C4.6 8.8 3 7.1 3 5"/>
-                                <path d="M6 13H2"/>
-                                <path d="M3 21c0-2.1 1.7-3.9 3.8-4"/>
-                                <path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/>
-                                <path d="M22 13h-4"/>
-                                <path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/>
-                            </svg>
-                        </span>
-                        <span class="ic-name">Pandemic preparedness</span>
-                        <span class="ic-desc">Real-time forensics infrastructure ready for the next pathogen.</span>
-                    </div>
-                    <div class="impact-cell">
-                        <span class="ic-icon" aria-hidden="true">
-                            <!-- Globe (Lucide) -->
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
-                                <path d="M2 12h20"/>
-                            </svg>
-                        </span>
-                        <span class="ic-name">Scalable reach</span>
-                        <span class="ic-desc">Applicable beyond hospitals to nursing homes and long-term care facilities.</span>
+                    <div class="impact-col">
+                        <div class="ic-kicker">Strategic</div>
+                        <h3 class="ic-head">Ready for what's next.</h3>
+                        <div class="ic-point">
+                            <span class="ic-pt-name">Pandemic preparedness</span>
+                            <span class="ic-pt-desc">Real-time forensics infrastructure ready for the next pathogen.</span>
+                        </div>
+                        <div class="ic-point">
+                            <span class="ic-pt-name">Scalable reach</span>
+                            <span class="ic-pt-desc">Applicable beyond hospitals to nursing homes and long-term care.</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <footer class="slide-bottom">
                 <span>nosotrack.com</span>
-                <span>05 / 06</span>
+                <span>05 / 07</span>
             </footer>
         </section>
 
 
-        <!-- ═════ SLIDE 6 · THE ASK ═════ -->
-        <section id="slide-6" class="slide on-dark" data-slide="6" data-section="06 · The Ask">
+        <!-- ═════ SLIDE 6 · ADOPTION (globe + citations) ═════ -->
+        <!-- Reuses the website's "Peer-reviewed science, adopted globally."
+             section verbatim by iframing /impact-embed/ (the live
+             <ImpactAdoption/> — living globe + Downloads / Citations /
+             Countries / Publications, drill-downs and all). Single source of
+             truth, so these figures match the current site. -->
+        <section id="slide-6" class="slide" data-slide="6" data-section="06 · Adoption & Team">
+            <header class="slide-top">
+                <span class="slide-mark">
+                    <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
+                        <path d="M3 8 L3 3 L8 3" stroke-width="1.2"/>
+                        <path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
+                        <path d="M29 24 L29 29 L24 29" stroke-width="1.2"/>
+                        <path d="M8 29 L3 29 L3 24" stroke-width="1.2"/>
+                        <line x1="16.00" y1="11.20" x2="16.00" y2="15.60" stroke-width="0.55"/>
+                        <line x1="11.31" y1="19.30" x2="15.13" y2="17.10" stroke-width="0.55"/>
+                        <line x1="20.69" y1="19.30" x2="16.87" y2="17.10" stroke-width="0.55"/>
+                        <circle cx="16" cy="9" r="2.2" stroke-width="0.35"/>
+                        <circle cx="9.4" cy="20.4" r="2.2" stroke-width="0.35"/>
+                        <circle cx="22.6" cy="20.4" r="2.2" stroke-width="0.35"/>
+                        <circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none"/>
+                    </svg>
+                    <span class="wordmark">NOSO<span class="accent">TRACK</span></span>
+                </span>
+                <span>Global Adoption · The Team</span>
+            </header>
+
+            <div class="slide-body">
+                <iframe class="adoption-frame"
+                        src="/impact-embed/"
+                        title="Nosotrack — peer-reviewed science, adopted globally"
+                        loading="lazy"></iframe>
+            </div>
+
+            <footer class="slide-bottom">
+                <span>nosotrack.com</span>
+                <span>06 / 07</span>
+            </footer>
+        </section>
+
+
+        <!-- ═════ SLIDE 7 · THE ASK ═════ -->
+        <section id="slide-7" class="slide on-dark" data-slide="7" data-section="07 · The Ask">
             <header class="slide-top">
                 <span class="slide-mark">
                     <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
@@ -1282,7 +1408,6 @@
             </header>
 
             <div class="slide-body">
-                <div class="slide-eyebrow">The Ask</div>
                 <h2 class="slide-title">From validated science to first pilot deployment.</h2>
                 <p class="slide-lead">
                     We are seeking funding and partner facilities to validate and deploy Nosotrack, turning Bayesian outbreak forensics into a working product on a real hospital floor.
@@ -1290,7 +1415,7 @@
 
                 <div class="ask-grid">
                     <div>
-                        <div class="slide-eyebrow" style="color: var(--alert); margin-bottom: 12px;">6-Month Milestones</div>
+                        <div class="slide-eyebrow" style="margin-bottom: 12px;">6-Month Milestones</div>
                         <div class="milestone-list">
                             <div class="milestone">
                                 <span class="m-num">01</span>
@@ -1319,7 +1444,7 @@
 
             <footer class="slide-bottom">
                 <span>nosotrack.com</span>
-                <span>06 / 06</span>
+                <span>07 / 07</span>
             </footer>
         </section>
 
@@ -1335,6 +1460,7 @@
         <button data-go="4">04</button>
         <button data-go="5">05</button>
         <button data-go="6">06</button>
+        <button data-go="7">07</button>
     </nav>
 
     <div class="kbd-hint" id="kbdHint">↓ / Space / →  to advance</div>
@@ -1416,8 +1542,10 @@
             if (idx === activeIdx || idx < 0 || idx >= slides.length) return;
             activeIdx = idx;
             dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+            // Retrigger the entrance reveal on whichever slide is now active.
+            slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
             // Tag the deck so dot color can adapt to dark/light slide. We use
-            // the slide's `on-dark` flag · present on slides 1 and 6.
+            // the slide's `on-dark` flag · present on slides 1 and 7.
             for (let n = 1; n <= slides.length; n++) {
                 deck.classList.toggle('on-slide-' + n, idx === n - 1);
             }
@@ -1446,7 +1574,7 @@
             } else if (k === 'End') {
                 e.preventDefault();
                 go(slides.length - 1);
-            } else if (/^[1-6]$/.test(k)) {
+            } else if (/^[1-7]$/.test(k)) {
                 e.preventDefault();
                 go(parseInt(k, 10) - 1);
             } else if (k === 'f' || k === 'F') {
@@ -1472,6 +1600,17 @@
 
         // Bring keyboard focus to the deck so arrow keys work without a click.
         deck.focus?.();
+
+        // ---- entrance motion ----
+        // Enable the reveal (see `.deck.anim` in CSS) and animate the opening
+        // slide in on the next frame, so it transitions from its hidden state
+        // instead of snapping in. activeIdx stays 0; revisiting a slide
+        // re-triggers its reveal via setActive().
+        deck.classList.add('anim');
+        requestAnimationFrame(function () {
+            if (slides[0]) slides[0].classList.add('is-active');
+            deck.classList.add('on-slide-1');
+        });
     })();
     </script>
 

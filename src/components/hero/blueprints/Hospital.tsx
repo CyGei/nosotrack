@@ -49,7 +49,6 @@ export const HOSP_LW_ROOM_H = LW_ROOM_H;
 export function HospitalBlueprint({ className, style }: Props) {
   const stroke = "rgba(239,238,239,0.34)";
   const strokeFaint = "rgba(239,238,239,0.16)";
-  const text = "rgba(239,238,239,0.62)";
   const textFaint = "rgba(239,238,239,0.34)";
 
   // L-shape outer shell

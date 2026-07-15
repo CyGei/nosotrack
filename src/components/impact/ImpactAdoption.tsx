@@ -22,7 +22,7 @@
  * back arrow at the globe's top-left (or Esc) returns to the totals and the
  * lead. On narrow screens the same pieces stack vertically.
  *
- * Every figure is live from src/data/research-metrics.json + research-geo.json.
+ * Every figure comes from src/data/research-metrics.json + research-geo.json.
  * No em dashes (house rule). Typography follows docs/TYPOGRAPHY.md exactly.
  */
 
@@ -79,7 +79,7 @@ const METRICS: MetricDef[] = [
       caption: `${fmtInt(tools.downloads)} downloads across ${DOWNLOAD_PKGS.length} packages`,
       eyebrow: "CRAN Downloads",
       blurb:
-        "Each count is an install of one of our open-source R packages from CRAN, the Comprehensive R Archive Network. Figures come straight from the RStudio mirror logs and refresh every week.",
+        "Each count is a download of one of our open-source R packages from CRAN, the Comprehensive R Archive Network. Figures come straight from the RStudio mirror logs.",
     },
   },
   {
@@ -171,7 +171,7 @@ export function ImpactAdoption() {
   const ciAngles = arc(CITATION_PKGS.length);
 
   const backArrow = openLabel && <BackArrow onClick={close} />;
-  const caption = open ? open.caption : "Live adoption map";
+  const caption = open ? open.caption : "Global adoption";
 
   // The arched globe stage (globe + aggregate arc + both breakdown arcs).
   const globeStage = (
@@ -264,7 +264,7 @@ export function ImpactAdoption() {
         {/* ── header ───────────────────────────────────────────────── */}
         <Reveal>
           <h2 className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]">
-            Validated by science, proven in response.
+            Peer-reviewed science, adopted globally.
           </h2>
         </Reveal>
 

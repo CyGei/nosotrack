@@ -18,9 +18,8 @@ export const DISEASE_X: PathogenSpec = {
   // The dossier displays "Disease X" as the heading; the right-hand
   // column of the dossier is populated with the WHO R&D Blueprint
   // definition + priority-diseases context (see PathogenDossier.tsx).
-  // Disease X is featured on the homepage via <PathogenSpotlight> and
-  // filtered out of the auto-drifting <PathogenTicker> so it isn't
-  // shown twice.
+  // Disease X is the hero specimen: it renders larger than the arced
+  // specimens (see PathogenArc, and the bigger targetRadius below).
   name: "Disease X",
   shortLabel: "Disease X",
   modelUrl: "/models/disease-x.glb",

@@ -49,8 +49,8 @@
  *   everyone who uses the tools, preprints included.
  *
  * Refresh cadence:
- *   Run at build time and/or on a weekly GitHub Action that commits the two
- *   files — git history then doubles as the metric time-series.
+ *   Run by hand whenever you want to refresh the figures. The committed JSON
+ *   is a static snapshot; there is no longer an automated job updating it.
  */
 
 import { writeFileSync } from "node:fs";

@@ -15,11 +15,11 @@
  *     a faint particle travelling each one (knowledge spreading);
  *   · every couple of seconds a country pulses once, like live activity.
  * Hovering a country pauses the spin and shows a small card with its real
- * figures (all-time citing works + recent CRAN installs). Reduced-motion users
+ * figures (all-time citing works + recent CRAN downloads). Reduced-motion users
  * get a still, fully-drawn globe that is still hoverable. Ink/grey only.
  *
  * Data: src/data/research-geo.json (OpenAlex citation geography + RStudio CRAN
- * install geography — never hand-edited).
+ * download geography — never hand-edited).
  */
 
 import { useEffect, useRef, useState } from "react";
