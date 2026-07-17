@@ -12,7 +12,9 @@ import { LenisProvider } from "@/components/LenisProvider";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
+// BRAND for the logo / OG card; SITE_TITLE for text (<title>, prose, alt).
 const SITE_TITLE = "Nosotrack";
+const BRAND = "NOSOTRACK";
 const SITE_DESCRIPTION = "Outbreak forensics and control.";
 
 export const metadata: Metadata = {
@@ -20,16 +22,16 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   metadataBase: new URL("https://nosotrack.com"),
   openGraph: {
-    title: SITE_TITLE,
+    title: BRAND,
     description: SITE_DESCRIPTION,
     url: "https://nosotrack.com",
-    siteName: SITE_TITLE,
+    siteName: BRAND,
     images: [
       {
         url: "/images/og-card.png",
         width: 1200,
         height: 630,
-        alt: SITE_TITLE,
+        alt: SITE_TITLE, // read aloud, so text-cased not BRAND
       },
     ],
     locale: "en_GB",

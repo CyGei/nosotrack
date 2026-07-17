@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      /* Local system fonts so the render is offline + deterministic. */
+      @font-face {
+        font-family: "JetBrains Mono";
+        src: local("JetBrains Mono"),
+          url("file:///Users/cy/Library/Fonts/JetBrainsMono-VariableFont_wght.ttf")
+            format("truetype");
+        font-weight: 300 800;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Inter Tight";
+        src: local("Inter Tight"),
+          url("file:///Users/cy/Library/Fonts/InterTight-VariableFont_wght.ttf")
+            format("truetype");
+        font-weight: 300 800;
+        font-display: block;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        gap: 60px;
+        padding-left: 118px;
+        background: linear-gradient(135deg, #f4f4f6 0%, #e7e7ea 100%);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: geometricPrecision;
+      }
+
+      .icon {
+        flex: 0 0 auto;
+        width: 300px;
+        height: 300px;
+      }
+
+      .lockup {
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* NOSO ink + TRACK alert-red — the canonical lockup. */
+      .wordmark {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-weight: 500;
+        font-size: 104px;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        color: #212326;
+        white-space: nowrap;
+      }
+      .wordmark .track {
+        color: #ff073a;
+      }
+      .wordmark .tm {
+        font-size: 0.34em;
+        vertical-align: super;
+        font-weight: 500;
+        letter-spacing: 0;
+        opacity: 0.7;
+        margin-left: 0.12em;
+      }
+
+      .tagline {
+        margin-top: 24px;
+        margin-left: 4px;
+        font-family: "Inter Tight", system-ui, sans-serif;
+        font-weight: 400;
+        font-size: 27px;
+        letter-spacing: -0.006em;
+        color: #474852;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- BrandMark icon — geometry verbatim from BrandMark.tsx. -->
+    <svg
+      class="icon"
+      viewBox="0 0 32 32"
+      fill="none"
+      stroke="#212326"
+      stroke-linecap="square"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M3 8 L3 3 L8 3" stroke-width="1.2" />
+      <path d="M24 3 L29 3 L29 8" stroke-width="1.2" />
+      <path d="M29 24 L29 29 L24 29" stroke-width="1.2" />
+      <path d="M8 29 L3 29 L3 24" stroke-width="1.2" />
+      <g stroke-linecap="round">
+        <line x1="16.00" y1="11.20" x2="16.00" y2="15.60" stroke-width="0.55" />
+        <line x1="11.31" y1="19.30" x2="15.13" y2="17.10" stroke-width="0.55" />
+        <line x1="20.69" y1="19.30" x2="16.87" y2="17.10" stroke-width="0.55" />
+        <circle cx="16" cy="9" r="2.2" stroke-width="0.35" />
+        <circle cx="9.4" cy="20.4" r="2.2" stroke-width="0.35" />
+        <circle cx="22.6" cy="20.4" r="2.2" stroke-width="0.35" />
+        <circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none" />
+      </g>
+    </svg>
+
+    <div class="lockup">
+      <div class="wordmark">
+        NOSO<span class="track">TRACK</span><span class="tm">™</span>
+      </div>
+      <div class="tagline">
+        Outbreak forensics for infection prevention and control
+      </div>
+    </div>
+  </body>
+</html>
