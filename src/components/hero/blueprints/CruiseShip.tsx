@@ -20,10 +20,6 @@ import type { CSSProperties } from "react";
 type Props = { className?: string; style?: CSSProperties };
 
 // ─── Plan-view geometry constants (consumed by habitats.ts) ──────────
-// Hull bounds
-export const SHIP_HULL_Y_TOP = 260;
-export const SHIP_HULL_Y_BOT = 540;
-
 // Cabin rows: PORT (top) and STARBOARD (bottom)
 export const SHIP_PORT_CABIN_Y = 280;
 export const SHIP_PORT_CABIN_H = 70;

@@ -50,9 +50,10 @@
  * scroll events the rAF loop is listening to. One swipe ≈ one frame.
  */
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
 import Snap from "lenis/snap";
+import { registerHeroNav } from "./heroNav";
 import { useActiveScene } from "./useActiveScene";
 import { TypingHeadline } from "./TypingHeadline";
 import { Scene1Field } from "./Scene1Field";
@@ -117,14 +118,14 @@ const FADE_MS = 500;
 
 const BRAND_SCENE = SCENES.find((s) => s.id === "brand")!;
 
-/** Smooth-scroll to the About section — through Lenis when it's mounted
- *  (so its internal target stays in sync), native scrollIntoView as the
- *  pre-mount fallback. */
-function scrollToAbout(lenis: ReturnType<typeof useLenis>) {
-  const about = document.getElementById("about");
-  if (!about) return;
-  if (lenis) lenis.scrollTo(about);
-  else about.scrollIntoView({ behavior: "smooth" });
+/** Smooth-scroll to a section by id ("about", "research", …) — through
+ *  Lenis when it's mounted (so its internal target stays in sync), native
+ *  scrollIntoView as the pre-mount fallback. */
+function scrollToId(lenis: ReturnType<typeof useLenis>, id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (lenis) lenis.scrollTo(el);
+  else el.scrollIntoView({ behavior: "smooth" });
 }
 
 export function Hero() {
@@ -147,10 +148,11 @@ export function Hero() {
   // below can compensate for the wrapper-height shrink WITHOUT having
   // to re-query DOM after the React state has flipped.
   const completionShrinkRef = useRef(0);
-  // Set by the brand-frame "Scroll to learn more" cue so the completion
-  // layout-effect knows to glide to About once the hero has collapsed
-  // to its locked height (see goToAbout).
-  const pendingAboutRef = useRef(false);
+  // Section id ("about", "research", …) to glide to once the hero has
+  // collapsed to its locked height — set by the brand-frame "Scroll to
+  // learn more" cue and by nav-link clicks routed through registerHeroNav.
+  // Null when nothing is pending. Read by the completion layout-effect.
+  const pendingScrollIdRef = useRef<string | null>(null);
 
   /* ─────────────────────────────────────────────────────────────
      "Has the user actually scrolled?" guard. Without this, the IO
@@ -227,14 +229,15 @@ export function Hero() {
         });
       }
     }
-    // Deferred "Scroll to learn more": the cue forces completion first
-    // (so About sits at its final position), then we glide down to it
-    // here — after compensation has pinned the brand at the top. Doing
-    // it post-collapse sidesteps the anchor-vs-completion race that
-    // otherwise stranded the click mid-page.
-    if (pendingAboutRef.current) {
-      pendingAboutRef.current = false;
-      scrollToAbout(lenis);
+    // Deferred section jump: a cue or nav link forced completion first
+    // (so the target section sits at its final offset), then we glide
+    // down to it here — after compensation has pinned the brand at the
+    // top. Doing it post-collapse sidesteps the anchor-vs-completion race
+    // that otherwise stranded the click mid-page.
+    if (pendingScrollIdRef.current) {
+      const id = pendingScrollIdRef.current;
+      pendingScrollIdRef.current = null;
+      scrollToId(lenis, id);
     }
   }, [hasCompleted, lenis]);
 
@@ -264,26 +267,60 @@ export function Hero() {
   }, [lenis, hasCompleted]);
 
   /* ─────────────────────────────────────────────────────────────
-     "Scroll to learn more" — the brand-frame cue's handler. A plain
-     #about anchor races the completion lock: the lock collapses the
-     wrapper mid-scroll and its compensation overrides the in-flight
-     anchor scroll, stranding the click. So we force completion NOW
-     (capturing the same shrink delta the IO path uses, so the viewport
-     stays static through the collapse) and defer the glide to About to
-     the completion layout-effect, by which point About is at its final
-     position. The already-completed branch is a defensive fallback —
-     the cue only renders pre-completion.
+     Collapse-then-scroll — the fix for the anchor-vs-completion race.
+     A plain #section anchor (the brand cue's "Scroll to learn more", any
+     nav link) starts scrolling toward a section that still sits several
+     viewports down inside the un-collapsed hero. Partway there the
+     completion sentinel trips: the wrapper collapses and its compensation
+     hard-resets Lenis's target, overriding the in-flight anchor scroll and
+     stranding the click mid-page — so it only lands on the SECOND click.
+     So we force completion NOW (capturing the same shrink delta the IO
+     path uses, so the viewport stays static through the collapse) and
+     defer the glide to the target to the completion layout-effect, by
+     which point the section sits at its final offset. If the hero has
+     already collapsed, there's nothing to unlock: scroll straight there.
      ───────────────────────────────────────────────────────────── */
-  const goToAbout = () => {
-    const wrapper = wrapperRef.current;
-    if (!hasCompleted && wrapper) {
-      completionShrinkRef.current = wrapper.offsetHeight - window.innerHeight;
-      pendingAboutRef.current = true;
-      setHasCompleted(true);
-    } else {
-      scrollToAbout(lenis);
-    }
-  };
+  const completeAndScrollTo = useCallback(
+    (id: string) => {
+      const wrapper = wrapperRef.current;
+      if (!hasCompleted && wrapper) {
+        completionShrinkRef.current = wrapper.offsetHeight - window.innerHeight;
+        pendingScrollIdRef.current = id;
+        setHasCompleted(true);
+      } else {
+        scrollToId(lenis, id);
+      }
+    },
+    [hasCompleted, lenis, wrapperRef],
+  );
+
+  // Brand-frame "Scroll to learn more" cue → About (the cue only renders
+  // pre-completion; completeAndScrollTo's else-branch is a fallback).
+  const goToAbout = () => completeAndScrollTo("about");
+
+  /* ─────────────────────────────────────────────────────────────
+     Nav bridge — let the global <Nav> route its same-page section links
+     through the very same collapse-then-scroll, so a nav click during the
+     cinematic lands on the FIRST try instead of the second. We take over
+     only when the target section actually exists; otherwise the nav falls
+     back to Lenis's native anchor handling. Lives as long as the hero is
+     mounted (re-registers when the closure's deps change).
+     ───────────────────────────────────────────────────────────── */
+  useEffect(
+    () =>
+      registerHeroNav((hash) => {
+        // Only intercept while the cinematic is still running — that's the
+        // only window in which the anchor-vs-completion race exists. Once
+        // completed, the sections sit at their final offsets, so Lenis's
+        // native anchor handling already lands on the first click (and
+        // keeps updating the URL hash); decline so the nav uses it.
+        const id = hash.replace(/^#/, "");
+        if (hasCompleted || !id || !document.getElementById(id)) return false;
+        completeAndScrollTo(id);
+        return true;
+      }),
+    [hasCompleted, completeAndScrollTo],
+  );
 
   /* ─────────────────────────────────────────────────────────────
      Render branch 1: completed — the locked final composition. One
@@ -547,10 +584,11 @@ function AdvanceCue({
       }}
     >
       {/* Real button so the chevron is clickable / tappable / focusable.
-          `-m-3 p-3` grows the touch target ~12px on every side without
-          shifting the chevron a pixel. Pointer + focus are switched off
-          while the cue is hidden so the final frame can't trap a tab
-          stop or a stray tap. */}
+          `-m-4 p-4` grows the touch target ~16px on every side without
+          shifting the chevron a pixel — a generous, thumb-friendly area
+          for the user who clicks the cue instead of scrolling. Pointer +
+          focus are switched off while the cue is hidden so the final
+          frame can't trap a tab stop or a stray tap. */}
       <button
         type="button"
         aria-label="Go to next frame"
@@ -559,7 +597,7 @@ function AdvanceCue({
         onClick={() =>
           scrollToScene(wrapperRef.current, activeScene + 1, count)
         }
-        className="group -m-3 flex cursor-pointer flex-row items-center gap-3 rounded-md p-3 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
+        className="group -m-4 flex cursor-pointer flex-row items-center gap-3 rounded-md p-4 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
         style={{ pointerEvents: visible ? "auto" : "none" }}
       >
         {/* Label — bright + legible, fades out for good after the user's
@@ -573,11 +611,14 @@ function AdvanceCue({
         >
           Scroll down
         </span>
-        {/* Bold double-chevron sliding downward — the clearly-visible
-            direction signal; nudges further down on hover / press. */}
+        {/* Bold, enlarged double-chevron sliding downward — the
+            clearly-visible direction signal, sized up so it also reads as
+            an obvious tap target; nudges further down on hover / press.
+            Same 0 0 26 34 viewBox, so the wider/taller box just scales the
+            strokes proportionally. */}
         <svg
-          width="26"
-          height="34"
+          width="34"
+          height="44"
           viewBox="0 0 26 34"
           fill="none"
           aria-hidden

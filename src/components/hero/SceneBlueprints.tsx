@@ -3,7 +3,7 @@
 /**
  * Scene "Blueprints" — three habitats side-by-side, all live.
  *
- * Hospital | Cruise Ship | Farm — each rendered through a `lockedScene`
+ * Hospital | Cruise Ship | Farm — each rendered through a `scene`-locked
  * HeroBackdrop instance with its own particle network running. The
  * grid is three equal columns on desktop and stacks vertically on
  * mobile (where space is the bottleneck, not GPU).
@@ -47,7 +47,7 @@ export function SceneBlueprints() {
           >
             {/* The backdrop renders absolute inset-0; we just need to
                 give it a positioned ancestor, which this cell is. */}
-            <HeroBackdrop lockedScene={hab.id} />
+            <HeroBackdrop scene={hab.id} />
           </div>
         ))}
       </div>

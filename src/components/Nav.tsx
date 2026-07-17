@@ -28,10 +28,11 @@
    with dark text.
    ========================================================================= */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { cn } from "@/lib/utils";
 import { BrandWordmark } from "@/components/BrandWordmark";
 import { BrandMark } from "@/components/BrandMark";
+import { requestHeroNav } from "@/components/hero/heroNav";
 
 const NAV_LOGO = "Nosotrack";
 // Brand-lockup tagline — the product category descriptor that previously
@@ -100,6 +101,22 @@ export function Nav() {
   const showScrolledStyle = !overHero;
   const closeMobile = () => setMobileOpen(false);
 
+  // Same-page section links: hand the jump to the hero so it collapses its
+  // cinematic FIRST, then glides to the section. Without this the hero's
+  // completion-lock fires mid-scroll and strands the first click, so the
+  // section only lands on the SECOND click. When no hero is mounted (or the
+  // target isn't a section it owns) requestHeroNav returns false and we
+  // fall through to Lenis's native anchor handling. External links (the
+  // ↗ Platform jump) are left untouched.
+  const onSectionLink = (
+    e: MouseEvent<HTMLAnchorElement>,
+    link: (typeof NAV_LINKS)[number],
+  ) => {
+    if (!link.external && requestHeroNav(link.href)) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <nav
       className={cn(
@@ -119,12 +136,14 @@ export function Nav() {
             centred against each other; the lockup column stacks the
             (linked) wordmark with a small mono caption. */}
         <div className="nav-brand flex items-center gap-[12px]">
-          <span
+          <a
+            href="#top"
             aria-hidden
+            tabIndex={-1}
             className="nav-mark inline-flex h-10 w-10 shrink-0 items-center justify-center transition-colors duration-[var(--transition-duration-fast)]"
           >
             <BrandMark className="block h-full w-full" />
-          </span>
+          </a>
           <div className="flex flex-col">
             <a
               href="#top"
@@ -151,6 +170,7 @@ export function Nav() {
             <li key={link.href}>
               <a
                 href={link.href}
+                onClick={(e) => onSectionLink(e, link)}
                 {...(link.external
                   ? { target: "_blank", rel: "noopener noreferrer" }
                   : {})}
@@ -209,7 +229,10 @@ export function Nav() {
               <li key={link.href}>
                 <a
                   href={link.href}
-                  onClick={closeMobile}
+                  onClick={(e) => {
+                    onSectionLink(e, link);
+                    closeMobile();
+                  }}
                   {...(link.external
                     ? { target: "_blank", rel: "noopener noreferrer" }
                     : {})}

@@ -24,16 +24,13 @@
  *     </div>
  *   </section>
  *
- * All spacing/typography numbers are verbatim from main. The optional tags
- * row is preserved for future phases that supply `tags`; current data
- * omits it so no row renders.
+ * All spacing/typography numbers are verbatim from main.
  */
 
 type RoadmapPhase = {
   badge: string;
   title: string;
   desc: string;
-  tags?: string[];
 };
 
 const ROADMAP_INTRO =
@@ -111,22 +108,6 @@ export function Roadmap() {
                     className="mb-5 text-[17px] leading-[1.55] tracking-[-0.005em] text-mute"
                     dangerouslySetInnerHTML={{ __html: phase.desc }}
                   />
-
-                  {/* OPTIONAL TAGS — border-top + tag list (only if tags exist) */}
-                  {phase.tags && phase.tags.length > 0 && (
-                    <div className="flex flex-wrap border-t border-rule pt-4">
-                      {phase.tags.map((tag, j) => (
-                        <span
-                          key={j}
-                          className={`mr-3 inline-flex items-center gap-1 py-[3px] pr-3 font-mono text-[11px] tracking-[0.08em] text-mute ${
-                            j < phase.tags!.length - 1 ? "border-r border-rule" : ""
-                          }`}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </article>
               </div>
             );

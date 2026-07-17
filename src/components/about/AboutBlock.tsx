@@ -24,9 +24,9 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useScrollReveal } from "@/lib/hooks";
 
-type StepNumber = "0.1" | "0.2" | "0.3";
+export type StepNumber = "0.1" | "0.2" | "0.3" | "0.4";
 
-const ALL_STEPS: StepNumber[] = ["0.1", "0.2", "0.3"];
+const ALL_STEPS: StepNumber[] = ["0.1", "0.2", "0.3", "0.4"];
 
 type Tab = "video" | "details";
 
@@ -165,7 +165,7 @@ export function AboutBlock({
 
 /* -------------------------------------------------------------------------- */
 
-function StepIndicator({ activeId }: { activeId: StepNumber }) {
+export function StepIndicator({ activeId }: { activeId: string }) {
   // Pre-render labels (active gets square brackets), then compute each
   // step's start offset in the reveal sequence:
   //   step0_chars · 1-unit separator · step1_chars · 1-unit separator · step2_chars

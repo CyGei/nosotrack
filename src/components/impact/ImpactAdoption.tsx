@@ -76,8 +76,8 @@ const METRICS: MetricDef[] = [
     breakdown: {
       pkgs: DOWNLOAD_PKGS,
       unit: "Downloads",
-      caption: `${fmtInt(tools.downloads)} downloads across ${DOWNLOAD_PKGS.length} packages`,
-      eyebrow: "CRAN Downloads",
+      caption: "CRAN downloads of our open-source R packages",
+      eyebrow: "Software Downloads",
       blurb:
         "Each count is a download of one of our open-source R packages from CRAN, the Comprehensive R Archive Network. Figures come straight from the RStudio mirror logs.",
     },
@@ -88,10 +88,10 @@ const METRICS: MetricDef[] = [
     breakdown: {
       pkgs: CITATION_PKGS,
       unit: "Cited",
-      caption: "Citations to each core method",
-      eyebrow: "Peer-reviewed citations",
+      caption: "Peer-reviewed papers that cite our methods",
+      eyebrow: "citations",
       blurb:
-        "Peer-reviewed papers that cite the team's research, resolved through OpenAlex. The headline spans the full body of work; the breakdown shows how often each core method's own paper is cited.",
+      "Peer-reviewed publications citing the team's research, identified through OpenAlex. The headline captures the collective impact of the full research portfolio, while the breakdown highlights citations to the foundational papers behind Nosotrack's core methods."
     },
   },
   { value: geoData.citationCountryCount, label: "Countries" },
@@ -171,7 +171,7 @@ export function ImpactAdoption() {
   const ciAngles = arc(CITATION_PKGS.length);
 
   const backArrow = openLabel && <BackArrow onClick={close} />;
-  const caption = open ? open.caption : "Global adoption";
+  const caption = open ? open.caption : "";
 
   // The arched globe stage (globe + aggregate arc + both breakdown arcs).
   const globeStage = (

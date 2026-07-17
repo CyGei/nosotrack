@@ -43,6 +43,17 @@ export type TypingHeadlineProps = {
   /** Apply the cream-halo `.hero-accent` to the final line. Used by the
    *  brand close ("Protect.") to match the legacy hero treatment. */
   haloLastLine?: boolean;
+  /** "Initials first" choreography — the brand close (T·I·P). Instead of
+   *  typing straight through, phase 1 reveals just the FIRST letter of
+   *  every line, top-to-bottom, so the left column momentarily reads
+   *  "TIP" (the investigative *tip*). After a short hold, phase 2 types
+   *  the remainder of each line in, line by line, in the normal cadence.
+   *  Ignored under forceImmediate / reduced-motion (shows everything). */
+  initialsFirst?: boolean;
+  /** ms between each initial letter appearing in phase 1 (T…I…P). */
+  initialStaggerMs?: number;
+  /** ms to hold on the bare "TIP" column before phase 2 unfolds it. */
+  initialHoldMs?: number;
 };
 
 export function TypingHeadline({
@@ -53,9 +64,16 @@ export function TypingHeadline({
   lineDelayMs = 140,
   className = "",
   haloLastLine = false,
+  initialsFirst = false,
+  initialStaggerMs = 200,
+  initialHoldMs = 550,
 }: TypingHeadlineProps) {
-  // Number of chars typed across all lines (running counter).
+  // Number of chars typed across all lines (running counter). Drives the
+  // DEFAULT (sequential) path.
   const [typed, setTyped] = useState(0);
+  // Per-line visible-char counts. Drives the `initialsFirst` path, where
+  // lines fill out of order (all first-letters, then each remainder).
+  const [byLine, setByLine] = useState<number[]>(() => lines.map(() => 0));
   const reduce = useReducedMotion();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -72,13 +90,72 @@ export function TypingHeadline({
     if (!active) {
       // Reset so re-entering the scene restarts the typing.
       setTyped(0);
+      setByLine(lines.map(() => 0));
       return;
     }
 
     if (forceImmediate || reduce) {
       // Skip animation, show everything at once.
       setTyped(totalChars);
+      setByLine(lines.map((line) => line.length));
       return;
+    }
+
+    /* ── "Initials first" choreography (brand close: T·I·P). ──────────
+       Build an ordered reveal schedule; each step sets one line's
+       visible-char count `delay` ms after the previous step.
+       Phase 1: reveal char 1 of every line, staggered → the column
+       reads "TIP". Phase 2: after one `initialHoldMs` pause, type each
+       line's remaining chars, line by line, in the normal cadence. */
+    if (initialsFirst) {
+      const steps: { line: number; count: number; delay: number }[] = [];
+      lines.forEach((line, i) => {
+        if (line.length === 0) return;
+        // First initial lands promptly; the rest stagger so each letter
+        // is seen to arrive (T … I … P) rather than all three at once.
+        steps.push({
+          line: i,
+          count: 1,
+          delay: i === 0 ? charDelayMs : initialStaggerMs,
+        });
+      });
+      let holdDone = false;
+      lines.forEach((line, i) => {
+        for (let c = 2; c <= line.length; c++) {
+          let delay = charDelayMs;
+          if (c === 2) {
+            // Hold once on the bare "TIP" before it unfolds; thereafter
+            // each new line's remainder starts on the usual line pause.
+            if (!holdDone) {
+              delay = initialHoldMs;
+              holdDone = true;
+            } else {
+              delay = lineDelayMs;
+            }
+          }
+          steps.push({ line: i, count: c, delay });
+        }
+      });
+
+      setByLine(lines.map(() => 0));
+      let idx = 0;
+      const run = () => {
+        const s = steps[idx];
+        setByLine((prev) => {
+          const arr = prev.slice();
+          arr[s.line] = s.count;
+          return arr;
+        });
+        idx += 1;
+        if (idx < steps.length) {
+          timerRef.current = setTimeout(run, steps[idx].delay);
+        }
+      };
+      if (steps.length) timerRef.current = setTimeout(run, steps[0].delay);
+
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+      };
     }
 
     setTyped(0);
@@ -108,24 +185,44 @@ export function TypingHeadline({
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [active, forceImmediate, reduce, lines, totalChars, charDelayMs, lineDelayMs]);
+  }, [
+    active,
+    forceImmediate,
+    reduce,
+    lines,
+    totalChars,
+    charDelayMs,
+    lineDelayMs,
+    initialsFirst,
+    initialStaggerMs,
+    initialHoldMs,
+  ]);
 
   // Slice each line by how many chars have been typed so far. Empty
   // lines reserve their height with a non-breaking space so the
   // headline never reflows as later lines fill in (would otherwise
   // cause the page-paint to jump on the first character of each new
   // line).
-  let remaining = typed;
-  const rendered = lines.map((line) => {
-    if (remaining <= 0) return "";
-    if (remaining >= line.length) {
-      remaining -= line.length;
-      return line;
-    }
-    const slice = line.slice(0, remaining);
-    remaining = 0;
-    return slice;
-  });
+  //
+  // `initialsFirst` slices each line by its OWN counter (lines fill out
+  // of order); the default path walks a single running counter across
+  // all lines in sequence.
+  let rendered: string[];
+  if (initialsFirst) {
+    rendered = lines.map((line, i) => line.slice(0, byLine[i] ?? 0));
+  } else {
+    let remaining = typed;
+    rendered = lines.map((line) => {
+      if (remaining <= 0) return "";
+      if (remaining >= line.length) {
+        remaining -= line.length;
+        return line;
+      }
+      const slice = line.slice(0, remaining);
+      remaining = 0;
+      return slice;
+    });
+  }
 
   return (
     <h1 className={className}>

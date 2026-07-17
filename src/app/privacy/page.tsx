@@ -8,10 +8,8 @@
  */
 
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Nav } from "@/components/Nav";
-import { Footer } from "@/components/Footer";
-import { Prose, H2, A } from "@/components/legal/Prose";
+import { LegalPage } from "@/components/legal/LegalPage";
+import { H2, A } from "@/components/legal/Prose";
 
 export const metadata: Metadata = {
   title: "Privacy Policy — Nosotrack",
@@ -20,35 +18,9 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const LAST_UPDATED = "2 May 2026";
-
 export default function PrivacyPage() {
   return (
-    <>
-      <Nav />
-
-      <main id="top" className="bg-bg">
-        <article className="mx-auto max-w-[720px] px-6 pb-[clamp(64px,10vh,120px)] pt-[clamp(96px,12vh,160px)]">
-          <Link
-            href="/"
-            className="mb-8 inline-block font-mono text-[12px] text-mute transition-colors hover:text-ink"
-          >
-            ← Back to Nosotrack
-          </Link>
-
-          <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-mute">
-            Legal
-          </div>
-
-          <h1 className="mb-2 font-display text-[clamp(36px,4vw,56px)] font-semibold leading-[1.05] tracking-tight text-ink">
-            Privacy Policy
-          </h1>
-
-          <p className="mb-12 font-mono text-[12px] text-mute">
-            Last updated: {LAST_UPDATED}
-          </p>
-
-          <Prose>
+    <LegalPage title="Privacy Policy" lastUpdated="2 May 2026">
             <p>
               This Privacy Policy explains what personal information is
               collected when you use the Nosotrack website at{" "}
@@ -171,12 +143,7 @@ export default function PrivacyPage() {
               </A>
               .
             </p>
-          </Prose>
-        </article>
-      </main>
-
-      <Footer />
-    </>
+    </LegalPage>
   );
 }
 

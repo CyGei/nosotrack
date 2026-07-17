@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * HeroBackdrop — blueprint + live particle simulation.
+ * HeroBackdrop — blueprint + live particle simulation for one habitat.
  *
- * Two scenes alternate (hospital ↔ cruise ship). Each scene shows the
- * blueprint behind a canvas that draws a population of nodes:
+ * The chosen scene (hospital / ship / farm) shows its blueprint behind a
+ * canvas that draws a population of nodes:
  *
  *   - Each particle belongs to a habitat (room / cabin / dining hall /
  *     corridor) and bounces softly off its walls.
@@ -22,7 +22,7 @@
  * Respects prefers-reduced-motion.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/lib/hooks";
 import { HospitalBlueprint } from "./blueprints/Hospital";
 import { CruiseShipBlueprint } from "./blueprints/CruiseShip";
@@ -37,8 +37,6 @@ import {
   type HabitatShape,
 } from "./blueprints/habitats";
 
-const SCENE_MS = 14_000;
-const FADE_MS = 1_200;
 const VIEW_W = 1000;
 const VIEW_H = 1000;
 
@@ -83,13 +81,11 @@ const COLOR_EDGE = "rgba(239,238,239,0.22)";
 const COLOR_EDGE_HOT = "rgba(255,7,58,0.78)";
 
 export type SceneId = "hospital" | "ship" | "farm";
-const SCENES: SceneId[] = ["hospital", "ship", "farm"];
 
 export type HeroBackdropProps = {
-  /** If provided, pin the backdrop to a single scene and disable the
-   *  hospital→ship→farm rotation. Used by hero-v2's blueprints frame,
-   *  which renders three locked instances side-by-side. */
-  lockedScene?: SceneId;
+  /** Which habitat this backdrop renders. SceneBlueprints mounts one
+   *  instance per scene, side-by-side. */
+  scene: SceneId;
 };
 
 const HABITATS_BY_SCENE: Record<SceneId, Habitat[]> = {
@@ -98,31 +94,15 @@ const HABITATS_BY_SCENE: Record<SceneId, Habitat[]> = {
   farm: FARM_HABITATS,
 };
 
-export function HeroBackdrop({ lockedScene }: HeroBackdropProps = {}) {
+export function HeroBackdrop({ scene }: HeroBackdropProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
   const particlesRef = useRef<Particle[]>([]);
   const neighbourSetRef = useRef<Map<string, Set<string>>>(new Map());
-  const [scene, setScene] = useState<SceneId>(lockedScene ?? "hospital");
   const reduce = useReducedMotion();
 
-  // If the caller pinned us to a single scene, keep state in sync if
-  // they ever change it (shouldn't happen in our usage, but cheap to
-  // support) and skip the cycling timer entirely.
-  useEffect(() => {
-    if (lockedScene) setScene(lockedScene);
-  }, [lockedScene]);
-
-  useEffect(() => {
-    if (reduce || lockedScene) return;
-    const id = setInterval(() => {
-      setScene((s) => SCENES[(SCENES.indexOf(s) + 1) % SCENES.length]);
-    }, SCENE_MS);
-    return () => clearInterval(id);
-  }, [reduce, lockedScene]);
-
-  // Build particle population + neighbour lookup when scene changes.
+  // Build particle population + neighbour lookup for this scene.
   useEffect(() => {
     const habitats = HABITATS_BY_SCENE[scene];
     const neighSet = new Map<string, Set<string>>();
@@ -371,32 +351,10 @@ export function HeroBackdrop({ lockedScene }: HeroBackdropProps = {}) {
       aria-hidden
       className="pointer-events-none absolute inset-0 overflow-hidden"
     >
-      <div
-        className="absolute inset-0 transition-opacity ease-[var(--ease-nt)]"
-        style={{
-          opacity: scene === "hospital" ? 1 : 0,
-          transitionDuration: `${FADE_MS}ms`,
-        }}
-      >
-        <HospitalBlueprint className="h-full w-full" />
-      </div>
-      <div
-        className="absolute inset-0 transition-opacity ease-[var(--ease-nt)]"
-        style={{
-          opacity: scene === "ship" ? 1 : 0,
-          transitionDuration: `${FADE_MS}ms`,
-        }}
-      >
-        <CruiseShipBlueprint className="h-full w-full" />
-      </div>
-      <div
-        className="absolute inset-0 transition-opacity ease-[var(--ease-nt)]"
-        style={{
-          opacity: scene === "farm" ? 1 : 0,
-          transitionDuration: `${FADE_MS}ms`,
-        }}
-      >
-        <FarmBlueprint className="h-full w-full" />
+      <div className="absolute inset-0">
+        {scene === "hospital" && <HospitalBlueprint className="h-full w-full" />}
+        {scene === "ship" && <CruiseShipBlueprint className="h-full w-full" />}
+        {scene === "farm" && <FarmBlueprint className="h-full w-full" />}
       </div>
       <canvas
         ref={canvasRef}

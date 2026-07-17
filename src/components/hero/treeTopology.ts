@@ -33,13 +33,10 @@ export type TreeNode = {
   appearAt: number;
 };
 
-export type SusceptibleKind = "ambient" | "target";
-
 export type Susceptible = {
   id: string;
   x: number;
   y: number;
-  kind: SusceptibleKind;
 };
 
 export type TreeEdge = {
@@ -52,7 +49,7 @@ export type TreeEdge = {
 export type Projection = {
   /** Tree node id (must be a "latest infected" leaf). */
   fromNodeId: string;
-  /** Susceptible id (must be kind: 'target'). */
+  /** Target susceptible id the projection lands on. */
   toSuscId: string;
   /** Progress on Scene4's clock at which this projection begins drawing. */
   appearAt: number;
@@ -121,30 +118,30 @@ export const SUSCEPTIBLES: Susceptible[] = [
   // looking like a strict grid.
 
   // Row 1 — around P0 (tree Y=90).
-  { id: "A1", x: 435, y: 110, kind: "ambient" },
-  { id: "A2", x: 580, y:  75, kind: "ambient" },
+  { id: "A1", x: 435, y: 110 },
+  { id: "A2", x: 580, y:  75 },
 
   // Row 2 — around C1 / C2 (tree Y=230).
-  { id: "A3", x: 240, y: 250, kind: "ambient" },
-  { id: "A4", x: 395, y: 265, kind: "ambient" },
-  { id: "A5", x: 605, y: 265, kind: "ambient" },
-  { id: "A6", x: 765, y: 205, kind: "ambient" },
+  { id: "A3", x: 240, y: 250 },
+  { id: "A4", x: 395, y: 265 },
+  { id: "A5", x: 605, y: 265 },
+  { id: "A6", x: 765, y: 205 },
 
   // Row 3 — leaf row (tree Y=380), ambients interspersed between
   // U1 / C3 / C4 / C5 with Y-jitter so the row breathes.
-  { id: "A7", x: 305, y: 410, kind: "ambient" },
-  { id: "A8", x: 510, y: 365, kind: "ambient" },
-  { id: "A9", x: 695, y: 405, kind: "ambient" },
-  { id: "A10", x: 865, y: 360, kind: "ambient" },
+  { id: "A7", x: 305, y: 410 },
+  { id: "A8", x: 510, y: 365 },
+  { id: "A9", x: 695, y: 405 },
+  { id: "A10", x: 865, y: 360 },
 
   // Targets — receive Frame 3 dashed projections from C3 / C4 / C5.
   // Sit on a separate row below the tree (Y=445-535) so they read as
   // "next at-risk row."
-  { id: "S1", x: 315, y: 490, kind: "target" },
-  { id: "S2", x: 475, y: 535, kind: "target" },
-  { id: "S3", x: 640, y: 510, kind: "target" },
-  { id: "S4", x: 810, y: 480, kind: "target" },
-  { id: "S5", x: 910, y: 445, kind: "target" },
+  { id: "S1", x: 315, y: 490 },
+  { id: "S2", x: 475, y: 535 },
+  { id: "S3", x: 640, y: 510 },
+  { id: "S4", x: 810, y: 480 },
+  { id: "S5", x: 910, y: 445 },
 ];
 
 // ─────────────────────────────────────────────────────────────────────

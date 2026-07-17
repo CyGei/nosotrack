@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nosotrack · ITCAI Pitch</title>
+    <title>Nosotrack</title>
 
     <!-- Same favicon as the main site -->
     <link rel="icon" type="image/svg+xml"
@@ -100,7 +100,11 @@
             align-items: center;
             gap: 12px;
             color: var(--ink);
+            text-decoration: none;
+            cursor: pointer;
+            transition: opacity .2s ease;
         }
+        .slide-mark:hover { opacity: .68; }
         .on-dark .slide-mark { color: var(--inv-hi); }
         .slide-mark svg { width: 18px; height: 18px; }
         .slide-mark .wordmark { font-weight: 700; letter-spacing: .12em; }
@@ -154,15 +158,23 @@
         .on-dark .slide-title { color: var(--inv-hi); }
 
         /* Body paragraph · rule-3 system, sized up for projection legibility. */
+        /* Lead / intro under the title · TYPOGRAPHY.md rule 2 — the site sets
+           these in INK at 22px (Roadmap/Research intros, Contact subtitle),
+           not the grey it reserves for secondary descriptions. Scaled up one
+           step for a projected medium. */
         .slide-lead {
-            font-size: clamp(18px, 1.35vw, 20px);
-            line-height: 1.5;
-            letter-spacing: -0.005em;
-            color: var(--mute);
-            max-width: 62ch;
+            font-size: clamp(22px, 1.9vw, 26px);
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+            color: var(--ink);
+            max-width: 55ch;
             margin: 0 0 clamp(32px, 5vh, 64px);
         }
-        .on-dark .slide-lead { color: var(--inv); }
+        .on-dark .slide-lead { color: var(--inv-hi); }
+        /* Emphasis inside a lead reads via color (a step to ink), not weight —
+           body hierarchy is never carried by boldness. */
+        .slide-lead strong { font-weight: 400; color: var(--ink); }
+        .on-dark .slide-lead strong { color: var(--inv-hi); }
 
         /* =================================================================
            SLIDE 1 · TITLE (dark)
@@ -172,27 +184,25 @@
             justify-content: flex-start;
             padding-top: clamp(80px, 12vh, 160px);
         }
+        /* Title-slide tagline · promoted from a micro mono eyebrow to a proper
+           Inter Tight line so it reads large and clear (TYPOGRAPHY.md rule 2,
+           sized up for the deck). Sits above the brand statement. */
+        .hero-tagline {
+            font-family: var(--display);
+            font-weight: 400;
+            font-size: clamp(24px, 2.6vw, 40px);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: var(--inv-hi);
+            margin: 0 0 clamp(32px, 5vh, 56px);
+            max-width: 24ch;
+        }
         .hero-stack {
             display: grid;
             grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
             gap: clamp(48px, 6vw, 96px);
             align-items: end;
         }
-        .hero-mark {
-            display: flex;
-            align-items: center;
-            gap: 28px;
-            margin-bottom: clamp(40px, 6vh, 64px);
-        }
-        .hero-mark svg { width: 56px; height: 56px; color: var(--inv-hi); }
-        .hero-mark .wordmark {
-            font-family: var(--display);
-            font-weight: 600;
-            font-size: clamp(28px, 3vw, 40px);
-            letter-spacing: -.02em;
-            color: var(--inv-hi);
-        }
-        .hero-mark .wordmark .accent { color: var(--alert); }
         .hero-title {
             font-family: var(--mono);
             font-weight: 400;
@@ -217,7 +227,7 @@
             padding-bottom: 6px;
         }
         .hero-side p {
-            font-size: clamp(16px, 1.2vw, 19px);
+            font-size: clamp(17px, 1.2vw, 19px);
             line-height: 1.55;
             color: var(--inv);
             max-width: 38ch;
@@ -226,12 +236,13 @@
         .hero-author {
             font-family: var(--mono);
             font-size: 11px;
-            letter-spacing: .18em;
+            letter-spacing: .22em;
             text-transform: uppercase;
             color: var(--inv-mute);
             line-height: 1.7;
         }
-        .hero-author strong { color: var(--inv-hi); font-weight: 600; }
+        /* Presenter name pops via color, not weight (site rule: size + color). */
+        .hero-author strong { color: var(--inv-hi); font-weight: 400; }
 
         /* =================================================================
            SLIDE 2 · PROBLEM
@@ -250,15 +261,9 @@
             border-right: 1px solid var(--rule);
         }
         .stat:last-child { border-right: 0; }
-        .stat-num {
-            font-family: var(--mono);
-            font-size: 11px;
-            letter-spacing: .22em;
-            color: var(--mute);
-        }
         .stat-value {
             font-family: var(--display);
-            font-weight: 500;
+            font-weight: 400;
             font-size: clamp(2.6rem, 4.6vw, 4rem);
             letter-spacing: -.04em;
             color: var(--ink);
@@ -267,16 +272,21 @@
         .stat-label {
             font-family: var(--mono);
             font-size: 11px;
-            font-weight: 500;
-            letter-spacing: .18em;
+            font-weight: 400;
+            letter-spacing: .22em;
             text-transform: uppercase;
             color: var(--ink);
         }
-        .stat-detail {
-            font-size: 15px;
+        /* Scope line above the metric row · plain Inter Tight (not the mono
+           eyebrow) so "In the United States alone" reads clearly. */
+        .stat-context {
+            font-family: var(--display);
+            font-weight: 400;
+            font-size: 17px;
             line-height: 1.5;
+            letter-spacing: -0.005em;
             color: var(--text);
-            max-width: 22ch;
+            margin: 0;
         }
         .pull-quote {
             margin-top: clamp(40px, 6vh, 80px);
@@ -284,7 +294,7 @@
             border-top: 1px solid var(--rule);
             font-family: var(--display);
             font-style: italic;
-            font-size: clamp(16px, 1.4vw, 21px);
+            font-size: clamp(18px, 1.5vw, 22px);
             color: var(--text);
             max-width: 90ch;
         }
@@ -331,7 +341,7 @@
         .eco-input .ei-tag {
             display: block;
             font-family: var(--mono);
-            font-size: 10px;
+            font-size: 11px;
             letter-spacing: .22em;
             text-transform: uppercase;
             color: var(--mute);
@@ -339,8 +349,8 @@
         }
         .eco-input .ei-name {
             font-family: var(--display);
-            font-size: clamp(15px, 1.2vw, 17px);
-            font-weight: 500;
+            font-size: 17px;
+            font-weight: 400;
             color: var(--ink);
             letter-spacing: -.01em;
         }
@@ -374,7 +384,7 @@
         .engine-badge .eb-tag {
             display: block;
             font-family: var(--mono);
-            font-size: 10px;
+            font-size: 11px;
             letter-spacing: .22em;
             text-transform: uppercase;
             color: var(--mute);
@@ -382,8 +392,8 @@
         }
         .engine-badge .eb-name {
             font-family: var(--display);
-            font-size: clamp(15px, 1.2vw, 17px);
-            font-weight: 500;
+            font-size: 17px;
+            font-weight: 400;
             color: var(--ink);
             letter-spacing: -.01em;
         }
@@ -401,22 +411,13 @@
             gap: 24px;
         }
         .eco-tree-text { max-width: 36ch; }
-        .eco-tree-text .ett-eye {
-            display: block;
-            font-family: var(--mono);
-            font-size: 10px;
-            letter-spacing: .22em;
-            text-transform: uppercase;
-            color: var(--mute);
-            margin-bottom: 6px;
-        }
         .eco-tree-text .ett-line {
             font-family: var(--display);
-            font-size: clamp(14px, 1.1vw, 16px);
+            font-size: 17px;
             color: var(--ink);
-            font-weight: 500;
+            font-weight: 400;
             letter-spacing: -.01em;
-            line-height: 1.4;
+            line-height: 1.45;
         }
 
         .eco-legend {
@@ -431,7 +432,7 @@
         .eco-legend-title {
             grid-column: 1 / -1;
             font-family: var(--mono);
-            font-size: 9px;
+            font-size: 11px;
             letter-spacing: .22em;
             text-transform: uppercase;
             color: var(--mute);
@@ -442,7 +443,7 @@
             align-items: center;
             gap: 8px;
             font-family: var(--display);
-            font-size: 11.5px;
+            font-size: 11px;
             color: var(--ink);
         }
         .eco-legend-dot {
@@ -581,21 +582,21 @@
         .demo-step .ds-num {
             font-family: var(--mono);
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 400;
             color: var(--mute);
-            letter-spacing: .18em;
+            letter-spacing: .22em;
         }
         .demo-step .ds-name {
             font-family: var(--mono);
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 11px;
+            font-weight: 400;
             color: var(--ink);
-            letter-spacing: .16em;
+            letter-spacing: .22em;
             text-transform: uppercase;
         }
         .demo-step .ds-desc {
             grid-column: 2;
-            font-size: 15px;
+            font-size: 16px;
             line-height: 1.55;
             color: var(--text);
             max-width: 32ch;
@@ -644,13 +645,13 @@
         }
         .impact-col .ic-pt-name {
             font-family: var(--display);
-            font-weight: 500;
-            font-size: 16px;
+            font-weight: 400;
+            font-size: 17px;
             letter-spacing: -.01em;
             color: var(--ink);
         }
         .impact-col .ic-pt-desc {
-            font-size: 15px;
+            font-size: 16px;
             line-height: 1.5;
             color: var(--text);
             max-width: 34ch;
@@ -671,6 +672,12 @@
             width: 100%;
             border: 0;
             background: transparent;
+            /* Full-bleed iframes swallow wheel/trackpad/touch, which trapped
+               the deck on slide 6 (the scroll-snap container never got the
+               event to advance to slide 7). Letting pointer events pass
+               through hands scrolling back to the deck. The globe stays a
+               live, animated visual — it just isn't click-interactive here. */
+            pointer-events: none;
         }
 
         /* =================================================================
@@ -681,16 +688,18 @@
         }
         .ask-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1.4fr) minmax(280px, 380px);
+            grid-template-columns: minmax(0, 1.4fr) minmax(300px, 420px);
             gap: clamp(40px, 5vw, 80px);
-            align-items: stretch;
+            /* Top-align so the card hugs its content instead of stretching
+               to the milestone column's height (which left a dead void). */
+            align-items: start;
             margin-top: clamp(24px, 3vh, 40px);
         }
         .milestone-list {
             display: flex;
             flex-direction: column;
             gap: clamp(16px, 2vh, 24px);
-            margin-top: clamp(20px, 3vh, 32px);
+            margin-top: 0;
         }
         .milestone {
             display: grid;
@@ -703,14 +712,14 @@
         .milestone .m-num {
             font-family: var(--mono);
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 400;
             color: var(--inv-mute);
             letter-spacing: .22em;
         }
         .milestone .m-text {
             font-family: var(--display);
             color: var(--inv-hi);
-            font-size: clamp(16px, 1.3vw, 19px);
+            font-size: clamp(17px, 1.3vw, 20px);
             line-height: 1.4;
             max-width: 56ch;
         }
@@ -718,11 +727,11 @@
         .contact-card {
             border: 1px solid var(--rule-inv-strong);
             background: rgba(255,255,255,0.02);
-            padding: clamp(28px, 4vh, 40px);
+            padding: clamp(32px, 4.5vh, 48px);
             position: relative;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 24px;
         }
         .contact-card::before {
             content: "";
@@ -731,48 +740,47 @@
             width: 64px; height: 2px;
             background: var(--inv-mute);
         }
-        .contact-card .cc-tag {
-            font-family: var(--mono);
-            font-size: 10px;
-            letter-spacing: .22em;
-            text-transform: uppercase;
-            color: var(--inv-mute);
-        }
-        .contact-card .cc-url {
+        /* Name leads the card · large Inter Tight headline. */
+        .contact-card .cc-name {
             font-family: var(--display);
-            font-weight: 500;
-            font-size: clamp(20px, 1.8vw, 26px);
+            font-weight: 400;
+            font-size: clamp(24px, 2.4vw, 32px);
             color: var(--inv-hi);
             letter-spacing: -.01em;
             border-bottom: 1px solid var(--rule-inv);
-            padding-bottom: 14px;
-        }
-        .contact-card .cc-name {
-            font-family: var(--mono);
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: .22em;
-            text-transform: uppercase;
-            color: var(--inv-mute);
-            margin-top: 4px;
+            padding-bottom: 18px;
         }
         .contact-card .cc-email {
             font-family: var(--display);
-            font-size: 16px;
-            color: var(--inv-hi);
-            font-weight: 500;
+            font-size: 18px;
+            color: var(--inv);
+            font-weight: 400;
+            text-decoration: none;
+            transition: color .2s ease;
         }
+        .contact-card .cc-email:hover { color: var(--inv-hi); }
+        .contact-card .cc-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 10px;
+        }
+        .contact-card .cc-link,
         .contact-card .cc-demo {
             font-family: var(--mono);
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 400;
             letter-spacing: .22em;
             text-transform: uppercase;
             color: var(--inv-hi);
+            text-decoration: none;
             border-bottom: 1px solid var(--rule-inv-strong);
             padding-bottom: 4px;
             align-self: flex-start;
+            transition: opacity .2s ease;
         }
+        .contact-card .cc-link:hover,
+        .contact-card .cc-demo:hover { opacity: .68; }
 
         /* =================================================================
            NAVIGATION OVERLAY (right edge · slide indicator dots)
@@ -909,21 +917,11 @@
             .deck.anim .slide.is-active .demo-step:nth-child(3) { transition-delay: .60s; }
             .deck.anim .slide.is-active .stat:nth-child(4) { transition-delay: .72s; }
 
-            /* Slide 1 · the three verbs type up in sequence, landing on the
-               cream-haloed "Protect." */
-            .deck.anim #slide-1 .hero-title .hw {
-                opacity: 0;
-                transform: translateY(0.16em);
-            }
-            .deck.anim #slide-1.is-active .hero-title .hw {
-                opacity: 1;
-                transform: none;
-                transition: opacity .7s cubic-bezier(.2, 0, 0, 1),
-                            transform .7s cubic-bezier(.2, 0, 0, 1);
-            }
-            .deck.anim #slide-1.is-active .hero-title .hw:nth-child(1) { transition-delay: .30s; }
-            .deck.anim #slide-1.is-active .hero-title .hw:nth-child(2) { transition-delay: .52s; }
-            .deck.anim #slide-1.is-active .hero-title .hw:nth-child(3) { transition-delay: .74s; }
+            /* Slide 1 · the "Track. Intervene. Protect." headline is driven
+               by JS (typeHeroTitle) — the site hero's T·I·P initials-first
+               typewriter — not a CSS fade. The .hw spans stay visible; the
+               parent .hero-stack still carries the slide-body entrance fade,
+               so the title fades in with the slide and then types. */
         }
 
         /* =================================================================
@@ -954,7 +952,7 @@
         <!-- ═════ SLIDE 1 · TITLE ═════ -->
         <section id="slide-1" class="slide on-dark" data-slide="1" data-section="01">
             <header class="slide-top">
-                <span class="slide-mark">
+                <a class="slide-mark" href="/" target="_top" aria-label="Return to nosotrack.com" title="Return to nosotrack.com">
                     <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
                         <path d="M3 8 L3 3 L8 3" stroke-width="1.2"/>
                         <path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
@@ -969,12 +967,12 @@
                         <circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none"/>
                     </svg>
                     <span class="wordmark">NOSO<span class="accent">TRACK</span></span>
-                </span>
-                <span>Cyril Geismar, PhD &nbsp;·&nbsp; ITCAI 2026</span>
+                </a>
+                <span>Cyril Geismar, PhD</span>
             </header>
 
             <div class="slide-body">
-                <div class="slide-eyebrow">Outbreak Forensics and Control</div>
+                <div class="hero-tagline">Outbreak Forensics and Control</div>
                 <div class="hero-stack">
                     <h1 class="hero-title">
                         <span class="hw">Track.</span>
@@ -1002,7 +1000,7 @@
         <!-- ═════ SLIDE 2 · THE PROBLEM ═════ -->
         <section id="slide-2" class="slide" data-slide="2" data-section="02 · The Problem">
             <header class="slide-top">
-                <span class="slide-mark">
+                <a class="slide-mark" href="/" target="_top" aria-label="Return to nosotrack.com" title="Return to nosotrack.com">
                     <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
                         <path d="M3 8 L3 3 L8 3" stroke-width="1.2"/>
                         <path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
@@ -1017,7 +1015,7 @@
                         <circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none"/>
                     </svg>
                     <span class="wordmark">NOSO<span class="accent">TRACK</span></span>
-                </span>
+                </a>
                 <span>Nosocomial Outbreaks</span>
             </header>
 
@@ -1027,27 +1025,23 @@
                     Healthcare-associated infections affect <strong>1 in 10 patients worldwide</strong>. Current control measures rely on broad testing and isolation. Effective intervention requires identifying the specific drivers of an outbreak: patient zero, superspreaders, transmission routes, and undetected or imported cases.
                 </p>
 
-                <div class="slide-eyebrow" style="margin-bottom: 16px; color: var(--mute);">In the United States alone</div>
+                <p class="stat-context">In the United States alone</p>
                 <div class="stat-grid">
                     <div class="stat">
                         <div class="stat-value">2M</div>
                         <div class="stat-label">HAIs / year</div>
-                        <div class="stat-detail">in the United States</div>
                     </div>
                     <div class="stat">
                         <div class="stat-value">100K</div>
                         <div class="stat-label">Annual deaths</div>
-                        <div class="stat-detail">in the United States</div>
                     </div>
                     <div class="stat">
                         <div class="stat-value">$45B</div>
                         <div class="stat-label">Economic burden</div>
-                        <div class="stat-detail">annual cost to US healthcare</div>
                     </div>
                     <div class="stat">
                         <div class="stat-value">77%</div>
                         <div class="stat-label">Non-compliance</div>
-                        <div class="stat-detail">hospitals cited by the US Joint Commission, 2024</div>
                     </div>
                 </div>
 
@@ -1064,7 +1058,7 @@
         <!-- ═════ SLIDE 3 · ECOSYSTEM / HOW IT WORKS ═════ -->
         <section id="slide-3" class="slide" data-slide="3" data-section="03 · How It Works">
             <header class="slide-top">
-                <span class="slide-mark">
+                <a class="slide-mark" href="/" target="_top" aria-label="Return to nosotrack.com" title="Return to nosotrack.com">
                     <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
                         <path d="M3 8 L3 3 L8 3" stroke-width="1.2"/>
                         <path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
@@ -1079,7 +1073,7 @@
                         <circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none"/>
                     </svg>
                     <span class="wordmark">NOSO<span class="accent">TRACK</span></span>
-                </span>
+                </a>
                 <span>How It Works</span>
             </header>
 
@@ -1159,8 +1153,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <span class="eb-tag">Nosotrack Engine</span>
-                                <span class="eb-name">Outbreak control engine</span>
+                                <span class="eb-tag">Nosotrack</span>
+                                <span class="eb-name">Outbreak Forensics and Control</span>
                             </div>
                         </div>
                     </div>
@@ -1169,8 +1163,7 @@
                     <div class="eco-tree">
                         <div class="eco-tree-head">
                             <div class="eco-tree-text">
-                                <span class="ett-eye">Transmission Tree</span>
-                                <span class="ett-line">The tree reveals the drivers of transmission.</span>
+                                <span class="ett-line">Nosotrack identifies transmission chains, revealing the drivers of disease transmission and enabling targeted control strategies.</span>
                             </div>
                             <div class="eco-legend">
                                 <span class="eco-legend-title">Legend</span>
@@ -1200,7 +1193,7 @@
         <!-- ═════ SLIDE 4 · LIVE FOUNDRY DEMO ═════ -->
         <section id="slide-4" class="slide" data-slide="4" data-section="04 · Live Demo">
             <header class="slide-top">
-                <span class="slide-mark">
+                <a class="slide-mark" href="/" target="_top" aria-label="Return to nosotrack.com" title="Return to nosotrack.com">
                     <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
                         <path d="M3 8 L3 3 L8 3" stroke-width="1.2"/>
                         <path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
@@ -1215,7 +1208,7 @@
                         <circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none"/>
                     </svg>
                     <span class="wordmark">NOSO<span class="accent">TRACK</span></span>
-                </span>
+                </a>
                 <span>Outbreak Forensics · Live Demo</span>
             </header>
 
@@ -1272,7 +1265,7 @@
         <!-- ═════ SLIDE 5 · IMPACT ═════ -->
         <section id="slide-5" class="slide" data-slide="5" data-section="05 · The Impact">
             <header class="slide-top">
-                <span class="slide-mark">
+                <a class="slide-mark" href="/" target="_top" aria-label="Return to nosotrack.com" title="Return to nosotrack.com">
                     <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
                         <path d="M3 8 L3 3 L8 3" stroke-width="1.2"/>
                         <path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
@@ -1287,7 +1280,7 @@
                         <circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none"/>
                     </svg>
                     <span class="wordmark">NOSO<span class="accent">TRACK</span></span>
-                </span>
+                </a>
                 <span>The Impact</span>
             </header>
 
@@ -1352,7 +1345,7 @@
              truth, so these figures match the current site. -->
         <section id="slide-6" class="slide" data-slide="6" data-section="06 · Adoption & Team">
             <header class="slide-top">
-                <span class="slide-mark">
+                <a class="slide-mark" href="/" target="_top" aria-label="Return to nosotrack.com" title="Return to nosotrack.com">
                     <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
                         <path d="M3 8 L3 3 L8 3" stroke-width="1.2"/>
                         <path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
@@ -1367,7 +1360,7 @@
                         <circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none"/>
                     </svg>
                     <span class="wordmark">NOSO<span class="accent">TRACK</span></span>
-                </span>
+                </a>
                 <span>Global Adoption · The Team</span>
             </header>
 
@@ -1388,7 +1381,7 @@
         <!-- ═════ SLIDE 7 · THE ASK ═════ -->
         <section id="slide-7" class="slide on-dark" data-slide="7" data-section="07 · The Ask">
             <header class="slide-top">
-                <span class="slide-mark">
+                <a class="slide-mark" href="/" target="_top" aria-label="Return to nosotrack.com" title="Return to nosotrack.com">
                     <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
                         <path d="M3 8 L3 3 L8 3" stroke-width="1.2"/>
                         <path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
@@ -1403,8 +1396,8 @@
                         <circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none"/>
                     </svg>
                     <span class="wordmark">NOSO<span class="accent">TRACK</span></span>
-                </span>
-                <span>Support Us · 6-Month Milestones</span>
+                </a>
+                <span>Support Us</span>
             </header>
 
             <div class="slide-body">
@@ -1415,7 +1408,6 @@
 
                 <div class="ask-grid">
                     <div>
-                        <div class="slide-eyebrow" style="margin-bottom: 12px;">6-Month Milestones</div>
                         <div class="milestone-list">
                             <div class="milestone">
                                 <span class="m-num">01</span>
@@ -1433,11 +1425,12 @@
                     </div>
 
                     <aside class="contact-card">
-                        <span class="cc-tag">Contact</span>
-                        <span class="cc-url">nosotrack.com</span>
-                        <span class="cc-name">Cyril Geismar, PhD</span>
-                        <span class="cc-email">cgeisma1@jh.edu</span>
-                        <a href="https://nosotrack.com" class="cc-demo" target="_blank">Try the demo →</a>
+                        <span class="cc-name">Dr Cyril Geismar</span>
+                        <a class="cc-email" href="mailto:c.geismar21@imperial.ac.uk">c.geismar21@imperial.ac.uk</a>
+                        <div class="cc-actions">
+                            <a class="cc-link" href="https://nosotrack.com/#contact" target="_top">Contact →</a>
+                            <a class="cc-demo" href="https://nosotrack.onrender.com/" target="_blank" rel="noopener">Try the demo →</a>
+                        </div>
                     </aside>
                 </div>
             </div>
@@ -1537,6 +1530,69 @@
         }, { threshold: [0.55, 0.75, 0.95] });
         slides.forEach(s => observer.observe(s));
 
+        // ---- hero headline typewriter (slide 1) ----
+        // Mirrors the site hero's brand close — the "initials-first" T·I·P
+        // choreography. Phase 1 reveals just the first letter of each line,
+        // staggered top-to-bottom, so the column momentarily reads T / I / P
+        // (the investigative *tip*). After a hold it types out each line —
+        // Track. / Intervene. / Protect. — keeping the cream halo on the last.
+        // Honours reduced-motion (shows the full headline at once).
+        function typeHeroTitle() {
+            const title = document.querySelector('#slide-1 .hero-title');
+            if (!title) return;
+            const spans = Array.prototype.slice.call(title.querySelectorAll('.hw'));
+            if (!spans.length) return;
+            const lines = spans.map(function (s) {
+                if (s.dataset.full == null) s.dataset.full = s.textContent;
+                return s.dataset.full;
+            });
+            // Cancel any run still in flight (fast slide re-entry).
+            if (title._typeTimers) title._typeTimers.forEach(clearTimeout);
+            const timers = [];
+            title._typeTimers = timers;
+
+            const setLine = function (i, n) {
+                spans[i].textContent = n > 0 ? lines[i].slice(0, n) : '\u00A0';
+            };
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                spans.forEach(function (s, i) { s.textContent = lines[i]; });
+                return;
+            }
+
+            const CHAR = 26, STAGGER = 200, HOLD = 550, LINE = 140, START = 420;
+            const steps = [];
+            // Phase 1 — first letter of every line (T … I … P).
+            lines.forEach(function (line, i) {
+                if (line.length) steps.push({ line: i, count: 1 });
+            });
+            // Phase 2 — type each line's remainder, line by line; hold once
+            // on the bare T·I·P column before the first line unfolds.
+            let holdDone = false;
+            lines.forEach(function (line, i) {
+                for (let c = 2; c <= line.length; c++) {
+                    let delay = CHAR;
+                    if (c === 2) { delay = holdDone ? LINE : HOLD; holdDone = true; }
+                    steps.push({ line: i, count: c, delay: delay });
+                }
+            });
+            // Phase-1 steps carry no delay yet: the first waits START (so the
+            // slide's fade-in has begun), the rest stagger.
+            steps.forEach(function (s, i) {
+                if (s.delay == null) s.delay = (i === 0 ? START : STAGGER);
+            });
+
+            spans.forEach(function (s, i) { setLine(i, 0); });
+            let idx = 0;
+            const run = function () {
+                const s = steps[idx];
+                setLine(s.line, s.count);
+                idx += 1;
+                if (idx < steps.length) timers.push(setTimeout(run, steps[idx].delay));
+            };
+            if (steps.length) timers.push(setTimeout(run, steps[0].delay));
+        }
+
         let activeIdx = 0;
         function setActive(idx) {
             if (idx === activeIdx || idx < 0 || idx >= slides.length) return;
@@ -1544,6 +1600,8 @@
             dots.forEach((d, i) => d.classList.toggle('active', i === idx));
             // Retrigger the entrance reveal on whichever slide is now active.
             slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+            // Replay the hero T·I·P typewriter each time slide 1 re-enters.
+            if (idx === 0) typeHeroTitle();
             // Tag the deck so dot color can adapt to dark/light slide. We use
             // the slide's `on-dark` flag · present on slides 1 and 7.
             for (let n = 1; n <= slides.length; n++) {
@@ -1607,6 +1665,10 @@
         // instead of snapping in. activeIdx stays 0; revisiting a slide
         // re-triggers its reveal via setActive().
         deck.classList.add('anim');
+        // Clear + start the hero typewriter synchronously (before first paint)
+        // so the full headline never flashes; the .hero-stack still fades in
+        // via the rAF below and the title types over it.
+        typeHeroTitle();
         requestAnimationFrame(function () {
             if (slides[0]) slides[0].classList.add('is-active');
             deck.classList.add('on-slide-1');

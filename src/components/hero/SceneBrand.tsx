@@ -54,9 +54,6 @@ export type SceneBrandProps = {
   active: boolean;
   /** Motto lines to type in. Final line picks up the cream halo. */
   lines: string[];
-  /** Skip the spin + slide + typing animation entirely (mobile /
-   *  reduced-motion). Renders the static stacked layout. */
-  forceImmediate?: boolean;
   /** Render the DESKTOP final composition instantly: logo at the
    *  shifted (25%) position, motto fully typed on the right, no spin,
    *  no slide, no typing animation. Used by the completion lock after
@@ -67,7 +64,6 @@ export type SceneBrandProps = {
 export function SceneBrand({
   active,
   lines,
-  forceImmediate = false,
   frozen = false,
 }: SceneBrandProps) {
   const reduce = useReducedMotion();
@@ -90,11 +86,7 @@ export function SceneBrand({
 
   // `frozen` takes priority — it represents the locked end-state and
   // must use the desktop choreographed-end layout regardless of size.
-  const mode: Mode = frozen
-    ? "frozen"
-    : forceImmediate || reduce
-      ? "stacked"
-      : "animated";
+  const mode: Mode = frozen ? "frozen" : reduce ? "stacked" : "animated";
 
   /* ─────────────────────────────────────────────────────────────
      Stacked: mobile / reduced-motion. No choreography, no spin,
@@ -130,7 +122,7 @@ export function SceneBrand({
        runs the headline's typing animation tied to the phase flip.
      ───────────────────────────────────────────────────────────── */
   const shifted = mode === "frozen" ? true : phase === "shifted";
-  const shouldSpin = mode === "animated" && active && !forceImmediate && !reduce;
+  const shouldSpin = mode === "animated" && active;
   const headlineActive = mode === "frozen" ? true : shifted;
   const lockupTransition =
     mode === "animated" ? `left ${SLIDE_MS}ms var(--ease-nt)` : "none";
@@ -183,6 +175,9 @@ export function SceneBrand({
             active={headlineActive}
             forceImmediate={mode === "frozen"}
             haloLastLine
+            // Reveal the T·I·P initials as a column first (the "tip"),
+            // then unfold each into Track./Intervene./Protect.
+            initialsFirst
             className="font-mono font-normal leading-[1.02] tracking-[-0.025em] text-inv-hi text-[clamp(2.2rem,5.4vw,5rem)]"
           />
         </div>

@@ -1,5 +1,5 @@
 /**
- * /pitch — ITCAI pitch deck.
+ * /pitch — pitch deck.
  *
  * The deck itself is a self-contained static HTML app
  * (`public/pitch-deck/index.html` + its own `styles.css` / `playbar.js` /
@@ -15,7 +15,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Nosotrack · Pitch",
-  description: "Nosotrack ITCAI pitch deck.",
+  description: "Nosotrack pitch deck.",
 };
 
 export default function PitchPage() {

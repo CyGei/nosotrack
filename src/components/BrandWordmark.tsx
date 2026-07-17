@@ -5,8 +5,8 @@
  *
  * Structure:
  *   <span.brand>
- *     Noso
- *     <span.brand-track>track</span>   ← always rendered in --alert red
+ *     NOSO
+ *     <span.brand-track>TRACK</span>   ← always rendered in --alert red
  *   </span.brand>
  *   <sup.brand-tm>™</sup>              ← tiny superscript trademark
  *
@@ -25,7 +25,7 @@ export function BrandWordmark() {
   return (
     <>
       <span className="whitespace-nowrap font-mono text-[0.94em] font-medium tracking-[-0.02em]">
-        Noso<span className="text-alert">track</span>
+        NOSO<span className="text-alert">TRACK</span>
       </span>
       <sup
         aria-label="trademark"
