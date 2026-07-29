@@ -105,7 +105,7 @@ export function About() {
       <AboutBlock
         id="0.3"
         title="Integration unlocks intelligence."
-        subtitle="Current tools work in silos. Nosotrack fuses their data streams into a unified analytical engine."
+        subtitle="Current outbreak surveillance tools work in silos. Nosotrack fuses their data streams into a unified analytical engine."
         video={<FoundryFrame scene="integration" />}
         details={
           <DetailsList
@@ -124,7 +124,7 @@ export function About() {
               },
               {
                 title: "Intervention",
-                desc: "An AI co-pilot scores intervention scenarios in seconds, ranked by containment, cost, and bed-days saved.",
+                desc: "An AI co-pilot scores intervention scenarios, ranked by containment, cost, and bed-days saved.",
               },
             ]}
           />

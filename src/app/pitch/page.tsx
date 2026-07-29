@@ -2,8 +2,8 @@
  * /pitch — pitch deck.
  *
  * The deck itself is a self-contained static HTML app
- * (`public/pitch-deck/index.html` + its own `styles.css` / `playbar.js` /
- * `assets/`). It can't live at `public/pitch/index.html` because Next's
+ * (`public/pitch-deck/index.html` + its own `playbar.js`; styles/tokens are
+ * inlined). It can't live at `public/pitch/index.html` because Next's
  * routing layer intercepts `/pitch/` before public files resolve — so
  * we host the deck under `/pitch-deck/` and serve it from this route via
  * a full-viewport iframe. The URL stays clean (`/pitch/`) and the deck
