@@ -1,13 +1,5 @@
 "use client";
 
-/**
- * useCountUp — a figure that eases from 0 to `target` once `run` flips true,
- * after an optional `startDelay` (used to choreograph a staggered cascade).
- * easeOutExpo: fast rise, quiet settle, no overshoot. Reduced-motion users get
- * the final value immediately. Extracted so the Impact ledger and any other
- * count-up surface share one implementation.
- */
-
 import { useEffect, useState } from "react";
 import { useReducedMotion } from "@/lib/hooks";
 

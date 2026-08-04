@@ -1,22 +1,4 @@
-/**
- * Habitat zones for the hero particle simulation.
- *
- * Each habitat is a rectangle inside the blueprint. Particles are placed
- * inside their habitat and bounded to it with soft-bounce. Habitats also
- * carry:
- *   - `count`     — how many particles spawn here
- *   - `neighbours` — IDs of OTHER habitats this one shares a wall or
- *                   corridor opening with. The simulation only allows
- *                   contact edges between particles whose habitats
- *                   neighbour each other (or are the same habitat).
- *   - `motion`    — optional. `corridor-h` or `corridor-v` flags a long,
- *                   thin habitat as a corridor; the simulation gives
- *                   particles inside persistent directional velocity so
- *                   they "walk" along the long axis (live digital twin).
- *
- * Coordinate system: 1000 × 1000 viewBox; must match Hospital.tsx and
- * CruiseShip.tsx geometry.
- */
+// All coordinates are in the blueprints' 1000 × 1000 viewBox.
 
 import {
   HOSP_NORTH_Y,
@@ -71,22 +53,16 @@ export type Habitat = {
   h: number;
   count: number;
   neighbours: string[];
-  /** When set, particles here behave as corridor walkers. */
   motion?: HabitatMotion;
-  /** When set, every particle in this habitat renders as this shape
-   *  (overrides the rotating shape pool). Used to mark a population
-   *  semantically — e.g. farm staff are always triangles. */
   forceShape?: HabitatShape;
 };
 
-/* ─────────────────────────  HOSPITAL  ───────────────────────── */
 const HOSP_INSET = 9;
 const EW_CORR_ID = "hosp-corr-EW";
 const NS_CORR_ID = "hosp-corr-NS";
 
 const hospital: Habitat[] = [];
 
-// All north / south rooms — used to populate corridor neighbours.
 const allNorthIds = Array.from(
   { length: HOSP_TOP_ROOMS },
   (_, i) => `hosp-N${i}`,
@@ -104,7 +80,6 @@ const allEastIds = Array.from(
   (_, i) => `hosp-E${i}`,
 );
 
-// NORTH rooms — neighbours: ±1 along the row + the E-W corridor.
 for (let i = 0; i < HOSP_TOP_ROOMS; i++) {
   const neighbours: string[] = [EW_CORR_ID];
   if (i > 0) neighbours.push(`hosp-N${i - 1}`);
@@ -120,7 +95,6 @@ for (let i = 0; i < HOSP_TOP_ROOMS; i++) {
   });
 }
 
-// SOUTH rooms — neighbours: ±1 along the row + the E-W corridor.
 for (let i = 0; i < HOSP_TOP_ROOMS; i++) {
   const neighbours: string[] = [EW_CORR_ID];
   if (i > 0) neighbours.push(`hosp-S${i - 1}`);
@@ -136,7 +110,6 @@ for (let i = 0; i < HOSP_TOP_ROOMS; i++) {
   });
 }
 
-// WEST rooms (left wing, narrow) — neighbours: ±1 + N-S corridor.
 for (let i = 0; i < HOSP_LEFT_ROOMS; i++) {
   const neighbours: string[] = [NS_CORR_ID];
   if (i > 0) neighbours.push(`hosp-W${i - 1}`);
@@ -152,7 +125,6 @@ for (let i = 0; i < HOSP_LEFT_ROOMS; i++) {
   });
 }
 
-// EAST rooms (left wing, wider, shared) — neighbours: ±1 + N-S corridor.
 for (let i = 0; i < HOSP_LEFT_ROOMS; i++) {
   const neighbours: string[] = [NS_CORR_ID];
   if (i > 0) neighbours.push(`hosp-E${i - 1}`);
@@ -168,7 +140,6 @@ for (let i = 0; i < HOSP_LEFT_ROOMS; i++) {
   });
 }
 
-// E-W corridor (top wing) — long horizontal habitat, walks back-and-forth.
 hospital.push({
   id: EW_CORR_ID,
   x: 82,
@@ -180,7 +151,6 @@ hospital.push({
   neighbours: [...allNorthIds, ...allSouthIds, NS_CORR_ID],
 });
 
-// N-S corridor (left wing) — long vertical habitat.
 hospital.push({
   id: NS_CORR_ID,
   x: 226,
@@ -194,7 +164,6 @@ hospital.push({
 
 export const HOSPITAL_HABITATS: Habitat[] = hospital;
 
-/* ─────────────────────────  SHIP  ───────────────────────── */
 const SHIP_CABIN_INSET_X = 3;
 const SHIP_CABIN_INSET_Y = 10;
 const SHIP_DINING_INSET = 10;
@@ -217,7 +186,6 @@ const allAftStbdIds = Array.from({ length: SHIP_AFT_CABINS }, (_, i) => aftStbdI
 const allFwdPortIds = Array.from({ length: SHIP_FWD_CABINS }, (_, i) => fwdPortId(i));
 const allFwdStbdIds = Array.from({ length: SHIP_FWD_CABINS }, (_, i) => fwdStbdId(i));
 
-// AFT block — PORT (top) row cabins
 for (let i = 0; i < SHIP_AFT_CABINS; i++) {
   const neighbours: string[] = [PORT_CORR_ID];
   if (i > 0) neighbours.push(aftPortId(i - 1));
@@ -233,7 +201,6 @@ for (let i = 0; i < SHIP_AFT_CABINS; i++) {
   });
 }
 
-// AFT block — STARBOARD (bottom) row cabins
 for (let i = 0; i < SHIP_AFT_CABINS; i++) {
   const neighbours: string[] = [STBD_CORR_ID];
   if (i > 0) neighbours.push(aftStbdId(i - 1));
@@ -249,7 +216,6 @@ for (let i = 0; i < SHIP_AFT_CABINS; i++) {
   });
 }
 
-// FWD block — PORT (top) row cabins
 for (let i = 0; i < SHIP_FWD_CABINS; i++) {
   const neighbours: string[] = [PORT_CORR_ID];
   if (i > 0) neighbours.push(fwdPortId(i - 1));
@@ -265,7 +231,6 @@ for (let i = 0; i < SHIP_FWD_CABINS; i++) {
   });
 }
 
-// FWD block — STARBOARD (bottom) row cabins
 for (let i = 0; i < SHIP_FWD_CABINS; i++) {
   const neighbours: string[] = [STBD_CORR_ID];
   if (i > 0) neighbours.push(fwdStbdId(i - 1));
@@ -281,7 +246,6 @@ for (let i = 0; i < SHIP_FWD_CABINS; i++) {
   });
 }
 
-// Atrium — small open public space; neighbours both corridors + dining.
 ship.push({
   id: ATRIUM_ID,
   x: SHIP_ATRIUM.x + SHIP_ATRIUM_INSET,
@@ -292,7 +256,6 @@ ship.push({
   neighbours: [PORT_CORR_ID, STBD_CORR_ID, DINING_ID],
 });
 
-// Dining hall — wide open midship habitat with many diners.
 ship.push({
   id: DINING_ID,
   x: SHIP_DINING.x + SHIP_DINING_INSET,
@@ -303,8 +266,6 @@ ship.push({
   neighbours: [PORT_CORR_ID, STBD_CORR_ID, ATRIUM_ID],
 });
 
-// PORT corridor — long horizontal habitat running the full length of
-// the ship between the port cabin row and the central public spaces.
 ship.push({
   id: PORT_CORR_ID,
   x: SHIP_PORT_CORR.x + SHIP_CORR_INSET,
@@ -322,7 +283,6 @@ ship.push({
   ],
 });
 
-// STARBOARD corridor
 ship.push({
   id: STBD_CORR_ID,
   x: SHIP_STBD_CORR.x + SHIP_CORR_INSET,
@@ -342,23 +302,8 @@ ship.push({
 
 export const SHIP_HABITATS: Habitat[] = ship;
 
-/* ─────────────────────────  FARM  ─────────────────────────
- * Six habitat zones + one corridor:
- *   · pasture (big, ~25 cattle clustering — index population)
- *   · free stalls (top barn row)
- *   · holding pen   ─┐
- *   · milking parlor ─┤  bottleneck for transmission
- *   · calf housing
- *   · milk room (no cattle — equipment only)
- *   · service alley (corridor-h, triangles = staff)
- *
- * Pasture and the service alley share a long edge, so staff walking
- * past the paddock can carry contact into the barn. The parlor is
- * downstream of holding, mirroring the real-world bottleneck.
- */
-
 const FARM_INSET = 14;
-const FARM_TITLE_INSET = 30; // extra top inset under zone labels
+const FARM_TITLE_INSET = 30;
 
 const PASTURE_ID = "farm-pasture";
 const STALLS_ID = "farm-stalls";
@@ -420,8 +365,7 @@ const farm: Habitat[] = [
     y: FARM_MILK_ROOM.y + FARM_TITLE_INSET,
     w: FARM_MILK_ROOM.w - FARM_INSET * 2,
     h: FARM_MILK_ROOM.h - FARM_TITLE_INSET - FARM_INSET,
-    // Milk room is equipment-only — no cattle live here. Still kept as a
-    // habitat so it can act as a neighbour relay between parlor + calves.
+    // Equipment-only: no particles, but relays contact between parlor and calves.
     count: 0,
     neighbours: [PARLOR_ID, CALVES_ID, ALLEY_ID],
   },

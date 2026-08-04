@@ -1,27 +1,7 @@
-/**
- * Hospital — Acute Care · Ward A · Level 3 digital twin.
- *
- * Minimal architectural blueprint: L-shaped floor plan, fine hairline
- * strokes, no decorative annotations. Strictly the geometry: outer shell,
- * corridors, room outlines, door gaps, subtle stair core. Patient nodes
- * (the canvas particles) provide the only colour on top.
- *
- * Coordinate system: 1000 × 1000 viewBox. Room rectangles below MUST
- * stay in sync with habitats.ts.
- *
- * Layout (L-shape):
- *   Top wing:  60..940 × 60..480  — 8 north + 8 south small rooms
- *   Left wing: 60..480 × 480..940 — 5 west + 5 east small rooms
- *   E-W corridor in top wing at y 220..270
- *   N-S corridor in left wing at x 220..270
- *   Corridors meet at the inner L-bend
- */
-
 import type { CSSProperties } from "react";
 
 type Props = { className?: string; style?: CSSProperties };
 
-// ─── Room grid constants (consumed by habitats.ts) ──────────────────
 const TOP_ROOM_W = 102;
 const TOP_ROOM_GAP = 4;
 const TOP_ROOM_START_X = 75;
@@ -51,7 +31,6 @@ export function HospitalBlueprint({ className, style }: Props) {
   const strokeFaint = "rgba(239,238,239,0.16)";
   const textFaint = "rgba(239,238,239,0.34)";
 
-  // L-shape outer shell
   const shell =
     "M 60 60 L 940 60 L 940 480 L 480 480 L 480 940 L 60 940 Z";
   const shellInner =
@@ -76,28 +55,22 @@ export function HospitalBlueprint({ className, style }: Props) {
         strokeLinejoin="miter"
         vectorEffect="non-scaling-stroke"
       >
-        {/* Outer shell + inner offset (drafting double-line) */}
         <path d={shell} />
         <path d={shellInner} stroke={strokeFaint} />
 
-        {/* East-west corridor through top wing (y 220..270) */}
         <line x1="60" y1="220" x2="940" y2="220" />
         <line x1="60" y1="270" x2="940" y2="270" />
 
-        {/* North-south corridor through left wing (x 220..270) */}
         <line x1="220" y1="270" x2="220" y2="940" />
         <line x1="270" y1="270" x2="270" y2="940" />
 
-        {/* L-bend infill (where corridors meet) */}
         <line x1="220" y1="220" x2="270" y2="220" />
 
-        {/* ─── Top wing — NORTH rooms ─── */}
         {topIds.map((i) => {
           const x = hospTopX(i);
           return (
             <g key={`N-${i}`}>
               <rect x={x} y={HOSP_NORTH_Y} width={TOP_ROOM_W} height={HOSP_NORTH_H} />
-              {/* Door gap into E-W corridor (centred on south wall) */}
               <line
                 x1={x + 12}
                 y1={220}
@@ -114,7 +87,6 @@ export function HospitalBlueprint({ className, style }: Props) {
                 stroke="rgba(33,35,38,1)"
                 strokeWidth="2"
               />
-              {/* Tiny en-suite alcove (top-right corner) */}
               <rect
                 x={x + TOP_ROOM_W - 26}
                 y={HOSP_NORTH_Y + 6}
@@ -126,13 +98,11 @@ export function HospitalBlueprint({ className, style }: Props) {
           );
         })}
 
-        {/* ─── Top wing — SOUTH rooms ─── */}
         {topIds.map((i) => {
           const x = hospTopX(i);
           return (
             <g key={`S-${i}`}>
               <rect x={x} y={HOSP_SOUTH_Y} width={TOP_ROOM_W} height={HOSP_SOUTH_H} />
-              {/* Door gap into E-W corridor (centred on north wall) */}
               <line
                 x1={x + 12}
                 y1={270}
@@ -160,13 +130,11 @@ export function HospitalBlueprint({ className, style }: Props) {
           );
         })}
 
-        {/* ─── Left wing — WEST rooms ─── */}
         {leftIds.map((i) => {
           const y = hospLeftY(i);
           return (
             <g key={`W-${i}`}>
               <rect x={HOSP_WEST_X} y={y} width={HOSP_WEST_W} height={LW_ROOM_H} />
-              {/* Door into N-S corridor (east wall) */}
               <line
                 x1={220}
                 y1={y + 12}
@@ -194,7 +162,6 @@ export function HospitalBlueprint({ className, style }: Props) {
           );
         })}
 
-        {/* ─── Left wing — EAST rooms ─── */}
         {leftIds.map((i) => {
           const y = hospLeftY(i);
           return (
@@ -216,7 +183,6 @@ export function HospitalBlueprint({ className, style }: Props) {
                 stroke="rgba(33,35,38,1)"
                 strokeWidth="2"
               />
-              {/* Two small en-suite alcoves (shared-room signal) */}
               <rect
                 x={HOSP_EAST_X + HOSP_EAST_W - 26}
                 y={y + 4}
@@ -235,18 +201,14 @@ export function HospitalBlueprint({ className, style }: Props) {
           );
         })}
 
-        {/* Stair / lift core at the L-bend (subtle orientation aid) */}
         <rect x={520} y={500} width={70} height={70} stroke={strokeFaint} />
         <line x1={520} y1={535} x2={590} y2={535} stroke={strokeFaint} />
         <line x1={555} y1={500} x2={555} y2={570} stroke={strokeFaint} />
 
-        {/* Service core at the far east end of top wing */}
         <rect x={850} y={500} width={80} height={70} stroke={strokeFaint} />
         <line x1={890} y1={500} x2={890} y2={570} stroke={strokeFaint} />
       </g>
 
-      {/* Title — primary line (top-left) + dimmed sub-line (top-right).
-          Split so the metadata never overlays the floor plan below. */}
       <g fontFamily="var(--font-mono)">
         <text
           x="60"
@@ -274,7 +236,6 @@ export function HospitalBlueprint({ className, style }: Props) {
         </text>
       </g>
 
-      {/* Corner registration ticks — L-brackets framing the plan */}
       <g stroke={stroke} strokeWidth="1" fill="none" strokeLinecap="square">
         <path d="M30 60 L30 30 L60 30" />
         <path d="M940 30 L970 30 L970 60" />

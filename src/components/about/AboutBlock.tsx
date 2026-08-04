@@ -1,25 +1,5 @@
 "use client";
 
-/**
- * AboutBlock — Palantir AIP block with optional VIDEO | DETAILS switch.
- *
- * Layout matches the AIP reference:
- *   [0.1] ─ 0.2 ─ 0.3
- *
- *   ┌────────────────────┐  Subtitle paragraph …
- *   │ Huge display title │
- *   │ on the LEFT        │  ╭─ VIDEO ─╮ ╭ DETAILS ╮      ← switch (when video present)
- *   │ (col-span-5)       │  ╰─────────╯ ╰─────────╯
- *   └────────────────────┘  ┌───────────────────────────┐
- *                           │ active panel content      │
- *                           │ (rounded border, padding) │
- *                           └───────────────────────────┘
- *
- * If `video` is omitted, the switch is hidden and the details panel
- * renders directly — used for the Problem block where there's nothing
- * to animate.
- */
-
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useScrollReveal } from "@/lib/hooks";
@@ -41,25 +21,18 @@ export function AboutBlock({
   id: StepNumber;
   title: string;
   subtitle?: string;
-  /** Omit to render the details panel directly with no Video/Details switch. */
   video?: React.ReactNode;
   details: React.ReactNode;
-  /** Render `details` open (no card border/padding). Ignored when `video` is set. */
   bare?: boolean;
 }) {
   const hasVideo = video != null;
   const [tab, setTab] = useState<Tab>(hasVideo ? "video" : "details");
 
-  // Trigger-on-entry typewriter — fires once when the title scrolls into
-  // view, then types at a relaxed 32 cps. `fractional` is a smooth char
-  // count so per-character alphas fade rather than hard-step.
   const { ref: titleRef, fractional } = useScrollReveal<HTMLHeadingElement>(
     title.length,
     32,
   );
 
-  // Each char fades in over a 1-char-wide window of `fractional`, so the
-  // leading edge is a soft fade instead of a hard step.
   const headIndex = Math.min(title.length, Math.ceil(fractional));
   const visibleChars = title.slice(0, headIndex);
   const hiddenChars = title.slice(headIndex);
@@ -72,21 +45,12 @@ export function AboutBlock({
         <StepIndicator activeId={id} />
 
         <div className="mt-14 grid grid-cols-12 gap-x-8 gap-y-10">
-          {/* LEFT — title (typed in lockstep with scroll position).
-              Width sized to fit the longest title (~32 chars wrapped to
-              2 lines at clamp(32px,3.6vw,56px) under max-w-[14ch]). The
-              right column gets the remaining 8/12 so the embedded video
-              renders at ~820 × 460 on a 1240px container — comfortably
-              above the "perceivable motion content" threshold most
-              accessibility audits flag below ~400px height. */}
           <div className="col-span-12 md:col-span-4">
             <h2
               ref={titleRef}
               className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)] max-w-[14ch]"
             >
               {visibleChars.split("").map((c, i) => {
-                // Per-char alpha derived from the shared `fractional` clock,
-                // so the character at the leading edge fades in as it arrives.
                 const alpha = Math.max(0, Math.min(1, fractional - i));
                 return (
                   <span key={i} style={{ opacity: alpha }}>
@@ -98,14 +62,12 @@ export function AboutBlock({
                 <span className="typewriter-cursor" aria-hidden />
               )}
               {hiddenChars && (
-                // Invisible tail — reserves the final heading height so
-                // there's no layout shift as text appears.
+                // Reserves the final heading height so typing causes no layout shift.
                 <span style={{ visibility: "hidden" }}>{hiddenChars}</span>
               )}
             </h2>
           </div>
 
-          {/* RIGHT — subtitle + (switch) + content panel */}
           <div className="col-span-12 md:col-span-8">
             {subtitle && (
               <p className="font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink max-w-[55ch]">
@@ -122,8 +84,6 @@ export function AboutBlock({
             )}
 
             {bare && !hasVideo ? (
-              // Open, borderless treatment (the Problem block) — the card
-              // frame is reserved for blocks that house a video.
               <div
                 key="details"
                 className={cn("animate-tab-in", subtitle ? "mt-10" : "mt-0")}
@@ -151,7 +111,6 @@ export function AboutBlock({
         </div>
       </div>
 
-      {/* Scoped fade-in for the swapping panel content */}
       <style>{`
         @keyframes tabIn {
           0%   { opacity: 0; transform: translateY(4px); }
@@ -163,12 +122,7 @@ export function AboutBlock({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-
 export function StepIndicator({ activeId }: { activeId: string }) {
-  // Pre-render labels (active gets square brackets), then compute each
-  // step's start offset in the reveal sequence:
-  //   step0_chars · 1-unit separator · step1_chars · 1-unit separator · step2_chars
   const stepLabels = ALL_STEPS.map((s) => (s === activeId ? `[${s}]` : s));
   const lengths = stepLabels.map((l) => l.length);
   const stepStarts = lengths.reduce<number[]>((acc, _len, i) => {
@@ -178,10 +132,6 @@ export function StepIndicator({ activeId }: { activeId: string }) {
   }, []);
   const total = lengths.reduce((a, b) => a + b, 0) + (ALL_STEPS.length - 1);
 
-  // Scroll-triggered reveal — mirrors the title typewriter (at a slightly
-  // snappier 40 cps) so the indicator and title read as one staged motion.
-  // Each step label fades in char-by-char and each separator "draws" from
-  // left to right via scaleX on the same fractional clock.
   const { ref, fractional } = useScrollReveal<HTMLOListElement>(total, 40);
 
   return (
@@ -234,10 +184,6 @@ export function StepIndicator({ activeId }: { activeId: string }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Switch — single pill with a sliding dark thumb (segmented toggle).         */
-/* -------------------------------------------------------------------------- */
-
 function Switch({
   tab,
   onChange,
@@ -247,9 +193,8 @@ function Switch({
   onChange: (t: Tab) => void;
   className?: string;
 }) {
-  // Everything visual is inline-styled to bypass tailwind-merge collapsing
-  // arbitrary-value classes like text-[10px] + text-[#efeeef] into the same
-  // group. Only positioning/layout primitives stay as Tailwind classes.
+  // Inline styles, not classes: tailwind-merge collapses arbitrary values like
+  // text-[10px] and text-[#efeeef] into one group and drops one of them.
   return (
     <div
       role="tablist"
@@ -262,7 +207,6 @@ function Switch({
         background: "#efeeef",
       }}
     >
-      {/* Sliding thumb */}
       <span
         aria-hidden
         className="absolute"

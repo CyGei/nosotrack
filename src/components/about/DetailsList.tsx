@@ -1,18 +1,3 @@
-/**
- * DetailsList — feature list rendered inside the DETAILS tab.
- * Matches the AIP screenshot layout: tight rows with a bold title
- * over a faint description.
- *
- * Two row kinds:
- *   - default: bold title + faint description.
- *   - kind: "header" — mono uppercase eyebrow sitting on a hairline rule,
- *     used to introduce a group of body rows (e.g. "The 3 i's" above
- *     Integration / Inference / Intervention). No description.
- *
- * `desc` accepts ReactNode so descriptions can embed inline links or
- * other JSX (e.g. <a>, <em>) without falling back to dangerouslySetInnerHTML.
- */
-
 import type { ReactNode } from "react";
 
 type DetailRow = {

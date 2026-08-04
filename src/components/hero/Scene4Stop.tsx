@@ -1,28 +1,5 @@
 "use client";
 
-/**
- * Scene "Stop" — Frame 3 of the hero. "Stop the spread."
- *
- * Open state: a frozen copy of Frame 2's final composition, wrapped at
- * opacity 0.45 so the entire reconstructed tree + grey substrate dims
- * uniformly. Then a NEW projection layer animates in on top:
- *   - Dashed red arrows fan out from the "latest infected" leaves
- *     (C3 / C4 / C5) toward target susceptibles.
- *   - The target susceptibles re-render at full opacity with a dashed
- *     red ring, overlaying the dimmed version underneath.
- *
- * Visual rule (locked with Cy 2026-05-27):
- *   - Everything carried over from Frame 2 dims together (~0.45). No
- *     splitting historical elements across multiple opacity tiers.
- *   - No dashed line ever connects to a dimmed grey. Dashed reds are
- *     exclusive to the lit projection layer — they originate at a
- *     dimmed leaf and terminate at a vivid target.
- *
- * Animation is driven by an internal `t2` ∈ [0, 1] over DRAW_DURATION_MS.
- * Resets on scene re-entry. Reduced-motion users skip straight to the
- * final state.
- */
-
 import { useDrawProgress } from "@/lib/hooks";
 import { clamp01 } from "@/lib/utils";
 import { TreeStage, TreeStageDefs } from "./TreeStage";
@@ -32,20 +9,13 @@ import {
   TREE_NODE_BY_ID,
 } from "./treeTopology";
 
-/** How long the full projection layer takes to animate in, ms. The 5
- *  projections are staggered every 0.08 of progress (= 80 ms here), so
- *  the sequence resolves in about half this duration and leaves the
- *  rest for the final composition to breathe. */
 const DRAW_DURATION_MS = 1_000;
 
-/** How much of progress an individual projection takes to draw. */
 const PROJECTION_REVEAL_SPAN = 0.15;
 
-/** Dim opacity for the carried-over Frame 2 composition. */
 const DIM_OPACITY = 0.45;
 
 export type Scene4StopProps = {
-  /** Whether the stop scene is the active one. */
   active: boolean;
 };
 
@@ -62,8 +32,6 @@ export function Scene4Stop({ active }: Scene4StopProps) {
       >
         <TreeStageDefs />
 
-        {/* Defs scoped to the projection layer — open-style arrow marker
-            (matches the foundry-demo's risk-edge style). */}
         <defs>
           <marker
             id="heroProjArrow"
@@ -84,20 +52,13 @@ export function Scene4Stop({ active }: Scene4StopProps) {
           </marker>
         </defs>
 
-        {/* ─── Dimmed Frame-2 carryover ───
-            Everything from Frame 2 sits inside this single opacity wrap.
-            staticDecorations=true freezes the P0 halo and superspreader
-            ring so the dimmed layer reads as past-state, not live. */}
         <g opacity={DIM_OPACITY}>
           <TreeStage progress={1} staticDecorations />
         </g>
 
-        {/* ─── Lit projection layer ───
-            Drawn AFTER the dimmed layer so it sits on top. Order within
-            the layer: arrows first (so they slide under the target
-            rings), then target rings. */}
+        {/* Drawn after the dimmed layer so it sits on top; arrows before
+            rings so they slide under them. */}
         <g>
-          {/* Dashed red projection arrows. */}
           {PROJECTIONS.map((proj, i) => {
             const from = TREE_NODE_BY_ID[proj.fromNodeId];
             const to = SUSC_BY_ID[proj.toSuscId];
@@ -118,8 +79,8 @@ export function Scene4Stop({ active }: Scene4StopProps) {
                 strokeWidth={1.3}
                 strokeOpacity={0.95}
                 strokeDasharray="4 3"
-                // Reverse the dashed-line "growth" feel using a synced
-                // dashoffset so the gap doesn't reshuffle as we extend.
+                // Synced dashoffset keeps the gaps from reshuffling as the
+                // line extends.
                 strokeDashoffset={(1 - reveal) * len}
                 markerEnd={
                   reveal > 0.6 ? "url(#heroProjArrow)" : undefined
@@ -128,10 +89,6 @@ export function Scene4Stop({ active }: Scene4StopProps) {
             );
           })}
 
-          {/* Lit targets — grey body + dashed red ring. Same incoming
-              projection drives the ring's reveal so the ring "lands" as
-              the arrow tip arrives. Sits on top of the dimmed target
-              underneath. */}
           {PROJECTIONS.map((proj) => {
             const to = SUSC_BY_ID[proj.toSuscId];
             if (!to) return null;

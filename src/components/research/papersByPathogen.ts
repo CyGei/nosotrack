@@ -1,68 +1,26 @@
-/**
- * Per-pathogen paper lookup for the Research-section dossier.
- *
- * The lookup is built at module load by reverse-mapping the
- * `TIMELINE` array in `src/data/timeline.ts` — every timeline entry
- * already declares which pathogens it applied to, so we get a per-
- * pathogen paper list for free without duplicating data. Manual additions cover
- * the six grid pathogens that have no timeline entries (influenza, HIV,
- * rhinovirus, enterococcus, C. auris, Disease X), sourced via a focused
- * literature pass on 2026-05-24 — see project_pathogen_registry memory.
- *
- * Aliases below collapse timeline pathogen-name strings into the grid
- * pathogen ids in `pathogens/index.ts`. A few notable folds:
- *   - SARS-CoV-1 → "sars-cov-2" (no SARS-1 spec; both are betacoronaviruses
- *     and the methods papers apply identically)
- *   - MRSA / Staphylococcus aureus → "staph-aureus"
- *   - All influenza subtypes (H1N1, H7N7, H3N8, H5N8, "Influenza") → "influenza"
- *   - "Various pathogens" → broadcast to every grid pathogen (these are
- *     truly methodological papers — outbreaker2's framework, the Campbell
- *     genome-informativeness analysis, linktree, mixtree — that apply to
- *     any specimen).
- *
- * Papers within each pathogen list are sorted by year ascending so the
- * dossier reads chronologically (methods → applications).
- */
+// Paper lookup for the dossier, built from TIMELINE plus MANUAL_PAPERS below.
 
 import { TIMELINE } from "@/data/timeline";
-
-/* ─────────────────────────────────────────────────────── types ── */
 
 export type PathogenPaper = {
   year: number;
   authors: string;
   title: string;
   url: string;
-  /**
-   * Journal name shown on the secondary line. Populated for every entry
-   * (timeline-derived and manually curated) as of the 2026-05-24 audit
-   * pass — the dossier looks inconsistent when some papers carry a
-   * journal and others don't, so the type still permits `undefined`
-   * but the lookup itself fills every paper.
-   */
   journal?: string;
 };
 
-/* ─────────────────────────────────────────────────────── alias ── */
-
-/**
- * Maps a timeline pathogen-name string to one of the grid pathogen ids
- * in `pathogens/index.ts`. Strings not in this table are dropped from
- * the per-pathogen lookup (e.g. "Mycobacterium tuberculosis", "Polio",
- * "Foot-and-mouth disease" — no specimens in the grid).
- *
- * The special key "Various pathogens" causes the paper to be broadcast
- * to every grid pathogen.
- */
+// Timeline pathogen-name → grid pathogen id. Unlisted names are dropped from the
+// lookup (no specimen to hang them on: A. baumannii, measles, mpox, TB, polio, FMD).
 const NAME_TO_ID: Record<string, string> = {
   "SARS-CoV-2": "sars-cov-2",
-  // No SARS-CoV-1 specimen in the grid; the methods papers apply to
-  // betacoronaviruses generically, so we fold them onto sars-cov-2.
+  // No SARS-CoV-1 specimen; its methods papers apply to betacoronaviruses generically.
   "SARS-CoV-1": "sars-cov-2",
   "MERS-CoV": "sars-cov-2",
   "Ebola virus": "ebola",
   Norovirus: "norovirus",
   "Klebsiella pneumoniae": "klebsiella",
+  "Enterococcus faecium": "enterococcus",
   MRSA: "staph-aureus",
   HIV: "hiv",
   "H1N1 influenza": "influenza",
@@ -72,20 +30,11 @@ const NAME_TO_ID: Record<string, string> = {
   Influenza: "influenza",
 };
 
+// Broadcast key: a timeline entry tagged this way applies to every grid pathogen.
 const BROADCAST_KEY = "Various pathogens";
 
-/* ─────────────────────────────────────── manual paper additions ── */
-
-/**
- * Hand-curated outbreak-reconstruction papers for grid pathogens that
- * have no timeline entries. Sourced 2026-05-24 — see the
- * project_pathogen_registry memory for the research methodology. Each
- * paper has been URL-verified and is open-access or institutional-OA.
- *
- * Disease X gets no specific papers (it's WHO's placeholder for an
- * unknown future pathogen) — the broadcast "Various pathogens" methods
- * papers carry the dossier.
- */
+// Hand-curated outbreak-reconstruction papers for grid pathogens with no timeline
+// entries. Sourced + URL-verified 2026-05-24.
 const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
   influenza: [
     {
@@ -148,9 +97,8 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
       journal: "American Journal of Infection Control",
       url: "https://pubmed.ncbi.nlm.nih.gov/26775935/",
     },
-    // Sparse literature on WGS-based rhinovirus transmission inference —
-    // fall back to the general-purpose methods trio so the dossier still
-    // gives the visitor real machinery to follow up on.
+    // Sparse literature on WGS-based rhinovirus transmission inference; the
+    // broadcast methods papers carry the rest.
   ],
   enterococcus: [
     {
@@ -178,9 +126,8 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
       url: "https://www.nature.com/articles/s41564-020-00806-7",
     },
   ],
-  // Note: the registry id is "cauris" (no hyphen), not "c-auris" — must
-  // match `pathogens/c-auris.ts > id`. Earlier draft used the hyphenated
-  // form and the papers silently dropped on the floor.
+  // Key must match `pathogens/c-auris.ts > id` — "cauris", no hyphen, or the
+  // papers silently drop.
   cauris: [
     {
       year: 2016,
@@ -207,51 +154,29 @@ const MANUAL_PAPERS: Record<string, PathogenPaper[]> = {
       url: "https://www.nejm.org/doi/full/10.1056/NEJMoa1714373",
     },
   ],
-  // Disease X is WHO's placeholder for an unknown future pathogen.
-  // No specific application papers exist; the dossier falls back to
-  // the broadcast methods papers via the "Various pathogens" tag.
+  // No application papers exist for WHO's unknown-pathogen placeholder.
   "disease-x": [],
-  // E. coli and ecoli papers — the Acinetobacter outbreaker application
-  // is the closest, but it isn't E. coli. Leave empty so the broadcast
-  // methods papers carry it; if Cy wants specifics we can add Stoesser
-  // et al. or Toleman et al. later.
+  // No E. coli-specific application paper; the broadcast methods papers carry it.
   ecoli: [],
   cdiff: [],
 };
 
-/* ──────────────────────────────────────────── derived lookup ── */
-
-/** Build the lookup once at module load. */
 function build(): Record<string, PathogenPaper[]> {
   const out: Record<string, PathogenPaper[]> = {};
 
-  // Collect every known grid id by walking the manual additions plus
-  // the union of NAME_TO_ID values. (We can't import PATHOGENS here
-  // without a circular dependency, and we don't need to — any id we
-  // encounter as we walk gets a bucket.)
+  // Ids are derived rather than imported from PATHOGENS — that import would be circular.
   const knownIds = new Set<string>([
     ...Object.keys(MANUAL_PAPERS),
     ...Object.values(NAME_TO_ID),
   ]);
   for (const id of knownIds) out[id] = [];
 
-  /** Add a paper to a bucket, deduping by URL. */
   const push = (id: string, paper: PathogenPaper) => {
     out[id] ??= [];
     if (out[id].some((p) => p.url === paper.url)) return;
     out[id].push(paper);
   };
 
-  // Walk the timeline, assigning each paper to the matching grid ids.
-  // We prefer the verbatim published `fullTitle` over the method
-  // nickname (`method`), so the dossier
-  // shows real paper titles rather than tool names. Falling back to
-  // `method` keeps the lookup robust against future entries that haven't
-  // been title-enriched yet.
-  //
-  // `journal` was added to every timeline entry in the 2026-05-24
-  // consistency audit so all papers — derived + manual — render with
-  // the publication name underneath the title.
   for (const entry of TIMELINE) {
     const paper: PathogenPaper = {
       year: parseInt(entry.year, 10) || 0,
@@ -266,8 +191,6 @@ function build(): Record<string, PathogenPaper[]> {
     );
 
     if (hasBroadcast) {
-      // Broadcast to every known pathogen id (including manual-only
-      // ones like "disease-x" and "c-auris").
       for (const id of knownIds) push(id, paper);
       continue;
     }
@@ -279,12 +202,10 @@ function build(): Record<string, PathogenPaper[]> {
     }
   }
 
-  // Merge in manual additions.
   for (const [id, papers] of Object.entries(MANUAL_PAPERS)) {
     for (const paper of papers) push(id, paper);
   }
 
-  // Chronological order per bucket.
   for (const id of Object.keys(out)) {
     out[id].sort((a, b) => a.year - b.year);
   }
@@ -294,16 +215,9 @@ function build(): Record<string, PathogenPaper[]> {
 
 const PAPERS = build();
 
-/**
- * Pathogens that intentionally have NO papers, even if the broadcast
- * "Various pathogens" methods would otherwise push entries into their
- * bucket. The dossier renders these as a question-mark specimen with
- * the paper column collapsed away — Disease X is the WHO placeholder
- * for "we don't know what's next", so a paper list would be dishonest.
- */
+// Suppressed even against the broadcast papers: Disease X is unknown by definition.
 const SUPPRESS_PAPERS = new Set(["disease-x"]);
 
-/** Return the paper list for a pathogen id (empty array if none). */
 export function papersFor(pathogenId: string): PathogenPaper[] {
   if (SUPPRESS_PAPERS.has(pathogenId)) return [];
   return PAPERS[pathogenId] ?? [];

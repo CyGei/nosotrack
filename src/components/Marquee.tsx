@@ -1,17 +1,5 @@
 "use client";
 
-/**
- * Marquee — DESIGN_BRIEF §7.5
- *
- * Infinite horizontal marquee of mono-typeset capability tags. Two copies
- * of the list are concatenated so the keyframe animation loops seamlessly
- * (translate from 0 → -50% over ~52 s). Hairline rules top and bottom keep
- * the band quiet on the cream canvas.
- *
- * Reduced-motion: animation suspended; list shown statically with
- * horizontal overflow allowed.
- */
-
 const CAPABILITIES = [
   "Outbreak Forensics",
   "Contact Tracing",
@@ -23,7 +11,7 @@ const CAPABILITIES = [
 ];
 
 export function Marquee() {
-  // Duplicate for seamless loop.
+  // Duplicated so the -50% translate keyframe loops seamlessly.
   const items = [...CAPABILITIES, ...CAPABILITIES];
 
   return (

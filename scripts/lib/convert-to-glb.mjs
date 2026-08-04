@@ -1,18 +1,3 @@
-/**
- * convert-to-glb.mjs — turn a WRL / STL source mesh into a GLB.
- *
- * Used by `scripts/fetch-pathogen.mjs` when an NIH 3D entry doesn't
- * ship a native GLB (most of the older NIAID virion cutaways are WRL).
- *
- * Strategy: load the mesh with the right three.js loader, weld dup
- * vertices (so meshoptimizer can actually simplify later), recolour to
- * mid-grey, then export via GLTFExporter. The companion fetch script
- * then runs `gltfpack` on the result.
- *
- * Browser API shims (Blob, FileReader) are mocked here — GLTFExporter
- * insists on them but only uses them as byte containers.
- */
-
 import * as THREE from "three";
 import { VRMLLoader } from "three/examples/jsm/loaders/VRMLLoader.js";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
@@ -20,8 +5,7 @@ import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { readFileSync, writeFileSync } from "node:fs";
 
-/* ──────────────────────────────────────── browser API shims ── */
-
+// GLTFExporter insists on browser Blob/FileReader, but only as byte containers.
 globalThis.self = globalThis;
 globalThis.window = globalThis;
 globalThis.document = {
@@ -87,18 +71,7 @@ class FakeFileReader {
 }
 globalThis.FileReader = FakeFileReader;
 
-/* ───────────────────────────────────────────────── pipeline ── */
-
-/**
- * Read a WRL/STL source from disk, convert to an in-memory THREE.Group.
- *
- * - WRL: handled by three's VRMLLoader (full VRML97 support).
- * - STL: handled by STLLoader; output is a single un-named mesh.
- *
- * After loading we run `mergeVertices` on every geometry so gltfpack's
- * simplifier has indexed geometry to chew on. Without this step the
- * downstream simplification is a no-op.
- */
+// mergeVertices is required: gltfpack's simplifier is a no-op on non-indexed geometry.
 export function loadMesh(srcPath, format) {
   const fmt = (format ?? srcPath.split(".").pop()).toLowerCase();
   if (fmt === "wrl" || fmt === "vrml") {
@@ -137,11 +110,6 @@ function weldGroup(group, tolerance) {
   });
 }
 
-/**
- * Serialize a THREE.Group / scene to a binary GLB file on disk.
- * Uses GLTFExporter; browser API shims at the top of this file make it
- * work in Node.
- */
 export async function exportGroupToGlb(group, outPath) {
   const exporter = new GLTFExporter();
   const result = await exporter.parseAsync(group, { binary: true });
@@ -149,9 +117,6 @@ export async function exportGroupToGlb(group, outPath) {
   return result.byteLength;
 }
 
-/**
- * One-call convenience: src on disk → GLB on disk.
- */
 export async function convertToGlb(srcPath, outPath, format) {
   const group = loadMesh(srcPath, format);
   let meshes = 0;

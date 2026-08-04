@@ -1,27 +1,17 @@
-/**
- * OUTBREAKS_2026 — major person-to-person disease outbreaks of 2025-2026, taken
- * from WHO Disease Outbreak News (DON). Every headline is a WHO DON item
- * (who.int/emergencies/disease-outbreak-news/item/...) — the single source of
- * truth for this timeline; each URL was fetched and verified. `cases` is the
- * outbreak total from the latest DON; `date` is "YYYY-MM" for placement on the
- * 2025→2026 curve. Vector-borne / water-borne / non-person-to-person events are
- * excluded (Nosotrack reconstructs who-infected-whom, which needs a
- * person-to-person chain), as are duplicate DON updates of the same outbreak.
- */
+// Source of truth: WHO Disease Outbreak News (DON). Every href is a DON item and
+// was fetched and verified; `cases` is the total from the latest DON for that
+// outbreak. Vector-borne / water-borne / non-person-to-person events are excluded,
+// as are duplicate DON updates of the same outbreak.
 
 export type OutbreakHeadline = { outlet: string; text: string; href: string };
 
 export type Outbreak = {
   id: string;
-  /** Disease name shown at the node. */
   short: string;
-  /** Short country/scope. */
   country: string;
-  /** Case tally (rendered as "N+"). */
   cases: number;
-  /** "YYYY-MM" of the DON — position on the 2025→2026 axis. */
+  /** "YYYY-MM" of the DON. */
   date: string;
-  /** WHO Disease Outbreak News headline(s). */
   headlines: OutbreakHeadline[];
 };
 

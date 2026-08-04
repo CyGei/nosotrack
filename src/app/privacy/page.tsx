@@ -1,12 +1,3 @@
-/**
- * /privacy — Privacy Policy (ported from legacy/privacy.html).
- *
- * Narrow prose-first column on the standard cream canvas. Uses the v4
- * design tokens (font-display, font-mono, text-ink/mute, color-alert)
- * and the section-pad / container-page utilities defined in globals.css.
- * No client interactivity — pure static legal page.
- */
-
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal/LegalPage";
 import { H2, A } from "@/components/legal/Prose";

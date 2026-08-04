@@ -1,8 +1,3 @@
-/**
- * Shared className for the clickable specimen tiles in the research section.
- * The ticker and the spotlight render the same viewer-in-a-button with an
- * identical hover/focus affordance — only the tile width differs.
- */
 export function specimenButtonClass(width: string) {
   return [
     `group relative block ${width} cursor-pointer`,

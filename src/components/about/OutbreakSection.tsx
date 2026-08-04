@@ -1,18 +1,7 @@
 "use client";
 
-/**
- * OutbreakSection — the opening act (0.1) of the About story: the broad
- * market. Every health emergency is a forensics problem — who infected whom,
- * who's a superspreader, what's undetected or imported, who's at risk. A
- * cumulative 2025→2026 curve (right column) shows how outbreaks are becoming
- * more frequent; the nosocomial block (0.2) then narrows to the hospital wedge
- * Nosotrack starts from.
- *
- * Laid out on the same two-column AIP grid as 0.2 / 0.3 (title left, subtitle +
- * curve right) so the section reads as one system. The title uses the same
- * scroll-triggered typewriter reveal as the AboutBlock titles — kept inline here
- * so 0.1 changes never touch AboutBlock.
- */
+// The typewriter reveal is duplicated from AboutBlock on purpose, so 0.1 changes
+// never touch the other blocks.
 
 import { useScrollReveal } from "@/lib/hooks";
 import { StepIndicator } from "./AboutBlock";
@@ -22,10 +11,6 @@ import { OUTBREAKS_2026 } from "./outbreaks2026";
 const TITLE = "Infectious diseases are on the rise.";
 
 export function OutbreakSection() {
-  // Trigger-on-entry typewriter — mirrors the AboutBlock titles (32 cps) so 0.1
-  // reveals in lockstep with 0.2–0.4. `fractional` is a smooth char clock; each
-  // char fades in over a 1-char window, and an invisible tail reserves the final
-  // height so there's no layout shift as text appears.
   const { ref: titleRef, fractional } = useScrollReveal<HTMLHeadingElement>(
     TITLE.length,
     32,
@@ -42,7 +27,6 @@ export function OutbreakSection() {
         <StepIndicator activeId="0.1" />
 
         <div className="mt-14 grid grid-cols-12 gap-x-8 gap-y-10">
-          {/* LEFT — title */}
           <div className="col-span-12 md:col-span-4">
             <h2
               ref={titleRef}
@@ -65,7 +49,6 @@ export function OutbreakSection() {
             </h2>
           </div>
 
-          {/* RIGHT — subtitle + the live timeline */}
           <div className="col-span-12 md:col-span-8">
             <p className="font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink max-w-[55ch]">
               Every outbreak is different. Effective control requires rapidly identifying the specific drivers of transmission: 

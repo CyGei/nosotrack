@@ -1,27 +1,5 @@
 "use client";
 
-/**
- * HeroBackdrop — blueprint + live particle simulation for one habitat.
- *
- * The chosen scene (hospital / ship / farm) shows its blueprint behind a
- * canvas that draws a population of nodes:
- *
- *   - Each particle belongs to a habitat (room / cabin / dining hall /
- *     corridor) and bounces softly off its walls.
- *   - Contact edges are restricted to SAME or NEIGHBOUR habitats only —
- *     no edges fly across the whole floor. Plus a per-particle cap of
- *     MAX_EDGES_PER_NODE so the graph reads as small chains, not a web.
- *   - Particles come in three shapes (circle / square / triangle) for
- *     population heterogeneity.
- *   - Corridor habitats (those with motion: "corridor-h" | "corridor-v")
- *     get DIRECTIONAL walkers — particles maintain a steady speed along
- *     the long axis, reversing at the short ends. This is what gives the
- *     "live digital twin" feel: nodes pass by room doors, occasionally
- *     transmitting into a room as they pass.
- *
- * Respects prefers-reduced-motion.
- */
-
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/lib/hooks";
 import { HospitalBlueprint } from "./blueprints/Hospital";
@@ -46,19 +24,13 @@ const INFECT_P = 0.08;
 const MAX_EDGES_PER_NODE = 2;
 const SEED_AFTER_MS = 800;
 const CROSS_HAB_EVERY_MS = 2200;
-const CORRIDOR_SPEED = 0.55; // viewBox units / frame — gentle walking pace
+const CORRIDOR_SPEED = 0.55; // viewBox units / frame
 
-/** Maximum fraction of the population that can ever be infected in a
- *  given scene. Cy locked at 20% on 2026-05-27 — previously the seed
- *  clusters + cross-habitat dynamics could push toward 40–50%, which
- *  read as "everything's on fire." 20% reads as "outbreak in progress,
- *  intervention possible." All three infection paths (initial seed,
- *  cross-habitat timer, edge transmission) honour this cap. */
+// Ceiling honoured by all three infection paths (seed, cross-habitat
+// timer, edge transmission).
 const MAX_INFECTED_RATIO = 0.2;
 
-/** Initial-seed target for pre-seeded clusters (hospital, farm). We
- *  start at ~12% so the cross-habitat dynamics have headroom to grow
- *  toward the 20% steady state. */
+// Kept below MAX_INFECTED_RATIO so cross-habitat spread has headroom.
 const SEED_CLUSTER_RATIO = 0.12;
 
 type Shape = HabitatShape;
@@ -72,7 +44,7 @@ type Particle = {
   habitat: Habitat;
   habitatId: string;
   shape: Shape;
-  corridor?: HabitatMotion; // copied from habitat for fast tick lookup
+  corridor?: HabitatMotion;
 };
 
 const COLOR_SUSCEPT = "rgba(220,220,224,0.92)";
@@ -83,8 +55,6 @@ const COLOR_EDGE_HOT = "rgba(255,7,58,0.78)";
 export type SceneId = "hospital" | "ship" | "farm";
 
 export type HeroBackdropProps = {
-  /** Which habitat this backdrop renders. SceneBlueprints mounts one
-   *  instance per scene, side-by-side. */
   scene: SceneId;
 };
 
@@ -102,7 +72,6 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
   const neighbourSetRef = useRef<Map<string, Set<string>>>(new Map());
   const reduce = useReducedMotion();
 
-  // Build particle population + neighbour lookup for this scene.
   useEffect(() => {
     const habitats = HABITATS_BY_SCENE[scene];
     const neighSet = new Map<string, Set<string>>();
@@ -112,8 +81,6 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
     neighbourSetRef.current = neighSet;
     const ps = makeParticles(habitats);
 
-    // Pre-seed a visible outbreak cluster so every scene opens on a
-    // recognisable hotspot rather than a vague single dot.
     if (scene === "hospital") {
       seedHospitalCluster(ps);
     } else if (scene === "farm") {
@@ -123,14 +90,11 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
     particlesRef.current = ps;
   }, [scene]);
 
-  // Seed initial infection + recurring cross-habitat jumps (to neighbours).
   useEffect(() => {
     if (reduce) return;
     const seedTimer = setTimeout(() => {
       const ps = particlesRef.current;
       if (ps.length === 0) return;
-      // If the scene was pre-seeded (e.g. hospital cluster), skip the
-      // random initial infection so we don't double-seed.
       if (ps.some((p) => p.infected)) return;
       const roomSeeds = ps.filter((p) => !p.corridor);
       const pool = roomSeeds.length ? roomSeeds : ps;
@@ -141,7 +105,6 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
       const ps = particlesRef.current;
       const infected = ps.filter((p) => p.infected);
       if (infected.length === 0) return;
-      // Hard cap — stop jumping once we hit the steady-state ceiling.
       if (infected.length >= ps.length * MAX_INFECTED_RATIO) return;
       const a = infected[Math.floor(Math.random() * infected.length)];
       const targetIds = a.habitat.neighbours;
@@ -162,7 +125,6 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
     };
   }, [scene, reduce]);
 
-  // Render loop.
   useEffect(() => {
     if (reduce) return;
     const canvas = canvasRef.current;
@@ -196,7 +158,6 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
       const ps = particlesRef.current;
       const neighSet = neighbourSetRef.current;
 
-      // ── Update positions ──
       for (const p of ps) {
         p.x += p.vx;
         p.y += p.vy;
@@ -208,21 +169,17 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
         const maxY = p.habitat.y + p.habitat.h - m;
 
         if (p.corridor === "corridor-h") {
-          // Walker — steady left/right travel, almost no vertical drift.
           p.vy *= 0.82;
           p.vy += (Math.random() - 0.5) * 0.02;
-          // Reseed forward speed if damping slowed it
           const sign = p.vx >= 0 ? 1 : -1;
           if (Math.abs(p.vx) < CORRIDOR_SPEED * 0.6) {
             p.vx = sign * CORRIDOR_SPEED;
           }
-          // Hard reverse at corridor ends so they walk back
           if (p.x < minX) { p.x = minX; p.vx = CORRIDOR_SPEED; }
           if (p.x > maxX) { p.x = maxX; p.vx = -CORRIDOR_SPEED; }
           if (p.y < minY) { p.y = minY; p.vy = 0; }
           if (p.y > maxY) { p.y = maxY; p.vy = 0; }
         } else if (p.corridor === "corridor-v") {
-          // Vertical walker
           p.vx *= 0.82;
           p.vx += (Math.random() - 0.5) * 0.02;
           const sign = p.vy >= 0 ? 1 : -1;
@@ -234,7 +191,6 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
           if (p.x < minX) { p.x = minX; p.vx = 0; }
           if (p.x > maxX) { p.x = maxX; p.vx = 0; }
         } else {
-          // Room particle — gentle Brownian drift bounded to habitat.
           const jitter = p.infected ? 0.10 : 0.045;
           p.vx += (Math.random() - 0.5) * jitter;
           p.vy += (Math.random() - 0.5) * jitter;
@@ -248,7 +204,6 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
         }
       }
 
-      // ── Compute edges (nearest-K, restricted to same/neighbour habitat) ──
       const drawn = new Set<string>();
       type Pair = { i: number; j: number; d: number; hot: boolean };
       const pairs: Pair[] = [];
@@ -279,11 +234,6 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
         }
       }
 
-      // ── Draw edges + handle transmission ──
-      // Track infected count for this frame so the 20% cap is honoured
-      // by edge transmission too. We count once up front and increment
-      // locally on each new infection — cheap and avoids an O(N) scan
-      // per transmission event.
       const infectionCap = ps.length * MAX_INFECTED_RATIO;
       let infectedNow = 0;
       for (const p of ps) if (p.infected) infectedNow++;
@@ -318,7 +268,6 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
         }
       }
 
-      // ── Draw particles (with shape variety) ──
       const now = performance.now();
       for (const p of ps) {
         const cx = offsetX + p.x * scale;
@@ -365,8 +314,6 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
   );
 }
 
-/* ─────────────────────  helpers  ───────────────────── */
-
 function drawShape(
   ctx: CanvasRenderingContext2D,
   shape: Shape,
@@ -397,25 +344,11 @@ function pickShape(seed: number): Shape {
   return "circle";
 }
 
-/**
- * Pre-seed a small but visible outbreak cluster in the hospital scene.
- * Strategy:
- *   - Fill priority rooms (S3 first — densest centre of the cluster —
- *     then S2 to its left, S4 to its right) until ~SEED_CLUSTER_RATIO
- *     of the population is infected.
- *   - Always infect the E-W corridor walker nearest the cluster — they
- *     carried it through the corridor. Counts toward the budget.
- *
- * Cap of SEED_CLUSTER_RATIO (12%) keeps the opening composition under
- * the global 20% ceiling so the cross-habitat dynamics can still grow.
- */
 function seedHospitalCluster(ps: Particle[]) {
   const budget = Math.max(2, Math.floor(ps.length * SEED_CLUSTER_RATIO));
   const ROOM_ORDER = ["hosp-S3", "hosp-S2", "hosp-S4"];
   let count = 0;
 
-  // Always seed the corridor walker first — they're the index case who
-  // ferried the pathogen along the corridor. Always counts.
   const walkers = ps.filter((p) => p.habitatId === "hosp-corr-EW");
   if (walkers.length > 0) {
     const targetX = 444;
@@ -432,7 +365,6 @@ function seedHospitalCluster(ps: Particle[]) {
     count++;
   }
 
-  // Fill the priority rooms in order until we exhaust the budget.
   for (const roomId of ROOM_ORDER) {
     if (count >= budget) break;
     for (const p of ps) {
@@ -452,21 +384,15 @@ function makeParticles(habitats: Habitat[]): Particle[] {
     const isCorrH = hab.motion === "corridor-h";
     const isCorrV = hab.motion === "corridor-v";
     for (let i = 0; i < hab.count; i++) {
-      // Initial position — spread along the long axis for corridors so
-      // walkers aren't all bunched up at one end.
       const x = isCorrH
         ? hab.x + (i + 0.5) * (hab.w / hab.count)
         : hab.x + Math.random() * hab.w;
       const y = isCorrV
         ? hab.y + (i + 0.5) * (hab.h / hab.count)
         : hab.y + Math.random() * hab.h;
-      // Initial velocity — walkers get a strong push along their axis;
-      // every other walker starts heading the opposite way so they pass.
       const dir = i % 2 === 0 ? 1 : -1;
       const vx = isCorrH ? dir * CORRIDOR_SPEED : (Math.random() - 0.5) * 0.35;
       const vy = isCorrV ? dir * CORRIDOR_SPEED : (Math.random() - 0.5) * 0.35;
-      // Shape: respect habitat-level override (e.g. farm staff are
-      // always triangles); otherwise fall back to the rotating pool.
       const shape: Shape = hab.forceShape ?? pickShape(seed++);
       out.push({
         x,
@@ -484,23 +410,11 @@ function makeParticles(habitats: Habitat[]): Particle[] {
   return out;
 }
 
-/**
- * Pre-seed a small outbreak in the dairy scene.
- * Strategy:
- *   - Always seed the staff walker nearest the holding pen (index case
- *     ferrying between paddock and barn).
- *   - Fill the holding pen first, then the parlor, until
- *     SEED_CLUSTER_RATIO of the population is infected.
- *
- * Cap of SEED_CLUSTER_RATIO (12%) keeps the opening under the global
- * 20% ceiling.
- */
 function seedFarmCluster(ps: Particle[]) {
   const budget = Math.max(2, Math.floor(ps.length * SEED_CLUSTER_RATIO));
   const ROOM_ORDER: string[] = [FARM_IDS.HOLDING, FARM_IDS.PARLOR];
   let count = 0;
 
-  // Always seed the staff walker first.
   const staff = ps.filter((p) => p.habitatId === FARM_IDS.ALLEY);
   if (staff.length > 0) {
     const targetX = 640;

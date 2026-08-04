@@ -1,23 +1,5 @@
 "use client";
 
-/**
- * Contact — ported from main branch (legacy/styles.css §16 #contact).
- *
- * Dark two-column band (matches the hero so the page bookends in ink):
- *   ┌─────────────────────────────┬───────────────────────────────┐
- *   │ CONTACT                       │ Name                          │
- *   │ Let's Work Together           │ ────────────                  │
- *   │ subtitle…                     │ Email                         │
- *   │                               │ ────────────                  │
- *   │ ⓘ github  ⓘ linkedin          │ Message                       │
- *   │                               │ ────────────                  │
- *   │                               │ [ Send Message ]              │
- *   └─────────────────────────────┴───────────────────────────────┘
- *
- * Inputs are borderless except for a hairline at the bottom that lifts
- * to cream on focus — the on-dark form pattern from main.
- */
-
 import { useState } from "react";
 import { Github, Linkedin } from "lucide-react";
 
@@ -67,7 +49,6 @@ export function Contact() {
     >
       <div className="container-page">
         <div className="grid grid-cols-1 gap-y-14 md:grid-cols-2 md:gap-x-24">
-          {/* LEFT — heading, subtitle, social channels */}
           <div>
             <h2 className="font-display font-normal leading-[1.05] tracking-tight text-inv-hi text-[clamp(32px,3.6vw,56px)] max-w-[16ch]">
               {CONTACT_TITLE.map((line, i) => (
@@ -102,7 +83,6 @@ export function Contact() {
             </div>
           </div>
 
-          {/* RIGHT — Formspree form */}
           <div>
             <form
               action={FORM_ACTION}
@@ -157,8 +137,6 @@ export function Contact() {
         </div>
       </div>
 
-      {/* Form styling — borderless inputs except the bottom hairline,
-          ported from main legacy/styles.css. */}
       <style>{`
         .contact-form-dark label {
           display: block;
@@ -196,8 +174,6 @@ export function Contact() {
     </section>
   );
 }
-
-/* -------------------------------------------------------------------------- */
 
 function Field({
   label,

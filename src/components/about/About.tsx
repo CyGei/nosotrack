@@ -1,29 +1,11 @@
 "use client";
 
-/**
- * About — DESIGN_BRIEF §7.5 (rev. 9).
- *
- * Four editorial blocks — market → wedge → product:
- *
- *   0.1  Every outbreak is unique… (OutbreakSection)
- *        → A looping arch of the real 2026 outbreaks. Every health emergency
- *          is a forensics problem; this is the broad market (public-health
- *          agencies / governments Nosotrack scales out to).
- *
- *   0.2  Nosocomial outbreaks are deadly, costly and difficult to manage.
- *        → The hospital wedge, established with WHO figures alone.
- *
- *   0.3  Integration unlocks intelligence.  → the 3 I's, integration video.
- *   0.4  Outbreak forensics, end to end.    → end-to-end forensics video.
- */
-
 import { AboutBlock } from "./AboutBlock";
 import { DetailsList } from "./DetailsList";
 import { OutbreakSection } from "./OutbreakSection";
 import { ProblemStats } from "./ProblemStats";
 import { FoundryFrame } from "./FoundryFrame";
 
-/** Inline external link — used inside detail rows. */
 function A({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noreferrer" className="about-link">
@@ -39,10 +21,8 @@ export function About() {
       className="border-t border-rule bg-bg"
       aria-label="How Nosotrack works"
     >
-      {/* 0.1 — Outbreaks everywhere: every health emergency is a forensics problem */}
       <OutbreakSection />
 
-      {/* 0.2 — Nosocomial: the hospital wedge Nosotrack starts from */}
       <AboutBlock
         id="0.2"
         title="Nosocomial outbreaks are deadly, costly and difficult to manage."
@@ -101,7 +81,6 @@ export function About() {
         }
       />
 
-      {/* 0.3 — Integration unlocks intelligence */}
       <AboutBlock
         id="0.3"
         title="Integration unlocks intelligence."
@@ -131,7 +110,6 @@ export function About() {
         }
       />
 
-      {/* 0.4 — Outbreak forensics, end to end */}
       <AboutBlock
         id="0.4"
         title="Outbreak forensics, end to end."
@@ -161,8 +139,6 @@ export function About() {
         }
       />
 
-      {/* Inline-link styling for `<A>` inside detail rows — inherits the
-          surrounding text color, just adds an underline so it's recognisable. */}
       <style>{`
         .about-link {
           color: inherit;

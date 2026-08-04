@@ -1,18 +1,3 @@
-// integration.jsx — About 0.2 "Integration unlocks intelligence."
-//
-// Vertical hierarchy that re-wires at integration:
-//   TOP     3 data-stream logos (EHR / LAB / RTLS)
-//   MIDDLE  Nosotrack logo (appears at integration)
-//   BOTTOM  the live hospital platform
-//
-// Per stream: a detailed card appears, its logo slides UP to dock at the
-// top trailing an information edge to the hospital PLATFORM. At integration
-// those edges lift off the platform and re-route into the Nosotrack logo,
-// which sends ONE edge to the platform; the transmission tree draws there.
-//
-// Reuses (window): React, COLOR, FONT_DISPLAY, FONT_MONO, Easing, clamp,
-// useSprite, FdyBrandMark, FdyWordmark, FdyChrome.
-
 const CYCLE = 26;
 const T = {
   ehrInfect: 3.0, ehrCard: 3.3, ehrDock: 7.6,
@@ -25,14 +10,12 @@ const T = {
 
 const DOCK_Y = 76;
 const HEADER_Y = 124;
-const NT = [640, 208];           // Nosotrack hub
-const PLAT_CENTER = [640, 372];  // Nosotrack → hospital landing point
+const NT = [640, 208];
+const PLAT_CENTER = [640, 372];
 
-// description placement: the open block opposite each card
-const BOX_R = { x: 808, y: 168, w: 432 };  // right (for left/centre cards)
-const BOX_L = { x: 54, y: 168, w: 320 };   // left  (for right card)
+const BOX_R = { x: 808, y: 168, w: 432 };
+const BOX_L = { x: 54, y: 168, w: 320 };
 
-// ── Isometric projection ─
 const ORIGIN = { x: 152, y: 540 };
 const EX = { x: 0.85, y: 0.07 };
 const EY = { x: 0.44, y: -0.66 };
@@ -79,7 +62,6 @@ function staffPlan(s, t) {
 
 const CONTACTS = [{ id: 'SD1', t: 13.5 }, { id: 'A1', t: 14.0 }, { id: 'A2', t: 14.4 }, { id: 'B1', t: 14.9 }, { id: 'B3', t: 15.3 }];
 const CONTACT_T = Object.fromEntries(CONTACTS.map((c) => [c.id, c.t]));
-// patients predicted at risk (susceptible neighbours of the cases)
 const AT_RISK = [
   { id: 'A4', from: 'A3', t: 22.3 }, { id: 'A5', from: 'A3', t: 22.5 },
   { id: 'B4', from: 'B2', t: 22.7 }, { id: 'B5', from: 'B2', t: 22.9 },
@@ -99,7 +81,6 @@ const EDGES = [
 const EDGE_DUR = 0.8;
 const FASTA = 'ATCGGATTCAGTCCGATACAGGCATTAGC';
 
-// streams: dock x (spread left / centre / right), platform landing point, card
 const STREAMS = [
   {
     key: 'EHR', glyph: 'ehr', dockX: 380, plat: [380, 350], cardIn: T.ehrCard, dockT: T.ehrDock,
@@ -124,7 +105,6 @@ const CAPS = [
   { text: 'Nosotrack fuses the data streams into a unified analytical engine.', a: T.integ, b: T.treeStart + 2.0, box: BOX_R },
 ];
 
-// ── helpers ─
 function rgba(hex, a) { const h = hex.replace('#', ''); return `rgba(${parseInt(h.slice(0, 2), 16)},${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)},${a})`; }
 function mix(a, b, t) {
   const pa = a.replace('#', ''), pb = b.replace('#', '');
@@ -135,8 +115,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const lerp2 = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t)];
 const accentOf = (a) => (a === 'alert' ? COLOR.alert : a === 'gold' ? COLOR.gold : COLOR.ink);
 
-// ── iconography — open-source Lucide icons (ISC), exact path data ──
-//   ehr → file-text · dna → dna · bt → bluetooth
+// Icon path data from Lucide (ISC).
 function Glyph({ kind, size = 22, color = COLOR.ink, sw = 2 }) {
   const c = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: color, strokeWidth: sw, strokeLinecap: 'round', strokeLinejoin: 'round' };
   if (kind === 'ehr') return (
@@ -227,7 +206,6 @@ function Edge({ from, to, p, op }) {
   );
 }
 
-// predicted "at-risk" edge — dashed, hollow target ring
 function RiskEdge({ from, to, p, op }) {
   if (p <= 0 || op < 0.02) return null;
   const dx = to[0] - from[0], dy = to[1] - from[1];
@@ -288,7 +266,6 @@ function DetailCard({ s, op, fastaN }) {
   );
 }
 
-// docked logo — icon-only square tile (no label), large
 function DockLogo({ pos, kind, op }) {
   if (op < 0.02) return null;
   const S = 66;
@@ -305,7 +282,6 @@ function DockLogo({ pos, kind, op }) {
   );
 }
 
-// ════════════════════════════════════════════════════════════════════════
 function IntegrationScene() {
   const { localTime: rawT } = useSprite();
   const t = ((rawT % CYCLE) + CYCLE) % CYCLE;
@@ -365,7 +341,6 @@ function IntegrationScene() {
         {status}
       </div>
 
-      {/* ============ SVG: hospital + edges + nodes ============ */}
       <svg width="1280" height="720" viewBox="0 0 1280 720" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {(() => {
           const fl = P(-16, -8), fr = P(1092, -8), br = P(1092, 308);
@@ -404,7 +379,6 @@ function IntegrationScene() {
         {STAFF.map((s) => <Node key={s.id} sx={POS[s.id][0]} sy={POS[s.id][1]} isStaff={true} state={stateOf(s.id, t)} t={t} resetP={resetP} dim={dimOf(s.id)} />)}
       </svg>
 
-      {/* ============ narration (typed, in the open block opposite the card) ============ */}
       {capOp > 0.01 && (
         <div style={{ position: 'absolute', left: capBox.x, top: capBox.y, width: capBox.w, opacity: capOp, fontFamily: FONT_MONO, fontSize: 18, lineHeight: 1.55, letterSpacing: '0.01em', color: COLOR.ink, pointerEvents: 'none' }}>
           {capText.slice(0, capN)}
@@ -414,14 +388,12 @@ function IntegrationScene() {
       {SP.map((p) => <DetailCard key={p.s.key} s={p.s} op={p.cardOp} fastaN={fastaN} />)}
       {SP.map((p) => <DockLogo key={p.s.key} pos={p.logoPos} kind={p.s.glyph} op={p.logoOp} />)}
 
-      {/* ============ Nosotrack hub ============ */}
       {markOp > 0.01 && (
         <div style={{ position: 'absolute', left: NT[0], top: NT[1], transform: 'translate(-50%, -50%)', opacity: markOp }}>
           <FdyBrandMark size={56} pulse networkSpin={spin} />
         </div>
       )}
 
-      {/* superspreader popup removed — A3 simply stays gold */}
     </div>
   );
 }

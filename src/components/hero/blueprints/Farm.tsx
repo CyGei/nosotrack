@@ -1,26 +1,7 @@
-/**
- * Dairy Farm · Barn 02 · Milking Shift digital twin.
- *
- * Minimal architectural blueprint of a dairy cattle facility. The farm
- * reads as: a large PASTURE on the left where the herd loafs, and a
- * compact BARN COMPLEX on the right (free stalls → holding pen →
- * milking parlor → milk room) with CALF HOUSING tucked beneath. A
- * SERVICE ALLEY runs along the bottom — staff (triangles) walk this
- * corridor between paddock and barn, threading every zone together.
- *
- * Style: rectangular farm perimeter (double-line fence), hairline
- * strokes, mono labels, corner registration ticks — strictly the
- * geometry, no decorative annotations.
- *
- * Coordinate system: 1000 × 1000 viewBox. Zone rectangles below MUST
- * stay in sync with habitats.ts.
- */
-
 import type { CSSProperties } from "react";
 
 type Props = { className?: string; style?: CSSProperties };
 
-// ─── Zone constants (consumed by habitats.ts) ──────────────────
 export const FARM_PASTURE = { x: 80, y: 130, w: 400, h: 690 } as const;
 export const FARM_STALLS = { x: 520, y: 130, w: 420, h: 170 } as const;
 export const FARM_HOLDING = { x: 520, y: 330, w: 240, h: 160 } as const;
@@ -42,9 +23,6 @@ export function FarmBlueprint({ className, style }: Props) {
       style={style}
       aria-hidden="true"
     >
-      {/* ───────────────  TITLE  ───────────────
-           Primary line (top-left) + dimmed sub-line (top-right), so the
-           metadata sits clear of the pasture/barn geometry below. */}
       <g fontFamily="var(--font-mono)">
         <text
           x="60"
@@ -72,7 +50,6 @@ export function FarmBlueprint({ className, style }: Props) {
         </text>
       </g>
 
-      {/* ───────────────  PLAN  ─────────────── */}
       <g
         fill="none"
         stroke={stroke}
@@ -81,18 +58,15 @@ export function FarmBlueprint({ className, style }: Props) {
         strokeLinejoin="miter"
         vectorEffect="non-scaling-stroke"
       >
-        {/* Perimeter fence — double line drafting feel */}
         <rect x="60" y="60" width="880" height="880" />
         <rect x="70" y="70" width="860" height="860" stroke={strokeFaint} />
 
-        {/* ── PASTURE — large left paddock ── */}
         <rect
           x={FARM_PASTURE.x}
           y={FARM_PASTURE.y}
           width={FARM_PASTURE.w}
           height={FARM_PASTURE.h}
         />
-        {/* Cross-fence dividing two paddocks (cosmetic) */}
         <line
           x1={FARM_PASTURE.x}
           y1={FARM_PASTURE.y + 360}
@@ -101,7 +75,6 @@ export function FarmBlueprint({ className, style }: Props) {
           stroke={strokeFaint}
           strokeDasharray="4 6"
         />
-        {/* Water trough */}
         <rect
           x={FARM_PASTURE.x + 250}
           y={FARM_PASTURE.y + 170}
@@ -109,7 +82,6 @@ export function FarmBlueprint({ className, style }: Props) {
           height="14"
           stroke={strokeFaint}
         />
-        {/* Field shelter */}
         <rect
           x={FARM_PASTURE.x + 40}
           y={FARM_PASTURE.y + 510}
@@ -124,7 +96,6 @@ export function FarmBlueprint({ className, style }: Props) {
           y2={FARM_PASTURE.y + 540}
           stroke={strokeFaint}
         />
-        {/* Gate from pasture → barn (east wall opening) */}
         <line
           x1={FARM_PASTURE.x + FARM_PASTURE.w}
           y1={FARM_PASTURE.y + 200}
@@ -134,14 +105,12 @@ export function FarmBlueprint({ className, style }: Props) {
           strokeWidth="2"
         />
 
-        {/* ── FREE STALLS — top barn section ── */}
         <rect
           x={FARM_STALLS.x}
           y={FARM_STALLS.y}
           width={FARM_STALLS.w}
           height={FARM_STALLS.h}
         />
-        {/* Center feed alley line dividing north/south stall rows */}
         <line
           x1={FARM_STALLS.x}
           y1={FARM_STALLS.y + FARM_STALLS.h / 2}
@@ -149,7 +118,6 @@ export function FarmBlueprint({ className, style }: Props) {
           y2={FARM_STALLS.y + FARM_STALLS.h / 2}
           stroke={strokeFaint}
         />
-        {/* 10 stall dividers — north row */}
         {Array.from({ length: 10 }, (_, i) => {
           const x = FARM_STALLS.x + (i + 1) * (FARM_STALLS.w / 10);
           return (
@@ -163,7 +131,6 @@ export function FarmBlueprint({ className, style }: Props) {
             />
           );
         })}
-        {/* 10 stall dividers — south row (mirror) */}
         {Array.from({ length: 10 }, (_, i) => {
           const x = FARM_STALLS.x + (i + 1) * (FARM_STALLS.w / 10);
           return (
@@ -177,7 +144,6 @@ export function FarmBlueprint({ className, style }: Props) {
             />
           );
         })}
-        {/* Door from stalls → holding pen (south wall opening) */}
         <line
           x1={FARM_STALLS.x + 60}
           y1={FARM_STALLS.y + FARM_STALLS.h}
@@ -187,14 +153,12 @@ export function FarmBlueprint({ className, style }: Props) {
           strokeWidth="2"
         />
 
-        {/* ── HOLDING PEN ── */}
         <rect
           x={FARM_HOLDING.x}
           y={FARM_HOLDING.y}
           width={FARM_HOLDING.w}
           height={FARM_HOLDING.h}
         />
-        {/* Angled crowd-gate (funnels herd toward parlor on east) */}
         <line
           x1={FARM_HOLDING.x + 20}
           y1={FARM_HOLDING.y + 30}
@@ -203,7 +167,6 @@ export function FarmBlueprint({ className, style }: Props) {
           stroke={strokeFaint}
           strokeDasharray="3 4"
         />
-        {/* Door from holding → parlor (east wall opening) */}
         <line
           x1={FARM_HOLDING.x + FARM_HOLDING.w}
           y1={FARM_HOLDING.y + 60}
@@ -213,14 +176,12 @@ export function FarmBlueprint({ className, style }: Props) {
           strokeWidth="2"
         />
 
-        {/* ── MILKING PARLOR — central choke point ── */}
         <rect
           x={FARM_PARLOR.x}
           y={FARM_PARLOR.y}
           width={FARM_PARLOR.w}
           height={FARM_PARLOR.h}
         />
-        {/* Center stall axis */}
         <line
           x1={FARM_PARLOR.x + FARM_PARLOR.w / 2}
           y1={FARM_PARLOR.y + 24}
@@ -228,7 +189,6 @@ export function FarmBlueprint({ className, style }: Props) {
           y2={FARM_PARLOR.y + FARM_PARLOR.h - 16}
           stroke={strokeFaint}
         />
-        {/* 4 paired milking stations */}
         {Array.from({ length: 4 }, (_, i) => {
           const y = FARM_PARLOR.y + 28 + i * 30;
           const halfW = FARM_PARLOR.w / 2 - 18;
@@ -252,14 +212,12 @@ export function FarmBlueprint({ className, style }: Props) {
           );
         })}
 
-        {/* ── CALF HOUSING ── */}
         <rect
           x={FARM_CALVES.x}
           y={FARM_CALVES.y}
           width={FARM_CALVES.w}
           height={FARM_CALVES.h}
         />
-        {/* 2 × 3 grid of small calf pens */}
         {Array.from({ length: 6 }, (_, i) => {
           const col = i % 3;
           const row = Math.floor(i / 3);
@@ -277,14 +235,12 @@ export function FarmBlueprint({ className, style }: Props) {
           );
         })}
 
-        {/* ── MILK ROOM — bulk tank + plate cooler ── */}
         <rect
           x={FARM_MILK_ROOM.x}
           y={FARM_MILK_ROOM.y}
           width={FARM_MILK_ROOM.w}
           height={FARM_MILK_ROOM.h}
         />
-        {/* Bulk tank (round) */}
         <circle
           cx={FARM_MILK_ROOM.x + FARM_MILK_ROOM.w / 2}
           cy={FARM_MILK_ROOM.y + 130}
@@ -297,7 +253,6 @@ export function FarmBlueprint({ className, style }: Props) {
           r={6}
           stroke={strokeFaint}
         />
-        {/* Plate cooler */}
         <rect
           x={FARM_MILK_ROOM.x + 18}
           y={FARM_MILK_ROOM.y + 220}
@@ -305,7 +260,6 @@ export function FarmBlueprint({ className, style }: Props) {
           height={28}
           stroke={strokeFaint}
         />
-        {/* Wash sink */}
         <rect
           x={FARM_MILK_ROOM.x + FARM_MILK_ROOM.w - 64}
           y={FARM_MILK_ROOM.y + 220}
@@ -313,7 +267,6 @@ export function FarmBlueprint({ className, style }: Props) {
           height={28}
           stroke={strokeFaint}
         />
-        {/* Door from parlor → milk room (north wall opening) */}
         <line
           x1={FARM_MILK_ROOM.x + 50}
           y1={FARM_MILK_ROOM.y}
@@ -323,7 +276,6 @@ export function FarmBlueprint({ className, style }: Props) {
           strokeWidth="2"
         />
 
-        {/* ── SERVICE ALLEY — staff corridor along the bottom ── */}
         <rect
           x={FARM_ALLEY.x}
           y={FARM_ALLEY.y}
@@ -331,7 +283,6 @@ export function FarmBlueprint({ className, style }: Props) {
           height={FARM_ALLEY.h}
           stroke={strokeFaint}
         />
-        {/* Dashed center line (service road) */}
         <line
           x1={FARM_ALLEY.x + 20}
           y1={FARM_ALLEY.y + FARM_ALLEY.h / 2}
@@ -342,7 +293,6 @@ export function FarmBlueprint({ className, style }: Props) {
         />
       </g>
 
-      {/* Plan labels (very subtle) */}
       <g
         fill={textFaint}
         fontFamily="var(--font-mono)"
@@ -398,7 +348,6 @@ export function FarmBlueprint({ className, style }: Props) {
         >
           SERVICE ALLEY
         </text>
-        {/* Compass / orientation hints (consistent with ship) */}
         <text x="60" y="926">
           ◀ PADDOCK
         </text>
@@ -407,7 +356,6 @@ export function FarmBlueprint({ className, style }: Props) {
         </text>
       </g>
 
-      {/* Corner registration ticks — L-brackets framing the plan */}
       <g stroke={stroke} strokeWidth="1" fill="none" strokeLinecap="square">
         <path d="M30 60 L30 30 L60 30" />
         <path d="M940 30 L970 30 L970 60" />

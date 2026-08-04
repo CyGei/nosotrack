@@ -1,15 +1,4 @@
-// scripts/build-demo.mjs
-// Pre-compiles the Foundry demo's JSX files into a single bundle.js.
-// Replaces the runtime Babel-standalone transform that used to live in
-// foundry-demo/index.html (which pulled ~3 MB of Babel and a slow per-file
-// transform on every page load). Run via `npm run build:demo`.
-//
-// Source-of-truth lives in `scripts/foundry-demo-src/` — kept OUT of
-// `public/` so the ~178 KB of JSX isn't shipped to GitHub Pages on every
-// deploy. The script reads the .jsx files from there and writes the
-// compiled bundle.js into `public/foundry-demo/bundle.js`, which pairs
-// with the static `public/foundry-demo/index.html` that the host iframe
-// loads.
+// Compiles scripts/foundry-demo-src/*.jsx into public/foundry-demo/bundle.js.
 
 import { build } from 'esbuild';
 import { writeFileSync } from 'node:fs';
@@ -23,12 +12,12 @@ const outDir = resolve(root, 'public/foundry-demo');
 
 // Order matters — later files reference globals defined in earlier ones.
 const sources = [
-    'animations.jsx',  // Stage, Sprite, Timeline, easing helpers
-    'common.jsx',      // BrandIntro and shared component primitives
-    'integration.jsx', // IntegrationScene (About 0.2)
-    'foundry.jsx',     // FoundryStack
-    'dashboard.jsx',   // DashboardScene
-    'main.jsx'         // root render
+    'animations.jsx',
+    'common.jsx',
+    'integration.jsx',
+    'foundry.jsx',
+    'dashboard.jsx',
+    'main.jsx'
 ];
 
 async function transform(file) {
@@ -51,8 +40,7 @@ const banner = `// foundry-demo bundle.js — DO NOT EDIT BY HAND.
 `;
 
 const parts = await Promise.all(sources.map(transform));
-// Wrap each file in an IIFE so top-level `const`/`let` don't collide. Cross-
-// file refs already go through window via `Object.assign(window, {...})`.
+// IIFE per file so top-level `const`/`let` don't collide; cross-file refs go via window.
 const wrapped = parts.map((code, i) =>
     `// ── ${sources[i]} ──\n(function(){\n${code}\n})();\n`
 );

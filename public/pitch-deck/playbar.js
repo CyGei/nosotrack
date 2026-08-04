@@ -1,27 +1,6 @@
-// playbar.js — shared playback bar for the demo iframe and the engine card.
-//
-// One implementation, two consumers (#demo, the engine card on #platform).
-// Owns: pause/play, scrub (mouse + touch), speed cycle, fullscreen.
-//
 // Fullscreen is CSS-pinned (toggles `.is-fullscreen` on a target element) so it
 // works on iPhone, where Webkit doesn't expose requestFullscreen on non-<video>
 // elements. Press Escape to exit.
-//
-// Usage:
-//   const bar = Nosotrack.createPlaybar(mountEl, {
-//     variant: 'light' | 'dark',         // colour scheme
-//     trackLabel: 'OUTBREAK',            // small mono caption (optional)
-//     speeds: [1, 1.5, 2, 3, 5],         // speed cycle
-//     initialSpeedIdx: 0,
-//     showTime: true,                    // show "M:SS" readout
-//     showFullscreen: true,              // show FS button
-//     fullscreenTarget: someContainerEl, // element pinned in fullscreen
-//     onTogglePlay() { ... },
-//     onSeek(timeInSec) { ... },
-//     onSpeedChange(speed) { ... },
-//     onFullscreen(isFs) { ... }
-//   });
-//   bar.update({ time, duration, playing, speed });
 
 (function () {
     'use strict';
@@ -58,7 +37,6 @@
         const showFullscreen = !!opts.showFullscreen;
         const fsTarget = opts.fullscreenTarget || null;
 
-        // ── Render ──
         mount.classList.add('playbar');
         if (opts.variant === 'dark') mount.classList.add('playbar--dark');
         mount.setAttribute('role', 'group');
@@ -79,7 +57,6 @@
         const spdBtn   = mount.querySelector('.playbar-spd');
         const fsBtn    = mount.querySelector('.playbar-fs');
 
-        // Local mirror — driven by `update()`, used to paint without round-trips.
         let state = { time: 0, duration: 1, playing: true, speed: speeds[speedIdx] };
 
         function paint() {
@@ -94,12 +71,10 @@
         }
         paint();
 
-        // ── Pause / play ──
         pauseBtn.addEventListener('click', () => {
             if (typeof opts.onTogglePlay === 'function') opts.onTogglePlay();
         });
 
-        // ── Speed cycle ──
         spdBtn.addEventListener('click', () => {
             speedIdx = (speedIdx + 1) % speeds.length;
             const s = speeds[speedIdx];
@@ -107,12 +82,10 @@
             if (typeof opts.onSpeedChange === 'function') opts.onSpeedChange(s);
         });
 
-        // ── Scrub (mouse + touch) ──
         function seekFromClientX(x) {
             const r = track.getBoundingClientRect();
             const pct = Math.max(0, Math.min(1, (x - r.left) / r.width));
             const t = pct * state.duration;
-            // Optimistically paint, then defer to host's seek handler.
             state.time = t; paint();
             if (typeof opts.onSeek === 'function') opts.onSeek(t);
         }
@@ -124,7 +97,6 @@
         window.addEventListener('touchmove', (e) => { if (dragging && e.touches[0]) seekFromClientX(e.touches[0].clientX); }, { passive: true });
         window.addEventListener('touchend',  () => { dragging = false; });
 
-        // ── Fullscreen (CSS-pinned, works on iPhone) ──
         let isFs = false;
         function setFs(v) {
             if (v === isFs) return;

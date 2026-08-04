@@ -1,15 +1,4 @@
-/**
- * Outbreak-forensics research timeline.
- *
- * Used by `src/components/research/papersByPathogen.ts` to build the
- * per-pathogen paper lookup. Pathogen-name strings are matched against
- * `NAME_TO_ID` in that file; "Various pathogens" is the broadcast key.
- *
- * Wording is verbatim from the original content.json — this file
- * replaces the JSON-as-CMS pattern with structured data colocated with
- * its consumer.
- */
-
+// Pathogen names are matched against NAME_TO_ID in papersByPathogen.ts; "Various pathogens" is the broadcast key.
 export type TimelinePathogen = {
   name: string;
   applicationYear: string;
@@ -19,9 +8,7 @@ export type TimelinePathogen = {
 export type TimelineEntry = {
   year: string;
   type: "method" | "application";
-  /** Short tag — falls back here if `fullTitle` is absent. */
   method: string;
-  /** Verbatim published paper title — preferred display name. */
   fullTitle?: string;
   authors: string;
   description: string;
@@ -117,6 +104,21 @@ export const TIMELINE: TimelineEntry[] = [
     journal: "PLOS Computational Biology",
   },
   {
+    year: "2014",
+    type: "application",
+    method: "Neonatal Klebsiella in an endemic setting",
+    fullTitle:
+      "Genome Sequencing of an Extended Series of NDM-Producing Klebsiella pneumoniae Isolates from Neonatal Infections in a Nepali Hospital Characterizes the Extent of Community- versus Hospital-Associated Transmission in an Endemic Setting",
+    authors: "Stoesser et al.",
+    description:
+      "Applies outbreaker to NDM-producing Klebsiella pneumoniae isolates from neonatal infections at Patan Hospital, Kathmandu, separating hospital-acquired transmission from community acquisition in a setting where the organism is endemic.",
+    pathogens: [
+      { name: "Klebsiella pneumoniae", applicationYear: "2014", icon: "🦠" },
+    ],
+    reference_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4249533/",
+    journal: "Antimicrobial Agents and Chemotherapy",
+  },
+  {
     year: "2015",
     type: "method",
     method: "beastlier",
@@ -150,6 +152,21 @@ export const TIMELINE: TimelineEntry[] = [
     reference_url:
       "https://academic.oup.com/inthealth/article/7/2/130/663364",
     journal: "International Health",
+  },
+  {
+    year: "2016",
+    type: "application",
+    method: "Sequential burn-centre outbreaks",
+    fullTitle:
+      "Next-Generation Sequencing and Comparative Analysis of Sequential Outbreaks Caused by Multidrug-Resistant Acinetobacter baumannii at a Large Academic Burn Center",
+    authors: "Kanamori et al.",
+    description:
+      "Reconstructs three sequential multidrug-resistant Acinetobacter baumannii outbreaks at the Jaycee Burn Center in North Carolina using outbreaker, across 42 isolates collected between 2007 and 2010.",
+    pathogens: [
+      { name: "Acinetobacter baumannii", applicationYear: "2007-2010", icon: "🦠" },
+    ],
+    reference_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4775949/",
+    journal: "Antimicrobial Agents and Chemotherapy",
   },
   {
     year: "2017",
@@ -270,6 +287,34 @@ export const TIMELINE: TimelineEntry[] = [
     journal: "Statistical Applications in Genetics and Molecular Biology",
   },
   {
+    year: "2020",
+    type: "application",
+    method: "Extensively drug-resistant Acinetobacter outbreak",
+    fullTitle:
+      "Whole-Genome-Sequence-Based Characterization of Extensively Drug-Resistant Acinetobacter baumannii Hospital Outbreak",
+    authors: "Makke et al.",
+    description:
+      "Combines whole-genome sequencing with outbreaker and SeqTrack to reconstruct an extensively drug-resistant Acinetobacter baumannii outbreak at a 544-bed Lebanese tertiary hospital, across 41 isolates from 23 patients; resolves two co-circulating clones spreading across multiple wards.",
+    pathogens: [
+      { name: "Acinetobacter baumannii", applicationYear: "2016", icon: "🦠" },
+    ],
+    reference_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC6968657/",
+    journal: "mSphere",
+  },
+  {
+    year: "2020",
+    type: "application",
+    method: "o2geosocial",
+    fullTitle:
+      "Probabilistic reconstruction of measles transmission clusters from routinely collected surveillance data",
+    authors: "Robert et al.",
+    description:
+      "Extends outbreaker2 as the R package o2geosocial to reconstruct clusters and importation status from age, location, genotype and onset date, for outbreaks with partial sampling or uninformative sequences; applied to 2,077 US measles cases and compared against 737 contact-traced reference clusters.",
+    pathogens: [{ name: "Measles", applicationYear: "2001-2016", icon: "🦠" }],
+    reference_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC7423430/",
+    journal: "Journal of the Royal Society Interface",
+  },
+  {
     year: "2021",
     type: "application",
     method: "Rehabilitation clinic outbreak",
@@ -311,6 +356,34 @@ export const TIMELINE: TimelineEntry[] = [
     journal: "eLife",
   },
   {
+    year: "2022",
+    type: "application",
+    method: "National third-wave reconstruction",
+    fullTitle:
+      "Reconstruction of a large-scale outbreak of SARS-CoV-2 infection in Iceland informs vaccination strategies",
+    authors: "Hjorleifsson et al.",
+    description:
+      "Extends outbreaker2 with contact tracing, genomes, household membership and the times of symptom onset, quarantine and diagnosis to reconstruct Iceland's third wave across 2,522 cases; estimates that observed cases were 87% of the total and that cases diagnosed outside quarantine were substantially more infectious.",
+    pathogens: [
+      { name: "SARS-CoV-2", applicationYear: "2020-2021", icon: "[Spike]" },
+    ],
+    reference_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8849849/",
+    journal: "Clinical Microbiology and Infection",
+  },
+  {
+    year: "2022",
+    type: "application",
+    method: "Long-term care facility outbreak",
+    fullTitle:
+      "Occupational and community risk of SARS-CoV-2 infection among employees of a long-term care facility: an observational study",
+    authors: "Lenggenhager et al.",
+    description:
+      "Pairs a staff seroprevalence study at a university-affiliated long-term care facility in Geneva with an outbreaker2 ancestry reconstruction of an 18-employee outbreak, separating occupational from community acquisition and pointing to four likely importations by healthcare workers.",
+    pathogens: [{ name: "SARS-CoV-2", applicationYear: "2020", icon: "[Spike]" }],
+    reference_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8931578/",
+    journal: "Antimicrobial Resistance and Infection Control",
+  },
+  {
     year: "2023",
     type: "application",
     method: "SARS-CoV-2 household transmissions",
@@ -323,6 +396,49 @@ export const TIMELINE: TimelineEntry[] = [
       { name: "SARS-CoV-2", applicationYear: "2020–2022", icon: "[Spike]" },
     ],
     reference_url: "https://pubmed.ncbi.nlm.nih.gov/37579586/",
+    journal: "Epidemics",
+  },
+  {
+    year: "2023",
+    type: "application",
+    method: "The value of genomics in Ebola transmission chains",
+    fullTitle:
+      "Quantifying the value of viral genomics when inferring who infected whom in the 2014-16 Ebola virus outbreak in Guinea",
+    authors: "Robert et al.",
+    description:
+      "Reconstructs 199 confirmed Ebola cases across eight transmission chains in Guinea with outbreaker2, run first on onset dates alone and then on onset dates plus the genomes of the 86 sequenced cases; adding genomic data cut the mean number of plausible infectors per case from 44 to 11.",
+    pathogens: [{ name: "Ebola virus", applicationYear: "2015", icon: "🦠" }],
+    reference_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC10013732/",
+    journal: "Virus Evolution",
+  },
+  {
+    year: "2023",
+    type: "application",
+    method: "Vancomycin-resistant Enterococcus outbreak",
+    fullTitle:
+      "Using Genomics To Investigate an Outbreak of Vancomycin-Resistant Enterococcus faecium ST78 at a Large Tertiary Hospital in Queensland",
+    authors: "Permana et al.",
+    description:
+      "Applies outbreaker2 to core-genome SNPs from an outbreak of vancomycin-resistant Enterococcus faecium ST78 at a large tertiary hospital in Queensland, Australia, covering 63 isolates from 62 patients.",
+    pathogens: [
+      { name: "Enterococcus faecium", applicationYear: "2023", icon: "🦠" },
+    ],
+    reference_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC10269735/",
+    journal: "Microbiology Spectrum",
+  },
+  {
+    year: "2023",
+    type: "application",
+    method: "Primary school outbreaks",
+    fullTitle:
+      "Reconstruction of SARS-CoV-2 outbreaks in a primary school using epidemiological and genomic data",
+    authors: "Kremer et al.",
+    description:
+      "Reconstructs outbreaks in a primary school and its associated households in Liège, Belgium from repetitive screening of 240 participants, using outbreaker2 alongside SCOTTI; estimates that 65.9% of direct infections occurred within the school and that uncertainty was lowest when genomic and epidemiological data were combined.",
+    pathogens: [
+      { name: "SARS-CoV-2", applicationYear: "2020-2021", icon: "[Spike]" },
+    ],
+    reference_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC10273772/",
     journal: "Epidemics",
   },
   {
@@ -340,6 +456,21 @@ export const TIMELINE: TimelineEntry[] = [
     journal: "PLOS ONE",
   },
   {
+    year: "2024",
+    type: "application",
+    method: "National mpox introductions",
+    fullTitle:
+      "Multiple introductions of monkeypox virus to Ireland during the international mpox outbreak, May 2022 to October 2023",
+    authors: "Gonzalez et al.",
+    description:
+      "Sequences 182 of 242 Irish mpox cases and compares them against 3,362 public genomes, using outbreaker2 to evaluate putative importation events; finds 12 distinguishable Clade IIb subclades, indicating repeated independent introductions rather than sustained spread from a single source.",
+    pathogens: [
+      { name: "Mpox virus", applicationYear: "2022-2023", icon: "🦠" },
+    ],
+    reference_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC11027473/",
+    journal: "Eurosurveillance",
+  },
+  {
     year: "2025",
     type: "method",
     method: "mixtree",
@@ -350,5 +481,18 @@ export const TIMELINE: TimelineEntry[] = [
     pathogens: [{ name: "Various pathogens", applicationYear: "N/A", icon: "🦠" }],
     reference_url: "https://arxiv.org/html/2511.20819v1",
     journal: "arXiv (preprint)",
+  },
+  {
+    year: "2026",
+    type: "application",
+    method: "Consecutive norovirus outbreaks",
+    fullTitle:
+      "Unraveling the Transmission Dynamics of a Novel Norovirus GII.17[P17] Lineage During Two Consecutive Outbreaks in a Spanish Hospital",
+    authors: "Kutter et al.",
+    description:
+      "Applies outbreaker2 to metagenomic sequences from two consecutive norovirus outbreaks at a 389-bed Spanish hospital, resolving three transmission clusters with inter-unit spread and up to three unobserved intermediate cases, all belonging to a novel GII.17[P17] lineage.",
+    pathogens: [{ name: "Norovirus", applicationYear: "2026", icon: "🦠" }],
+    reference_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC13161831/",
+    journal: "Journal of Medical Virology",
   },
 ];

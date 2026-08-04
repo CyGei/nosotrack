@@ -1,16 +1,3 @@
-// foundry.jsx — Section A: brand intro + Palantir-style stack
-//
-// Pass 1 changes:
-//   • Standardized cabinet projection: skew = depth × 0.16 (top=16, mid=32, bot=16)
-//   • Scripted SD1 path so the staff diamond actually visits A3 then crosses to Ward B
-//   • Three hospital callouts: index case / staff exposure / cross-ward transmission
-//   • Continuous A→B transition: bottom-platform network spins on cue, then
-//     the entire foundry stack collapses (scale + fade) toward the logo
-//     position (552, 596) while the dashboard expands from that same point.
-
-// ─────────────────────────────────────────────────────────────────────────
-// BrandIntro — port of original SceneBrand + end-of-intro network spin
-// ─────────────────────────────────────────────────────────────────────────
 function BrandIntro() {
   const { localTime: t } = useSprite();
 
@@ -97,9 +84,6 @@ function BrandIntro() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Hospital layout (mid platform)
-// ─────────────────────────────────────────────────────────────────────────
 const WARDS = {
   A: { x0: 220, x1: 500, y0: 332, y1: 488, label: 'Ward A' },
   B: { x0: 510, x1: 770, y0: 332, y1: 488, label: 'Ward B' },
@@ -131,18 +115,14 @@ const PATIENTS = [];
 });
 const PATIENT_BY_ID = Object.fromEntries(PATIENTS.map(p => [p.id, p]));
 
-// ─────────────────────────────────────────────────────────────────────────
-// Staff motion: SD1 is scripted so it actually visits A3, then crosses to
-// Ward B before infecting B2. Other 3 staff use generic wander.
-// ─────────────────────────────────────────────────────────────────────────
 const SD1_PATH = [
-  { t: 0,    x: 280, y: 412 },   // start in Ward A left corridor
-  { t: 6,    x: 380, y: 414 },   // drift right
-  { t: 9,    x: 460, y: 410 },   // arrive near A3 (Ward A right)
-  { t: 11,   x: 470, y: 410 },   // dwell near A3 (gets infected at t=10.5)
-  { t: 12,   x: 600, y: 412 },   // crossing to Ward B
-  { t: 13,   x: 640, y: 410 },   // arrive at B2 (Ward B middle)
-  { t: 15,   x: 660, y: 414 },   // dwell in Ward B
+  { t: 0,    x: 280, y: 412 },
+  { t: 6,    x: 380, y: 414 },
+  { t: 9,    x: 460, y: 410 },
+  { t: 11,   x: 470, y: 410 },
+  { t: 12,   x: 600, y: 412 },
+  { t: 13,   x: 640, y: 410 },
+  { t: 15,   x: 660, y: 414 },
   { t: 21,   x: 660, y: 414 },
 ];
 
@@ -180,13 +160,12 @@ function staffPos(staff, t) {
   return [clamp(x, 240, 1040), clamp(y, 396, 436)];
 }
 
-// Infection chain
 const INFECTIONS = [
   { id: 'A3',  t: 7.0,  source: null   },
   { id: 'A1',  t: 8.5,  source: 'A3'   },
   { id: 'A2',  t: 9.5,  source: 'A3'   },
   { id: 'SD1', t: 10.5, source: 'A3'   },
-  { id: 'B2',  t: 13.0, source: 'SD1'  },   // bumped a bit later so SD1 has crossed
+  { id: 'B2',  t: 13.0, source: 'SD1'  },
   { id: 'B1',  t: 14.0, source: 'B2'   },
   { id: 'B3',  t: 15.0, source: 'B2'   },
 ];
@@ -203,7 +182,6 @@ function infectionStateAt(t) {
   return state;
 }
 
-// Hex color mix utility — used in steady mode to fade reds back to grey.
 function mixColor(a, b, t) {
   const pa = a.startsWith('#') ? a.slice(1) : a;
   const pb = b.startsWith('#') ? b.slice(1) : b;
@@ -216,21 +194,13 @@ function mixColor(a, b, t) {
   return `rgb(${r},${g},${bl})`;
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Node helper — ring pulses ONLY at moment of infection, then settles
-// (item 4 prep — no perpetual rings on every infected node)
-// ─────────────────────────────────────────────────────────────────────────
 function FdyNode({ x, y, r, isStaff, infected, gold, infT, t, label, infFade = 0 }) {
-  // In steady mode (About 0.2) infFade ramps 0 → 1 near the loop seam,
-  // mixing the alert/gold colour back toward the susceptible baseline so
-  // the cycle restart is invisible.
   const baseFill = isStaff ? COLOR.staff : COLOR.patient;
   const activeFill = gold ? COLOR.gold : infected ? COLOR.alert : baseFill;
   const activeStroke = gold ? COLOR.gold : infected ? COLOR.alert : COLOR.mute;
   const fill = (infected || gold) && infFade > 0 ? mixColor(activeFill, baseFill, infFade) : activeFill;
   const stroke = (infected || gold) && infFade > 0 ? mixColor(activeStroke, COLOR.mute, infFade) : activeStroke;
   const dim = 1 - infFade;
-  // One-shot ring at moment of infection (1.4s window after infT)
   const onsetP = (infected && infT != null && !gold)
     ? clamp((t - infT) / 1.4, 0, 1)
     : 0;
@@ -264,9 +234,6 @@ function FdyNode({ x, y, r, isStaff, infected, gold, infT, t, label, infFade = 0
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Hospital callout — small label with leader line, fades in/out
-// ─────────────────────────────────────────────────────────────────────────
 function HospitalCallout({ t, startT, duration, x, y, dx, dy, text }) {
   const fadeIn = clamp((t - startT) / 0.4, 0, 1);
   const fadeOut = clamp((t - startT - duration + 0.4) / 0.4, 0, 1);
@@ -292,9 +259,6 @@ function HospitalCallout({ t, startT, duration, x, y, dx, dy, text }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Platform geometry — standardized cabinet skew = depth × 0.16
-// ─────────────────────────────────────────────────────────────────────────
 const TOP_Y       = 220;
 const MID_Y       = 410;
 const BOT_Y       = 600;
@@ -305,9 +269,9 @@ const TOP_PLATFORM_D = 100;
 const MID_PLATFORM_D = 200;
 const BOT_PLATFORM_D = 100;
 const SKEW_RATIO  = 0.16;
-const TOP_SKEW    = Math.round(TOP_PLATFORM_D * SKEW_RATIO);   // 16
-const MID_SKEW    = Math.round(MID_PLATFORM_D * SKEW_RATIO);   // 32
-const BOT_SKEW    = Math.round(BOT_PLATFORM_D * SKEW_RATIO);   // 16
+const TOP_SKEW    = Math.round(TOP_PLATFORM_D * SKEW_RATIO);
+const MID_SKEW    = Math.round(MID_PLATFORM_D * SKEW_RATIO);
+const BOT_SKEW    = Math.round(BOT_PLATFORM_D * SKEW_RATIO);
 
 const LOGO_X = 552;
 const LOGO_Y = 596;
@@ -315,10 +279,6 @@ const LOGO_Y = 596;
 function FoundryStack({ mode = 'default' }) {
   const { localTime: rawT } = useSprite();
 
-  // ── Steady mode (About 0.2: integration loop) ──
-  // Skip the build-up and the collapse-to-dashboard exit. Loop the
-  // infection chain on a 22 s cycle, offset so reds appear immediately
-  // and fade back to grey near the loop seam. No robot, no bubble.
   const STEADY_CYCLE = 22;
   const STEADY_OFFSET = 6;   // shifts the chain so A3 infects at stage t≈1
   const STEADY_FADE_START = 18;
@@ -326,7 +286,6 @@ function FoundryStack({ mode = 'default' }) {
   const steady = mode === 'steady';
   const t = steady ? ((rawT + STEADY_OFFSET) % STEADY_CYCLE) : rawT;
 
-  // Reveal progresses — in steady mode everything is at 1 from the start.
   const headerOp        = steady ? 1 : clamp(t / 0.6, 0, 1);
   const topPlatformsP   = steady ? 1 : clamp((t - 0.8) / 1.4, 0, 1);
   const topIconsP       = steady ? 1 : clamp((t - 2.0) / 1.0, 0, 1);
@@ -336,8 +295,6 @@ function FoundryStack({ mode = 'default' }) {
   const dotsP           = steady ? 1 : clamp((t - 5.6) / 1.4, 0, 1);
   const bottomPlatformP = steady ? 1 : clamp((t - 13.5) / 1.4, 0, 1);
   const flowBottomP     = steady ? 1 : clamp((t - 14.3) / 1.2, 0, 1);
-  // No alert in steady mode — the alert is the moment the user clicks
-  // through to 0.3.
   const robotApppearP   = steady ? 0 : clamp((t - 15.0) / 0.8, 0, 1);
   const bubbleP         = steady ? 0 : clamp((t - 16.0) / 1.0, 0, 1);
   const goldP           = clamp((t - A3_GOLD_T) / 1.2, 0, 1);
@@ -345,10 +302,7 @@ function FoundryStack({ mode = 'default' }) {
   const bubbleText = 'Superspreader detected: Patient A3';
   const bubbleChars = Math.floor(clamp((t - 16.3) / 2.2, 0, 1) * bubbleText.length);
 
-  // ── Continuous transition (default mode only) ──
-  // At total time ≈ 24.5 (= localTime 21) the cursor (in DashboardScene)
-  // clicks the bottom logo. We trigger the network spin and the collapse
-  // in lockstep so this scene's exit is the dashboard's entrance.
+  // t=21 must line up with the DashboardScene cursor click - this collapse is the dashboard's entrance.
   const bottomLogoSpin = steady
     ? 0
     : (t > 21 ? Easing.easeInOutCubic(clamp((t - 21) / 1.0, 0, 1)) * 360 : 0);
@@ -356,8 +310,7 @@ function FoundryStack({ mode = 'default' }) {
   const collapseScale = 1 - collapseP * 0.95;
   const collapseOp    = 1 - collapseP;
 
-  // Fade reds back to grey near the end of the steady cycle so the loop
-  // seam is invisible. Applied to FdyNode below via the infFade prop.
+  // Fades reds back to grey before the steady cycle repeats so the loop seam is invisible.
   const infFade = steady
     ? clamp((t - STEADY_FADE_START) / (STEADY_FADE_END - STEADY_FADE_START), 0, 1)
     : 0;
@@ -372,12 +325,10 @@ function FoundryStack({ mode = 'default' }) {
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      {/* Chrome stays fixed at top-left during collapse, fades with collapse */}
       <div style={{ opacity: 1 - collapseP }}>
         <FdyChrome chapter="Integration" />
       </div>
 
-      {/* Everything visual collapses toward (LOGO_X, LOGO_Y) */}
       <div style={{
         position: 'absolute', inset: 0,
         opacity: collapseOp,
@@ -385,7 +336,6 @@ function FoundryStack({ mode = 'default' }) {
         transformOrigin: `${LOGO_X}px ${LOGO_Y}px`,
         willChange: 'transform, opacity',
       }}>
-        {/* Centered Nosotrack header */}
         <div style={{
           position: 'absolute', left: '50%', top: 80,
           transform: `translateX(-50%) translateY(${(1 - headerOp) * -8}px)`,
@@ -396,11 +346,9 @@ function FoundryStack({ mode = 'default' }) {
           <FdyWordmark size={28} />
         </div>
 
-        {/* Main SVG canvas */}
         <svg width="1280" height="720" viewBox="0 0 1280 720"
           style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
 
-          {/* ========== TOP PLATFORMS ========== */}
           {topPlatforms.map((p, i) => {
             const reveal = clamp((t - 0.8 - i * 0.15) / 1.0, 0, 1);
             const eased = Easing.easeOutCubic(reveal);
@@ -425,7 +373,6 @@ function FoundryStack({ mode = 'default' }) {
             );
           })}
 
-          {/* Top platform vizzes (uniform 200×60 box at platform center) */}
           {topIconsP > 0 && (
             <g opacity={topIconsP}>
               <foreignObject x={320 - 100} y={TOP_Y - 30} width="200" height="60">
@@ -444,7 +391,6 @@ function FoundryStack({ mode = 'default' }) {
             </g>
           )}
 
-          {/* Flow lines: top → mid */}
           {topPlatforms.map((p, i) => (
             <FdyFlow key={p.id + 'f'}
               from={[p.cx, TOP_Y + TOP_PLATFORM_D / 2 + 6]}
@@ -455,7 +401,6 @@ function FoundryStack({ mode = 'default' }) {
             />
           ))}
 
-          {/* ========== MID PLATFORM — Hospital ========== */}
           <g opacity={midPlatformP} transform={`translate(0, ${(1 - midPlatformP) * 12})`}>
             <FdyPlatform
               cx={640} cy={MID_Y}
@@ -505,7 +450,6 @@ function FoundryStack({ mode = 'default' }) {
               );
             })}
 
-            {/* Patients */}
             {dotsP > 0 && PATIENTS.map((p, i) => {
               const reveal = clamp((dotsP - (i % 6) * 0.04) * 1.4, 0, 1);
               const seed = i * 1.3;
@@ -530,7 +474,6 @@ function FoundryStack({ mode = 'default' }) {
               );
             })}
 
-            {/* Staff diamonds */}
             {dotsP > 0 && STAFF_LIST.map((s, i) => {
               const reveal = clamp((dotsP - 0.4 - i * 0.08) * 1.4, 0, 1);
               const [x, y] = staffPos(s, t);
@@ -553,7 +496,6 @@ function FoundryStack({ mode = 'default' }) {
 
           </g>
 
-          {/* Flow lines: mid → bottom */}
           <FdyFlow
             from={[640 - 60, MID_Y + MID_PLATFORM_D / 2 + 6]}
             to={[640 - 30, BOT_Y - BOT_PLATFORM_D / 2 - 4]}
@@ -569,7 +511,6 @@ function FoundryStack({ mode = 'default' }) {
             curve={0.5}
           />
 
-          {/* ========== BOTTOM PLATFORM — Nosotrack ========== */}
           <g opacity={bottomPlatformP}
             transform={`translate(0, ${(1 - bottomPlatformP) * 14})`}>
             <FdyPlatform
@@ -588,7 +529,6 @@ function FoundryStack({ mode = 'default' }) {
           </g>
         </svg>
 
-        {/* Bottom platform overlays */}
         {bottomPlatformP > 0 && (
           <React.Fragment>
             <div style={{
@@ -650,10 +590,6 @@ function FoundryStack({ mode = 'default' }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// BluetoothCard — 3 glyphs (middle red, sides grey) connected by dashed
-// lines, occupying the same 200×60 viz box as EHR/Lab cards.
-// ─────────────────────────────────────────────────────────────────────────
 function BluetoothCard({ t, cx, cy }) {
   const positions = [
     [cx - 70, cy - 12],

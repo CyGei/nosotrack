@@ -1,9 +1,3 @@
-/**
- * /terms — Terms of Use (ported from legacy/terms.html).
- *
- * Mirrors /privacy in layout / typography. Pure static page.
- */
-
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal/LegalPage";
 import { H2, A } from "@/components/legal/Prose";

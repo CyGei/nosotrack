@@ -1,26 +1,5 @@
 #!/usr/bin/env node
-/**
- * fetch-geo.mjs — build the per-country "global adoption" dataset for the
- * Impact section's globe. TWO real signals per country, no fabrication:
- *
- *   CITATIONS (all-time) — from OpenAlex: the author countries of every work
- *   citing the tools' methods papers. Per tool we group its citers by country
- *   in one call (`cites:W1%7CW2` de-dupes within the tool) and sum across the
- *   six tools. EpiEstim dominates, as everywhere in these figures.
- *
- *   DOWNLOADS (recent window) — the `cranlogs` API has no country field, but
- *   the raw RStudio CRAN logs do. We stream the last WINDOW_DAYS daily logs
- *   (http, since https to that host hangs), filter to our CRAN packages and
- *   tally the ISO-2 `country` column. This is a bounded window (all-time by
- *   country would mean fetching the entire log history), so it is LABELLED as
- *   such and never conflated with the all-time 312,164 total.
- *
- * Output: src/data/research-geo.json (country + centroid + {citations,
- * downloads}), consumed by <Globe/>. Never hand-edited.
- *
- * Sources: OpenAlex (docs.openalex.org) + RStudio CRAN logs
- * (cran-logs.rstudio.com). Both free, no key.
- */
+// Builds src/data/research-geo.json (per-country citations + downloads) for the globe.
 
 import { writeFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
@@ -34,18 +13,15 @@ const root = resolve(__dirname, "..");
 const MAILTO = "cyrilgeismar@gmail.com";
 const OA = "https://api.openalex.org";
 
-// Methods paper DOIs per tool — mirrors TOOLS[] in fetch-metrics.mjs.
+// Mirrors TOOLS[] in fetch-metrics.mjs.
 const TOOL_METHODS = {
   EpiEstim: ["10.1093/aje/kwt133", "10.1016/j.epidem.2019.100356"],
   outbreaker2: ["10.1186/s12859-018-2330-z", "10.1371/journal.pcbi.1003457"],
   SeqTrack: ["10.1038/hdy.2010.78"],
   linktree: ["10.1371/journal.pone.0313037"],
   mixtree: ["10.1371/journal.pcbi.1014271"],
-  // o2ools — utility package, no methods paper, so no citation geography.
 };
 
-// ISO-3166-1 alpha-2 → { name (display), lat, lon (approx. geographic centre) }.
-// Approximate centroids; a couple of degrees is invisible on a small globe.
 const COUNTRIES = {
   US: { name: "United States", lat: 39.8, lon: -98.6 },
   GB: { name: "United Kingdom", lat: 54.0, lon: -2.4 },
@@ -208,7 +184,7 @@ async function resolveWorkId(doi) {
 
 const iso2 = (key) => String(key).split("/").pop().toUpperCase();
 
-// ── Downloads by country — raw RStudio CRAN logs ──────────────────────────
+// The cranlogs API has no country field, so we tally the raw RStudio CRAN logs.
 const CRAN_PKGS = new Set([
   "EpiEstim",
   "outbreaker2",
@@ -217,25 +193,21 @@ const CRAN_PKGS = new Set([
   "linktree",
   "mixtree",
 ]);
+// Rolling window, never all-time: by-country downloads mean streaming whole daily
+// logs, so the output labels its from/to and is never conflated with all-time totals.
 const WINDOW_DAYS = Number(process.env.GEO_WINDOW_DAYS || 30);
-// A day's log is 50–80 MB gzipped; over plain http a slow mirror can stall.
-// Each request gets a long IDLE timeout (fires only if the socket goes quiet,
-// never while bytes are still flowing) and a few retries, so a transient stall
-// never silently drops a day from the window. Both tunable via env.
-const DAY_TIMEOUT_MS = Number(process.env.GEO_DAY_TIMEOUT_MS || 600000); // 10 min idle
+// A day's log is 50–80 MB gzipped; the timeout is IDLE-only, so a slow-but-alive
+// stream is never killed mid-transfer.
+const DAY_TIMEOUT_MS = Number(process.env.GEO_DAY_TIMEOUT_MS || 600000);
 const DAY_RETRIES = Number(process.env.GEO_DAY_RETRIES || 4);
 
 const ymd = (d) => d.toISOString().slice(0, 10);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** Stream one day's gzipped log and tally our packages by country into a FRESH
- *  per-day Map (never the shared tally — so retrying after a mid-stream failure
- *  can't double-count rows already seen on the aborted attempt). Resolves:
- *    { rows, day }            — streamed OK
- *    { rows: 0, day, missing } — CRAN publishes no log for that day (404); final
- *    null                      — transient failure (bad status / socket error /
- *                                corrupt gzip / idle-timeout); caller retries. */
+// Tallies into a FRESH per-day Map, never the shared one: a retry after a
+// mid-stream failure would otherwise double-count the rows already seen.
 function fetchDayDownloads(date) {
+  // http, not https — https to cran-logs.rstudio.com hangs.
   const url = `http://cran-logs.rstudio.com/${date.slice(0, 4)}/${date}.csv.gz`;
   return new Promise((resolveDay) => {
     let done = false;
@@ -243,10 +215,10 @@ function fetchDayDownloads(date) {
     const finish = (v) => {
       if (done) return;
       done = true;
-      if (v === null && req) req.destroy(); // tear down the socket before retry
+      if (v === null && req) req.destroy();
       resolveDay(v);
     };
-    const fail = () => finish(null); // transient -> caller retries
+    const fail = () => finish(null);
     req = http.get(url, (r) => {
       if (r.statusCode === 404) {
         r.resume();
@@ -260,10 +232,8 @@ function fetchDayDownloads(date) {
       let rows = 0;
       const gunzip = zlib.createGunzip();
       const rl = readline.createInterface({ input: r.pipe(gunzip) });
-      // A truncated/corrupt day surfaces as a Z_BUF_ERROR. Every stream in the
-      // chain needs its own handler: readline RE-EMITS an input-stream error on
-      // the Interface, so without rl.on("error") that error is unhandled and
-      // crashes the whole process. All three route to the same retry path.
+      // A truncated day surfaces as Z_BUF_ERROR, and readline re-emits its input's
+      // errors — without all three handlers it goes unhandled and crashes the process.
       r.on("error", fail);
       gunzip.on("error", fail);
       rl.on("error", fail);
@@ -286,14 +256,14 @@ function fetchDayDownloads(date) {
 }
 
 async function fetchDownloadsByCountry() {
-  const tally = new Map(); // ISO2 -> downloads
-  const end = new Date(Date.now() - 2 * 864e5); // logs lag ~1–2 days
+  const tally = new Map();
+  const end = new Date(Date.now() - 2 * 864e5); // CRAN logs lag ~1–2 days
   const days = [];
   for (let i = 0; i < WINDOW_DAYS; i++)
     days.push(ymd(new Date(end.getTime() - i * 864e5)));
-  let got = 0; // days streamed OK
-  let noLog = 0; // days CRAN has no log for (404)
-  let failed = 0; // days that failed every retry
+  let got = 0;
+  let noLog = 0;
+  let failed = 0;
   for (const d of days) {
     let result = null;
     for (let attempt = 1; attempt <= DAY_RETRIES; attempt++) {
@@ -301,7 +271,7 @@ async function fetchDownloadsByCountry() {
       if (result) break;
       if (attempt < DAY_RETRIES) {
         process.stdout.write(`  · ${d}: attempt ${attempt}/${DAY_RETRIES} failed, retrying…\n`);
-        await sleep(2000 * attempt); // linear backoff
+        await sleep(2000 * attempt);
       }
     }
     if (!result) {
@@ -327,8 +297,7 @@ async function fetchDownloadsByCountry() {
 }
 
 async function main() {
-  // ── Citations by country (OpenAlex) ──
-  const cites = new Map(); // ISO2 -> citer-slots
+  const cites = new Map();
   for (const [tool, dois] of Object.entries(TOOL_METHODS)) {
     const ids = (await Promise.all(dois.map(resolveWorkId))).filter(Boolean);
     if (!ids.length) {
@@ -347,10 +316,8 @@ async function main() {
     process.stdout.write(`> ${tool}: ${data.group_by.length} countries, ${sum} citer-slots\n`);
   }
 
-  // ── Downloads by country (raw CRAN logs) ──
   const dl = await fetchDownloadsByCountry();
 
-  // ── Merge: any country with a centroid that has citations OR downloads ──
   const codes = new Set([...cites.keys(), ...dl.tally.keys()]);
   const skipped = [];
   const countries = [...codes]
@@ -377,9 +344,7 @@ async function main() {
   const out = {
     generatedAt: new Date().toISOString().slice(0, 10),
     source: `OpenAlex (author countries citing the methods papers, all-time) + RStudio CRAN logs (downloads by country, ${dl.from} to ${dl.to})`,
-    // Counts of countries actually ON the globe (those we could place), not the
-    // raw tallies: a few small countries have no centroid and are dropped at the
-    // merge above, so dl.tally.size / cites.size would overstate what the map shows.
+    // Countries actually placed on the globe — those without a centroid are dropped above.
     citationCountryCount: countries.filter((c) => c.citations > 0).length,
     downloadCountryCount: countries.filter((c) => c.downloads > 0).length,
     downloadWindow: { days: dl.daysCovered, from: dl.from, to: dl.to, total: dl.total },

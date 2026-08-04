@@ -1,20 +1,3 @@
-/**
- * Team — ported from main branch (legacy/styles.css §14 .team-grid).
- *
- * Two-column layout:
- *   ┌────────────────┬┬───────────────────────────────┐
- *   │ FOUNDER         ││ ADVISORS                       │
- *   │ [square photo]  ││ [photo]   [photo]              │
- *   │ Name            ││ Name      Name                 │
- *   │ Role            ││ Role      Role                 │
- *   │ Bio             ││ Bio       Bio                  │
- *   └────────────────┴┴───────────────────────────────┘
- *      1fr        1px       2fr (split into 2 columns)
- *
- * Photos are square, grayscale 100% by default, lifting to 40% on hover.
- * Bios contain anchor tags — rendered via dangerouslySetInnerHTML.
- */
-
 import Image from "next/image";
 
 export type TeamPerson = {
@@ -22,12 +5,7 @@ export type TeamPerson = {
   role: string;
   photo: string;
   bio: string;
-  /**
-   * CSS object-position for the square crop, tuned per photo so every face's
-   * eye-line lands at the same height (~36% down) across the row. The source
-   * portraits have different aspect ratios and framing, so a plain centre-crop
-   * left the eye-lines misaligned.
-   */
+  // CSS object-position, tuned per photo so every eye-line lands at the same height.
   focus?: string;
 };
 
@@ -64,48 +42,27 @@ export function Team() {
       aria-label="Team"
     >
       <div className="container-page">
-        {/* Section heading — matches Research §"Pathogen agnostic…" */}
         <h2 className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]">
           A team of experts.
         </h2>
 
-        {/*
-          Founder | divider | Advisor | Advisor.
-
-          A flat 4-track grid — [founder 1fr][48px divider gutter][advisor 1fr][advisor 1fr] —
-          so all three photo columns are exactly 1fr and the square photos come out
-          identical in size, with tops AND bottoms aligned. (The old
-          [1fr_1px_2fr] layout nested the advisors in a 2fr column split by a 24px
-          gap, which made each advisor photo 12px narrower than the founder's —
-          leaving the founder photo hanging ~12px lower than the pair.)
-
-          Labels and cards are separate grid items placed explicitly on md+, but DOM
-          order stays founder → divider → advisors so the mobile single-column stack
-          reads correctly. Mobile vertical rhythm is handled with margins since the
-          grid runs gap-y-0.
-        */}
         <div className="mt-10 grid grid-cols-1 gap-y-0 md:grid-cols-[1fr_48px_1fr_1fr] md:grid-rows-[auto_auto] md:gap-x-6 md:items-start">
-          {/* FOUNDER label — col 1 / row 1 */}
           <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.22em] text-mute md:col-start-1 md:row-start-1">
             Founder
           </p>
-          {/* Founder card — col 1 / row 2 */}
           <div className="mb-10 md:col-start-1 md:row-start-2 md:mb-0">
             <TeamCard person={FOUNDER} />
           </div>
 
-          {/* Divider — vertical gutter on md+ (spans both rows), horizontal rule on mobile */}
           <div
             aria-hidden
             className="hidden bg-rule md:col-start-2 md:row-start-1 md:row-span-2 md:mx-auto md:block md:h-full md:w-px md:self-stretch"
           />
           <div aria-hidden className="mb-10 block h-px bg-rule md:hidden" />
 
-          {/* ADVISORS label — spans the two advisor columns / row 1 */}
           <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.22em] text-mute md:col-start-3 md:col-span-2 md:row-start-1">
             Advisors
           </p>
-          {/* Advisor cards — cols 3 & 4 / row 2 */}
           <div className="mb-10 md:col-start-3 md:row-start-2 md:mb-0">
             <TeamCard person={ADVISORS[0]} />
           </div>
@@ -115,7 +72,6 @@ export function Team() {
         </div>
       </div>
 
-      {/* Bio link styling — bios contain external anchors. */}
       <style>{`
         .team-bio a {
           color: var(--color-ink);
@@ -134,8 +90,6 @@ export function Team() {
     </section>
   );
 }
-
-/* -------------------------------------------------------------------------- */
 
 function TeamCard({ person }: { person: TeamPerson }) {
   const src = `/${person.photo}`;

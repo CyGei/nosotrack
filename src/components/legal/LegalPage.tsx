@@ -4,12 +4,6 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { Prose } from "./Prose";
 
-/**
- * LegalPage — shared shell for the /privacy and /terms pages: the nav, a
- * narrow prose column with the "Legal" eyebrow, title, and last-updated
- * line, the Prose body, and the footer. Only the title, date, and body
- * differ between the two documents, so the scaffold lives here once.
- */
 export function LegalPage({
   title,
   lastUpdated,

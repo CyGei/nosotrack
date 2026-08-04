@@ -1,5 +1,3 @@
-// common.jsx — Shared design helpers for the Nosotrack Foundry demo
-
 const COLOR = {
   bg:        '#fafafa',
   bgAlt:     '#f3f3f1',
@@ -17,32 +15,26 @@ const COLOR = {
   panelLine: 'rgba(30,30,43,.20)',
   ward:      '#eceae6',
   wardLine:  'rgba(30,30,43,.18)',
-  wardTint:  'rgba(30,30,43,.04)',  // unified light grey for all wards
-  patient:   '#bfbfbe',             // susceptible patient (round, grey)
-  staff:     '#a4a4a7',             // susceptible staff (diamond, grey)
+  wardTint:  'rgba(30,30,43,.04)',
+  patient:   '#bfbfbe',
+  staff:     '#a4a4a7',
 };
 
 const FONT_DISPLAY = "'Inter Tight', 'Helvetica Neue', Arial, sans-serif";
 const FONT_MONO    = "'JetBrains Mono', ui-monospace, monospace";
 
-// ─────────────────────────────────────────────────────────────────────────
-// Brand mark — brackets stay fixed, inner NETWORK rotates as a unit
-// (mirrors nosotrack.com/styles.css .brand-mark-network on hover)
-// ─────────────────────────────────────────────────────────────────────────
 function FdyBrandMark({
   size = 24,
   dotColor = COLOR.alert,
-  networkSpin = 0,         // degrees, applied to the inner network only
+  networkSpin = 0,
   pulse = false,
-  bracketReveal = 1,       // 0..1 — for intro bracket draw-on (4 sequential)
+  bracketReveal = 1,
 }) {
-  // For each bracket, dasharray reveal driven by bracketReveal (0..1, full at 1)
   const segLen = 20;
   const off = (i) => segLen * (1 - clamp((bracketReveal - i * 0.18) / 0.34, 0, 1));
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none"
       stroke={COLOR.ink} strokeLinecap="square">
-      {/* Brackets — fixed, no rotation */}
       <path d="M3 8 L3 3 L8 3" strokeWidth="1.4"
         strokeDasharray={segLen} strokeDashoffset={off(0)} />
       <path d="M24 3 L29 3 L29 8" strokeWidth="1.4"
@@ -52,7 +44,6 @@ function FdyBrandMark({
       <path d="M8 29 L3 29 L3 24" strokeWidth="1.4"
         strokeDasharray={segLen} strokeDashoffset={off(3)} />
 
-      {/* Inner network — rotates around viewBox center (16, 16) */}
       <g transform={`rotate(${networkSpin} 16 16)`}>
         <line x1="16" y1="11.2" x2="16" y2="15.6" strokeWidth="0.6" strokeLinecap="round" />
         <line x1="11.31" y1="19.3" x2="15.13" y2="17.1" strokeWidth="0.6" strokeLinecap="round" />
@@ -68,7 +59,6 @@ function FdyBrandMark({
   );
 }
 
-// "Nosotrack" wordmark
 function FdyWordmark({ size = 24 }) {
   return (
     <span style={{
@@ -81,7 +71,6 @@ function FdyWordmark({ size = 24 }) {
   );
 }
 
-// Robot character — grey/ink (was red before; now neutral)
 function FdyRobot({ size = 36, glowing = false, accent = COLOR.ink }) {
   const fill = 'rgba(30,30,43,0.06)';
   return (
@@ -101,7 +90,6 @@ function FdyRobot({ size = 36, glowing = false, accent = COLOR.ink }) {
   );
 }
 
-// Animated cursor (arrow pointer with optional click ring)
 function FdyCursor({ x, y, clicking = false, hidden = false }) {
   return (
     <div style={{
@@ -132,10 +120,6 @@ function FdyCursor({ x, y, clicking = false, hidden = false }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Isometric platform — parallelogram top + thin front strip for depth
-// (NO shadow underneath, per request)
-// ─────────────────────────────────────────────────────────────────────────
 function FdyPlatform({
   cx, cy, w, d = 56,
   skew = 22,
@@ -167,7 +151,6 @@ function FdyPlatform({
   );
 }
 
-// Dashed flow line connecting two platforms
 function FdyFlow({ from, to, progress = 1, color = COLOR.ruleStrong, dashed = true, curve = 0.5 }) {
   const [x1, y1] = from;
   const [x2, y2] = to;
@@ -193,7 +176,6 @@ function FdyFlow({ from, to, progress = 1, color = COLOR.ruleStrong, dashed = tr
   );
 }
 
-// Chrome (top-left brand label, top-right caption, corner crosshairs)
 function FdyChrome({ chapter, label }) {
   return (
     <React.Fragment>
@@ -232,23 +214,16 @@ function FdyCorner({ x, y, dx, dy, len = 8 }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Bluetooth glyph (the angular B)
-// ─────────────────────────────────────────────────────────────────────────
 function FdyBluetooth({ cx, cy, size = 28, color = COLOR.ink, opacity = 1, pulse = 0 }) {
-  // viewBox 32×32 → scale to size
   const s = size / 32;
   const halfS = size / 2;
-  // Pulse ring radius (animated via parent passing pulse 0..1)
   const ringR = halfS * (0.9 + pulse * 0.7);
   const ringOp = (1 - pulse) * 0.55;
   return (
     <g transform={`translate(${cx}, ${cy})`} opacity={opacity}>
-      {/* Pulse halo */}
       {pulse > 0 && (
         <circle r={ringR} fill="none" stroke={color} strokeWidth="1" opacity={ringOp} />
       )}
-      {/* Bluetooth glyph */}
       <g transform={`scale(${s})`}>
         <path
           d="M 16 4 L 16 28 M 16 4 L 24 12 L 8 20 M 16 28 L 24 20 L 8 12"
@@ -264,10 +239,6 @@ function FdyBluetooth({ cx, cy, size = 28, color = COLOR.ink, opacity = 1, pulse
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// DNAViz — sliding helix bars (ported from /Users/cy/Downloads/Nosotrack)
-// Used on the Diagnostic Lab platform (genomic sequencing card)
-// ─────────────────────────────────────────────────────────────────────────
 function FdyDNAViz({ t, w = 200, h = 70 }) {
   const bars = 14;
   return (
@@ -289,19 +260,12 @@ function FdyDNAViz({ t, w = 200, h = 70 }) {
           </g>
         );
       })}
-      {/* Sequence label */}
       <text x="4" y={h - 4} fontFamily={FONT_MONO} fontSize="7" fill={COLOR.mute}
         letterSpacing="1.6">A·T·C·G·G·A·T·T·C·A</text>
     </svg>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// EHRViz — animated table-like rows scrolling
-// Used on the EHR (Electronic Health Records) platform
-// `bg` masks the scrolling rows behind the header (defaults to white to
-// match the platform top).
-// ─────────────────────────────────────────────────────────────────────────
 function FdyEHRViz({ t, w = 200, h = 70, bg = '#ffffff' }) {
   const rows = [
     ['P-1043', 'WARD-C', '→'],
@@ -339,7 +303,6 @@ function FdyEHRViz({ t, w = 200, h = 70, bg = '#ffffff' }) {
           );
         })}
       </g>
-      {/* Header */}
       <rect x="0" y="0" width={w} height="11" fill={bg} />
       <text x="6"  y="8" fontFamily={FONT_MONO} fontSize="6.5" fill={COLOR.mute} letterSpacing="1.2">PATIENT</text>
       <text x="60" y="8" fontFamily={FONT_MONO} fontSize="6.5" fill={COLOR.mute} letterSpacing="1.2">WARD</text>

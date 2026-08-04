@@ -1,40 +1,6 @@
 #!/usr/bin/env node
-/**
- * fetch-pathogen.mjs — turn a NIH 3D entry into a shipped pathogen.
- *
- * Usage:
- *   node scripts/fetch-pathogen.mjs <nih3d-entry-id> <slug> [si=auto]
- *
- * Examples:
- *   node scripts/fetch-pathogen.mjs 13323 sars-cov-2-virion
- *   node scripts/fetch-pathogen.mjs 13373 influenza-virion 0.30
- *   node scripts/fetch-pathogen.mjs 7856  ebola-virion 0.10
- *
- * What it does:
- *   1. Hits `https://3d.nih.gov/api/entries/<id>` for metadata.
- *   2. Picks the latest published submission, finds the best source
- *      file (GLB > WRL > STL). The cutaway-style NIAID models are
- *      mostly WRL; the API metadata flags them correctly.
- *   3. Downloads via `/api/files/<fileId>` (the direct-file endpoint
- *      — `entries/download/...` returns HTML, don't use it).
- *   4. If non-GLB, converts via three.js loaders + GLTFExporter
- *      (see `./lib/convert-to-glb.mjs`).
- *   5. Runs `gltfpack` to simplify + meshopt-compress. For WRL-sourced
- *      cutaways with disjoint sub-meshes we add `-sa -sp` so the
- *      simplifier crosses boundaries; otherwise gltfpack's defaults
- *      preserve every triangle.
- *   6. Writes `public/models/<slug>.glb`.
- *   7. Prints a ready-to-paste PathogenSpec stub.
- *
- * Auto simplification ratio (when not specified):
- *   - GLB sources    → 0.30  (good cryo-ET meshes deserve more triangles)
- *   - WRL/STL sources → 0.10  (cutaways are very high-poly; aggressive simp
- *                              keeps file size under ~1 MB)
- *
- * Requirements:
- *   - `gltfpack` on PATH (else falls back to `npx gltfpack`).
- *   - `three` in node_modules — already in Nosotrack's deps.
- */
+// Downloads a NIH 3D entry, converts + optimizes it to public/models/<slug>.glb,
+// and prints a PathogenSpec stub. Requires `gltfpack` (falls back to npx).
 
 import { writeFileSync, mkdirSync, existsSync, statSync, unlinkSync } from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -54,7 +20,6 @@ if (!entryArg || !slugArg) {
   process.exit(1);
 }
 
-// Accept "3DPX-013373" or "13373".
 const entryId = String(entryArg).toLowerCase().replace(/^3dpx-?/, "");
 
 console.log(`> Fetching NIH 3D entry ${entryId}…`);
@@ -65,7 +30,6 @@ if (!metaRes.ok) {
 }
 const meta = await metaRes.json();
 
-// Latest published submission.
 const subs = (meta.submissions || []).filter(
   (s) => s.submissionStatus === "Published"
 );
@@ -81,7 +45,6 @@ const allFiles = [
   ...(latest.outputFiles || []),
 ];
 
-// Format preference: GLB ships directly; WRL > STL for conversion.
 const PREF = ["GLB", "WRL", "STL"];
 let chosen = null;
 for (const fmt of PREF) {
@@ -110,7 +73,7 @@ console.log(
   `  source: ${chosen.name} (${chosen.format}, ${(chosen.fileSize / 1024 / 1024).toFixed(1)} MB)`
 );
 
-// Download
+// /api/files/<id> is the direct-file endpoint; entries/download/… returns HTML.
 console.log(`> Downloading…`);
 const dlRes = await fetch(`https://3d.nih.gov/api/files/${chosen.fileId}`);
 if (!dlRes.ok) {
@@ -124,21 +87,13 @@ const rawPath = resolve(modelsDir, `${slugArg}.raw.${ext}`);
 writeFileSync(rawPath, Buffer.from(ab));
 console.log(`  wrote ${rawPath} (${(ab.byteLength / 1024 / 1024).toFixed(1)} MB)`);
 
-// If not GLB, convert via three.js.
 let preGltfpackPath = rawPath;
 const isGlbSource = chosen.format === "GLB";
 if (!isGlbSource) {
-  // Three.js's VRMLLoader holds the whole vertex set in memory at once;
-  // anything past ~60 MB of raw WRL OOMs an 8 GB Node heap. Pre-decimate
-  // huge WRL files with topology-preserving vertex clustering (see
-  // `scripts/lib/decimate-wrl.py`). The grid arg controls coarseness —
-  // 128 cells along the longest axis keeps virion meshes recognisable.
+  // three's VRMLLoader holds the whole vertex set at once — past ~60 MB of raw
+  // WRL it OOMs an 8 GB Node heap, so pre-decimate by vertex clustering.
   let loaderInput = rawPath;
   if (chosen.format === "WRL" && ab.byteLength > 60 * 1024 * 1024) {
-    // Bigger source = denser cluster grid so we retain detail
-    // proportional to what's there. Linear fit calibrated against the
-    // Ebola (94 MB → grid 96) and Influenza-008052 (165 MB → grid 64)
-    // sources Cy uses as reference.
     const sizeMB = ab.byteLength / 1024 / 1024;
     const grid = sizeMB > 130 ? 64 : sizeMB > 80 ? 96 : 128;
     console.log(
@@ -171,14 +126,12 @@ if (!isGlbSource) {
   preGltfpackPath = convertedPath;
 }
 
-// Pick the simplification ratio.
 const si = siArg ?? (isGlbSource ? "0.30" : "0.10");
 
 console.log(`> Running gltfpack -si ${si} ${isGlbSource ? "" : "-sa -sp "}-cc…`);
 const outPath = resolve(modelsDir, `${slugArg}.glb`);
 const baseArgs = ["-i", preGltfpackPath, "-o", outPath, "-si", si, "-cc"];
-// Cutaway-converted meshes have many disjoint surfaces; aggressive +
-// permissive simplification is the only way to get them under 1 MB.
+// -sa -sp: converted cutaways are disjoint surfaces gltfpack won't simplify otherwise.
 const gltfpackArgs = isGlbSource ? baseArgs : [...baseArgs, "-sa", "-sp"];
 
 let res = spawnSync("gltfpack", gltfpackArgs, { stdio: "inherit" });
@@ -193,7 +146,7 @@ if (res.status !== 0) {
   process.exit(1);
 }
 
-// Clean up intermediates (best-effort — some sandboxes deny unlink)
+// Best-effort: some sandboxes deny unlink on mounted dirs.
 const safeUnlink = (p) => {
   try { unlinkSync(p); } catch { /* noop */ }
 };
@@ -203,13 +156,11 @@ if (preGltfpackPath !== rawPath) safeUnlink(preGltfpackPath);
 const sizeKb = Math.round(statSync(outPath).size / 1024);
 console.log(`  optimized → ${outPath} (${sizeKb} KB)`);
 
-// Print a stub
 const upperSlug = slugArg
   .toUpperCase()
   .replace(/[^A-Z0-9]+/g, "_")
   .replace(/^_|_$/g, "");
 
-// License normalisation: NIH metadata uses "CC-BY", "CC-BY-NC", "Public Domain".
 const normLicense =
   license === "CC-BY"
     ? "CC-BY 4.0"
@@ -219,9 +170,6 @@ const normLicense =
         ? "Public Domain"
         : license;
 
-// Virion meshes (WRL cutaways and most GLBs alike) tend to be radially
-// symmetric, so the stub defaults to the radial classifier; hand-tune per
-// specimen if a named-material split reads better.
 const defaultClassifier = `{ kind: "radial", cutoffRatio: 0.78 }`;
 
 console.log("");

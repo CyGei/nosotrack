@@ -1,16 +1,4 @@
-/**
- * /pitch — pitch deck.
- *
- * The deck itself is a self-contained static HTML app
- * (`public/pitch-deck/index.html` + its own `playbar.js`; styles/tokens are
- * inlined). It can't live at `public/pitch/index.html` because Next's
- * routing layer intercepts `/pitch/` before public files resolve — so
- * we host the deck under `/pitch-deck/` and serve it from this route via
- * a full-viewport iframe. The URL stays clean (`/pitch/`) and the deck
- * gets its own document so its scroll-snap chrome and keyboard handlers
- * don't fight with the host site.
- */
-
+// The deck lives under /pitch-deck/ because Next intercepts /pitch/ before public files resolve; iframed so its keyboard/scroll handlers stay isolated.
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

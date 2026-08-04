@@ -1,35 +1,6 @@
 #!/usr/bin/env node
-/**
- * build-hero-clips.mjs — generate the self-hosted hero video collage.
- *
- * WHY THIS EXISTS
- *   The hero's first frame (Scene1Field) used to stream full-length
- *   source videos straight from third-party CDNs (Wikimedia .webm, CDC
- *   .mp4) and seek deep into them (e.g. 2:12 into a multi-minute file).
- *   That meant: a black box on first paint, long buffering, janky
- *   seeking, and a hard dependency on upstream CDNs that can change or
- *   throttle at any time.
- *
- *   This script fetches each source ONCE, trims it to just the window we
- *   show, scales + compresses it to a small web-optimized MP4, and drops
- *   the result in `public/hero/`. Scene1Field then plays those local
- *   files — tiny, instant, no seeking, no third-party runtime dependency.
- *   It also extracts a poster frame so the hero paints instantly even
- *   before the first clip has buffered.
- *
- * USAGE
- *   npm run build:hero-clips
- *
- * REQUIREMENTS
- *   ffmpeg on your PATH (https://ffmpeg.org/download.html — `brew install
- *   ffmpeg` on macOS). The script checks for it and exits with guidance
- *   if it's missing. Run it once; commit the generated files in
- *   `public/hero/`. Re-run only when you change the clip list below.
- *
- * TO CHANGE THE COLLAGE
- *   Edit SOURCES below (url + in/out window + id), then re-run. The `id`
- *   becomes the filename and must match the `id`s in Scene1Field.tsx.
- */
+// Trims the hero source videos into small local MP4s + a poster in public/hero/.
+// Requires ffmpeg on PATH. Each `id` is the filename and must match Scene1Field.tsx.
 
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, statSync } from "node:fs";
@@ -39,15 +10,8 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, "..", "public", "hero");
 
-// ─────────────────────────────────────────────────────────────────────
-// Source clips — order is the on-screen rotation order. `start`/`end` are
-// seconds into the SOURCE file; only that window is downloaded + kept.
-// All sources are public-domain or CC-BY field-response / PPE footage.
-// ─────────────────────────────────────────────────────────────────────
-// NOTE: order here mirrors the on-screen rotation in Scene1Field and
-// drives which clip the poster is extracted from (the first SUCCESSFUL
-// entry). Keep `covid-field` first — its opening frame is the cleanest
-// hold-frame for the dark hero.
+// Order mirrors the on-screen rotation in Scene1Field; `start`/`end` are seconds
+// into the source file.
 const SOURCES = [
   {
     id: "covid-field",
@@ -79,17 +43,11 @@ const SOURCES = [
   },
 ];
 
-// Encode settings — 1280px wide, 24fps, no audio, H.264 + faststart so the
-// moov atom is at the front and the browser can start playing immediately.
-// CRF 28 is visually clean for desaturated, overlaid background footage and
-// keeps each clip well under ~1 MB.
 const WIDTH = 1280;
 const FPS = 24;
 const CRF = 28;
 
-// Wikimedia (and good HTTP manners generally) require a descriptive
-// User-Agent — anonymous library UAs like ffmpeg's default "Lavf/.." get
-// rate-limited with HTTP 429. See https://meta.wikimedia.org/wiki/User-Agent_policy
+// Wikimedia rate-limits ffmpeg's default "Lavf/.." UA with HTTP 429.
 const USER_AGENT =
   "NosotrackHeroBuild/1.0 (https://nosotrack.org; hero clip build script)";
 const MAX_ATTEMPTS = 3;
@@ -108,8 +66,7 @@ function hasFfmpeg() {
 
 const sleep = (ms) => spawnSync("sleep", [String(ms / 1000)]);
 
-// A real, non-empty output file. ffmpeg can exit 0 yet leave a 0-byte file
-// (e.g. when a ranged request is throttled mid-stream), so check the size.
+// ffmpeg can exit 0 yet leave a 0-byte file when a ranged request is throttled.
 function builtOk(path) {
   try {
     return statSync(path).size > 1024;
@@ -118,8 +75,6 @@ function builtOk(path) {
   }
 }
 
-// Shared HTTP input flags: descriptive UA + auto-reconnect so a dropped or
-// throttled connection retries instead of producing an empty file.
 const httpInputArgs = [
   "-user_agent", USER_AGENT,
   "-reconnect", "1",
@@ -156,8 +111,7 @@ function main() {
         console.log(`  ↻ retry ${attempt}/${MAX_ATTEMPTS} (last attempt was throttled/dropped)…`);
         sleep(RETRY_BACKOFF_MS * (attempt - 1));
       }
-      // `-ss` before `-i` = fast input seek via HTTP range requests, so we
-      // only pull the bytes around the window rather than the whole file.
+      // `-ss` before `-i`: seeks via HTTP range requests instead of pulling the whole file.
       run("ffmpeg", [
         "-y",
         ...httpInputArgs,
@@ -187,9 +141,6 @@ function main() {
     }
   }
 
-  // Poster — first frame of the first SUCCESSFUL clip. Scene1Field renders
-  // this as the <video poster> so the hero paints instantly before any clip
-  // loads. (Keying it to a specific clip would break if that one failed.)
   if (succeeded.length > 0) {
     const src = join(OUT_DIR, `${succeeded[0]}.mp4`);
     console.log(`\n→ poster.jpg  (from ${succeeded[0]})`);
@@ -198,13 +149,13 @@ function main() {
       "-ss", "0.3",
       "-i", src,
       "-frames:v", "1",
-      "-update", "1", // ffmpeg 8.x: explicit single-image-output flag
+      "-update", "1", // ffmpeg 8.x requires this for single-image output
       "-vf", `scale=${WIDTH}:-2`,
       "-q:v", "4",
       join(OUT_DIR, "poster.jpg"),
     ]);
     if (!builtOk(join(OUT_DIR, "poster.jpg"))) {
-      // 0.3s may be past a very short clip; retry from the first frame.
+      // 0.3s may be past the end of a very short clip; retry from the first frame.
       run("ffmpeg", [
         "-y", "-i", src, "-frames:v", "1",
         "-update", "1",
@@ -214,7 +165,6 @@ function main() {
     }
   }
 
-  // Summary.
   console.log("\n────────────────────────────────────");
   console.log(`✓ built:  ${succeeded.join(", ") || "(none)"}`);
   if (failed.length) {

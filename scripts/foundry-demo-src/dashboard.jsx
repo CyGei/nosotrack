@@ -1,62 +1,24 @@
-// dashboard.jsx — Section B: cursor opens the dashboard, drills into A3,
-// chats with the Co-Pilot, reviews 4 strategies, and deploys the
-// recommended one.
-//
-// Pass 1 changes:
-//   • Continuous A→B transition: scene starts during foundry overlap so
-//     the cursor enters while foundry is still on-screen, then dashboard
-//     expands FROM the logo position (552, 596) as foundry collapses.
-//   • Orthogonal (Manhattan) tree edges with rounded corners + arrowheads.
-//   • Strategy drawer slides up from the bottom (no full-screen overlay).
-//   • Cursor walks to Scenario 03 and clicks; "Deploy" confirmation lands.
-//   • Stats strip in dashboard header (replaces "POSTERIOR 0.94 · MCMC").
-//   • Red reserved for infection state; AI Co-Pilot chrome moves to ink;
-//     Recommended badge moves to gold (ties to the gold superspreader).
-
-// Default logo position is the bottom-platform centre from FoundryStack.
-// DashboardScene accepts `logoX` / `logoY` props that override these so a
-// different scene (e.g. NotificationLogo for the endtoend route) can place
-// the logo at stage centre and have the cursor + frame-expand origin track
-// it without forking the demo.
 const LOGO_X = 552;
 const LOGO_Y = 596;
 
-// ── Cursor scripted path ───────────────────────────────────────────────────
-// DashboardScene starts at total t=23 (overlapping foundry). Cursor enters,
-// reaches the logo at localTime 1.5 = total 24.5, which is exactly when
-// FoundryStack triggers the network spin and begins to collapse.
-//
-// The logo waypoints (t=1.5 and t=4.0) are parameterised on (logoX, logoY)
-// so the cursor walks to the same place the scene's logo is rendered.
 function makeCursorPath(logoX, logoY) {
   return [
-    // Sentinel — off-screen position used while the cursor is hidden
-    // (cursorVisP < 0.5 below). cursorAt() walks waypoints in order and
-    // needs at least one entry to fall back to before the real path
-    // begins.
     { t: 0.0,  x: 1400, y: 800 },
-    // Cursor pops into view just below-right of the logo, then makes a
-    // short hop to click. Whole intro (3 alerts + hop + click) wraps
-    // inside ~2 s of stage time.
     { t: 1.4,  x: logoX + 180, y: logoY + 140 },
-    { t: 2.0,  x: logoX, y: logoY, click: true },  // arrive + click logo
-    { t: 4.0,  x: logoX, y: logoY },               // hold while collapse + expand
-    // Drill into A3.
+    { t: 2.0,  x: logoX, y: logoY, click: true },
+    { t: 4.0,  x: logoX, y: logoY },
     { t: 6.5,  x: 470,  y: 400 },
     { t: 8.5,  x: 370,  y: 276 },
     { t: 8.7,  x: 370,  y: 276, click: true },
-    // Move to AI Co-Pilot icon
     { t: 13.5, x: 1130, y: 110 },
     { t: 14.0, x: 1130, y: 110, click: true },
-    // Move to chat input
     { t: 15.0, x: 1010, y: 600 },
-    { t: 19.5, x: 1010, y: 600 },                  // hold while typing
-    { t: 19.7, x: 1158, y: 600, click: true },     // send
-    // Strategy drawer appears.
+    { t: 19.5, x: 1010, y: 600 },
+    { t: 19.7, x: 1158, y: 600, click: true },
     { t: 22.5, x: 1158, y: 600 },
-    { t: 23.5, x: 540,  y: 510 },                  // walk to Scenario 03
-    { t: 24.0, x: 540,  y: 510, click: true },     // click recommended
-    { t: 25.5, x: 540,  y: 510 },                  // hold on deploy
+    { t: 23.5, x: 540,  y: 510 },
+    { t: 24.0, x: 540,  y: 510, click: true },
+    { t: 25.5, x: 540,  y: 510 },
   ];
 }
 
@@ -80,7 +42,6 @@ function cursorAt(t, path) {
   return { x: last.x, y: last.y, click: false };
 }
 
-// ── Dashboard tree pane: all 22 entities laid out ward-by-ward ───────────
 const WARD_LAYOUT = [
   { key: 'A', label: 'Ward A', x0: 40,  x1: 380  },
   { key: 'B', label: 'Ward B', x0: 400, x1: 740  },
@@ -101,7 +62,7 @@ WARD_LAYOUT.forEach(({ key, x0, x1 }) => {
 });
 
 const TREE_STAFF = [
-  { id: 'SD1', x: 360, y: 230 },   // infected
+  { id: 'SD1', x: 360, y: 230 },
   { id: 'SD2', x: 200, y: 230 },
   { id: 'SD3', x: 540, y: 230 },
   { id: 'SD4', x: 870, y: 230 },
@@ -114,30 +75,18 @@ TREE_PATIENTS.forEach(p => { TREE_BY_ID[p.id] = { x: p.x, y: p.y, isStaff: false
 TREE_STAFF.forEach(s => { TREE_BY_ID[s.id] = { x: s.x, y: s.y, isStaff: true }; });
 
 const INFECTED_IDS = ['A3', 'A1', 'A2', 'SD1', 'B2', 'B1', 'B3'];
-// Extra categories the engine surfaces beyond plain confirmed/susceptible:
-//   • Undetected — case the engine flagged that IPC didn't know about
-//                   (B4). Rendered as a strong purple node.
-//   • Imported   — admitted infected from outside (C1). Rendered as a
-//                   red node with a blue ring around it.
-//   • At-risk    — high-risk contacts of the superspreader (A4/A5/A6).
-//                   Rendered as grey nodes with a red ring around them.
 const UNDETECTED_IDS = ['B4'];
 const IMPORTED_IDS   = ['C1'];
 const AT_RISK_IDS    = ['A4', 'A5', 'A6'];
 
-// Dashed "potential exposure" arrows from the infected staff member SD1
-// to the at-risk patients in Ward A. SD1 was infected by A3 and moved
-// through the ward before crossing to Ward B; these arrows mark the
-// patients SD1 may have exposed but the engine hasn't confirmed yet.
 const AT_RISK_EDGES = [
   ['SD1', 'A4'],
   ['SD1', 'A5'],
   ['SD1', 'A6'],
 ];
 
-// Category palette overrides for the tree pane patient renderer.
-const PURPLE_UNDETECTED = '#6e4c92'; // stronger than the legacy pitch lavender
-const BLUE_IMPORTED     = '#3a7bd5'; // outer ring colour
+const PURPLE_UNDETECTED = '#6e4c92';
+const BLUE_IMPORTED     = '#3a7bd5';
 const TREE_EDGES = [
   ['A3', 'A1'],
   ['A3', 'A2'],
@@ -204,28 +153,21 @@ const STRATEGIES = [
 
 const PROMPT_TEXT = 'Devise 4 control strategies. Max 10 PCR/day. I cannot transfer anyone from Ward A.';
 
-// ─────────────────────────────────────────────────────────────────────────
-// Manhattan path with rounded corners + endpoint retraction
-// ─────────────────────────────────────────────────────────────────────────
 function manhattanPath(ax, ay, bx, by, r = 6, childR = 13) {
   const dirH = bx > ax ? 1 : (bx < ax ? -1 : 0);
   const dirV = by > ay ? 1 : (by < ay ? -1 : 0);
-  // Same y — straight horizontal, retract by childR
   if (dirV === 0) {
     const ex = bx - dirH * childR;
     const d = `M ${ax} ${ay} L ${ex} ${ay}`;
     return { d, len: Math.abs(ex - ax) };
   }
-  // Same x — straight vertical
   if (dirH === 0) {
     const ey = by - dirV * childR;
     const d = `M ${ax} ${ay} L ${ax} ${ey}`;
     return { d, len: Math.abs(ey - ay) };
   }
-  // Manhattan: down to midY, horizontal, then down to b (with rounded corners)
   const midY = (ay + by) / 2;
   const ey = by - dirV * childR;
-  // If too narrow for a clean corner radius, fall back to a single L
   if (Math.abs(midY - ay) < r * 1.5 || Math.abs(by - midY) < r * 1.5 || Math.abs(bx - ax) < r * 2) {
     const d = `M ${ax} ${ay} L ${ax} ${midY} L ${bx} ${midY} L ${bx} ${ey}`;
     return { d, len: Math.abs(midY - ay) + Math.abs(bx - ax) + Math.abs(ey - midY) };
@@ -241,7 +183,6 @@ function manhattanPath(ax, ay, bx, by, r = 6, childR = 13) {
     `L ${corner2x} ${midY} ` +
     `Q ${bx} ${midY}, ${bx} ${corner2y} ` +
     `L ${bx} ${ey}`;
-  // Approximate path length
   const len =
     Math.abs(corner1y - ay)
     + 1.57 * r
@@ -251,17 +192,10 @@ function manhattanPath(ax, ay, bx, by, r = 6, childR = 13) {
   return { d, len };
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// DashboardScene
-// ─────────────────────────────────────────────────────────────────────────
 function DashboardScene({ logoX = LOGO_X, logoY = LOGO_Y } = {}) {
   const { localTime: t } = useSprite();
 
-  // Cursor stays hidden until ~lt 1.0 — it only appears for the brief
-  // hop to the logo, no long approach. Fade in over 0.3 s; hidden check
-  // below trips at cursorVisP >= 0.5.
   const cursorVisP   = clamp((t - 1.0) / 0.3, 0, 1);
-  // Dashboard frame expands FROM (LOGO_X, LOGO_Y) starting at lt 2.4
   const dashOpen     = clamp((t - 2.4) / 1.8, 0, 1);
   const treeP        = clamp((t - 4.5) / 2.4, 0, 1);
   const popupP       = clamp((t - 8.7) / 0.8, 0, 1);
@@ -282,14 +216,12 @@ function DashboardScene({ logoX = LOGO_X, logoY = LOGO_Y } = {}) {
   const cursor = cursorAt(t, cursorPath);
 
   const popupVisible = t > 8.7 && t < 13.0;
-  // Chrome only when dashboard is at least mostly open (avoids overlap with foundry chrome)
   const showChrome = dashOpen > 0.6;
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
       {showChrome && <FdyChrome chapter="Analytics" />}
 
-      {/* Dashboard frame — present from lt 2.0; expands FROM logo position */}
       {dashOpen > 0 && (
         <DashboardFrame
           openP={dashOpen}
@@ -317,18 +249,12 @@ function DashboardScene({ logoX = LOGO_X, logoY = LOGO_Y } = {}) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// DashboardFrame — expands FROM logo (LOGO_X, LOGO_Y) toward full size
-// ─────────────────────────────────────────────────────────────────────────
 function DashboardFrame({
   openP, treeP, popupP, popupVisible, chatP,
   promptChars, sent, thinkingP, strategiesP, deployClickP, t,
   logoX = LOGO_X, logoY = LOGO_Y,
 }) {
   const eased = Easing.easeOutCubic(openP);
-  // Frame fills (80, 80) to (1200, 640). transform-origin in frame-local
-  // space is (logoX - 80, logoY - 80) so the dashboard scales out of
-  // wherever the previous scene placed the brand mark.
   const ox = logoX - 80;
   const oy = logoY - 80;
 
@@ -345,7 +271,6 @@ function DashboardFrame({
       boxShadow: '0 12px 40px rgba(0,0,0,0.10)',
       overflow: 'hidden',
     }}>
-      {/* Header — stats strip replaces the MCMC tag */}
       <div style={{
         height: 44,
         borderBottom: `1px solid ${COLOR.rule}`,
@@ -364,9 +289,7 @@ function DashboardFrame({
           color: COLOR.mute,
         }}>Outbreak Forensics</div>
         <div style={{ flex: 1 }} />
-        {/* Stats strip — counts tick up as the tree builds */}
         <StatsStrip treeP={treeP} />
-        {/* AI Co-Pilot icon */}
         <div style={{
           width: 30, height: 30,
           marginLeft: 14,
@@ -380,7 +303,6 @@ function DashboardFrame({
         </div>
       </div>
 
-      {/* Body */}
       <div style={{
         position: 'absolute', left: 0, right: chatP > 0.1 ? 380 : 0, top: 44, bottom: 0,
         transition: 'right 400ms cubic-bezier(.4,.2,.2,1)',
@@ -396,7 +318,6 @@ function DashboardFrame({
         )}
       </div>
 
-      {/* AI Co-Pilot chat sidebar */}
       <div style={{
         position: 'absolute', right: 0, top: 44, bottom: 0,
         width: 380,
@@ -417,9 +338,6 @@ function DashboardFrame({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Stats strip — 4 ticking counters in the dashboard header
-// ─────────────────────────────────────────────────────────────────────────
 function StatsStrip({ treeP }) {
   const eased = Easing.easeOutQuart(clamp(treeP, 0, 1));
   const stats = [
@@ -449,9 +367,6 @@ function StatsStrip({ treeP }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Transmission tree pane — orthogonal edges with rounded corners
-// ─────────────────────────────────────────────────────────────────────────
 function TransmissionTreePane({ treeP, t }) {
   const isInfected   = (id) => INFECTED_IDS.includes(id);
   const isUndetected = (id) => UNDETECTED_IDS.includes(id);
@@ -462,8 +377,6 @@ function TransmissionTreePane({ treeP, t }) {
 
   return (
     <svg width="100%" height="100%" viewBox="0 0 1120 472" preserveAspectRatio="xMidYMid meet">
-      {/* Arrowhead markers — solid (confirmed transmissions) and an
-          open variant for the dashed "potential exposure" arrows from SD1. */}
       <defs>
         <marker id="fdyTreeArrow" viewBox="0 0 10 10"
           refX="9" refY="5"
@@ -482,7 +395,6 @@ function TransmissionTreePane({ treeP, t }) {
         </marker>
       </defs>
 
-      {/* Ward backgrounds */}
       <g opacity={treeP}>
         {WARD_LAYOUT.map((w) => (
           <g key={w.key}>
@@ -506,7 +418,6 @@ function TransmissionTreePane({ treeP, t }) {
         ))}
       </g>
 
-      {/* Tree edges — orthogonal Manhattan paths */}
       <g>
         {TREE_EDGES.map(([from, to], i) => {
           const a = TREE_BY_ID[from];
@@ -529,10 +440,7 @@ function TransmissionTreePane({ treeP, t }) {
         })}
       </g>
 
-      {/* At-risk arrows — dashed, drawn AFTER the solid tree edges so the
-          dashed stroke + open arrowhead settle on top of any crossings.
-          Source is SD1 (the infected staff member); targets are the at-risk
-          patients A4/A5/A6 the engine flagged as potential exposures. */}
+      {/* Drawn after the solid tree edges so the dashed strokes paint on top at crossings. */}
       <g>
         {AT_RISK_EDGES.map(([from, to], i) => {
           const a = TREE_BY_ID[from];
@@ -553,7 +461,6 @@ function TransmissionTreePane({ treeP, t }) {
         })}
       </g>
 
-      {/* Patient nodes */}
       {TREE_PATIENTS.map((p, i) => {
         const reveal = clamp((treeP - i * 0.03) * 1.6, 0, 1);
         const eased = Easing.easeOutBack(clamp(reveal, 0, 1));
@@ -564,13 +471,6 @@ function TransmissionTreePane({ treeP, t }) {
         const gold   = isGold(p.id);
         const r = gold ? 13 : 10;
 
-        // Centre fill — the node's primary state.
-        //   • Gold (superspreader)
-        //   • Red  (confirmed / imported — imported is a red node inside a
-        //          blue ring)
-        //   • Strong purple (undetected)
-        //   • Grey (at-risk and susceptible — at-risk wears an extra red
-        //          ring drawn below)
         const fill = gold
           ? COLOR.gold
           : (inf || imp)
@@ -595,12 +495,9 @@ function TransmissionTreePane({ treeP, t }) {
         const showHighlight = p.id === 'A3' && highlightA3;
         return (
           <g key={p.id} transform={`translate(${p.x}, ${p.y}) scale(${eased})`}>
-            {/* Imported — blue ring around the red node. */}
             {imp && (
               <circle r={r + 5} fill="none" stroke={BLUE_IMPORTED} strokeWidth="1.6" />
             )}
-            {/* At-risk — red ring around the grey node. Dashed to distinguish
-                from a confirmed/superspreader pulse. */}
             {atRisk && (
               <circle r={r + 5} fill="none" stroke={COLOR.alert} strokeWidth="1.6"
                 strokeDasharray="3 2" />
@@ -626,7 +523,6 @@ function TransmissionTreePane({ treeP, t }) {
         );
       })}
 
-      {/* Staff nodes */}
       {TREE_STAFF.map((s, i) => {
         const reveal = clamp((treeP - 0.4 - i * 0.05) * 1.6, 0, 1);
         const eased = Easing.easeOutBack(clamp(reveal, 0, 1));
@@ -646,36 +542,28 @@ function TransmissionTreePane({ treeP, t }) {
         );
       })}
 
-      {/* Legend — six categories. Imports and at-risk are rendered as
-          rings around a centre dot, matching the tree pane glyphs above. */}
       <g opacity={treeP * 0.85} transform="translate(20, 446)">
         <text x="0" y="3" fontFamily={FONT_MONO} fontSize="9"
           fill={COLOR.mute} letterSpacing="2.2"
           style={{ textTransform: 'uppercase' }}>Legend</text>
 
-        {/* Susceptible */}
         <circle cx="78" cy="0" r="5" fill={COLOR.patient} stroke={COLOR.mute} strokeWidth="1" />
         <text x="90" y="3" fontFamily={FONT_MONO} fontSize="9" fill={COLOR.text} letterSpacing="0.6">Susceptible</text>
 
-        {/* Undetected — stronger purple */}
         <circle cx="186" cy="0" r="5" fill={PURPLE_UNDETECTED} />
         <text x="198" y="3" fontFamily={FONT_MONO} fontSize="9" fill={COLOR.text} letterSpacing="0.6">Undetected</text>
 
-        {/* Confirmed */}
         <circle cx="292" cy="0" r="5" fill={COLOR.alert} />
         <text x="304" y="3" fontFamily={FONT_MONO} fontSize="9" fill={COLOR.text} letterSpacing="0.6">Confirmed</text>
 
-        {/* Imported — red node inside a blue ring */}
         <circle cx="388" cy="0" r="8" fill="none" stroke={BLUE_IMPORTED} strokeWidth="1.2" />
         <circle cx="388" cy="0" r="5" fill={COLOR.alert} />
         <text x="402" y="3" fontFamily={FONT_MONO} fontSize="9" fill={COLOR.text} letterSpacing="0.6">Imported</text>
 
-        {/* Superspreader — rotated gold square */}
         <rect x="481" y="-5" width="10" height="10" fill={COLOR.gold}
           transform="rotate(45 486 0)" />
         <text x="498" y="3" fontFamily={FONT_MONO} fontSize="9" fill={COLOR.text} letterSpacing="0.6">Superspreader</text>
 
-        {/* At risk — grey node inside a dashed red ring */}
         <circle cx="612" cy="0" r="8" fill="none" stroke={COLOR.alert} strokeWidth="1.2" strokeDasharray="2.5 2" />
         <circle cx="612" cy="0" r="5" fill={COLOR.patient} stroke={COLOR.mute} strokeWidth="1" />
         <text x="626" y="3" fontFamily={FONT_MONO} fontSize="9" fill={COLOR.text} letterSpacing="0.6">At risk</text>
@@ -684,9 +572,6 @@ function TransmissionTreePane({ treeP, t }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Patient popup card (anchored to A3)
-// ─────────────────────────────────────────────────────────────────────────
 function PatientPopup({ p }) {
   const eased = Easing.easeOutCubic(p);
   return (
@@ -747,11 +632,6 @@ function Row({ label, value, valueColor = COLOR.ink }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// AI Co-Pilot chat sidebar
-//   • Chat input border uses ink (was red while typing)
-//   • Thinking dots use ink (was red)
-// ─────────────────────────────────────────────────────────────────────────
 function CoPilotChat({ promptChars, sent, thinkingP, strategiesP }) {
   const promptShown = PROMPT_TEXT.slice(0, promptChars);
   const isTyping = promptChars > 0 && !sent;
@@ -818,7 +698,6 @@ function CoPilotChat({ promptChars, sent, thinkingP, strategiesP }) {
           flex: 1,
           padding: '8px 10px',
           background: '#fff',
-          // Reserved red — input border uses ink while active
           border: `1px solid ${isTyping ? COLOR.ink : COLOR.ruleStrong}`,
           borderRadius: 6,
           fontFamily: FONT_MONO, fontSize: 11,
@@ -879,11 +758,6 @@ function ThinkingDot({ delay }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Strategy drawer — slides up from the bottom of the body (220 tall),
-// keeps the tree visible above. Cursor walks to recommended (Scenario 03)
-// and clicks; "Deploying" confirmation slides up over the card.
-// ─────────────────────────────────────────────────────────────────────────
 function StrategyDrawer({ p, deployClickP }) {
   const slideP = Easing.easeOutCubic(clamp(p, 0, 1));
   return (
@@ -993,7 +867,6 @@ function StrategyDrawer({ p, deployClickP }) {
                 ))}
               </div>
 
-              {/* Deploy confirmation overlay */}
               {deployed && (
                 <div style={{
                   position: 'absolute', inset: 0,
@@ -1025,66 +898,37 @@ function StrategyDrawer({ p, deployClickP }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// NotificationLogo — pre-dashboard intro for the About 0.3 (endtoend) loop.
-//
-// Shows the Nosotrack brand mark large in the centre of the stage with
-// the wordmark below, plus an iOS-style red notification badge in the
-// top-right that counts 1 → 2 → 3 → 4 as alerts roll in. At lt = CLICK_T
-// (synchronised with the DashboardScene cursor click) the inner network
-// spins and the whole composition collapses toward (logoX, logoY) while
-// the dashboard expands from the same point.
-//
-// Drives the "main logo with notification badge" intro requested in
-// rev. 12. Designed to be mounted alongside DashboardScene in main.jsx's
-// EndToEndLoop with matching logoX / logoY props.
-// ─────────────────────────────────────────────────────────────────────────
 function NotificationLogo({ logoX = 640, logoY = 360 } = {}) {
   const { localTime: t } = useSprite();
 
-  // Notification counter — starts at 0, increments through 1..3.
-  // Paced so the three alerts breathe inside a ~2-second intro and the
-  // cursor click lands shortly after the third badge.
   const incrementTimes = [0.2, 0.8, 1.4];
   let count = 0;
   for (let i = 0; i < incrementTimes.length; i++) {
     if (t >= incrementTimes[i]) count = i + 1;
   }
-  // Badge "pop" scale when the count increments — exp-decay from 1.35 → 1.
   let badgeScale = 1;
   if (count > 0) {
     const dt = t - incrementTimes[count - 1];
     badgeScale = 1 + 0.35 * Math.exp(-dt * 8);
   }
 
-  // Synchronise with DashboardScene cursor: cursor clicks at its lt 2.0,
-  // which in EndToEndLoop is stage_t = 2.0 (DashboardScene starts at
-  // stage_t 0). NotificationLogo's Sprite starts at stage_t = 0 so its
-  // lt 2.0 = the click moment.
   const CLICK_T = 2.0;
   const networkSpin = t > CLICK_T
     ? Easing.easeInOutCubic(clamp((t - CLICK_T) / 1.0, 0, 1)) * 360
     : 0;
 
-  // Collapse begins just after the click — the whole intro (3 alerts +
-  // click + collapse) wraps inside ~3 s of stage time.
   const COLLAPSE_T = 2.2;
   const collapseP = clamp((t - COLLAPSE_T) / 1.2, 0, 1);
   const collapseScale = 1 - collapseP * 0.95;
   const collapseOp = 1 - collapseP;
 
-  // Brand-mark size and badge geometry.
   const markSize = 140;
   const badgeR = 18;
-  // Badge sits in the top-right of the bounding box around the brand mark.
-  // The brand mark renders at (markSize × markSize) anchored top-left of
-  // its inline-block container, so the badge centre is offset (markSize - 8, 8).
   const badgeOffsetX = markSize - 10;
   const badgeOffsetY = 6;
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      {/* Chrome (NOSOTRACK / INBOX) — fades with the collapse. */}
       <div style={{ opacity: collapseOp }}>
         <FdyChrome chapter="Inbox" />
       </div>
@@ -1101,7 +945,6 @@ function NotificationLogo({ logoX = 640, logoY = 360 } = {}) {
           willChange: 'transform, opacity',
         }}
       >
-        {/* Brand mark + notification badge, stacked + centered */}
         <div style={{ position: 'relative', display: 'inline-block' }}>
           <FdyBrandMark size={markSize} pulse networkSpin={networkSpin} />
           {count > 0 && (
@@ -1135,7 +978,6 @@ function NotificationLogo({ logoX = 640, logoY = 360 } = {}) {
           )}
         </div>
 
-        {/* Wordmark directly below the brand mark */}
         <div style={{ marginTop: 22 }}>
           <span
             style={{
@@ -1152,8 +994,6 @@ function NotificationLogo({ logoX = 640, logoY = 360 } = {}) {
           </span>
         </div>
 
-        {/* Subtle eyebrow caption — gives the splash some texture
-            without competing with the badge. */}
         <div
           style={{
             marginTop: 12,

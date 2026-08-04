@@ -1,51 +1,18 @@
-
-// animations.jsx
-// Reusable animation starter: Stage, Timeline, Sprite, easing helpers.
-//
-// EMBED MODE — when this file is loaded by the host site (Nosotrack
-// marketing page) inside an iframe with ?embed=1, the Stage:
-//   • hides its built-in playback bar (the host renders an external one
-//     styled to match the engine card on the platform section);
-//   • drops the dark "letterbox" surround and box-shadow on the canvas
-//     so the demo blends into the host's framed bezel;
-//   • bridges its play/pause/seek/speed state to the parent window via
-//     postMessage so the external bar stays in sync.
-//
-// The standalone foundry-demo/index.html (without ?embed=1) is unchanged.
-// Usage (in an HTML file that loads React + Babel):
-//
-//   <Stage width={1280} height={720} duration={10} background="#f6f4ef">
-//     <MyScene />
-//   </Stage>
-//
-// Inside <Stage>, any child can call useTime() to read the current
-// playhead (seconds). Or wrap content in <Sprite start={1} end={4}>...</Sprite>
-// to only render during that window -- children receive a `localTime` and
-// `progress` via the useSprite() hook.
-//
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ── Easing functions (hand-rolled, Popmotion-style) ─────────────────────────
-// All easings take t ∈ [0,1] and return eased t ∈ [0,1] (may overshoot for back/elastic).
 const Easing = {
   linear: (t) => t,
 
-  // Quad
   easeInQuad:    (t) => t * t,
   easeOutQuad:   (t) => t * (2 - t),
   easeInOutQuad: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
 
-  // Cubic
   easeInCubic:    (t) => t * t * t,
   easeOutCubic:   (t) => (--t) * t * t + 1,
   easeInOutCubic: (t) => (t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1),
 
-  // Quart
   easeInQuart:    (t) => t * t * t * t,
   easeOutQuart:   (t) => 1 - (--t) * t * t * t,
   easeInOutQuart: (t) => (t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t),
 
-  // Expo
   easeInExpo:  (t) => (t === 0 ? 0 : Math.pow(2, 10 * (t - 1))),
   easeOutExpo: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
   easeInOutExpo: (t) => {
@@ -55,12 +22,10 @@ const Easing = {
     return 1 - 0.5 * Math.pow(2, -20 * t + 10);
   },
 
-  // Sine
   easeInSine:    (t) => 1 - Math.cos((t * Math.PI) / 2),
   easeOutSine:   (t) => Math.sin((t * Math.PI) / 2),
   easeInOutSine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
 
-  // Back (overshoot)
   easeOutBack: (t) => {
     const c1 = 1.70158, c3 = c1 + 1;
     return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
@@ -76,7 +41,6 @@ const Easing = {
       : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
   },
 
-  // Elastic
   easeOutElastic: (t) => {
     const c4 = (2 * Math.PI) / 3;
     if (t === 0) return 0;
@@ -85,14 +49,8 @@ const Easing = {
   },
 };
 
-// ── Core interpolation helpers ──────────────────────────────────────────────
-
-// Clamp a value to [min, max]
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
-// interpolate([0, 0.5, 1], [0, 100, 50], ease?) -> fn(t)
-// Popmotion-style: linearly maps t across input keyframes to output values,
-// with optional easing per segment (single fn or array of fns).
 function interpolate(input, output, ease = Easing.linear) {
   return (t) => {
     if (t <= input[0]) return output[0];
@@ -110,8 +68,6 @@ function interpolate(input, output, ease = Easing.linear) {
   };
 }
 
-// animate({from, to, start, end, ease})(t) — simpler single-segment tween.
-// Returns `from` before `start`, `to` after `end`.
 function animate({ from = 0, to = 1, start = 0, end = 1, ease = Easing.easeInOutCubic }) {
   return (t) => {
     if (t <= start) return from;
@@ -121,22 +77,10 @@ function animate({ from = 0, to = 1, start = 0, end = 1, ease = Easing.easeInOut
   };
 }
 
-// ── Timeline context ────────────────────────────────────────────────────────
-
 const TimelineContext = React.createContext({ time: 0, duration: 10, playing: false });
 
 const useTime = () => React.useContext(TimelineContext).time;
 const useTimeline = () => React.useContext(TimelineContext);
-
-// ── Sprite ──────────────────────────────────────────────────────────────────
-// Renders children only when the playhead is inside [start, end]. Provides
-// a sub-context with `localTime` (seconds since start) and `progress` (0..1).
-//
-//   <Sprite start={2} end={5}>
-//     {({ localTime, progress }) => <Thing x={progress * 100} />}
-//   </Sprite>
-//
-// Or as a plain wrapper — children can call useSprite() themselves.
 
 const SpriteContext = React.createContext({ localTime: 0, progress: 0, duration: 0 });
 const useSprite = () => React.useContext(SpriteContext);
@@ -161,10 +105,6 @@ function Sprite({ start = 0, end = Infinity, children, keepMounted = false }) {
   );
 }
 
-// ── Sample sprite components ────────────────────────────────────────────────
-
-// TextSprite: fades/slides text in on entry, holds, then fades out on exit.
-// Props: text, x, y, size, color, font, entryDur, exitDur, align
 function TextSprite({
   text,
   x = 0, y = 0,
@@ -217,7 +157,6 @@ function TextSprite({
   );
 }
 
-// ImageSprite: scales + fades in; optional Ken Burns drift during hold.
 function ImageSprite({
   src,
   x = 0, y = 0,
@@ -228,7 +167,7 @@ function ImageSprite({
   kenBurnsScale = 1.08,
   radius = 12,
   fit = 'cover',
-  placeholder = null, // {label: string} for striped placeholder
+  placeholder = null,
 }) {
   const { localTime, duration } = useSprite();
   const exitStart = Math.max(0, duration - exitDur);
@@ -284,8 +223,6 @@ function ImageSprite({
   );
 }
 
-// RectSprite: simple rectangle that animates position/size/color via props.
-// Useful demo primitive — takes a `render` fn for per-frame customization.
 function RectSprite({
   x = 0, y = 0,
   width = 100, height = 100,
@@ -293,7 +230,7 @@ function RectSprite({
   radius = 8,
   entryDur = 0.4,
   exitDur = 0.3,
-  render, // optional: (ctx) => style overrides
+  render,
 }) {
   const spriteCtx = useSprite();
   const { localTime, duration } = spriteCtx;
@@ -330,8 +267,6 @@ function RectSprite({
   );
 }
 
-
-// Detect embed mode once at module load.
 const STAGE_EMBED = (function () {
   try { return new URLSearchParams(window.location.search).has('embed'); }
   catch { return false; }
@@ -349,7 +284,7 @@ function Stage({
   children,
 }) {
   const [time, setTime] = React.useState(() => {
-    if (STAGE_EMBED) return 0; // always start fresh in the embedded player
+    if (STAGE_EMBED) return 0;
     try {
       const v = parseFloat(localStorage.getItem(persistKey + ':t') || '0');
       return isFinite(v) ? clamp(v, 0, duration) : 0;
@@ -365,19 +300,16 @@ function Stage({
   const rafRef = React.useRef(null);
   const lastTsRef = React.useRef(null);
 
-  // Persist playhead — skipped in embed so the host always gets a fresh start
   React.useEffect(() => {
     if (STAGE_EMBED) return;
     try { localStorage.setItem(persistKey + ':t', String(time)); } catch {}
   }, [time, persistKey]);
 
-  // Auto-scale to fit viewport. In embed mode the external bar lives in the
-  // parent page, so the iframe is purely the canvas — no playback-bar reserve.
   React.useEffect(() => {
     if (!stageRef.current) return;
     const el = stageRef.current;
     const measure = () => {
-      const barH = STAGE_EMBED ? 0 : 44; // playback bar height
+      const barH = STAGE_EMBED ? 0 : 44;
       const s = Math.min(
         el.clientWidth / width,
         (el.clientHeight - barH) / height
@@ -394,8 +326,6 @@ function Stage({
     };
   }, [width, height]);
 
-  // Animation loop — speed multiplier applied to dt so the host can drive
-  // 1×/1.5×/2×/3×/5× without changing the loop logic.
   React.useEffect(() => {
     if (!playing) {
       lastTsRef.current = null;
@@ -422,8 +352,7 @@ function Stage({
     };
   }, [playing, duration, loop, speed]);
 
-  // ── Embed bridge ──────────────────────────────────────────────────────
-  // Two-way postMessage with the host page's external playback bar.
+  // Host bridge: parent posts {source:'nosotrack-host', cmd:'play'|'pause'|'toggle'|'seek'|'speed'|'restart'}; this Stage posts back {source:'nosotrack-demo', type:'ready'|'tick'}.
   React.useEffect(() => {
     if (!STAGE_EMBED) return;
     const onMsg = (e) => {
@@ -439,7 +368,6 @@ function Stage({
       }
     };
     window.addEventListener('message', onMsg);
-    // Announce ready so the host can initialise its UI.
     try {
       window.parent.postMessage({
         source: 'nosotrack-demo', type: 'ready', duration
@@ -448,8 +376,7 @@ function Stage({
     return () => window.removeEventListener('message', onMsg);
   }, [duration]);
 
-  // Throttle time broadcasts to ~30 Hz so the parent's bar stays smooth
-  // without flooding postMessage.
+  // 33 ms ~ 30 Hz - throttles tick broadcasts so postMessage isn't flooded.
   const lastBroadcastRef = React.useRef(0);
   React.useEffect(() => {
     if (!STAGE_EMBED) return;
@@ -464,7 +391,6 @@ function Stage({
     } catch {}
   }, [time, playing, speed, duration]);
 
-  // Keyboard: space = play/pause, ← → = seek
   React.useEffect(() => {
     const onKey = (e) => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
@@ -497,13 +423,10 @@ function Stage({
         position: 'absolute', inset: 0,
         display: 'flex', flexDirection: 'column',
         alignItems: 'center',
-        // In embed mode: transparent so the host's framed bezel paints
-        // around the canvas with no dark letterbox bands.
         background: STAGE_EMBED ? 'transparent' : '#0a0a0a',
         fontFamily: 'Inter, system-ui, sans-serif',
       }}
     >
-      {/* Canvas area — vertically centered in remaining space */}
       <div style={{
         flex: 1,
         width: '100%',
@@ -520,8 +443,6 @@ function Stage({
             transform: `scale(${scale})`,
             transformOrigin: 'center',
             flexShrink: 0,
-            // Drop the heavy drop-shadow in embed mode — the host already
-            // paints a bezel around the iframe.
             boxShadow: STAGE_EMBED ? 'none' : '0 20px 60px rgba(0,0,0,0.4)',
             overflow: 'hidden',
           }}
@@ -532,9 +453,6 @@ function Stage({
         </div>
       </div>
 
-      {/* Playback bar — only rendered standalone. In embed mode the host
-          page renders an external bar (matching the engine card on the
-          platform section) and drives this Stage via postMessage. */}
       {!STAGE_EMBED && (
         <PlaybackBar
           time={displayTime}
@@ -550,10 +468,6 @@ function Stage({
     </div>
   );
 }
-
-// ── Playback bar ────────────────────────────────────────────────────────────
-// Play/pause, return-to-begin, scrub track, time display.
-// Uses fixed-width time fields so layout doesn't thrash.
 
 function PlaybackBar({ time, duration, playing, onPlayPause, onReset, onSeek, onHover }) {
   const trackRef = React.useRef(null);
@@ -647,7 +561,6 @@ function PlaybackBar({ time, duration, playing, onPlayPause, onReset, onSeek, on
         )}
       </IconButton>
 
-      {/* Current time: fixed width so it doesn't thrash */}
       <div style={{
         fontFamily: mono,
         fontSize: 12,
@@ -658,7 +571,6 @@ function PlaybackBar({ time, duration, playing, onPlayPause, onReset, onSeek, on
         {fmt(time)}
       </div>
 
-      {/* Scrub track */}
       <div
         ref={trackRef}
         onMouseMove={onTrackMove}
@@ -695,7 +607,6 @@ function PlaybackBar({ time, duration, playing, onPlayPause, onReset, onSeek, on
         }}/>
       </div>
 
-      {/* Duration: fixed width */}
       <div style={{
         fontFamily: mono,
         fontSize: 12,
@@ -733,7 +644,6 @@ function IconButton({ children, onClick, title }) {
     </button>
   );
 }
-
 
 Object.assign(window, {
   Easing, interpolate, animate, clamp,

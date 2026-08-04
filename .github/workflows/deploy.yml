@@ -1,22 +1,15 @@
 name: Deploy to GitHub Pages
 
-# Build the Next.js static export and publish to GitHub Pages.
-# Trigger: every push to `main` (production) plus a manual button on the
-# Actions tab. PRs build but do NOT deploy — keeps preview pollution off
-# the live domain.
-
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
-# Pages-deploy requires write to id-token + pages.
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Only one deploy at a time; in-flight runs get cancelled by newer pushes.
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -44,14 +37,11 @@ jobs:
         run: npm run build
 
       - name: Copy CNAME into out/
-        # Required for the apex domain (nosotrack.com) to bind correctly.
-        # Pages strips a stale CNAME between deploys, so we re-emit it
-        # every build instead of relying on a hand-placed file.
+        # Pages strips a stale CNAME between deploys, so re-emit every build.
         run: cp CNAME out/CNAME
 
       - name: Add .nojekyll
-        # GitHub Pages otherwise treats underscore-prefixed paths
-        # (Next.js writes `_next/`) as Jekyll directives and 404s them.
+        # Without it Jekyll 404s Next.js's `_next/` paths.
         run: touch out/.nojekyll
 
       - name: Upload artifact

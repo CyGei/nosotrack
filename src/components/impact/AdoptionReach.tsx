@@ -1,21 +1,5 @@
 "use client";
 
-/**
- * AdoptionReach — deck-only composition for the pitch deck's slide 6.
- *
- * Team on the LEFT (three aligned photos, each with name / position /
- * affiliation only), the living Globe with its adoption metrics arched off its
- * right on the RIGHT — mirroring the site's <ImpactAdoption> so the figures
- * (Downloads / Citations / Countries / Publications) always match the site and
- * sit BESIDE the globe (in view), not stacked below it where the iframe fold
- * would clip them.
- *
- * Team identity (name / role / photo / focus) is imported from <Team> so it
- * never drifts; only the per-person position titles live here.
- *
- * Rendered standalone at /impact-embed and iframed by the deck.
- */
-
 import { useEffect, useRef, useState } from "react";
 import { useScrollReveal } from "@/lib/hooks";
 import Image from "next/image";
@@ -39,12 +23,10 @@ const METRICS: MetricDef[] = [
   { value: people.publications, label: "Publications" },
 ];
 
-// Metrics arch off the globe's right edge — same treatment as ImpactAdoption.
 const ARC_OFFSET = 84;
 const AGG_ANGLES = [-36, -12, 12, 36];
 
-// Position titles (deck-only). Keyed by the name in <Team> so identity data
-// stays single-sourced; the affiliation comes from each person's `role`.
+// Keyed by the name in <Team>; the affiliation comes from each person's `role`.
 const POSITION: Record<string, string> = {
   "Dr Cyril Geismar": "Postdoctoral Research Fellow",
   "Dr Anne Cori": "Associate Professor",
@@ -58,9 +40,6 @@ export function AdoptionReach() {
   const [size, setSize] = useState(280);
   const [run, setRun] = useState(false);
 
-  // Scroll-triggered typewriter — same hook the About titles use, so the
-  // embedded slide-6 heading types in like every other deck title. The
-  // IntersectionObserver fires on mount when the lazy iframe scrolls in.
   const { ref: titleRef, fractional } = useScrollReveal<HTMLHeadingElement>(
     TITLE.length,
     32,
@@ -71,8 +50,7 @@ export function AdoptionReach() {
   const isStarted = fractional > 0;
   const isDone = fractional >= TITLE.length;
 
-  // Size the globe off its column so the arched metrics stay inside the track.
-  // The `- 150` reserves room for the arc + figures to the globe's right.
+  // `- 150` reserves room for the arc + figures to the globe's right.
   useEffect(() => {
     const el = box.current;
     if (!el) return;
@@ -123,14 +101,12 @@ export function AdoptionReach() {
       </h2>
 
       <div className="mt-10 grid items-start gap-x-12 gap-y-12 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-        {/* ── LEFT · the team behind the methods ── */}
         <div className="grid grid-cols-3 items-start gap-x-6">
           {[FOUNDER, ...ADVISORS].map((p) => (
             <Person key={p.name} person={p} position={POSITION[p.name]} />
           ))}
         </div>
 
-        {/* ── RIGHT · living globe + arched adoption metrics ── */}
         <div ref={box} className="relative flex justify-center lg:justify-end">
           <div
             className="relative"
@@ -158,8 +134,6 @@ export function AdoptionReach() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-
 function Metric({
   metric,
   run,
@@ -177,7 +151,6 @@ function Metric({
         transition: `opacity 640ms var(--ease-nt) ${delay}ms`,
       }}
     >
-      {/* Site StatTally figure — arched size. */}
       <div className="font-display font-normal leading-none tracking-tight tabular-nums text-ink text-[clamp(22px,2.4vw,32px)]">
         {fmtInt(v)}
         {metric.plus && <span className="text-mute">+</span>}

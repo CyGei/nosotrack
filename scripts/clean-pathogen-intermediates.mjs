@@ -1,17 +1,6 @@
 #!/usr/bin/env node
-/**
- * clean-pathogen-intermediates.mjs — remove transient WRL / STL / .converted.glb
- * artifacts left over from `fetch-pathogen.mjs` runs.
- *
- * The fetch script tries to delete its own intermediates with `unlinkSync`,
- * but in the cowork sandbox `unlink` is denied on mounted directories, so
- * the temporary files accumulate. Run this on your local machine after
- * any fetch run, before `npm run build` — otherwise Next.js will copy
- * hundreds of MB of dead WRL into `out/`.
- *
- * Usage:
- *   node scripts/clean-pathogen-intermediates.mjs
- */
+// Removes fetch-pathogen.mjs intermediates the sandbox couldn't unlink — run before
+// `npm run build`, or Next.js copies hundreds of MB of dead WRL into out/.
 
 import { readdirSync, unlinkSync, statSync } from "node:fs";
 import { resolve, dirname } from "node:path";
@@ -21,7 +10,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const modelsDir = resolve(__dirname, "..", "public/models");
 
 const KILL_RE = /\.(raw\.[a-z0-9]+|small\.[a-z0-9]+|converted\.glb)$/i;
-const KILL_PREFIX_RE = /^.*-test\./i; // also nuke the rhinovirus-test.* dev files
+const KILL_PREFIX_RE = /^.*-test\./i;
 
 let n = 0;
 let bytes = 0;

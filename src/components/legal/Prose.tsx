@@ -1,11 +1,5 @@
 import type { ReactNode } from "react";
 
-/**
- * Shared inline typography for the /privacy and /terms legal pages — a
- * prose wrapper, section heading, and link with automatic external-link
- * handling. Kept in one place so both documents read identically.
- */
-
 export function Prose({ children }: { children: ReactNode }) {
   return (
     <div className="space-y-4 text-[15px] leading-[1.7] text-text [&_strong]:font-medium [&_strong]:text-ink">

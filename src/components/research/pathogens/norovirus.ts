@@ -1,16 +1,6 @@
 import type { PathogenSpec } from "./types";
 
-/**
- * Norovirus — non-enveloped icosahedral RNA virus, leading cause of
- * acute gastroenteritis outbreaks worldwide. Highly transmissible
- * (low infectious dose, environmental persistence), making it a
- * frequent culprit in hospital, cruise-ship, and long-term-care
- * facility outbreaks.
- *
- * Source: AI-assisted image-to-3D (input was 174 MB / 3.95M tris;
- * the simplifier kept the icosahedral facet structure), simplified
- * to ~1.5% triangles + meshopt-compressed (~593 KB).
- */
+// Source: AI-assisted image-to-3D (input 174 MB / 3.95M tris), simplified to ~1.5% triangles + meshopt (~593 KB).
 export const NOROVIRUS: PathogenSpec = {
   id: "norovirus",
   name: "Norovirus",

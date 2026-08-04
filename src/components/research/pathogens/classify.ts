@@ -1,86 +1,16 @@
-/**
- * paintRedShading — one algorithm, every pathogen mesh.
- *
- * Goal: highlight surface projections (spikes, fimbriae, glycoproteins,
- * flagella, capsule bumps) in red while keeping the body grey. No
- * per-spec configuration, no parameters.
- *
- * Algorithm — "Mahalanobis distance from PCA-fitted ellipsoid":
- *
- *   1. Fit a 3D ellipsoid to the mesh by computing the centroid and the
- *      3×3 covariance matrix of vertex positions. Eigendecomposition is
- *      implicit: the inverse covariance matrix encodes the ellipsoid
- *      directly. This ellipsoid IS "the standard body shape" — a sphere
- *      for cocci, a prolate ellipsoid for rods, a half-ellipsoid for
- *      cutaway virions.
- *
- *   2. Score every vertex by its squared Mahalanobis distance from that
- *      ellipsoid: score[i] = (v[i] − μ) · Σ⁻¹ · (v[i] − μ). Vertices on
- *      the "1-σ surface" sit near score=3; spike tips that protrude
- *      beyond the body shape get higher scores; cut-surface interiors
- *      get lower.
- *
- *   3. Robust outlier threshold = median(score) + 2 × MAD(score). MAD
- *      (median absolute deviation) is insensitive to the few extreme
- *      tail values that throw off mean/stddev or Otsu, so the same
- *      formula works on unimodal smooth meshes and bimodal spike-rich
- *      ones.
- *
- *   4. Connected-component filter using mesh adjacency + position-weld
- *      (so duplicate vertices at the same physical position, common
- *      after gltfpack -cc, are treated as connected). Cluster minimum
- *      is 3 — kills isolated single-vertex noise while preserving every
- *      real feature cluster.
- *
- *   5. Paint binary grey/red into the per-vertex `color` attribute.
- *
- * Why this works across the full catalogue:
- *
- *   - Spherical virions (SARS, rhinovirus, capsids): ellipsoid ≈ sphere,
- *     spikes are radial outliers → red.
- *   - Rod bacteria (E. coli, K. pneumoniae): ellipsoid is prolate, side
- *     bumps + ends are above the 1-σ surface → red.
- *   - Cutaways (Ebola, HIV): ellipsoid ≈ half-virion shape, glycoprotein
- *     spike tips poke out → red, while the cut surface is *inside* the
- *     ellipsoid → grey.
- *   - Heterogeneous-resolution meshes (AI-generated): no iterative
- *     smoothing means edge-length variation doesn't break the
- *     algorithm. Only the global covariance fit and per-vertex score
- *     matter.
- *
- * Complexity: O(V) for centroid + covariance + scores + adjacency;
- * O(V log V) for the MAD sort; O(V + E) for CC. Runs in <200 ms for
- * 160k-vertex meshes.
- */
-
 import * as THREE from "three";
 
-/** Brand palette — locked. Don't introduce more shades. */
 export const PALETTE_GREY = new THREE.Color(0x7a7d83);
 export const PALETTE_RED = new THREE.Color(0xff073a);
 
-/** MAD outlier multiplier. 2.0 corresponds to roughly the upper 5–10 %
- *  tail for unimodal distributions and the upper mode for bimodal ones;
- *  empirically picks the spike clusters on every shipped specimen. */
+// MAD outlier multiplier; 2.0 empirically isolates the spike clusters on every shipped specimen.
 const MAD_MULT = 2.0;
 
-/** Minimum connected component size. 3 is enough to reject single- or
- *  paired-vertex noise specks while admitting every real biological
- *  cluster (which always has a base + walls = many connected verts). */
 const MIN_CLUSTER = 3;
 
-/** Position-weld cell size as a fraction of mean edge length. 0.5 catches
- *  gltfpack-quantized seam splits without accidentally welding real
- *  neighbours. */
+// Weld cell as a fraction of mean edge length: 0.5 catches gltfpack-quantized seam splits without welding real neighbours.
 const WELD_CELL_RATIO = 0.5;
 
-/* ─────────────────────────────────────────────────── public ── */
-
-/**
- * Apply the universal red-shading algorithm to one mesh in place.
- * Writes a fresh `color` BufferAttribute and leaves the geometry ready
- * for `MeshStandardMaterial({ vertexColors: true })`.
- */
 export function paintRedShading(mesh: THREE.Mesh): void {
   const geom = mesh.geometry as THREE.BufferGeometry;
   const posAttr = geom.getAttribute("position") as
@@ -90,7 +20,6 @@ export function paintRedShading(mesh: THREE.Mesh): void {
   const V = posAttr.count;
   if (V === 0) return;
 
-  // Flatten positions to a Float32Array once — every step below benefits.
   const positions = new Float32Array(V * 3);
   for (let i = 0; i < V; i++) {
     positions[i * 3 + 0] = posAttr.getX(i);
@@ -98,7 +27,7 @@ export function paintRedShading(mesh: THREE.Mesh): void {
     positions[i * 3 + 2] = posAttr.getZ(i);
   }
 
-  // Colour attribute, pre-filled grey (degenerate exits look correct).
+  // Pre-fill grey so degenerate early exits still look correct.
   const colorAttr = ensureColorAttribute(geom, V);
   paintAll(colorAttr, PALETTE_GREY);
 
@@ -107,31 +36,25 @@ export function paintRedShading(mesh: THREE.Mesh): void {
     return;
   }
 
-  // 1+2. Mahalanobis scores
   const scores = mahalanobisScores(positions, V);
   if (!scores) {
     colorAttr.needsUpdate = true;
     return;
   }
 
-  // 3. Threshold
   const threshold = madThreshold(scores);
 
-  // 4. CC filter
   const adj = buildAdjacency(geom, positions, V);
   const candidate = new Uint8Array(V);
   for (let i = 0; i < V; i++) candidate[i] = scores[i] >= threshold ? 1 : 0;
   const isRed = filterByClusterSize(candidate, adj, V, MIN_CLUSTER);
 
-  // 5. Paint
   for (let i = 0; i < V; i++) {
     if (!isRed[i]) continue;
     colorAttr.setXYZ(i, PALETTE_RED.r, PALETTE_RED.g, PALETTE_RED.b);
   }
   colorAttr.needsUpdate = true;
 }
-
-/* ─────────────────────────────────────────────── helpers ── */
 
 function ensureColorAttribute(
   geom: THREE.BufferGeometry,
@@ -153,19 +76,11 @@ function paintAll(colorAttr: THREE.BufferAttribute, color: THREE.Color) {
   }
 }
 
-/**
- * Compute the centroid + 3×3 covariance of vertex positions, invert
- * the covariance in closed form, and return the squared Mahalanobis
- * distance for every vertex.
- *
- * Returns null only for genuinely degenerate inputs (e.g. all vertices
- * coincident — covariance has zero determinant).
- */
+// Squared Mahalanobis distance per vertex from the PCA-fitted ellipsoid; null when the covariance is degenerate.
 function mahalanobisScores(
   positions: Float32Array,
   V: number
 ): Float32Array | null {
-  // Centroid
   let cx = 0,
     cy = 0,
     cz = 0;
@@ -178,7 +93,7 @@ function mahalanobisScores(
   cy /= V;
   cz /= V;
 
-  // Covariance (symmetric, store 6 upper-triangular entries)
+  // Symmetric covariance, 6 upper-triangular entries.
   let c00 = 0,
     c01 = 0,
     c02 = 0,
@@ -203,7 +118,6 @@ function mahalanobisScores(
   c12 /= V;
   c22 /= V;
 
-  // Closed-form 3×3 symmetric inverse via adjugate / determinant.
   const a00 = c11 * c22 - c12 * c12;
   const a01 = c02 * c12 - c01 * c22;
   const a02 = c01 * c12 - c02 * c11;
@@ -236,14 +150,6 @@ function mahalanobisScores(
   return scores;
 }
 
-/**
- * Robust outlier threshold via median + k × MAD.
- *
- * MAD = median(|x − median(x)|). It's the robust analogue of stddev:
- * insensitive to extreme outliers, which makes it work uniformly on
- * unimodal distributions (smooth coccus) and bimodal ones (cryo-ET
- * virion with clear envelope vs spike modes).
- */
 function madThreshold(scores: Float32Array): number {
   const sorted = Float32Array.from(scores).sort();
   const median = sorted[Math.floor(sorted.length / 2)];
@@ -257,15 +163,7 @@ function madThreshold(scores: Float32Array): number {
   return median + MAD_MULT * mad;
 }
 
-/**
- * Build 1-ring adjacency from triangles, augmented with a position-weld
- * pass so identical positions (common after gltfpack -cc splits seams)
- * are treated as connected. Without the weld, the CC filter would reject
- * real clusters on non-manifold meshes.
- *
- * CSR storage: `offsets[i]` is the start index into `nbrs`, `offsets[i+1]`
- * the end. ~3× faster to iterate than arrays-of-arrays.
- */
+// CSR: neighbours of i are nbrs[offsets[i] .. offsets[i+1]].
 type Adjacency = { nbrs: Uint32Array; offsets: Uint32Array };
 
 function buildAdjacency(
@@ -282,7 +180,6 @@ function buildAdjacency(
     sets[b].add(a);
   };
 
-  // Triangle-based edges
   const idxAttr = geom.getIndex();
   const triCount =
     (idxAttr ? (idxAttr.array as ArrayLike<number>).length : V) / 3;
@@ -314,9 +211,8 @@ function buildAdjacency(
     }
   }
 
-  // Position-weld: connect verts that hash to the same spatial cell.
-  // Cell size scales with mean edge length so quantized seam-duplicates
-  // collapse but real triangle neighbours don't accidentally weld.
+  // Position-weld: gltfpack -cc splits seams into coincident verts, which would
+  // otherwise break the connected-component filter.
   if (edgeCount > 0 && triCount > 0) {
     const cellSize = WELD_CELL_RATIO * (edgeSum / edgeCount);
     if (cellSize > 0) {
@@ -338,7 +234,6 @@ function buildAdjacency(
     }
   }
 
-  // Flatten to CSR
   const offsets = new Uint32Array(V + 1);
   let total = 0;
   for (let i = 0; i < V; i++) {
@@ -362,11 +257,6 @@ function edgeLen(positions: Float32Array, a: number, b: number): number {
   return Math.sqrt(dx * dx + dy * dy + dz * dz);
 }
 
-/**
- * Reject candidate vertices that don't belong to a connected component
- * of at least `minSize` vertices. Iterative BFS over the augmented
- * 1-ring adjacency graph; only candidate→candidate edges are traversed.
- */
 function filterByClusterSize(
   candidate: Uint8Array,
   adj: Adjacency,

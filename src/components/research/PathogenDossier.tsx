@@ -1,36 +1,5 @@
 "use client";
 
-/**
- * PathogenDossier — modal "case file" overlay opened from PathogenGrid.
- *
- * Layout (stripped-down Palantir):
- *   - Fixed full-viewport backdrop (`bg-ink/70`) that closes on click.
- *   - Centered card on top of the backdrop:
- *       · header — just a bare × close button (no "Specimen dossier" tag,
- *         no "Close" word — the symbol carries it)
- *       · body   — left: pathogen viewer + name (+ optional disease
- *                  subtitle) + NIH attribution where applicable.
- *                  right: scrollable paper list (year · authors · title ·
- *                  journal). For Disease X the right column instead
- *                  shows the WHO R&D Blueprint definition + priority-
- *                  diseases context + source link (see <DiseaseXBody>).
- *                  Single-column layout only when neither papers nor a
- *                  special right body apply.
- *
- * Interaction:
- *   - Esc closes
- *   - Click on backdrop closes
- *   - Click on card body does NOT close (stopPropagation)
- *   - Body scroll-locks while open
- *
- * Attribution rule (2026-05-24 v2):
- *   - NIH 3D entries (nih3dEntryId starts with "3DPX-") get a "Model · NIH
- *     3D Print Exchange · <license>" line that links to the entry.
- *   - AI-generated specimens (nih3dEntryId starts with "nosotrack/") get
- *     no attribution line — Cy didn't want to advertise the AI provenance,
- *     and Public-Domain works don't require credit.
- */
-
 import { useEffect } from "react";
 import { PathogenViewer } from "./PathogenViewer";
 import { papersFor, type PathogenPaper } from "./papersByPathogen";
@@ -48,13 +17,10 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
   const papers = papersFor(pathogen.id);
   const hasPapers = papers.length > 0;
   const isDiseaseX = pathogen.id === "disease-x";
-  // The right column is present whenever there's papers OR a special
-  // per-pathogen body (Disease X).
   const hasRightBody = hasPapers || isDiseaseX;
-  // Real NIH 3D entries — show source link. AI specimens are hidden.
+  // Only real NIH 3D entries need attribution; AI specimens are Public Domain.
   const isNih = pathogen.source.nih3dEntryId.startsWith("3DPX-");
 
-  // Esc-to-close + body scroll lock. Cleanup restores scroll on unmount.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -76,9 +42,7 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
       onClick={onClose}
       className={[
         "fixed inset-0 z-[100] flex items-center justify-center",
-        // Asymmetric vertical padding: enough top room to clear the 72px
-        // fixed nav even on short viewports (≤700px) where items-center
-        // would otherwise pull the card under the nav.
+        // Extra top padding clears the 72px fixed nav on short viewports.
         "px-4 pt-20 pb-4 sm:px-8 sm:pt-24 sm:pb-8",
         "bg-[rgba(33,35,38,0.78)] backdrop-blur-[2px]",
         "animate-[fadeIn_180ms_ease-out]",
@@ -89,16 +53,11 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
         className={[
           "relative w-full max-w-[1080px] max-h-[78vh] overflow-hidden",
           "bg-bg border border-rule-strong",
-          // Narrow the card when there's no right column at all so the
-          // lone left column doesn't look stranded inside an empty
-          // 1080px shell. Disease X gets the WHO body in the right
-          // column, so it keeps the full width.
           hasRightBody ? "" : "max-w-[560px]",
           "grid grid-rows-[auto_1fr]",
           "animate-[dossierIn_240ms_cubic-bezier(0.16,1,0.3,1)]",
         ].join(" ")}
       >
-        {/* ──────────────────── header (bare close) ──────────────────── */}
         <header className="flex items-center justify-end border-b border-rule px-4 py-3">
           <button
             type="button"
@@ -114,14 +73,12 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
           </button>
         </header>
 
-        {/* ──────────────────── body ──────────────────── */}
         <div
           className={[
             "overflow-hidden grid grid-cols-1",
             hasRightBody ? "md:grid-cols-[minmax(280px,420px)_1fr]" : "",
           ].join(" ")}
         >
-          {/* Left — viewer + name */}
           <div
             className={[
               "p-6 flex flex-col",
@@ -164,7 +121,6 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
             )}
           </div>
 
-          {/* Right — papers, or the Disease X / WHO callout. */}
           {hasPapers && (
             <div className="overflow-y-auto p-6 sm:p-8">
               <ul className="list-none p-0">
@@ -182,8 +138,7 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
         </div>
       </div>
 
-      {/* Keyframes scoped inline because Tailwind v4 isn't configured
-          with a tailwind.config.js for custom keyframes. */}
+      {/* Inline keyframes: no tailwind.config.js in this Tailwind v4 setup. */}
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; }
@@ -198,13 +153,6 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
   );
 }
 
-/* ────────────────────────────────────────────── components ── */
-
-/**
- * DiseaseXBody — WHO R&D Blueprint definition, priority-diseases
- * context, and source link. Renders in the right column of the dossier
- * for the special-case `disease-x` pathogen (which has no paper list).
- */
 function DiseaseXBody() {
   return (
     <div>
@@ -254,9 +202,6 @@ function PaperRow({ paper }: { paper: PathogenPaper }) {
           <span
             className={[
               "font-mono text-[11px] uppercase tracking-[0.22em] truncate",
-              // Author name carries the affordance — fades to alert-red
-              // on row hover. Replaces the old explicit "Read paper →"
-              // chip (removed 2026-05-24) so the row reads cleaner.
               "text-faint group-hover:text-[var(--color-alert)] transition-colors",
             ].join(" ")}
           >

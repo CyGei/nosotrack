@@ -1,27 +1,5 @@
 "use client";
 
-/**
- * Globe — the centrepiece. A living map of where the tools are used worldwide:
- * evidence of scientific reach, not a chart.
- *
- * Drawn with d3-geo over the world-atlas 110m country outlines (real countries
- * are visible: faint land + coastlines + graticule). It tells a small story on
- * first view:
- *   · the sphere rotates imperceptibly (~one turn / 60s), and nudges a few
- *     degrees with scroll so it feels responsive;
- *   · the country dots don't appear at once — they fade in one by one over the
- *     first ~2.5s (adoption growing);
- *   · thin arcs reach out from the founders' base to the leading adopters, with
- *     a faint particle travelling each one (knowledge spreading);
- *   · every couple of seconds a country pulses once, like live activity.
- * Hovering a country pauses the spin and shows a small card with its real
- * figures (all-time citing works + recent CRAN downloads). Reduced-motion users
- * get a still, fully-drawn globe that is still hoverable. Ink/grey only.
- *
- * Data: src/data/research-geo.json (OpenAlex citation geography + RStudio CRAN
- * download geography — never hand-edited).
- */
-
 import { useEffect, useRef, useState } from "react";
 import {
   geoOrthographic,
@@ -102,15 +80,12 @@ export function Globe({
     const dotR = (c: GeoCountry) =>
       1.4 + 4.6 * Math.sqrt((c.citations || c.downloads * 4) / maxCitations || 0);
 
-    // Order: biggest first, so its dot appears first in the intro.
     const byCit = [...countries].sort((a, b) => b.citations - a.citations);
-    // Ascending: dots drawn smallest-first so the largest land on top. Hoisted
-    // out of the per-frame draw() loop — the order never changes.
+    // Smallest-first, so the largest dots draw on top.
     const byCitAsc = [...countries].sort((a, b) => a.citations - b.citations);
     const appearAt = new Map<string, number>();
     byCit.forEach((c, i) => appearAt.set(c.code, Math.min(2500, i * 140)));
 
-    // Arcs from the founders' base (UK) to the leading adopters.
     const hub = countries.find((c) => c.code === "GB") ?? byCit[0];
     const arcs = byCit
       .filter((c) => c.code !== hub.code)
@@ -138,12 +113,10 @@ export function Globe({
 
       ctx.clearRect(0, 0, size, size);
 
-      // sea
       ctx.beginPath();
       path({ type: "Sphere" });
       ctx.fillStyle = `rgba(${INK},0.02)`;
       ctx.fill();
-      // land + coastlines
       ctx.beginPath();
       path(LAND);
       ctx.fillStyle = `rgba(${INK},0.05)`;
@@ -151,20 +124,17 @@ export function Globe({
       ctx.strokeStyle = `rgba(${INK},0.16)`;
       ctx.lineWidth = 0.5;
       ctx.stroke();
-      // graticule
       ctx.beginPath();
       path(GRAT);
       ctx.strokeStyle = `rgba(${INK},0.05)`;
       ctx.lineWidth = 0.5;
       ctx.stroke();
-      // limb
       ctx.beginPath();
       path({ type: "Sphere" });
       ctx.strokeStyle = `rgba(${INK},0.2)`;
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // arcs + travelling particles (after the intro settles)
       const arcA = clamp((t - 2000) / 900, 0, 1);
       if (arcA > 0) {
         ctx.strokeStyle = `rgba(${INK},${0.1 * arcA})`;
@@ -188,7 +158,6 @@ export function Globe({
         }
       }
 
-      // country dots — staggered in over the intro, largest last (on top)
       placed = [];
       for (const c of byCitAsc) {
         const ll: LL = [c.lon, c.lat];
@@ -215,7 +184,6 @@ export function Globe({
         placed.push({ c, x: pt[0], y: pt[1], r });
       }
 
-      // pulses — a country flares once, like live activity
       for (const pl of pulses) {
         const age = t - pl.t;
         if (age < 0 || age > 1100) continue;
@@ -262,21 +230,17 @@ export function Globe({
     });
     if (wrapRef.current) {
       io.observe(wrapRef.current);
-      // Mount-check: the globe is lazy-loaded, so it may mount already on
-      // screen — start the intro immediately rather than waiting for a scroll.
+      // Lazy-loaded, so it can mount already on screen: start the intro now.
       const r = wrapRef.current.getBoundingClientRect();
       if (r.top < (window.innerHeight || 0) && r.bottom > 0) setInView(true);
     }
 
-    // Reduced motion: a single static frame, repainted only on hover.
     const paintStatic = () => draw(spinBase, 1e9, hoverCode);
 
     if (reduce) {
       paintStatic();
     } else {
       draw(spinBase, 0, null);
-      // Redraw the whole projection each frame is not cheap, so cap it and skip
-      // entirely when the globe is off-screen.
       const tick = (now: number) => {
         raf = requestAnimationFrame(tick);
         if (!inView) {

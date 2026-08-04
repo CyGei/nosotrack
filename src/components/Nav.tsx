@@ -1,33 +1,5 @@
 "use client";
 
-/* =========================================================================
-   Nav — structural + visual port of main branch legacy/styles.css §7.
-   ----------------------------------------------------------------------
-   HTML structure (mirrors main):
-     <nav class="main-nav">
-       <div class="nav-inner">                  ← 72 px, flex space-between
-         <div class="nav-brand">                ← div (not link); 10 px gap
-           <span class="nav-mark">SVG</span>    ← only the mark is a span
-           <a class="nav-logo">                 ← only the wordmark is a link
-             <BrandWordmark />
-           </a>
-         </div>
-         <ul class="nav-links">                 ← ul; links only (CTA dropped rev.13)
-           <li><a>Link</a></li>
-           …
-         </ul>
-         <button class="nav-hamburger">         ← 3 spans, animate to X
-           <span/><span/><span/>
-         </button>
-       </div>
-     </nav>
-
-   A single flag drives the theme: `overHero` is true while the hero still
-   overlaps the nav band. Over the hero the nav is transparent with cream
-   text; once past it, the nav flips to a cream backdrop (blur + border)
-   with dark text.
-   ========================================================================= */
-
 import { useEffect, useState, type MouseEvent } from "react";
 import { cn } from "@/lib/utils";
 import { BrandWordmark } from "@/components/BrandWordmark";
@@ -35,17 +7,7 @@ import { BrandMark } from "@/components/BrandMark";
 import { requestHeroNav } from "@/components/hero/heroNav";
 
 const NAV_LOGO = "Nosotrack";
-// Brand-lockup tagline — the product category descriptor that previously
-// lived as the hero eyebrow. Pinned under the wordmark so it's visible on
-// every page (defence-tech lockup pattern: Anduril/Shield AI). Hidden on
-// mobile to avoid crowding the hamburger; the wordmark alone carries the
-// brand on narrow screens.
 const NAV_TAGLINE = "Outbreak forensics and control";
-// "Platform" jumps straight to the live MVP dashboard (Render-hosted),
-// opened in a new tab so the marketing site stays put behind it. Placed
-// first to mirror Palantir's nav, where Platform leads. The ↗ glyph
-// (rendered in the markup) signals the off-site jump; every other link is
-// an in-page section anchor.
 const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "Platform", href: "https://nosotrack.onrender.com", external: true },
   { label: "About", href: "#about" },
@@ -55,18 +17,12 @@ const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "Contact", href: "#contact" },
 ];
 
-// The dark/inverted theme drops once scrollY > hero.offsetHeight - 80.
 const PAST_HERO_PAD = 80;
 
 export function Nav() {
   const [overHero, setOverHero] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // One single scroll handler that mirrors main.js — both flags driven
-  // off window.scrollY so the trigger points match exactly. Defensive:
-  // when the hero element isn't measurable yet (e.g. during hydration
-  // before layout settles), assume we're still on it as long as scrollY
-  // is near the top, so the "Noso" wordmark stays cream on the dark hero.
   useEffect(() => {
     const onScroll = () => {
       const hero = document.getElementById("hero");
@@ -75,9 +31,7 @@ export function Nav() {
         const past = window.scrollY > heroH - PAST_HERO_PAD;
         setOverHero(!past);
       } else {
-        // Hero not laid out yet — stay on-dark while the page is near
-        // the top; flip to light only once the user has scrolled well
-        // beyond a typical viewport.
+        // Hero not measurable yet (pre-layout hydration) — assume on-hero near the top.
         setOverHero(window.scrollY < 200);
       }
     };
@@ -90,24 +44,11 @@ export function Nav() {
     };
   }, []);
 
-  // Nav theme: dark (cream text on transparent) whenever the user is
-  // still over the hero, light (dark text on cream backdrop) once they've
-  // scrolled past it. With hero-v2 being (N+1)*100svh tall, the nav must
-  // stay dark for the whole hero ride — so both the text theme and the
-  // cream backdrop key off the same `overHero` flag. (A separate scrollY
-  // threshold is redundant: by the time the hero is behind us the page is
-  // already scrolled several viewports.)
   const dark = overHero;
   const showScrolledStyle = !overHero;
   const closeMobile = () => setMobileOpen(false);
 
-  // Same-page section links: hand the jump to the hero so it collapses its
-  // cinematic FIRST, then glides to the section. Without this the hero's
-  // completion-lock fires mid-scroll and strands the first click, so the
-  // section only lands on the SECOND click. When no hero is mounted (or the
-  // target isn't a section it owns) requestHeroNav returns false and we
-  // fall through to Lenis's native anchor handling. External links (the
-  // ↗ Platform jump) are left untouched.
+  // Hero must collapse its cinematic first, else its completion-lock strands the first click.
   const onSectionLink = (
     e: MouseEvent<HTMLAnchorElement>,
     link: (typeof NAV_LINKS)[number],
@@ -130,11 +71,6 @@ export function Nav() {
       aria-label="Primary"
     >
       <div className="nav-inner container-page flex h-[72px] items-center justify-between">
-        {/* ── BRAND lockup: mark + (wordmark over tagline) ──
-            The tagline pins the product descriptor underneath the wordmark
-            so it persists across every page. Mark and lockup are vertically
-            centred against each other; the lockup column stacks the
-            (linked) wordmark with a small mono caption. */}
         <div className="nav-brand flex items-center gap-[12px]">
           <a
             href="#top"
@@ -161,7 +97,6 @@ export function Nav() {
           </div>
         </div>
 
-        {/* ── DESKTOP nav-links UL ── */}
         <ul
           className="nav-links hidden list-none items-center gap-9 md:flex"
           role="list"
@@ -187,7 +122,6 @@ export function Nav() {
           ))}
         </ul>
 
-        {/* ── HAMBURGER — 3 spans (top + middle + bottom), morph to X ── */}
         <button
           type="button"
           aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
@@ -216,7 +150,6 @@ export function Nav() {
         </button>
       </div>
 
-      {/* ── MOBILE sheet — drops below the 72 px rim ── */}
       {mobileOpen && (
         <div
           className={cn(

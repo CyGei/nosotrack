@@ -1,25 +1,5 @@
 "use client";
 
-/**
- * PathogenArc — the Research section's specimen display, composed to mirror
- * the "Impact & adoption" globe stage below it:
- *
- *   Disease X is the hero (large, static, like the globe) and the rest of the
- *   catalogue drifts along an arc off its RIGHT edge — a live "conveyor" that
- *   shows only ~3-4 specimens at once, fading each in at the top of the arc
- *   and out at the bottom, looping through every specimen. Echoes both the
- *   globe's arched metric labels and the old ticker's motion.
- *
- * Geometry mirrors ImpactAdoption's arched-metrics stage: items ride a circle
- * of radius ARC_RADIUS centred on the hero, sweeping the right side (angle
- * 0 = 3 o'clock, negative = up). Positions/opacities are driven imperatively
- * by a rAF loop (no per-frame React renders); the specimens themselves stay
- * mounted the whole time, so there is no WebGL context churn.
- *
- * A ResizeObserver scales the fixed-size stage down to fit narrow columns /
- * phones (same idea as the globe measuring its track).
- */
-
 import { useEffect, useRef, useState } from "react";
 import type { PathogenSpec } from "./pathogens/types";
 import { PathogenViewer } from "./PathogenViewer";
@@ -31,17 +11,14 @@ type Props = {
   others: PathogenSpec[];
 };
 
-/* ── geometry / motion (px · degrees · seconds) — tune here ───────────── */
-const HERO_SIZE = 332; // Disease X — matched to the globe below, static
-const DOT_SIZE = 72; // arched specimens
-const ARC_RADIUS = 215; // distance of each specimen from the hero centre
-// Kept small so the band's vertical sweep stays WITHIN the hero's height
-// (like the globe's metric labels), so the arc never sprawls past the X.
-const VIS_ANGLE = 32; // visible band spans -VIS_ANGLE..+VIS_ANGLE on the right
-const VISIBLE_FRAC = 0.23; // fraction of the loop on the band => ~3 shown (fewer
-//                            so the bigger specimens keep breathing room)
-const PERIOD_S = 22; // seconds for one specimen to travel the whole loop
-const EDGE = 0.18; // fade-in / fade-out ramp (fraction of the visible sweep)
+const HERO_SIZE = 332;
+const DOT_SIZE = 72;
+const ARC_RADIUS = 215;
+// Visible band spans -VIS_ANGLE..+VIS_ANGLE (degrees) on the right of the hero.
+const VIS_ANGLE = 32;
+const VISIBLE_FRAC = 0.23; // fraction of the loop on the band => ~3 shown at once
+const PERIOD_S = 22;
+const EDGE = 0.18; // fade in/out ramp, as a fraction of the visible sweep
 
 export function PathogenArc({ hero, others }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -49,14 +26,12 @@ export function PathogenArc({ hero, others }: Props) {
 
   const N = others.length;
 
-  // Intrinsic (unscaled) stage dimensions.
   const cx = HERO_SIZE / 2;
   const sweep = ARC_RADIUS * Math.sin((VIS_ANGLE * Math.PI) / 180);
   const stageH = Math.max(HERO_SIZE, 2 * sweep + DOT_SIZE);
   const stageW = cx + ARC_RADIUS + DOT_SIZE / 2;
   const cy = stageH / 2;
 
-  // Scale the fixed-size stage down to fit its container (never up).
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   useEffect(() => {
@@ -69,14 +44,14 @@ export function PathogenArc({ hero, others }: Props) {
     return () => ro.disconnect();
   }, [stageW]);
 
-  // Drive the arc conveyor imperatively.
+  // Positions are driven imperatively so the mounted viewers never re-render.
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   useEffect(() => {
     const items = itemRefs.current;
     const wrap = wrapRef.current;
 
+    // u in [0,1] across the visible band, top -> bottom.
     const placeAt = (el: HTMLDivElement, u: number, opacity: number) => {
-      // u in [0,1] across the visible band, top -> bottom.
       const a = ((-VIS_ANGLE + 2 * VIS_ANGLE * u) * Math.PI) / 180;
       const left = cx + ARC_RADIUS * Math.cos(a);
       const top = cy + ARC_RADIUS * Math.sin(a);
@@ -90,7 +65,6 @@ export function PathogenArc({ hero, others }: Props) {
     ).matches;
 
     if (reduced || N === 0) {
-      // Static fallback: a few specimens evenly spread across the band.
       const count = Math.max(1, Math.min(N, Math.round(N * VISIBLE_FRAC)));
       items.forEach((el, i) => {
         if (!el) return;
@@ -104,7 +78,7 @@ export function PathogenArc({ hero, others }: Props) {
     let last = performance.now();
     let elapsed = 0;
     let paused = false;
-    const speed = 1 / PERIOD_S; // loops per second
+    const speed = 1 / PERIOD_S;
 
     const tick = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.1);
@@ -114,9 +88,9 @@ export function PathogenArc({ hero, others }: Props) {
 
       items.forEach((el, i) => {
         if (!el) return;
-        let s = ((i / N + base) % 1 + 1) % 1; // phase in [0,1)
+        let s = ((i / N + base) % 1 + 1) % 1;
         if (s <= VISIBLE_FRAC) {
-          const u = s / VISIBLE_FRAC; // 0..1 across the visible band
+          const u = s / VISIBLE_FRAC;
           const opacity = Math.max(0, Math.min(u / EDGE, (1 - u) / EDGE, 1));
           placeAt(el, u, opacity);
         } else {
@@ -152,7 +126,6 @@ export function PathogenArc({ hero, others }: Props) {
         className="relative mx-auto w-full"
         style={{ height: stageH * scale }}
       >
-        {/* Left-aligned so the X's left edge lines up with the globe's. */}
         <div
           className="absolute left-0 top-0"
           style={{
@@ -162,7 +135,6 @@ export function PathogenArc({ hero, others }: Props) {
             transformOrigin: "top left",
           }}
         >
-          {/* Hero — Disease X, static, vertically centred on the arc. */}
           <div
             className="absolute left-0"
             style={{
@@ -184,7 +156,6 @@ export function PathogenArc({ hero, others }: Props) {
             </button>
           </div>
 
-          {/* Conveyor — the rest of the catalogue drifts along the arc. */}
           {others.map((p, i) => (
             <div
               key={p.id}

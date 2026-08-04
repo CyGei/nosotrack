@@ -1,71 +1,52 @@
-/* =========================================================================
-   Nosotrack — redesign-v4
-   Global styles + Tailwind v4 theme tokens.
-
-   ALL colour/typography tokens are lifted verbatim from DESIGN_BRIEF.md §2–§4.
-   Do not introduce a colour that isn't named here. If you need a new one,
-   amend DESIGN_BRIEF.md first.
-   ========================================================================= */
-
 @import "tailwindcss";
 
-/* Custom variant: dark theme is invoked per-section by adding `.on-dark`
-   to the section root (only the Hero, per §11 hard rule). */
 @custom-variant on-dark (&:where(.on-dark, .on-dark *));
 
 @theme {
-  /* ============ CANVAS ============ */
-  --color-bg: #efeeef;        /* the greyish cream — default page background */
-  --color-bg-alt: #f3f3f3;    /* subtle adjacent-section alternation */
-  --color-bg-tint: #dbdbdb;   /* chip / card backgrounds on light surfaces */
-  --color-bg-ink: #212326;    /* DARK CANVAS — HERO ONLY */
+  /* Canvas */
+  --color-bg: #efeeef;
+  --color-bg-alt: #f3f3f3;
+  --color-bg-tint: #dbdbdb;
+  --color-bg-ink: #212326;    /* hero only */
 
-  /* ============ INK (text on light) ============ */
+  /* Ink (text on light) */
   --color-ink: #1e1e2b;
   --color-text: #474852;
   --color-mute: #767676;
   --color-faint: #a4a4a7;
 
-  /* ============ INVERTED (text on dark hero) ============ */
+  /* Inverted (text on dark hero) */
   --color-inv-hi: #efeeef;
   --color-inv: #c9c9cc;
   --color-inv-mute: #8a8a8f;
   --color-inv-faint: #5a5c60;
 
-  /* ============ RULES / BORDERS ============ */
+  /* Rules / borders */
   --color-rule: rgba(30, 30, 43, 0.12);
   --color-rule-strong: rgba(30, 30, 43, 0.24);
   --color-rule-strongest: rgba(30, 30, 43, 0.42);
   --color-rule-inv: rgba(239, 238, 239, 0.14);
   --color-rule-inv-strong: rgba(239, 238, 239, 0.28);
 
-  /* ============ SIGNAL — outbreak alert red (product viz only) ============ */
+  /* Signal — product viz only */
   --color-alert: #ff073a;
 
-  /* ============ TYPOGRAPHY ============
-     Font family vars are set by next/font in layout.tsx → :root. */
+  /* Typography — family vars are set by next/font in layout.tsx → :root */
   --font-display: var(--font-display-stack);
   --font-mono: var(--font-mono-stack);
 
-  /* ============ LAYOUT ============ */
+  /* Layout */
   --container-page: 1240px;
   --spacing-pad: clamp(20px, 3vw, 40px);
   --spacing-section: clamp(72px, 8vw, 112px);
 
-  /* ============ MOTION ============ */
-  --ease-nt: cubic-bezier(0.2, 0, 0, 1);          /* the Nosotrack curve */
+  /* Motion */
+  --ease-nt: cubic-bezier(0.2, 0, 0, 1);
   --transition-duration-fast: 160ms;
   --transition-duration-base: 320ms;
 }
 
-/* =========================================================================
-   2. Reset & base — carried over from legacy/styles.css §2.
-   Wrapped in @layer base so Tailwind utilities (which live in
-   @layer utilities) can override the universal margin/padding reset.
-   Without this layer wrapper, unlayered `* { margin: 0 }` would beat
-   every `mt-*` / `mb-*` / `pt-*` utility in the cascade.
-   ========================================================================= */
-
+/* Layered so Tailwind utilities can override the universal reset. */
 @layer base {
   *,
   *::before,
@@ -171,26 +152,12 @@ html {
   scrollbar-color: var(--color-rule-strong) transparent;
 }
 
-/* =========================================================================
-   Hero frame-snapping on touch devices.
-   On phones/tablets (coarse pointer) the page scroller snaps to each hero
-   frame, so one swipe lands cleanly on one frame instead of parking
-   half-way between two. `proximity` (not `mandatory`) and the `:has()`
-   guard keep this scoped: it only engages on a page that actually
-   contains the hero, and only near the hero's snap anchors — the rest of
-   the page, and other routes, scroll normally. The final frame still
-   releases to the content below. Desktop uses Lenis's JS Snap addon
-   instead (see Hero.tsx), which is why this is coarse-pointer only.
-   ========================================================================= */
+/* Hero frame-snapping, touch only — desktop uses Lenis's JS Snap (Hero.tsx). */
 @media (pointer: coarse) {
   html:has([data-hero-snap]) {
     scroll-snap-type: y proximity;
   }
 }
-
-/* =========================================================================
-   3. Section primitives — see DESIGN_BRIEF §4 layout system.
-   ========================================================================= */
 
 .container-page {
   max-width: var(--container-page);
@@ -202,11 +169,7 @@ html {
   padding-block: var(--spacing-section);
 }
 
-/* Wrapped in @layer base so Tailwind utilities (in @layer utilities)
-   can override the inherited cream color — otherwise classes like
-   `text-bg-ink` on a CTA button inside the dark Hero silently lose
-   the cascade fight and render cream-on-cream. Same lesson as the
-   memory note on the Tailwind reset. */
+/* Layered so utilities like `text-bg-ink` inside the hero win the cascade. */
 @layer base {
   .on-dark {
     background: var(--color-bg-ink);
@@ -218,20 +181,12 @@ html {
   }
 }
 
-/* Hide scrollbar but keep scroll behaviour — used by the pathogen ticker
-   so the auto-drifting strip doesn't show a horizontal scrollbar under
-   a row of floating specimens. */
 .no-scrollbar {
   scrollbar-width: none; /* Firefox */
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chromium, Safari */
 }
-
-/* =========================================================================
-   Nav link underline — grows from 0 to 100% width on hover, ported from
-   main branch legacy/styles.css §nav `.nav-links a:not(.nav-cta)::after`.
-   ========================================================================= */
 
 .nav-link-underline::after {
   content: "";
@@ -247,21 +202,11 @@ html {
   width: 100%;
 }
 
-/* =========================================================================
-   Nav theme switcher — explicit color rules tied to `data-theme` on the
-   <nav> element. These guarantee the cream-on-dark / dark-on-cream
-   behavior wins over any Tailwind class-merge edge case and mirror main
-   branch legacy/styles.css §7 `body.nav-on-dark nav.main-nav:not(.scrolled)`
-   cascade verbatim.
-   ========================================================================= */
-
 nav.main-nav[data-theme="dark"] .nav-mark,
 nav.main-nav[data-theme="dark"] .nav-logo {
   color: var(--color-inv-hi);
 }
 nav.main-nav[data-theme="dark"] .nav-tagline {
-  /* Muted cream — subordinate to the wordmark but clearly readable
-     against the dark hero. Same token the .nav-links rest-state uses. */
   color: var(--color-inv);
 }
 nav.main-nav[data-theme="dark"] .nav-links a {
@@ -279,7 +224,6 @@ nav.main-nav[data-theme="light"] .nav-logo {
   color: var(--color-ink);
 }
 nav.main-nav[data-theme="light"] .nav-tagline {
-  /* Muted ink — supportive caption tone on the cream/scrolled nav. */
   color: var(--color-mute);
 }
 nav.main-nav[data-theme="light"] .nav-links a {
@@ -292,14 +236,8 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
   background: var(--color-ink);
 }
 
-/* =========================================================================
-   Brand mark — inner network spins 360° on nav/footer brand hover.
-   Matches main branch legacy/styles.css §nav. Brackets stay fixed (the
-   "frame"); the network rotates as a single unit around the SVG centre.
-   ========================================================================= */
-
 .brand-mark-network {
-  transform-origin: 16px 16px;
+  transform-origin: 16px 16px; /* SVG viewBox centre */
   transition: transform 1.6s cubic-bezier(0.2, 0, 0, 1);
 }
 .nav-brand:hover .brand-mark-network,
@@ -311,12 +249,6 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
   .nav-brand:hover .brand-mark-network,
   .footer-brand:hover .brand-mark-network { transform: none; }
 }
-
-/* =========================================================================
-   Hero — cream halo on "Protect." (matches main branch legacy/styles.css
-   §8 .hero-title .accent). Subtle luminescence, not alert; red stays
-   reserved for outbreak signal.
-   ========================================================================= */
 
 .hero-accent {
   text-shadow:
@@ -338,12 +270,6 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
   }
 }
 
-/* =========================================================================
-   Typewriter cursor — thin blinking bar that trails the typing headline
-   in About blocks. Disappears as soon as the typewriter finishes.
-   ========================================================================= */
-
-/* Thin standard text-cursor caret (not a glyph — an actual 2px bar). */
 .typewriter-cursor {
   display: inline-block;
   width: 2px;
@@ -359,29 +285,11 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
   50.01%, 100% { opacity: 0; }
 }
 
-/* =========================================================================
-   Hero v2 — one-time entrance spin for the closing brand frame.
-   Mirrors the .brand-mark-network hover rotation used by the nav and
-   footer logos: the four corner brackets stay fixed (the "frame")
-   while the inner network rotates a full turn around the SVG centre
-   (16,16). Applied via animation rather than transition so it auto-
-   plays on mount/key-change instead of needing a state toggle.
-   ========================================================================= */
-
 @keyframes heroBrandSpin {
   from { transform: rotate(0deg);   }
   to   { transform: rotate(360deg); }
 }
 
-/* =========================================================================
-   Hero v2 — frame-advance cue.
-   A pair of bold down-chevrons that slide downward in sequence beside the
-   indicator rail, making the "scroll / swipe DOWN to advance" gesture
-   unmistakable (users were swiping sideways). Bright and clearly visible by
-   design — this is an instruction, not a whisper. The two chevrons share
-   one slide animation; the lower one is delayed so the motion reads as a
-   continuous downward flow.
-   ========================================================================= */
 @keyframes heroArrowSlide {
   0%   { transform: translateY(-5px); opacity: 0; }
   30%  { opacity: 1; }
@@ -403,10 +311,6 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
     opacity: 1;
   }
 }
-
-/* =========================================================================
-   4. Reduced motion — non-negotiable per §11.
-   ========================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   *,

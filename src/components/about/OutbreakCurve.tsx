@@ -1,18 +1,5 @@
 "use client";
 
-/**
- * OutbreakCurve — the "cumulative rise" treatment for 0.1. Time is the x-axis
- * (2025 → 2026, in the site's axis style); there is NO y-axis — the line simply
- * climbs by one per outbreak, so the smooth rising curve *is* the message
- * ("becoming more frequent"). Each outbreak is a node (site dot style) labelled
- * with disease + place; the case count, exact date and headlines live in the
- * click card. The past is a solid filled rise; the curve then *continues* — a
- * dashed extrapolation of its own trajectory — up to a "?", the unknown ahead.
- *
- * Nodes are nudged to strictly-increasing x (so co-dated outbreaks don't stack
- * into a vertical the spline can't smooth) — exact dates are in the card.
- */
-
 import { useEffect, useState } from "react";
 import { ArrowUpRight, X } from "lucide-react";
 import { useScrollReveal } from "@/lib/hooks";
@@ -41,8 +28,7 @@ const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v
 
 type Pt = { x: number; y: number };
 
-/** Catmull-Rom → cubic bézier, with per-segment y clamped so a monotonic
- *  (cumulative) series never dips. Returns an SVG path string. */
+// Catmull-Rom → cubic bézier; per-segment y is clamped so the cumulative series never dips.
 function smoothPath(pts: Pt[]) {
   if (pts.length < 2) return pts.length ? `M ${pts[0].x} ${pts[0].y}` : "";
   let d = `M ${pts[0].x.toFixed(2)} ${pts[0].y.toFixed(2)}`;
@@ -85,8 +71,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
     pts.push({ x, y: Y_BOT - (i / (n - 1)) * (Y_BOT - Y_TOP) });
   });
 
-  // Alternate label sides through crowded runs; the de-overlap below then
-  // spreads each side apart vertically with a short leader.
   const sides: boolean[] = []; // true = label on the left
   ordered.forEach((_, i) => {
     if (i === 0) {
@@ -97,10 +81,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
     sides.push(crowded ? !sides[i - 1] : pts[i].x >= (X0 + X1) / 2);
   });
 
-  // De-overlap ALL labels: place them top-to-bottom, pushing a label down
-  // whenever its horizontal reach AND vertical gap clash with one already placed
-  // — this also separates labels on opposite sides that reach toward each other.
-  // A short leader then ties each shifted label back to its point.
   const LABEL_GAP = 8.6;
   const REACH = 12; // approx label width in viewBox units
   const labelY: Record<number, number> = {};
@@ -113,9 +93,7 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
       const x0 = sides[i] ? px - REACH : px;
       const x1 = sides[i] ? px : px + REACH;
       let y = pts[i].y;
-      // Push strictly downward past any already-placed label that overlaps in
-      // both x-reach and y; iterate over placed rows (already sorted by y), with
-      // a hard guard so it can never spin.
+      // MUST stay bounded — an unbounded loop here once hung `next build`.
       for (let pass = 0; pass < placed.length + 2; pass++) {
         let bumped = false;
         for (const p of placed) {
@@ -129,10 +107,8 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
       labelY[i] = y;
       placed.push({ x0, x1, y });
     });
-  // Clear the stroke, not just other labels: a rising curve passes BELOW a node
-  // on its left and ABOVE it on its right, so an un-biased label gets struck
-  // through by the line. Lift left-side labels up and drop right-side labels
-  // down by roughly a half-label so the sub-label always sits clear of the line.
+  // The rising curve passes below a node on its left and above it on its right,
+  // so labels must be biased away from the line or it strikes through them.
   const LINE_CLEAR = 4;
   ordered.forEach((_, i) => (labelY[i] += sides[i] ? -LINE_CLEAR : LINE_CLEAR));
   const over = Math.max(...Object.values(labelY)) - (Y_AXIS - 3);
@@ -143,7 +119,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
   const linePath = smoothPath(pts);
   const areaPath = `${linePath} L ${pts[n - 1].x.toFixed(2)} ${Y_AXIS} L ${pts[0].x.toFixed(2)} ${Y_AXIS} Z`;
 
-  // Future: continue the curve's own tangent, then curve into the "?".
   const a = pts[n - 2], b = pts[n - 1];
   const len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
   const c1x = b.x + ((b.x - a.x) / len) * 9;
@@ -175,8 +150,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [openId]);
 
-  // Card sits in the open space (below the node unless it's near the floor),
-  // joined to the node by a curved leader.
   const cardBelow = open ? pts[openIdx].y < 56 : true;
   const anchorY = open ? (cardBelow ? pts[openIdx].y + 5 : pts[openIdx].y - 5) : 0;
 
@@ -198,7 +171,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
           </clipPath>
         </defs>
 
-        {/* time axis — from the first point to an arrowhead under the "?" */}
         <line
           x1={pts[0].x} y1={Y_AXIS} x2={QX} y2={Y_AXIS}
           stroke="var(--color-rule-strong)" strokeWidth="1.25" vectorEffect="non-scaling-stroke"
@@ -220,7 +192,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
 
       </svg>
 
-      {/* nodes + labels */}
       {ordered.map((o, i) => {
         const p = pts[i];
         const op = Math.max(0, Math.min(1, fractional - i));
@@ -266,7 +237,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
         );
       })}
 
-      {/* "?" — the unknown ahead */}
       <span
         aria-hidden
         className="absolute z-10 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-ink bg-bg font-display text-[22px] font-normal leading-none text-ink"
@@ -275,12 +245,10 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
         ?
       </span>
 
-      {/* one quiet divider between the two years */}
       <div
         className="absolute w-px -translate-x-1/2 bg-rule"
         style={{ left: `${boundaryX}%`, top: `${Y_AXIS}%`, height: 40 }}
       />
-      {/* month labels (unadorned, under the line) */}
       {monthMarks.map((m) => (
         <div
           key={m.mi}
@@ -290,7 +258,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
           {m.label}
         </div>
       ))}
-      {/* years, centred under their spans */}
       <span
         className="absolute -translate-x-1/2 font-display text-[clamp(15px,1.5vw,18px)] font-normal leading-none tracking-[0.01em] tabular-nums text-mute"
         style={{ left: `${year25X}%`, top: `calc(${Y_AXIS}% + 30px)` }}
@@ -303,7 +270,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
       >
         2026
       </span>
-      {/* axis arrowhead — time continues on toward the unknown */}
       <span
         aria-hidden
         className="absolute -translate-y-1/2"
@@ -320,7 +286,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
         </svg>
       </span>
 
-      {/* click card — count + date + headlines, in the site's window style */}
       {open && (
         <div
           className="animate-pop absolute z-40 w-[340px] max-w-full -translate-x-1/2 rounded-[12px] border border-rule-strongest bg-bg px-6 py-5 shadow-[0_10px_34px_-14px_rgba(30,30,43,0.28)]"

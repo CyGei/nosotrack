@@ -1,16 +1,6 @@
 import type { PathogenSpec } from "./types";
 
-/**
- * Staphylococcus aureus — gram-positive coccus, characteristic
- * grape-like clusters. The methicillin-resistant strain (MRSA) is one
- * of the most-tracked nosocomial pathogens in the world.
- *
- * Source: AI-assisted image-to-3D, textures stripped and simplified to
- * ~10% triangles + meshopt-compressed (~875 KB).
- *
- * Classifier `all-grey` — no surface projections worth differentiating
- * (consistent with the other bacterial specimens; see ecoli precedent).
- */
+// Source: AI-assisted image-to-3D, textures stripped, simplified to ~10% triangles + meshopt (~875 KB).
 export const STAPH_AUREUS: PathogenSpec = {
   id: "staph-aureus",
   name: "S. aureus",

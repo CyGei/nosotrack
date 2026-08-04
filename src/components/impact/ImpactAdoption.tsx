@@ -1,31 +1,5 @@
 "use client";
 
-/**
- * ImpactAdoption — the "Impact & adoption" movement (id="impact"). It flows
- * straight out of the Research section above (no divider) and reads as one
- * quiet statement of global adoption.
- *
- * Composition (wide screens):
- *
- *   ┌ lead paragraph ────────┐   ┌ living Globe ─────────────────┐
- *   │ a decade of research…  │   │        (•)   Downloads  312k+ │
- *   │ outbreaker2 · EpiEstim │   │       (•••)  Citations  46.7k │
- *   │ · linktree …           │   │        (•)   Countries    127 │
- *   └────────────────────────┘   │              Publications 311 │
- *                                 └───────────────────────────────┘
- *
- * The globe sits to the RIGHT of the paragraph, with the aggregate metrics
- * arched around its right edge (Downloads · Citations · Countries ·
- * Publications). Clicking the Downloads or Citations figure drills that total
- * into its per-package breakdown (a second arc in the same place) AND swaps the
- * left paragraph: the lead fades out and a short methodology note fades in. A
- * back arrow at the globe's top-left (or Esc) returns to the totals and the
- * lead. On narrow screens the same pieces stack vertically.
- *
- * Every figure comes from src/data/research-metrics.json + research-geo.json.
- * No em dashes (house rule). Typography follows docs/TYPOGRAPHY.md exactly.
- */
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import metricsData from "@/data/research-metrics.json";
@@ -43,9 +17,6 @@ const Globe = dynamic(() => import("./Globe").then((m) => m.Globe), {
 type Pkg = { name: string; value: number };
 const byValueDesc = (a: Pkg, b: Pkg) => b.value - a.value;
 
-// Per-package breakdowns. Downloads sum to exactly tools.downloads; citations
-// are each method paper's own citation count (SeqTrack has citations but no
-// CRAN package, so the two sets differ).
 const DOWNLOAD_PKGS: Pkg[] = metricsData.packages
   .filter((p) => (p.downloads ?? 0) > 0)
   .map((p) => ({ name: p.name, value: p.downloads ?? 0 }))
@@ -100,7 +71,6 @@ const METRICS: MetricDef[] = [
 
 const ARC_OFFSET = 82;
 const AGG_ANGLES = [-36, -12, 12, 36];
-// Spread n items across the right arc, top → bottom.
 const arc = (n: number, maxA = 40) =>
   Array.from({ length: n }, (_, i) =>
     n === 1 ? 0 : -maxA + (2 * maxA * i) / (n - 1),
@@ -118,11 +88,7 @@ export function ImpactAdoption() {
     mountCheck: true,
   });
 
-  // globeSize is derived from the column that actually holds the globe: the
-  // right grid track when wide, the full-width wrapper when stacked. Sizing off
-  // the real measured width (not a computed fraction) keeps the arched metrics
-  // inside the track regardless of the grid's gap maths. The `- 250` reserves
-  // room for the arc + figure to the globe's right.
+  // `- 250` reserves room for the arc + figures to the globe's right.
   useEffect(() => {
     const el = measureRef.current;
     if (!el) return;
@@ -149,14 +115,12 @@ export function ImpactAdoption() {
   }, [openLabel, close]);
 
   const open = METRICS.find((m) => m.label === openLabel)?.breakdown ?? null;
-  // Keep the last breakdown mounted so the methodology note can fade OUT (and
-  // the lead fade back IN) on close without its text vanishing mid-transition.
+  // Keep the last breakdown mounted so its text survives the closing fade.
   const lastBreakdown = useRef<Breakdown | null>(open);
   if (open) lastBreakdown.current = open;
   const para = open ?? lastBreakdown.current;
 
-  // Globe is anchored to the LEFT of its stage; metrics arch off its right.
-  // Positions are px from the stage's left edge (globe centre = R, R).
+  // px from the stage's left edge; globe centre = (R, R).
   const R = globeSize / 2;
   const Rm = R + ARC_OFFSET;
   const pos = (deg: number) => {
@@ -173,7 +137,6 @@ export function ImpactAdoption() {
   const backArrow = openLabel && <BackArrow onClick={close} />;
   const caption = open ? open.caption : "";
 
-  // The arched globe stage (globe + aggregate arc + both breakdown arcs).
   const globeStage = (
     <div className="relative" style={{ height: globeSize }}>
       <div
@@ -184,7 +147,6 @@ export function ImpactAdoption() {
         {backArrow}
       </div>
 
-      {/* aggregate metrics — fade out when a breakdown is open */}
       {METRICS.map((m, i) => (
         <div
           key={m.label}
@@ -210,7 +172,6 @@ export function ImpactAdoption() {
         </div>
       ))}
 
-      {/* downloads breakdown */}
       {DOWNLOAD_PKGS.map((p, i) => (
         <div
           key={`dl-${p.name}`}
@@ -231,7 +192,6 @@ export function ImpactAdoption() {
         </div>
       ))}
 
-      {/* citations breakdown */}
       {CITATION_PKGS.map((p, i) => (
         <div
           key={`ci-${p.name}`}
@@ -261,14 +221,12 @@ export function ImpactAdoption() {
       aria-label="Impact and adoption"
     >
       <div className="container-page">
-        {/* ── header ───────────────────────────────────────────────── */}
         <Reveal>
           <h2 className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]">
             Peer-reviewed science, adopted globally.
           </h2>
         </Reveal>
 
-        {/* ── paragraph + globe (with drill-down) ──────────────────── */}
         <Reveal className="mt-12 md:mt-16">
           <div ref={reachRef}>
             {wide ? (
@@ -276,10 +234,8 @@ export function ImpactAdoption() {
                 className="grid items-center gap-12"
                 style={{ gridTemplateColumns: "minmax(0,1fr) minmax(0,1.1fr)" }}
               >
-                {/* LEFT — lead ⇄ methodology */}
                 <TextSwap open={open} para={para} />
 
-                {/* RIGHT — globe + arched metrics */}
                 <div ref={measureRef} className="relative">
                   {globeStage}
                   <div
@@ -292,7 +248,6 @@ export function ImpactAdoption() {
               </div>
             ) : (
               <div className="space-y-12">
-                {/* lead-in (stays put; methodology appears by the metrics) */}
                 <LeadCopy />
 
                 <div ref={measureRef}>
@@ -357,9 +312,6 @@ export function ImpactAdoption() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-
-/** The default lead copy — Impact's provenance statement. */
 function LeadCopy() {
   return (
     <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink text-justify hyphens-auto [text-wrap:pretty]">
@@ -368,18 +320,18 @@ function LeadCopy() {
         Its inference engine is grounded in scientifically validated methods that have become part of the standard toolkit for outbreak response worldwide.
       </p>
       <p>
-        These methods have supported real investigations by hospitals, research
+        These methods have supported real-world outbreak investigations by hospitals, research
         institutions and public health agencies, including SARS-CoV-2 nosocomial
-        outbreaks in Switzerland and the UK, MRSA transmission in UK neonatal
-        intensive care units, <em>Klebsiella pneumoniae</em> in a Nepali
-        neonatal unit, <em>Acinetobacter baumannii</em> in hospitals in North
-        Carolina, and Ebola in the Democratic Republic of the Congo.
+        outbreaks in Switzerland and the UK, <em>Klebsiella pneumoniae</em> in a
+        Nepali neonatal unit, vancomycin-resistant <em>Enterococcus faecium</em>{" "}
+        in an Australian tertiary hospital, multidrug-resistant{" "}
+        <em>Acinetobacter baumannii</em> at a burn centre in North Carolina, and
+        Ebola in Guinea.
       </p>
     </div>
   );
 }
 
-/** How a drilled-down metric was collected — replaces the lead when open. */
 function Methodology({ para }: { para: Breakdown }) {
   return (
     <div>
@@ -393,11 +345,6 @@ function Methodology({ para }: { para: Breakdown }) {
   );
 }
 
-/**
- * The left column on wide screens: the lead copy and the methodology note share
- * one slot and cross-fade. The lead stays in flow (holding the slot's height so
- * nothing jumps); the methodology overlays it, vertically centred.
- */
 function TextSwap({
   open,
   para,

@@ -1,55 +1,5 @@
 "use client";
 
-/**
- * Hero v2 — sticky-scroll cinematic, five-frame edition.
- *
- * Frame order (top → bottom of the wrapper):
- *   1. FIELD        — PPE video collage,           "outbreak forensics
- *                     real Africa-flavoured CC0     for infection prevention
- *                     + CDC public-domain footage   and control"
- *   2. TREE         — transmission tree auto-      "Reconstruct the chain
- *                     drawing on entry              of transmission."
- *   3. STOP         — intervention "stop the        "Stop
- *                     spread" motif                  the spread."
- *   4. BLUEPRINTS   — hospital | ship | farm       "Deployable
- *                     side-by-side, all three       anywhere."
- *                     particle networks live
- *   5. BRAND        — Nosotrack lockup with a      "Track. Intervene.
- *                     one-time entrance spin       Protect."
- *                     + slide-left choreography
- *
- * Scroll mechanics (standard modern protocol — no scroll-jacking
- * libraries, no lerp, no overengineering):
- *   - Outer wrapper is (N + 1) × 100svh tall, so the sticky inner
- *     pin gives each scene exactly 100svh of scroll dwell. One screen
- *     of scroll = one frame advance.
- *   - The inner stage is `position: sticky; top: 0; height: 100svh`.
- *   - `useActiveScene` samples scrollY each rAF, computes which scene
- *     is active, and React swaps the visible background.
- *   - Cross-fade between frames is 500ms — short enough that fast
- *     scrolls don't leave partial fades visible, long enough that the
- *     transition reads as a deliberate cut.
- *
- * Completion lock (the user's "lock end state once the pin releases"):
- *   - An IntersectionObserver watches a 1px sentinel at the wrapper
- *     bottom. When the sentinel enters the viewport (the natural pin-
- *     release moment), we set `hasCompleted` and the whole hero re-
- *     renders as a 100svh static section showing only the FROZEN
- *     final composition. No re-pin on scroll-up. No replay. No reset.
- *   - `useLayoutEffect` runs immediately after the DOM mutates and
- *     applies a `scrollBy({ top: -shrinkDelta, behavior: 'instant' })`
- *     so the user's viewport content stays exactly where it was at the
- *     moment of release — no visual jump.
- *   - A `hasUserScrolled` guard prevents the IO from firing on initial
- *     mount when the user lands on the page already past the hero
- *     (e.g. hard refresh while scrolled to #contact); we only commit
- *     completion AFTER the first real scroll event from the user.
- *
- * Mobile uses the same code path. `100svh` already accounts for the
- * iOS/Android address bar resize, and touch-scroll triggers the same
- * scroll events the rAF loop is listening to. One swipe ≈ one frame.
- */
-
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
 import Snap from "lenis/snap";
@@ -67,20 +17,14 @@ type SceneId = "field" | "tree" | "stop" | "blueprints" | "brand";
 type SceneSpec = {
   id: SceneId;
   lines: string[];
-  /** Apply the cream-halo `.hero-accent` to the FINAL line only. Used
-   *  on the brand frame so "Protect." picks up the breathing glow. */
   haloLastLine?: boolean;
-  /** When true, the scene component renders its OWN copy internally
-   *  (logo + headline two-column composition). Hero skips its
-   *  global TypingHeadline overlay for these so they don't double-
-   *  render. Used by the brand close-frame. */
+  /** Scene renders its own copy; Hero skips the global headline overlay. */
   selfContained?: boolean;
 };
 
 const SCENES: SceneSpec[] = [
   {
     id: "field",
-    // Lowercase per the brief — feels more Palantir / less marketing.
     lines: ["Outbreak forensics", "for infection prevention", "and control."],
   },
   {
@@ -105,22 +49,15 @@ const SCENES: SceneSpec[] = [
 
 const SCENE_COUNT = SCENES.length;
 
-// Wrapper height: (N + 1) × 100svh. With the sticky inner pinned at
-// 100svh, that gives totalScroll = N × 100svh and each scene gets
-// exactly 100svh of dwell. The "+1" is critical — without it each
-// scene only gets (N−1)/N × 100svh = 80svh for N=5 and the pacing
-// feels rushed / skip-y on fast scrolls.
+// The "+1" is required: with the sticky stage pinned at 100svh it makes
+// totalScroll = N × 100svh, i.e. exactly one viewport of dwell per scene.
 const WRAPPER_VH = (SCENE_COUNT + 1) * 100;
 
-// Cross-fade duration between scenes. Down from v1's 800ms so quick
-// scrolls don't leave partial fades visible.
 const FADE_MS = 500;
 
 const BRAND_SCENE = SCENES.find((s) => s.id === "brand")!;
 
-/** Smooth-scroll to a section by id ("about", "research", …) — through
- *  Lenis when it's mounted (so its internal target stays in sync), native
- *  scrollIntoView as the pre-mount fallback. */
+// Prefer Lenis when mounted so its internal target stays in sync.
 function scrollToId(lenis: ReturnType<typeof useLenis>, id: string) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -130,37 +67,16 @@ function scrollToId(lenis: ReturnType<typeof useLenis>, id: string) {
 
 export function Hero() {
   const { wrapperRef, activeScene } = useActiveScene(SCENE_COUNT);
-  // Lenis tracks its own internal scroll target independent of
-  // `window.scrollY`. When the completion-lock shrinks the wrapper we
-  // need to move BOTH in lock-step, otherwise Lenis's stale target
-  // makes the next wheel input rocket the page across the shrunk delta.
-  // Null on the server / before mount; the completion effect guards.
   const lenis = useLenis();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  // One marker per scene, sitting at the centre of that scene's scroll
-  // band. They feed BOTH snap mechanisms — Lenis's Snap addon on desktop
-  // (below) and CSS scroll-snap on touch (globals.css). One set of
-  // anchors, two consumers.
   const snapMarkerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [hasCompleted, setHasCompleted] = useState(false);
   const [hasUserScrolled, setHasUserScrolled] = useState(false);
-  // Captured at the moment we commit completion so the layout-effect
-  // below can compensate for the wrapper-height shrink WITHOUT having
-  // to re-query DOM after the React state has flipped.
   const completionShrinkRef = useRef(0);
-  // Section id ("about", "research", …) to glide to once the hero has
-  // collapsed to its locked height — set by the brand-frame "Scroll to
-  // learn more" cue and by nav-link clicks routed through registerHeroNav.
-  // Null when nothing is pending. Read by the completion layout-effect.
   const pendingScrollIdRef = useRef<string | null>(null);
 
-  /* ─────────────────────────────────────────────────────────────
-     "Has the user actually scrolled?" guard. Without this, the IO
-     below would fire immediately on a refresh-while-past-hero (because
-     the sentinel is already in view) and we'd shrink the hero before
-     the user has done anything. We just wait for one real scroll
-     event before allowing completion to be committed.
-     ───────────────────────────────────────────────────────────── */
+  // Guard: without a real scroll first, the sentinel IO fires immediately
+  // on a refresh-while-past-hero and collapses the hero unprompted.
   useEffect(() => {
     const onFirstScroll = () => setHasUserScrolled(true);
     window.addEventListener("scroll", onFirstScroll, {
@@ -170,12 +86,6 @@ export function Hero() {
     return () => window.removeEventListener("scroll", onFirstScroll);
   }, []);
 
-  /* ─────────────────────────────────────────────────────────────
-     Completion detector. The sentinel sits at the very bottom of the
-     wrapper. IntersectionObserver fires when its top edge crosses
-     into the viewport — i.e. the user has scrolled to or past the
-     wrapper bottom, which is the natural pin-release point.
-     ───────────────────────────────────────────────────────────── */
   useEffect(() => {
     if (hasCompleted || !hasUserScrolled) return;
     const sentinel = sentinelRef.current;
@@ -185,8 +95,6 @@ export function Hero() {
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
-        // Capture the shrink amount BEFORE setState so useLayoutEffect
-        // below can read it without racing the re-render.
         completionShrinkRef.current =
           wrapper.offsetHeight - window.innerHeight;
         setHasCompleted(true);
@@ -197,21 +105,9 @@ export function Hero() {
     return () => io.disconnect();
   }, [hasCompleted, hasUserScrolled, wrapperRef]);
 
-  /* ─────────────────────────────────────────────────────────────
-     Scroll compensation. Runs synchronously AFTER React has committed
-     the DOM change (wrapper shrunk from WRAPPER_VH×svh to 100svh) but
-     BEFORE the browser paints. We move the scroll up by the same delta
-     the wrapper lost so the user's viewport content stays visually
-     static at the moment of release.
-
-     Lenis is the source of truth for scroll. `lenis.scrollTo` with
-     `immediate: true` and `force: true` sets BOTH `window.scrollY` AND
-     Lenis's internal target in one call, keeping the two in sync —
-     otherwise the next wheel input gets added to Lenis's stale target
-     and rockets the page across the shrunk delta. We also call
-     `lenis.resize()` so Lenis re-measures the now-shorter document.
-     If Lenis isn't ready yet (SSR / pre-mount), fall back to native.
-     ───────────────────────────────────────────────────────────── */
+  // Compensate for the wrapper shrink before paint. Lenis keeps a scroll
+  // target separate from window.scrollY; scrollTo({immediate, force}) sets
+  // both, or the next wheel input rockets across the shrunk delta.
   useLayoutEffect(() => {
     if (!hasCompleted) return;
     const delta = completionShrinkRef.current;
@@ -229,11 +125,6 @@ export function Hero() {
         });
       }
     }
-    // Deferred section jump: a cue or nav link forced completion first
-    // (so the target section sits at its final offset), then we glide
-    // down to it here — after compensation has pinned the brand at the
-    // top. Doing it post-collapse sidesteps the anchor-vs-completion race
-    // that otherwise stranded the click mid-page.
     if (pendingScrollIdRef.current) {
       const id = pendingScrollIdRef.current;
       pendingScrollIdRef.current = null;
@@ -241,17 +132,8 @@ export function Hero() {
     }
   }, [hasCompleted, lenis]);
 
-  /* ─────────────────────────────────────────────────────────────
-     Frame snapping — desktop / pointer devices.
-     Lenis's own Snap addon snaps the wheel to each scene's band centre
-     so one scroll lands cleanly on one frame. `proximity` (not
-     `mandatory`) keeps it from trapping the user on the final frame —
-     once they scroll decisively past it, the completion-lock fires and
-     this effect tears the Snap down. Touch is intentionally skipped:
-     Lenis Snap ignores touchmove by design, so phones use native CSS
-     scroll-snap instead (see globals.css). Re-runs if the Lenis
-     instance arrives late or the hero completes.
-     ───────────────────────────────────────────────────────────── */
+  // Coarse pointers are skipped: Lenis Snap ignores touchmove by design,
+  // so touch uses native CSS scroll-snap (globals.css) instead.
   useEffect(() => {
     if (!lenis || hasCompleted) return;
     if (window.matchMedia("(pointer: coarse)").matches) return;
@@ -266,20 +148,8 @@ export function Hero() {
     };
   }, [lenis, hasCompleted]);
 
-  /* ─────────────────────────────────────────────────────────────
-     Collapse-then-scroll — the fix for the anchor-vs-completion race.
-     A plain #section anchor (the brand cue's "Scroll to learn more", any
-     nav link) starts scrolling toward a section that still sits several
-     viewports down inside the un-collapsed hero. Partway there the
-     completion sentinel trips: the wrapper collapses and its compensation
-     hard-resets Lenis's target, overriding the in-flight anchor scroll and
-     stranding the click mid-page — so it only lands on the SECOND click.
-     So we force completion NOW (capturing the same shrink delta the IO
-     path uses, so the viewport stays static through the collapse) and
-     defer the glide to the target to the completion layout-effect, by
-     which point the section sits at its final offset. If the hero has
-     already collapsed, there's nothing to unlock: scroll straight there.
-     ───────────────────────────────────────────────────────────── */
+  // Collapse first, scroll after: an in-flight anchor scroll gets clobbered
+  // when the completion sentinel trips mid-flight, stranding it mid-page.
   const completeAndScrollTo = useCallback(
     (id: string) => {
       const wrapper = wrapperRef.current;
@@ -294,26 +164,11 @@ export function Hero() {
     [hasCompleted, lenis, wrapperRef],
   );
 
-  // Brand-frame "Scroll to learn more" cue → About (the cue only renders
-  // pre-completion; completeAndScrollTo's else-branch is a fallback).
   const goToAbout = () => completeAndScrollTo("about");
 
-  /* ─────────────────────────────────────────────────────────────
-     Nav bridge — let the global <Nav> route its same-page section links
-     through the very same collapse-then-scroll, so a nav click during the
-     cinematic lands on the FIRST try instead of the second. We take over
-     only when the target section actually exists; otherwise the nav falls
-     back to Lenis's native anchor handling. Lives as long as the hero is
-     mounted (re-registers when the closure's deps change).
-     ───────────────────────────────────────────────────────────── */
   useEffect(
     () =>
       registerHeroNav((hash) => {
-        // Only intercept while the cinematic is still running — that's the
-        // only window in which the anchor-vs-completion race exists. Once
-        // completed, the sections sit at their final offsets, so Lenis's
-        // native anchor handling already lands on the first click (and
-        // keeps updating the URL hash); decline so the nav uses it.
         const id = hash.replace(/^#/, "");
         if (hasCompleted || !id || !document.getElementById(id)) return false;
         completeAndScrollTo(id);
@@ -322,11 +177,6 @@ export function Hero() {
     [hasCompleted, completeAndScrollTo],
   );
 
-  /* ─────────────────────────────────────────────────────────────
-     Render branch 1: completed — the locked final composition. One
-     100svh section, no sticky, no scene indicator, no choreography.
-     Scrolling past it (in either direction) is native page scroll.
-     ───────────────────────────────────────────────────────────── */
   if (hasCompleted) {
     return (
       <section
@@ -338,10 +188,6 @@ export function Hero() {
     );
   }
 
-  /* ─────────────────────────────────────────────────────────────
-     Render branch 2: active — sticky-scroll cinematic. Same path on
-     desktop and mobile.
-     ───────────────────────────────────────────────────────────── */
   return (
     <section
       ref={wrapperRef}
@@ -368,21 +214,9 @@ export function Hero() {
           );
         })}
 
-        {/* Left-side gradient scrim — sits between the scene background
-            (z-implicit) and the headline overlay (z-10) so the title
-            has a soft dark wash behind it on busy frames (video).
-            On already-dark frames (tree, stop) the scrim blends
-            invisibly into the ink background. Skipped on the self-
-            contained brand frame which has no overlay headline AND on
-            the blueprints frame — its leftmost column (hospital) sits
-            directly under the scrim's darkest band, which read as the
-            hospital being dimmed vs. the cruise ship at the right. */}
         {!SCENES[activeScene].selfContained &&
           SCENES[activeScene].id !== "blueprints" && <HeadlineScrim />}
 
-        {/* Global headline overlay — used for every scene EXCEPT the
-            self-contained brand frame, which renders its own headline
-            inside its two-column choreography. */}
         {!SCENES[activeScene].selfContained && (
           <div className="container-page absolute inset-0 z-10 flex flex-col justify-center">
             <SceneCopy
@@ -413,11 +247,8 @@ export function Hero() {
         />
       </div>
 
-      {/* Snap anchors — one per scene at the centre of its scroll band.
-          Direct children of the wrapper (NOT the sticky stage) so they
-          hold fixed document offsets instead of pinning. Zero-size and
-          non-interactive; they exist only to give the two snap systems
-          (Lenis Snap on desktop, CSS scroll-snap on touch) a target. */}
+      {/* Snap anchors must be direct children of the wrapper, not the
+          sticky stage, so they hold fixed document offsets. */}
       {SCENES.map((_, i) => (
         <div
           key={`snap-${i}`}
@@ -434,10 +265,6 @@ export function Hero() {
         />
       ))}
 
-      {/* Sentinel — 1px tall, at the absolute bottom of the wrapper.
-          When this crosses into the viewport from below, the user has
-          scrolled to the natural pin-release point and we commit to
-          the completion lock. */}
       <div
         ref={sentinelRef}
         aria-hidden
@@ -447,11 +274,6 @@ export function Hero() {
   );
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Scene chooser — returns the background visual for a given scene.
-   Self-contained scenes (brand) receive their `lines` through here
-   so Hero's SCENES array stays the single source of truth.
-   ─────────────────────────────────────────────────────────────── */
 function SceneBackground({
   scene,
   active,
@@ -473,15 +295,6 @@ function SceneBackground({
   }
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Headline scrim — left-side dark gradient that boosts title-text
-   contrast on busy frames (Field video, Blueprints).
-   On already-dark frames (Tree, Stop) the scrim's left edge sits at
-   70% ink which is visually identical to the 100% ink background, so
-   it has zero visible cost. Sized to roughly the text column width
-   (text uses max-w-[22ch] inside container-page — the gradient fades
-   to transparent just past where the longest line ends).
-   ─────────────────────────────────────────────────────────────── */
 function HeadlineScrim() {
   return (
     <div
@@ -495,9 +308,6 @@ function HeadlineScrim() {
   );
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Scene copy — typing headline.
-   ─────────────────────────────────────────────────────────────── */
 function SceneCopy({
   lines,
   haloLastLine,
@@ -519,14 +329,8 @@ function SceneCopy({
   );
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Scroll helpers — shared by the indicator dots and the clickable
-   cues. `scrollToScene` smooth-scrolls so a scene's band centre
-   reaches the top of the viewport, advancing exactly one frame. It
-   reads rect.height at call time so the math holds whether the
-   wrapper is full-height or mid-completion, and honours
-   prefers-reduced-motion to match globals.css's scroll-behavior rule.
-   ─────────────────────────────────────────────────────────────── */
+// rect.height is read at call time so the math holds whether the wrapper
+// is full-height or mid-completion.
 function scrollToScene(
   wrapper: HTMLElement | null,
   index: number,
@@ -541,26 +345,6 @@ function scrollToScene(
   window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Advance cue — the "how do I move to the next frame?" hint.
-   On desktop it sits just LEFT of the vertical scene-indicator rail
-   (see SceneIndicator), vertically centred to align with it. On mobile
-   the rail-adjacent centre would collide with the overlaid headline, so
-   the cue drops to bottom-centre (matching BrandOutro's placement; the
-   two never show at once). The chevron always points DOWN — deliberately
-   vertical motion to correct the observed behaviour of users swiping
-   left↔right instead of scrolling down to advance.
-
-   The "scroll down" label disappears once the user has scrolled for the
-   first time (`hasScrolled`) — by then they've learnt the gesture, so
-   only the quiet arrow remains as a direction reminder on the remaining
-   frames. The label reads "Scroll down" on every platform.
-
-   Now interactive: the chevron is a real button — click or tap
-   advances exactly one frame (reusing the indicator-dot scroll math),
-   and it's keyboard-focusable with an aria-label. It only accepts
-   input while visible; on the final frame it's inert and aria-hidden.
-   ─────────────────────────────────────────────────────────────── */
 function AdvanceCue({
   visible,
   hasScrolled,
@@ -583,12 +367,7 @@ function AdvanceCue({
         color: "var(--color-inv-hi)",
       }}
     >
-      {/* Real button so the chevron is clickable / tappable / focusable.
-          `-m-4 p-4` grows the touch target ~16px on every side without
-          shifting the chevron a pixel — a generous, thumb-friendly area
-          for the user who clicks the cue instead of scrolling. Pointer +
-          focus are switched off while the cue is hidden so the final
-          frame can't trap a tab stop or a stray tap. */}
+      {/* `-m-4 p-4` grows the touch target without shifting the chevron. */}
       <button
         type="button"
         aria-label="Go to next frame"
@@ -600,8 +379,6 @@ function AdvanceCue({
         className="group -m-4 flex cursor-pointer flex-row items-center gap-3 rounded-md p-4 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
         style={{ pointerEvents: visible ? "auto" : "none" }}
       >
-        {/* Label — bright + legible, fades out for good after the user's
-            first scroll but keeps its space so the arrow stays put. */}
         <span
           className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-[0.2em]"
           style={{
@@ -611,11 +388,6 @@ function AdvanceCue({
         >
           Scroll down
         </span>
-        {/* Bold, enlarged double-chevron sliding downward — the
-            clearly-visible direction signal, sized up so it also reads as
-            an obvious tap target; nudges further down on hover / press.
-            Same 0 0 26 34 viewBox, so the wider/taller box just scales the
-            strokes proportionally. */}
         <svg
           width="34"
           height="44"
@@ -646,37 +418,13 @@ function AdvanceCue({
   );
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Brand outro — the two ways out of the cinematic, shown only on the
-   FINAL (brand) frame as a matched pair sitting SIDE-BY-SIDE at
-   bottom-centre. Identical treatment (mono cream label + arrow on the
-   transparent dark hero); they differ only in where the arrow points:
-
-     • "Explore the platform" → arrow OUTWARD (↗). Off-site jump to the
-       live MVP dashboard, opened in a new tab (same target + rel as the
-       nav "Platform" link) so the marketing site stays put behind it.
-     • "Scroll to learn more" → arrow DOWN (↓). Releases the cinematic
-       (forces the completion lock) then glides down to the About
-       section — see `onLearnMore` / `goToAbout` in <Hero>.
-
-   Cream-on-transparent (not a filled button) keeps both legible on the
-   dark canvas without a background that could swallow the label. Both
-   are inert + aria-hidden whenever this isn't the active frame; the
-   whole hero re-renders without them once `hasCompleted` flips and the
-   pin releases.
-   ─────────────────────────────────────────────────────────────── */
 function BrandOutro({
   visible,
   onLearnMore,
 }: {
   visible: boolean;
-  /** Releases the cinematic and scrolls to About; wired from <Hero>. */
   onLearnMore: () => void;
 }) {
-  // One shared treatment so the two read as a matched pair — only the
-  // label + arrow direction differ. `-m-3 p-3` enlarges the tap target
-  // in place; pointer + focus gate on `visible` so neither is
-  // interactive off the final frame.
   const itemClass =
     "group -m-3 flex cursor-pointer flex-col items-center gap-2 rounded-md p-3 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]";
   const labelClass =
@@ -696,7 +444,6 @@ function BrandOutro({
         color: "var(--color-inv-hi)",
       }}
     >
-      {/* Platform — outward arrow (↗), off-site jump in a new tab. */}
       <a
         href="https://nosotrack.onrender.com"
         target="_blank"
@@ -723,9 +470,8 @@ function BrandOutro({
         </svg>
       </a>
 
-      {/* Scroll — down arrow (↓). A button (not a #about anchor) so its
-          handler can force the completion lock BEFORE scrolling; a raw
-          anchor scroll races that lock and lands mid-page. */}
+      {/* A button, not a #about anchor: the handler must force the
+          completion lock before scrolling or the click lands mid-page. */}
       <button
         type="button"
         onClick={onLearnMore}
@@ -754,15 +500,6 @@ function BrandOutro({
   );
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Scene indicator rail — a VERTICAL column of dots pinned to the right
-   edge of the hero, vertically centred. Clicking a dot jumps you to
-   that scene. The vertical orientation reinforces that frames advance
-   downward (a horizontal row read like a carousel and invited sideways
-   swipes). The active dot stretches into a tall pill; the AdvanceCue
-   arrow sits immediately to its left. Math still works with the wrapper
-   height because we read `rect.height` at click time.
-   ─────────────────────────────────────────────────────────────── */
 function SceneIndicator({
   count,
   activeScene,

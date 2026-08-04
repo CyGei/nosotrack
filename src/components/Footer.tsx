@@ -1,13 +1,3 @@
-/**
- * Footer — two-band layout ported from main branch legacy/styles.css §17:
- *
- *   BAND 1   — brand (mark + wordmark) on the left, nav links on the right.
- *   DIVIDER  — a hairline, then the copyright line beneath it.
- *
- * Outer padding (40 px top / 32 px bottom) keeps the top hairline clear
- * of the logo.
- */
-
 import { BrandWordmark } from "@/components/BrandWordmark";
 import { BrandMark } from "@/components/BrandMark";
 
@@ -30,7 +20,6 @@ export function Footer() {
         className="container-page"
         style={{ paddingTop: "40px", paddingBottom: "32px" }}
       >
-        {/* BAND 1 — brand on the left, link list on the right. */}
         <div className="flex flex-wrap items-center justify-between gap-6">
           <div className="footer-brand flex items-center gap-[10px]">
             <span
@@ -58,8 +47,6 @@ export function Footer() {
           </ul>
         </div>
 
-        {/* DIVIDER + BAND 2 — copyright / credit. The hairline sits 64 px
-            below the brand band and 32 px above the copy. */}
         <div className="mt-16 border-t border-rule-inv pt-8">
           <p className="font-mono text-[11px] tracking-[0.1em] text-inv-mute">
             © {FOOTER_COPY}

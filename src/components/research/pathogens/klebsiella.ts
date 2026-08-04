@@ -1,18 +1,6 @@
 import type { PathogenSpec } from "./types";
 
-/**
- * Klebsiella pneumoniae — gram-negative encapsulated rod with Type 3
- * fimbriae. A core nosocomial pathogen, especially the
- * carbapenem-resistant strains (CRKP).
- *
- * Source: AI-assisted image-to-3D, textures stripped and simplified to
- * ~7% triangles + meshopt-compressed (~1.05 MB).
- *
- * Classifier `all-grey` — consistent with the ecoli precedent (Cy
- * rejected axial-tipped fimbriae as stylistic noise). If a future
- * source ships with cleanly separated fimbriae meshes, switch to
- * mesh-name then.
- */
+// Source: AI-assisted image-to-3D, textures stripped, simplified to ~7% triangles + meshopt (~1.05 MB).
 export const KLEBSIELLA: PathogenSpec = {
   id: "klebsiella",
   name: "K. pneumoniae",

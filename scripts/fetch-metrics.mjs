@@ -1,57 +1,6 @@
 #!/usr/bin/env node
-/**
- * fetch-metrics.mjs — build the research-impact database.
- *
- * Usage:
- *   node scripts/fetch-metrics.mjs
- *
- * The section tells two stories, in two bands:
- *
- *   BAND 1 — THE PEOPLE.  For each researcher (by ORCID) we pull their full
- *   works list from OpenAlex, drop the non-substantive "works" (Figshare
- *   figures, datasets, supplements, preprints — see NOTE), and report their
- *   career publication + citation totals, de-duplicated across the team.
- *   These cover each person's ENTIRE body of work, not just the tools.
- *
- *   BAND 2 — THE TOOLS.  Six packages/methods the platform is built on
- *   (EpiEstim, outbreaker2, o2ools, SeqTrack, linktree, mixtree). For each
- *   tool we assemble:
- *     · DOWNLOADS — CRAN downloads (summed across the tool's CRAN names).
- *       Tools with no CRAN package of their own (SeqTrack) have none.
- *     · OUR PAPERS — the paper(s) WE wrote about the tool (its methods
- *       paper[s]) PLUS the papers WE wrote that USED it. The latter are
- *       derived automatically: any team-authored work that cites the tool's
- *       methods paper and is not itself a methods paper. `appInclude` /
- *       `appExclude` (bare DOIs) override the derivation at the edges.
- *     · CITATIONS — EVERY paper that cites the tool or any of OUR papers for
- *       it. That means two hops: works citing the methods paper(s), PLUS
- *       works citing our application papers. Citers are deduped across both
- *       hops and tagged `byTeam` when authored by one of the four.
- *
- * One generated file, bundled into the site:
- *   · src/data/research-metrics.json   — both bands + per-tool detail
- *
- * The raw citing-papers list is computed to derive the counts above but is
- * NOT persisted — nothing at build- or run-time consumes it.
- *
- * Sources (both free, no API key):
- *   · OpenAlex   https://docs.openalex.org  (publications + citations)
- *   · cranlogs   https://cranlogs.r-pkg.org (package downloads)
- *
- * NOTE — why we filter works (BAND 1 only):
- *   OpenAlex ingests Crossref + DataCite, and PLOS/Figshare mint a separate
- *   DOI for every figure and supplement (e.g. …pcbi.1014271.g003). Those land
- *   as "works" on an author's profile and would inflate a naive publication
- *   count from ~12 real papers to ~90. We keep only substantive types (and
- *   drop preprints, which OpenAlex double-counts against their published
- *   versions). See SUBSTANTIVE_TYPES / isRealWork(). The tool-citation lists
- *   in BAND 2 are deliberately NOT type-filtered — the goal there is to show
- *   everyone who uses the tools, preprints included.
- *
- * Refresh cadence:
- *   Run by hand whenever you want to refresh the figures. The committed JSON
- *   is a static snapshot; there is no longer an automated job updating it.
- */
+// Builds src/data/research-metrics.json from OpenAlex (publications, citations)
+// and cranlogs (downloads).
 
 import { writeFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
@@ -61,36 +10,21 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 const dataDir = resolve(root, "src/data");
 
-/* ───────────────────────────────────────────────────────── config ── */
-
-// OpenAlex "polite pool": a contact address earns faster, more reliable
-// service. https://docs.openalex.org/how-to-use-the-api/rate-limits-and-authentication
+// OpenAlex "polite pool": a contact address earns faster, more reliable service.
 const MAILTO = "cyrilgeismar@gmail.com";
 const OA = "https://api.openalex.org";
 const CRANLOGS = "https://cranlogs.r-pkg.org";
 const UA = `nosotrack-metrics (+https://nosotrack.com; mailto:${MAILTO})`;
 
-// The four researchers, anchored on ORCID (authoritative — avoids the
-// name-collision / profile-split problems that plague raw author.id sweeps).
+// Anchored on ORCID: raw author.id sweeps hit OpenAlex name collisions / split profiles.
 const RESEARCHERS = [
   { key: "jombart", name: "Thibaut Jombart", orcid: "0000-0003-2226-8692" },
   { key: "cori", name: "Anne Cori", orcid: "0000-0002-8443-9162" },
   { key: "campbell", name: "Finlay Campbell", orcid: "0000-0002-1849-1886" },
   { key: "geismar", name: "Cyril Geismar", orcid: "0000-0002-8486-5890" },
 ];
-// OpenAlex stamps authorships with the full ORCID URL — match on that.
 const OURCID = new Set(RESEARCHERS.map((r) => `https://orcid.org/${r.orcid}`));
 
-// The six tools the platform is built on. Each may carry:
-//   · crans        — CRAN name(s) whose downloads are SUMMED. Empty ⇒ the
-//                    tool has no package of its own (SeqTrack lives in a
-//                    method, not a standalone CRAN release) ⇒ no downloads.
-//   · methodsDois  — the paper(s) WE wrote describing the tool. Empty ⇒ a
-//                    companion utility with no standalone paper (o2ools).
-//   · appInclude / appExclude — bare DOIs to force in / out of the derived
-//                    "papers we wrote that USED this tool" set.
-//   · repo         — canonical code home, or null (SeqTrack has none of its
-//                    own — deliberately not attributed to another package).
 const TOOLS = [
   {
     id: "epiestim",
@@ -118,7 +52,7 @@ const TOOLS = [
     id: "o2ools",
     name: "o2ools",
     crans: ["o2ools"],
-    methodsDois: [], // companion utility package — no standalone methods paper
+    methodsDois: [],
     appInclude: [],
     appExclude: [],
     repo: "https://github.com/CyGei/o2ools",
@@ -128,7 +62,7 @@ const TOOLS = [
   {
     id: "seqtrack",
     name: "SeqTrack",
-    crans: [], // a method, not a standalone CRAN package — no downloads
+    crans: [],
     methodsDois: ["10.1038/hdy.2010.78"],
     appInclude: [],
     appExclude: [],
@@ -160,17 +94,11 @@ const TOOLS = [
   },
 ];
 
-// Every tool's methods DOI, bare + lowercased. A team-authored work that IS
-// one of these is a methods paper, never an "application" paper of another
-// tool (keeps the mixtree paper from being logged as an outbreaker2 app).
 const ALL_METHODS_DOIS = new Set(
   TOOLS.flatMap((t) => t.methodsDois.map((d) => d.toLowerCase()))
 );
 
-// OpenAlex `type` values we count as real, peer-reviewed publications (BAND 1
-// only). Preprints are excluded on purpose: OpenAlex frequently keeps a
-// medRxiv/bioRxiv preprint AND its published article as separate works, so
-// counting preprints double-counts both the paper and its citations.
+// Preprints excluded: OpenAlex keeps a preprint AND its published article as separate works.
 const SUBSTANTIVE_TYPES = new Set([
   "article",
   "review",
@@ -181,16 +109,11 @@ const SUBSTANTIVE_TYPES = new Set([
   "letter",
 ]);
 
-// Fields we pull for any citing / paper work — enough to render a row AND to
-// decide team authorship (authorships[].author.orcid).
 const WORK_SELECT =
   "id,doi,display_name,publication_year,type,cited_by_count,authorships,primary_location";
 
-/* ─────────────────────────────────────────────────────── helpers ── */
-
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** GET JSON with polite retry/backoff on 429 / 5xx. */
 async function getJSON(url, tries = 4) {
   for (let i = 0; i < tries; i++) {
     let res;
@@ -215,9 +138,8 @@ const shortId = (id) => (id ? String(id).replace("https://openalex.org/", "") : 
 const bareDoi = (doi) => (doi ? String(doi).replace("https://doi.org/", "") : null);
 const venueOf = (w) => w?.primary_location?.source?.display_name ?? null;
 const isFigshare = (w) => /figshare/i.test(venueOf(w) || "");
-// PLOS/Figshare component DOIs look like `<base>.g003`, `.s007`, `.t002`…
+// PLOS/Figshare mint a DOI per figure/supplement: `<base>.g003`, `.s007`, `.t002`…
 const isComponentDoi = (doi) => /\.[a-z]{1,4}\d{3,}$/i.test(doi || "");
-// Authored by one of the four? (used to derive app papers + tag self-cites)
 const isTeam = (w) => !!w.authorships?.some((a) => OURCID.has(a.author?.orcid));
 
 const authorsOf = (w) => {
@@ -226,7 +148,6 @@ const authorsOf = (w) => {
   return first ? (n > 1 ? `${first} et al.` : first) : "Unknown";
 };
 
-/** Keep only substantive, non-component, non-Figshare works (BAND 1). */
 function isRealWork(w) {
   if (!SUBSTANTIVE_TYPES.has(w.type)) return false;
   if (isFigshare(w)) return false;
@@ -234,7 +155,6 @@ function isRealWork(w) {
   return true;
 }
 
-/** Page an OpenAlex works query to exhaustion via cursor pagination. */
 async function oaWorks(filter, select) {
   const out = [];
   let cursor = "*";
@@ -252,7 +172,6 @@ async function oaWorks(filter, select) {
   return out;
 }
 
-/** Compress an OpenAlex work into a stored paper / citing-paper record. */
 function paperRec(w) {
   return {
     id: shortId(w.id),
@@ -265,11 +184,9 @@ function paperRec(w) {
   };
 }
 
-/* ───────────────────────────────────────────────── BAND 1: people ── */
-
 async function fetchResearchers() {
   const perPerson = [];
-  const unionWorks = new Map(); // openalex id -> cited_by_count
+  const unionWorks = new Map();
 
   for (const r of RESEARCHERS) {
     process.stdout.write(`> ${r.name} (ORCID ${r.orcid})… `);
@@ -296,20 +213,11 @@ async function fetchResearchers() {
   return { perPerson, groupPublications, groupCitations };
 }
 
-/* ──────────────────────────────────────────────────── BAND 2: tools ── */
-
-/**
- * For one tool: resolve its methods paper(s), collect everyone who cites them
- * (hop 1), derive the team's own application papers from those citers, then
- * collect everyone who cites THOSE (hop 2). Return the merged, deduped citer
- * set plus the tool's own paper list (methods + application).
- */
 async function fetchTool(tool) {
   let primary = null;
   const methodsWorks = [];
-  const citerMap = new Map(); // openalex id -> citing work (deduped, both hops)
+  const citerMap = new Map();
 
-  // Hop 1 — the methods paper(s) and their citers.
   for (const doi of tool.methodsDois) {
     const paper = await getJSON(`${OA}/works/doi:${doi}?select=${WORK_SELECT}&mailto=${MAILTO}`);
     methodsWorks.push(paper);
@@ -325,9 +233,7 @@ async function fetchTool(tool) {
     for (const w of citers) if (w.id && !citerMap.has(w.id)) citerMap.set(w.id, w);
   }
 
-  // Derive OUR application papers: team-authored citers that are not
-  // themselves any tool's methods paper. Then apply manual overrides.
-  const appMap = new Map(); // openalex id -> work
+  const appMap = new Map();
   for (const w of citerMap.values()) {
     if (!isTeam(w)) continue;
     if (ALL_METHODS_DOIS.has((bareDoi(w.doi) || "").toLowerCase())) continue;
@@ -343,7 +249,6 @@ async function fetchTool(tool) {
     if (w?.id) appMap.set(w.id, w);
   }
 
-  // Hop 2 — everyone who cites our application papers.
   for (const app of appMap.values()) {
     const citers = await oaWorks(`cites:${shortId(app.id)}`, WORK_SELECT);
     for (const w of citers) if (w.id && !citerMap.has(w.id)) citerMap.set(w.id, w);
@@ -364,22 +269,17 @@ async function fetchTool(tool) {
   };
 }
 
-/**
- * Merged monthly CRAN-download series across one or more package names
- * (outbreaker2 sums outbreaker + outbreaker2), plus the cumulative total.
- * Returns { total: null } for tools with no CRAN package (SeqTrack).
- */
 async function fetchDownloads(crans) {
   if (!crans.length) return { total: null, monthly: [] };
   const today = new Date().toISOString().slice(0, 10);
   const range = `2012-10-01:${today}`;
-  const buckets = new Map(); // YYYY-MM -> downloads (summed across crans)
+  const buckets = new Map();
 
   for (const cran of crans) {
     try {
       const d = await getJSON(`${CRANLOGS}/downloads/daily/${range}/${cran}`);
       for (const row of d?.[0]?.downloads || []) {
-        const m = String(row.day).slice(0, 7); // YYYY-MM
+        const m = String(row.day).slice(0, 7);
         buckets.set(m, (buckets.get(m) || 0) + (Number(row.downloads) || 0));
       }
     } catch {
@@ -394,16 +294,14 @@ async function fetchDownloads(crans) {
   return { total, monthly };
 }
 
-/* ─────────────────────────────────────────────────────── main ── */
-
 console.log("Building research-impact database…\n");
 console.log("BAND 1 — the people (career totals):");
 const researchers = await fetchResearchers();
 
 console.log("\nBAND 2 — the tools:");
 const packages = [];
-const citationDb = new Map(); // openalex id -> { ...rec, cites: Set, byTeam }
-const papersDb = new Map(); //   openalex id -> { ...rec, tools: Set, role }
+const citationDb = new Map();
+const papersDb = new Map();
 
 for (const tool of TOOLS) {
   process.stdout.write(`> ${tool.name}: `);
@@ -423,7 +321,7 @@ for (const tool of TOOLS) {
     if (!papersDb.has(p.id)) papersDb.set(p.id, { ...p, tools: new Set() });
     const e = papersDb.get(p.id);
     e.tools.add(tool.id);
-    if (p.role === "methods") e.role = "methods"; // methods wins over application
+    if (p.role === "methods") e.role = "methods";
   }
 
   packages.push({
@@ -454,7 +352,6 @@ for (const tool of TOOLS) {
   );
 }
 
-// Flatten the citation database, newest first.
 const citations = [...citationDb.values()]
   .map((c) => ({
     id: c.id,
@@ -475,19 +372,17 @@ const teamCiting = citations.filter((c) => c.byTeam).length;
 const metrics = {
   generatedAt,
   source: "OpenAlex (publications & citations) + cranlogs (downloads)",
-  // BAND 1 — the people: whole-career totals, deduped across the four.
   people: {
     publications: researchers.groupPublications,
     citations: researchers.groupCitations,
     perPerson: researchers.perPerson,
   },
-  // BAND 2 — the tools: tool-scoped aggregates.
   tools: {
     count: TOOLS.length,
-    papers: papersDb.size, // unique papers WE wrote across the tools
+    papers: papersDb.size,
     downloads: toolDownloads,
-    citations: citations.length, // unique papers citing the tools / our tool-papers
-    teamCiting, // of which authored by the team (self / follow-on)
+    citations: citations.length,
+    teamCiting,
   },
   packages,
 };

@@ -1,14 +1,6 @@
 import type { PathogenSpec } from "./types";
 
-/**
- * SARS-CoV-2 — NIAID Visual & Medical Arts cryo-ET-derived virion.
- *
- * Source GLB (~11 MB, 566K tris) was downloaded from NIH 3D entry
- * 3DPX-013323 and reduced with `gltfpack -si 0.30 -cc` to 649 KB / 170K
- * tris. The shipped file has no materials — just per-vertex POSITION +
- * COLOR_0 — so the radial classifier (everything past 78% of the
- * bounding-sphere radius is a spike) is the right strategy here.
- */
+// Source: NIH 3D 3DPX-013323 GLB (~11 MB, 566K tris), `gltfpack -si 0.30 -cc` → 649 KB / 170K tris.
 export const SARS_COV_2: PathogenSpec = {
   id: "sars-cov-2",
   name: "SARS-CoV-2",

@@ -1,27 +1,6 @@
 "use client";
 
-/**
- * PathogenViewer — generic 3D specimen renderer.
- *
- * Takes a `PathogenSpec` (see ./pathogens/types.ts) and renders the
- * model using raw three.js. The classifier on the spec decides how
- * vertices get remapped to the brand palette (grey body, red projections).
- *
- * This is the only WebGL-touching component in the Research section.
- * Everything pathogen-specific lives in the registry under
- * ./pathogens/ — to add a new one you write a config file, never edit
- * this component.
- *
- * Raw three.js (NOT @react-three/fiber — R3F 8.x crashes under Next 15
- * + React 18.3 in this app; see project memory). Loader / decoder
- * imports use the JS examples paths shipped inside the `three` package.
- *
- * Behaviour:
- *   - IntersectionObserver pauses the RAF loop when off-screen
- *   - prefers-reduced-motion renders a single static frame
- *   - ResizeObserver keeps the canvas in sync with its container
- *   - Full dispose on unmount; safe to swap specimens via React `key`
- */
+// Raw three.js, NOT @react-three/fiber — R3F 8.x crashes under Next 15 + React 18.3 here.
 
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
@@ -33,18 +12,10 @@ import type { PathogenSpec } from "./pathogens/types";
 type Props = {
   pathogen: PathogenSpec;
   className?: string;
-  /**
-   * If true, the viewer starts at a boosted rotation speed (×SPIN_BURST_MULT)
-   * and exponentially decays back to the spec's base speed over
-   * SPIN_BURST_MS milliseconds. Used by the dossier modal to give the
-   * specimen a "scan accelerating" beat when it opens.
-   */
   initialSpinBurst?: boolean;
 };
 
-/** Multiplier applied to base rotationSpeed at t=0 of the burst. */
 const SPIN_BURST_MULT = 6;
-/** Time to decay from SPIN_BURST_MULT × base back to 1 × base. */
 const SPIN_BURST_MS = 1200;
 
 export function PathogenViewer({
@@ -59,17 +30,12 @@ export function PathogenViewer({
     const container = containerRef.current;
     if (!container) return;
 
-    // Reset the loaded flag every time the spec changes — the parent
-    // typically swaps specimens via `key`, which would unmount/remount
-    // and reset state anyway, but this keeps the component robust if
-    // someone passes a new `pathogen` prop without a key.
     setLoaded(false);
 
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    /* ─────────────────────────── scene / camera / renderer ─────── */
     const framing = pathogen.framing ?? {};
     const targetRadius = framing.targetRadius ?? 1.35;
     const cameraZ = framing.cameraZ ?? 6.0;
@@ -97,10 +63,6 @@ export function PathogenViewer({
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
-    /* ─────────────────────────────────────────────────── lights ── */
-    // Three-point setup: warm key from upper-right, cool fill from
-    // front-left, warm rim from behind. Plus a hemisphere wash so the
-    // global colour stays balanced.
     const key = new THREE.DirectionalLight(0xfff4e6, 2.2);
     key.position.set(3.5, 4.2, 4.5);
     scene.add(key);
@@ -113,7 +75,6 @@ export function PathogenViewer({
     const hemi = new THREE.HemisphereLight(0xefeeef, 0x6d6d72, 0.4);
     scene.add(hemi);
 
-    /* ───────────────────────────────────────────── model load ── */
     const root = new THREE.Group();
     root.rotation.set(tiltX, tiltY, tiltZ);
     scene.add(root);
@@ -121,10 +82,7 @@ export function PathogenViewer({
     const disposables: { dispose: () => void }[] = [];
     let cancelled = false;
 
-    /** Normalise + add a built/loaded model group to the scene. */
     const mount = (modelRoot: THREE.Object3D) => {
-      // Centre + uniform scale to a unit bounding sphere so the
-      // camera framing is consistent across specimens.
       const box = new THREE.Box3().setFromObject(modelRoot);
       const sphere = new THREE.Sphere();
       box.getBoundingSphere(sphere);
@@ -144,11 +102,6 @@ export function PathogenViewer({
         if (cancelled) return;
         const modelRoot = gltf.scene;
 
-        // For every mesh: run the universal red-shading algorithm
-        // (Taubin smooth → outward displacement → Otsu → CC filter →
-        // grey/red per-vertex colours), compute normals if absent, then
-        // attach a vertex-colour MeshStandardMaterial. See ./pathogens/
-        // classify.ts for the algorithm's design rationale.
         modelRoot.traverse((obj) => {
           if (!(obj instanceof THREE.Mesh)) return;
           const geom = obj.geometry as THREE.BufferGeometry;
@@ -179,22 +132,15 @@ export function PathogenViewer({
       }
     );
 
-    /* ──────────────────────────────── animation + observers ── */
     let raf = 0;
     let isVisible = true;
     let lastT = performance.now();
     const burstStart = initialSpinBurst ? performance.now() : 0;
 
-    /**
-     * Multiplier applied to rotSpeed at time `now` — exponential decay
-     * from SPIN_BURST_MULT back to 1 across SPIN_BURST_MS. Returns 1
-     * (no boost) when the burst is disabled or already expired.
-     */
     const burstMult = (now: number) => {
       if (!initialSpinBurst) return 1;
       const elapsed = now - burstStart;
       if (elapsed >= SPIN_BURST_MS) return 1;
-      // Ease-out cubic from MULT → 1.
       const p = elapsed / SPIN_BURST_MS;
       const ease = 1 - Math.pow(1 - p, 3);
       return SPIN_BURST_MULT - (SPIN_BURST_MULT - 1) * ease;
@@ -237,7 +183,6 @@ export function PathogenViewer({
     const resObs = new ResizeObserver(onResize);
     resObs.observe(container);
 
-    /* ─────────────────────────────────────────────── cleanup ── */
     return () => {
       cancelled = true;
       cancelAnimationFrame(raf);
@@ -251,18 +196,13 @@ export function PathogenViewer({
         }
       }
       renderer.dispose();
-      // Explicitly drop the WebGL context — browsers cap live contexts
-      // (~16), and the ticker/spotlight mount many specimens, so relying on
-      // GC to reclaim them can blank later canvases.
+      // Browsers cap live WebGL contexts (~16); GC alone is too late and blanks later canvases.
       renderer.forceContextLoss();
       if (renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);
       }
     };
-    // `initialSpinBurst` is captured once at mount — re-running the effect
-    // on burst toggle would tear down the whole renderer, which is what
-    // we want when the parent swaps specimens (handled via React `key`),
-    // but is unnecessary cost for a flag that's typically only set once.
+    // `initialSpinBurst` is captured once at mount; re-running would tear down the renderer.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathogen]);
 
@@ -274,7 +214,6 @@ export function PathogenViewer({
       }
     >
       <div ref={containerRef} className="absolute inset-0" aria-hidden />
-      {/* Subtle loading state — fades out the moment the GLB resolves. */}
       <div
         className={`pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${
           loaded ? "opacity-0" : "opacity-100"

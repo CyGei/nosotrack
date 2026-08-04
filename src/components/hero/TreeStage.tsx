@@ -1,31 +1,5 @@
 "use client";
 
-/**
- * TreeStage — shared SVG renderer for the transmission tree and the
- * grey susceptible substrate. Used by:
- *   - Scene3Tree (Frame 2 "Reconstruct the chain") at animated progress 0→1
- *   - Scene4Stop (Frame 3 "Stop the spread") at progress=1, wrapped in a
- *     dim-everything <g opacity="0.45">.
- *
- * The `progress` prop (0..1) drives:
- *   - Each tree node's grey → red colour transition (it crosses at its
- *     own `appearAt` threshold, taking 0.06 of progress to finish).
- *   - Each tree edge's stroke-dashoffset draw-in (crosses at the edge's
- *     `appearAt`, takes 0.10 of progress to finish).
- *
- * Susceptibles are ALWAYS rendered at full opacity here — the dimming
- * for Frame 3 happens at the parent's wrapper, not inside the stage.
- *
- * Tree nodes are rendered as two stacked layers:
- *   1. A grey "ghost" circle, always at full opacity (the susceptible
- *      pre-state).
- *   2. A kind-specific colour overlay (red fill / halo / superspreader
- *      ring / undetected dashed outline), at `opacity = colorReveal`.
- *      For undetected, the overlay's body uses ink-bg so as it fades
- *      in it covers the grey ghost and leaves only the dashed red
- *      outline visible.
- */
-
 import { clamp01 } from "@/lib/utils";
 import {
   TREE_NODES,
@@ -38,11 +12,6 @@ import {
 const COLOR_GREY = "var(--color-inv)";
 const COLOR_INK = "var(--color-bg-ink)";
 
-/** Uniform radius for ALL grey dots in the pre-tree state — every node
- *  reads as one of a population. The kind-specific radius (P0 larger,
- *  superspreader larger) only takes effect once the colour overlay
- *  fades in, so the size growth is part of the "becoming red"
- *  transition. */
 const GREY_RADIUS = 7;
 const GREY_OPACITY = 0.85;
 
@@ -55,9 +24,7 @@ function baseRadius(kind: TreeNode["kind"]) {
 export type TreeStageProps = {
   /** 0..1. Drives the tree-node colour reveal and the edge draw-in. */
   progress: number;
-  /** When true, suppress P0/superspreader animated SMIL halos. Used by
-   *  Scene4Stop so the dimmed final state is visually still — no
-   *  pulsing inside the dim layer. */
+  /** Suppress the P0/superspreader animated SMIL halos. */
   staticDecorations?: boolean;
 };
 
@@ -66,8 +33,6 @@ export function TreeStage({ progress, staticDecorations = false }: TreeStageProp
 
   return (
     <>
-      {/* ─── Susceptible substrate — floating grey dots, uniform size
-           and opacity (one population, before anything has happened). ─── */}
       <g>
         {SUSCEPTIBLES.map((s) => (
           <circle
@@ -81,7 +46,6 @@ export function TreeStage({ progress, staticDecorations = false }: TreeStageProp
         ))}
       </g>
 
-      {/* ─── Tree edges — draw in via stroke-dashoffset ─── */}
       <g>
         {TREE_EDGES.map((e, i) => {
           const a = TREE_NODE_BY_ID[e.from];
@@ -110,7 +74,6 @@ export function TreeStage({ progress, staticDecorations = false }: TreeStageProp
         })}
       </g>
 
-      {/* ─── Tree nodes — grey ghost + colour overlay ─── */}
       <g>
         {TREE_NODES.map((n) => {
           const r = baseRadius(n.kind);
@@ -119,18 +82,9 @@ export function TreeStage({ progress, staticDecorations = false }: TreeStageProp
 
           return (
             <g key={n.id} transform={`translate(${n.x}, ${n.y})`}>
-              {/* 1. Grey ghost — uniform with every other susceptible.
-                  Stays at GREY_RADIUS / GREY_OPACITY regardless of the
-                  node's eventual kind, so the pre-tree state reads as
-                  one homogenous population. The colour overlay below
-                  uses the kind-specific radius once it fades in, so the
-                  size growth is part of the "becoming red" moment. */}
               <circle r={GREY_RADIUS} fill={COLOR_GREY} opacity={GREY_OPACITY} />
 
-              {/* 2. Kind-specific colour overlay — fades in over 0.06 of
-                  progress starting at appearAt. */}
               <g opacity={colorReveal}>
-                {/* Patient zero — slow breathing halo. */}
                 {n.kind === "p0" && (
                   <circle
                     r={r + 10}
@@ -158,7 +112,6 @@ export function TreeStage({ progress, staticDecorations = false }: TreeStageProp
                   </circle>
                 )}
 
-                {/* Superspreader — faster pulsing ring. */}
                 {n.kind === "superspread" && (
                   <circle
                     r={r + 6}
@@ -186,8 +139,8 @@ export function TreeStage({ progress, staticDecorations = false }: TreeStageProp
                   </circle>
                 )}
 
-                {/* Core overlay circle. Undetected uses ink fill + dashed
-                    red outline so the grey ghost disappears under it. */}
+                {/* Undetected fills with ink so the grey ghost is hidden
+                    under it, leaving only the dashed outline. */}
                 <circle
                   r={r}
                   fill={n.kind === "undetected" ? COLOR_INK : "currentColor"}
@@ -197,7 +150,6 @@ export function TreeStage({ progress, staticDecorations = false }: TreeStageProp
                 />
               </g>
 
-              {/* Label — fades in once the node is mostly coloured. */}
               <text
                 x="0"
                 y={r + 16}
@@ -218,7 +170,7 @@ export function TreeStage({ progress, staticDecorations = false }: TreeStageProp
   );
 }
 
-/** Shared <defs> for the arrow markers. Render once at the SVG root. */
+/** Render once at the SVG root. */
 export function TreeStageDefs() {
   return (
     <defs>

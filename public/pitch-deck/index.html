@@ -1,22 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Nosotrack</title><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke='%231e1e2b' stroke-width='2.5' stroke-linecap='square'%3E%3Cpath d='M3 8 L3 3 L8 3'/%3E%3Cpath d='M24 3 L29 3 L29 8'/%3E%3Cpath d='M29 24 L29 29 L24 29'/%3E%3Cpath d='M8 29 L3 29 L3 24'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23ff073a' stroke='none'/%3E%3C/svg%3E"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,400;1,500&display=swap" rel="stylesheet"><style>
-/* ============================================================
-   DECK — redesign 2026-07-26 (rev. protocol).
-   Left-text / right-visual across content slides. Content aligns to
-   the site's 1240px container. Titles top-anchored; visuals stay right.
-
-   TYPE RULES — the whole deck lives on these tokens; no ad-hoc sizes.
-   A. TITLE  — one recipe on every content slide (.slide-title): display
-      400, --fz-display clamp(40,4.6vw,70), lh 1.05, ls -0.025em, typed
-      in char-by-char on activate. Cover (1) leads with the mono brand
-      sign + statement; embed (6) carries its own heading — the two
-      structural exceptions, matching TYPOGRAPHY.md's Hero exemption.
-   B. BODY   — one uniform .slide-lead per block, LEFT-aligned, --fz-lead 22-25,
-      display 400, ink/inv-hi; bold lead-ins via <strong> + a per-slide 700
-      override. (--fz-body 18 now only labels slide-5 data sources.)
-   Labels --fz-label 16 · notes --fz-note 12 · mono caps --fz-cap 11 .18em.
-   ============================================================ */
 :root{
-  /* Design tokens — ported from the site so the deck is self-contained (no styles.css). */
   --bg:#efeeef; --bg-alt:#f3f3f3; --bg-tint:#dbdbdb; --bg-ink:#212326;
   --ink:#1e1e2b; --text:#474852; --mute:#767676; --faint:#a4a4a7;
   --inv-hi:#efeeef; --inv:#c9c9cc; --inv-mute:#8a8a8f;
@@ -24,7 +7,6 @@
   --alert:#ff073a;
   --display:'Inter Tight','Alliance No. 1','Neue Haas Grotesk','Helvetica Neue',Arial,sans-serif;
   --mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;
-  /* Deck type scale + edge gutter. */
   --fz-display: clamp(40px, 4.6vw, 70px);
   --fz-hero:    clamp(30px, 3.7vw, 54px);
   --fz-lead:    clamp(22px, 1.7vw, 25px);
@@ -50,7 +32,6 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
   display:grid; grid-template-rows:auto 1fr auto; background:var(--bg); color:var(--text); }
 .slide.on-dark { background:var(--bg-ink); color:var(--inv); }
 
-/* ===== chrome ===== */
 .slide-top, .slide-bottom { display:flex; align-items:center; justify-content:space-between;
   padding:24px var(--edge); font-family:var(--mono); font-size:var(--fz-cap);
   letter-spacing:.18em; text-transform:uppercase; color:var(--mute); position:relative; }
@@ -68,11 +49,9 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .slide-mark .wordmark { font-weight:700; letter-spacing:.12em; }
 .slide-mark .wordmark .accent { color:var(--alert); }
 
-/* ===== body wrapper ===== */
 .slide-body { display:flex; flex-direction:column; justify-content:flex-start;
   padding:clamp(48px,7vh,96px) var(--edge); width:100%; box-sizing:border-box; }
 
-/* ===== type roles ===== */
 .slide-title { font-family:var(--display); font-weight:400; font-size:var(--fz-display); color:var(--ink);
   line-height:1.05; letter-spacing:-0.025em; margin:0 0 clamp(20px,2.6vh,32px); max-width:20ch; }
 .on-dark .slide-title { color:var(--inv-hi); }
@@ -86,23 +65,18 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .slide-lead strong { font-weight:400; color:var(--ink); }
 .on-dark .slide-lead strong { color:var(--inv-hi); }
 
-/* ===== left-text / right-visual protocol ===== */
 .split { display:grid; grid-template-columns:minmax(0,4.7fr) minmax(0,7fr); gap:clamp(36px,4.2vw,76px);
   align-items:stretch; width:100%; flex:1 1 auto; min-height:0; }
 .split-left { min-width:0; display:flex; flex-direction:column; justify-content:center; }
 .split-right { min-width:0; display:flex; flex-direction:column; justify-content:center; }
-/* Titles are full-width mastheads across the slide (direct children of .slide-body), not confined to the left column. */
 .slide-body > .slide-title { max-width:none; margin-bottom:clamp(18px,2.4vh,40px); }
 .split-left .slide-lead { max-width:44ch; }
 
-/* =================================================================
-   SLIDE 1 · TITLE (dark) — definition left, verbs right, credit bottom-center
-   ================================================================= */
+/* slide 1 */
 #slide-1 .slide-body { justify-content:center; position:relative; padding-top:clamp(44px,7vh,92px); padding-bottom:clamp(70px,11vh,128px); }
 .hero-split { display:grid; grid-template-columns:minmax(0,1.12fr) minmax(0,1fr); gap:clamp(40px,5vw,96px); align-items:center; width:100%; }
 .hero-statement { font-family:var(--display); font-weight:400; font-size:var(--fz-hero); line-height:1.14;
   letter-spacing:-0.025em; color:var(--inv-hi); margin:0; max-width:24ch; text-align:left; text-wrap:pretty; }
-/* Brand-glow the closing phrase — reuses .hero-title .accent's breathe. */
 .hero-statement .halo { color:var(--inv-hi);
   text-shadow:0 0 22px rgba(239,238,239,.32),0 0 8px rgba(239,238,239,.22);
   animation:accent-breathe 5.2s ease-in-out infinite; }
@@ -111,7 +85,6 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .hero-brand { color:var(--inv-hi); line-height:0; }
 .hero-brand-svg { width:clamp(92px,8.5vw,144px); height:clamp(92px,8.5vw,144px); display:block; }
 .hero-brand-net { transform-origin:16px 16px; }
-/* NOSOTRACK(TM) wordmark under the logo — ports the site's BrandWordmark (slides 1 & 9). */
 .brand-wordmark { font-family:var(--mono); font-weight:500; font-size:clamp(1.2rem,2.2vw,2rem); letter-spacing:-0.02em; color:var(--inv-hi); line-height:1; white-space:nowrap; }
 .brand-wordmark .accent { color:var(--alert); }
 .brand-wordmark .tm { font-size:0.55em; vertical-align:super; line-height:0; margin-left:0.15em; opacity:0.7; letter-spacing:normal; }
@@ -133,9 +106,7 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .hero-credit .hc-role, .hero-credit .hc-aff { font-family:var(--display); font-size:var(--fz-label);
   letter-spacing:-.005em; color:var(--inv); line-height:1.5; }
 
-/* =================================================================
-   SLIDE 2 · THE TREND — title + key case numbers left, curve right
-   ================================================================= */
+/* slide 2 */
 .oc-wrap { position:relative; width:100%; height:100%; min-height:clamp(360px,50vh,480px); }
 .oc-svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
 #ocClip { transition:width 1.6s cubic-bezier(.2,0,0,1); }
@@ -157,23 +128,16 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .oc-year { position:absolute; transform:translateX(-50%); font-family:var(--display); font-size:var(--fz-label); color:var(--ink); font-variant-numeric:tabular-nums; }
 .oc-year.dim { color:var(--mute); }
 
-/* =================================================================
-   SLIDE 3 · THE PROBLEM — title + lead left, penalty bar chart right
-   ================================================================= */
-/* Body is one style/size (slide-lead), left-aligned. Figures are bullets. */
+/* slide 3 */
 #slide-3 .slide-lead { text-align:left; }
 #slide-3 .slide-lead span { display:block; }
 #slide-3 .slide-lead span + span { margin-top:clamp(9px,1.5vh,15px); }
-/* Extra breathing room after the framing sentence and after the "US impact" label. */
 #slide-3 .slide-lead .lead-sub { margin-top:clamp(16px,2.4vh,26px); }
 #slide-3 .slide-lead .lead-sub + .bullet { margin-top:clamp(16px,2.4vh,26px); }
 #slide-3 .slide-lead .bullet { position:relative; padding-left:1.15em; }
 #slide-3 .slide-lead .bullet::before { content:"\2022"; position:absolute; left:0; color:var(--mute); }
-/* Bold the opening HAI clause (explicit override of the deck's weight-400 strong). */
 #slide-3 .slide-lead strong { font-weight:700; }
-/* Penalty bar chart — one font (Inter Tight), no red, animated on entry. */
 .pen-chart { display:flex; flex-direction:column; width:100%; }
-/* Caption sits at the bottom-right of the chart, muted like a source line. */
 .pen-head { font-family:var(--display); font-size:var(--fz-label); color:var(--mute); letter-spacing:-0.01em; margin:clamp(14px,2vh,20px) 0 0; text-align:right; }
 .pen-rows { display:flex; flex-direction:column; gap:clamp(11px,1.7vh,16px); }
 .pen-row { display:flex; flex-direction:column; gap:7px; }
@@ -182,21 +146,12 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .pen-val { font-family:var(--display); font-size:var(--fz-label); color:var(--ink); letter-spacing:-0.01em; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .pen-track { position:relative; width:100%; height:4px; background:var(--bg-tint); }
 .pen-bar { position:absolute; left:0; top:0; height:100%; width:0; background:var(--ink); transition:width 1s cubic-bezier(.2,0,0,1); }
-/* =================================================================
-   SLIDE 4 · CURRENT PRACTICE — title + lead left, capsid jigsaw right
-   ================================================================= */
+/* slide 4 */
 /* Two-sentence title: keep the authored line break (survives the char-span typewriter). */
 #slide-4 .slide-title { white-space:pre-wrap; }
 #slide-4 .slide-lead span { display:block; }
 #slide-4 .slide-lead span + span { margin-top:clamp(9px,1.5vh,15px); }
 #slide-4 .slide-lead strong { font-weight:700; }
-/* Fragmented-evidence capsid: a disc cut into eight fitted jigsaw pieces, the tab left on
-   each piece's rim standing in for a spike protein, centre piece missing until the end.
-   Flat surfaces and cool grey outlines; the only depth is a hairline shadow under each
-   piece, an inner shadow inside the gap, and the halo the last piece keeps. The SVG is
-   absolutely positioned so it contributes no intrinsic height and letterboxes into whatever
-   height is left over, instead of an aspect-locked box pushing the footer off short
-   viewports. Geometry and icons are built in the slide-4 IIFE; type sits over the top. */
 .pz-fig { flex:1 1 auto; min-height:0; position:relative; }
 .pz-svg { position:absolute; inset:0; width:100%; height:100%; display:block; }
 .pz-piece { filter:drop-shadow(0 1px 2px rgba(30,30,43,.11)); }
@@ -208,8 +163,6 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .pz-lbl { fill:var(--ink); font-family:var(--display); font-size:var(--fz-label); letter-spacing:-0.01em; text-anchor:middle; }
 .pz-ask { fill:var(--ink); font-family:var(--display); font-size:var(--fz-body); font-weight:700;
   letter-spacing:-0.015em; text-anchor:middle; }
-/* The last piece keeps a faint halo once it lands — the light-ground counterpart of the
-   cream glow on "Protect.", same 5.2s breathe. */
 .pz-centre { animation:pz-halo 5.2s ease-in-out infinite; }
 @keyframes pz-halo {
   0%,100% { filter:drop-shadow(0 0 7px rgba(255,255,255,.7)) drop-shadow(0 1px 2px rgba(30,30,43,.11)); }
@@ -218,27 +171,15 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 @media (prefers-reduced-motion: reduce) {
   .pz-centre { animation:none; filter:drop-shadow(0 0 9px rgba(255,255,255,.85)) drop-shadow(0 1px 2px rgba(30,30,43,.11)); }
 }
-/* Slide 4 gives the visual the room the other slides spend on trailing whitespace: the
-   title still top-anchors at the deck's usual line, only the space under it is tightened.
-   Both values match the max-height:880px block, so short viewports are unaffected. */
+/* Both values match the max-height:880px block, so short viewports are unaffected. */
 #slide-4 .slide-body { padding-bottom:clamp(14px,2.2vh,40px); }
 #slide-4 .slide-body > .slide-title { margin-bottom:clamp(8px,1.4vh,26px); }
 
-/* =================================================================
-   SLIDE 5 · HOW IT WORKS — merged text + 3 sources left, tree right
-   ================================================================= */
-/* Two-sentence title: keep the authored line break (survives the char-span typewriter). */
+/* slide 5 */
 #slide-5 .slide-title { white-space:pre-wrap; }
-/* Lead opens with a bold statement (explicit override of the deck's weight-400 strong). */
 #slide-5 .slide-lead span { display:block; }
 #slide-5 .slide-lead span + span { margin-top:clamp(9px,1.5vh,15px); }
 #slide-5 .slide-lead strong { font-weight:700; }
-.eco-inputs { margin-top:clamp(22px,3.2vh,36px); display:flex; flex-direction:column; gap:clamp(12px,1.8vh,18px); }
-.eco-input { display:grid; grid-template-columns:28px 1fr; gap:16px; align-items:center; padding-bottom:clamp(12px,1.6vh,16px); border-bottom:1px solid var(--rule); }
-.eco-input:last-child { border-bottom:0; }
-.eco-input .ei-icon { width:26px; height:26px; display:flex; align-items:center; justify-content:center; color:var(--ink); }
-.eco-input .ei-icon svg { width:24px; height:24px; }
-.eco-input .ei-name { font-family:var(--display); font-size:var(--fz-body); font-weight:400; color:var(--ink); letter-spacing:-.01em; }
 .eco-tree { display:flex; flex-direction:column; gap:clamp(14px,2vh,20px); }
 .eco-tree-figure { position:relative; padding:clamp(14px,2vh,22px) clamp(14px,1.6vw,20px); background:var(--bg-alt); border:1px solid var(--rule); min-height:300px; display:flex; align-items:center; justify-content:center; }
 .tt-svg { width:100%; height:auto; display:block; }
@@ -247,10 +188,7 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .eco-legend-item { display:flex; align-items:center; gap:8px; font-family:var(--display); font-size:var(--fz-note); letter-spacing:-0.005em; color:var(--mute); }
 .tt-glyph { width:16px; height:16px; flex-shrink:0; }
 
-/* =================================================================
-   SLIDE 6 · LIVE DEMO — steps left, video right
-   ================================================================= */
-/* Steps use the standard body (.slide-lead): bold label + description, line-by-line. */
+/* slide 6 */
 #slide-6 .slide-lead span { display:block; }
 #slide-6 .slide-lead span + span { margin-top:clamp(9px,1.5vh,15px); }
 #slide-6 .slide-lead strong { font-weight:700; }
@@ -264,8 +202,7 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .demo-stage-light { position:relative; width:100%; aspect-ratio:16/9; background:#fafafa; overflow:hidden; }
 .demo-stage-light iframe { position:absolute; inset:0; width:100%; height:100%; border:0; display:block; background:#fafafa; }
 #demoPlaybar { margin-top:12px; }
-/* Playback control bar — built at runtime by playbar.js (createPlaybar, light variant).
-   Ported from the removed styles.css; light values inlined (deck uses no dark/fullscreen). */
+/* Playback control bar — built at runtime by playbar.js (createPlaybar, light variant). */
 .playbar { height:44px; background:var(--bg-alt); border:1px solid var(--rule); border-top:none;
   display:flex; align-items:center; gap:12px; padding:0 14px; }
 .playbar-track { flex:1; height:2px; background:var(--rule); position:relative; cursor:pointer; touch-action:none; }
@@ -280,18 +217,13 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .playbar-pause svg { width:8px; height:10px; }
 .playbar-pause:hover, .playbar-spd:hover { color:var(--ink); border-color:var(--ink); }
 
-/* =================================================================
-   SLIDE 7 · ADOPTION & TEAM (embedded)
-   ================================================================= */
+/* slide 7 */
 #slide-7 .slide-body { padding:0; }
 .adoption-frame { flex:1; width:100%; border:0; background:transparent; pointer-events:none; }
 
-/* =================================================================
-   SLIDE 8 · THE VISION (dark) — text left, digital-twin blueprints right
-   ================================================================= */
+/* slide 8 */
 .split-vision { grid-template-columns:minmax(0,5fr) minmax(0,6.4fr); }
 .split-vision .slide-lead { max-width:44ch; margin-bottom:clamp(10px,1.4vh,16px); }
-/* Slide-7 body is ONE uniform .slide-lead block: intro + detail as stacked spans. */
 #slide-8 .slide-lead span { display:block; }
 #slide-8 .slide-lead span + span { margin-top:clamp(9px,1.5vh,15px); }
 #slide-8 .slide-lead strong { font-weight:700; }
@@ -301,29 +233,19 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .bp-node { fill:rgba(30,30,43,0.65); }
 .bp-node.flag { fill:var(--alert); filter:drop-shadow(0 0 6px rgba(255,7,58,0.65)); }
 
-/* =================================================================
-   SLIDE 9 · THE ASK (dark)
-   ================================================================= */
+/* slide 9 */
 #slide-9 .slide-body { padding-top:clamp(48px,7vh,96px); position:relative; }
-/* Slide-1 brand lockup (logo + NOSOTRACK(TM) + "Track. Intervene. Protect."), full hero size,
-   VERTICALLY CENTERED on the right over the whole slide — exactly like slide 1's hero-right.
-   Centre via top:0/bottom:0 + flex (NOT a transform, which the entrance-motion transform:none would undo). */
 .ask-brand-wrap { position:absolute; top:0; bottom:0; left:55%; right:0; display:flex; align-items:center; justify-content:center; }
 .ask-lockup { display:flex; flex-direction:column; align-items:center; gap:clamp(14px,2.4vh,28px); }
-/* Name + email, centered at the bottom like slide 1's hero-credit. */
 .ask-credit { position:absolute; left:0; right:0; bottom:clamp(22px,4vh,40px); display:flex; flex-direction:column; gap:6px; text-align:center; align-items:center; }
 .ask-credit .hc-name { font-family:var(--display); font-size:var(--fz-body); color:var(--inv-hi); letter-spacing:-.01em; }
 .ask-credit .hc-email { font-family:var(--display); font-size:var(--fz-label); color:var(--inv); letter-spacing:-.005em; text-decoration:none; transition:color .2s ease; }
 .ask-credit .hc-email:hover { color:var(--inv-hi); }
 .ask-grid { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(300px,420px); gap:clamp(40px,5vw,80px); align-items:start; margin-top:clamp(22px,3vh,38px); }
-/* Ask steps = slide-6 style: bold lead-in + body, stacked line-by-line (no numbers, no rules). */
 #slide-9 .slide-lead span { display:block; }
 #slide-9 .slide-lead span + span { margin-top:clamp(9px,1.5vh,15px); }
 #slide-9 .slide-lead strong { font-weight:700; }
 
-/* =================================================================
-   NAV DOTS + KBD HINT
-   ================================================================= */
 .nav-dots { position:fixed; top:50%; right:clamp(14px,1.6vw,24px); transform:translateY(-50%); display:flex; flex-direction:column; gap:13px; z-index:100; }
 .nav-dots button { width:22px; height:22px; background:transparent; border:0; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:flex-end; color:var(--faint); font-family:var(--mono); font-size:10px; font-weight:500; letter-spacing:.15em; opacity:.55; transition:opacity .2s ease, color .2s ease; }
 .nav-dots button::after { content:""; display:inline-block; width:16px; height:1px; background:currentColor; margin-left:6px; }
@@ -335,9 +257,6 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
 .kbd-hint.fade { opacity:0; }
 .deck.on-slide-1 ~ .kbd-hint, .deck.on-slide-9 ~ .kbd-hint { color:var(--inv-mute); }
 
-/* =================================================================
-   ENTRANCE MOTION
-   ================================================================= */
 @media (prefers-reduced-motion: no-preference) {
   .deck.anim .slide .slide-body > * { opacity:0; transform:translateY(22px) scale(.985); will-change:opacity,transform; }
   .deck.anim .slide.is-active .slide-body > * { opacity:1; transform:none; transition:opacity .72s cubic-bezier(.2,0,0,1), transform .72s cubic-bezier(.2,0,0,1); }
@@ -347,13 +266,6 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
   .deck.anim .slide .slide-body > .slide-title { opacity:1; transform:none; transition:none; }
 }
 
-/* =================================================================
-   RESPONSIVE
-   ================================================================= */
-/* Short viewports (laptops/projectors under ~880px tall): tighten the body's
-   vertical spacing so the aspect-locked visuals (chart/tree/demo/blueprints)
-   and the footer stay on-slide. The 1440x900 reference layout is above the
-   breakpoint and stays untouched. */
 @media (max-height: 880px) {
   .slide-body { padding-top:clamp(18px,2.6vh,96px); padding-bottom:clamp(14px,2.2vh,96px); }
   .slide-body > .slide-title { margin-bottom:clamp(8px,1.4vh,40px); }
@@ -477,9 +389,7 @@ window.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-/* Slide 2 — outbreak "cumulative rise" curve. A faithful vanilla port of the
-   site's About 0.1 <OutbreakCurve> (same geometry, same WHO DON data, same
-   node/label treatment) so the deck matches the site exactly and stays static. */
+/* Slide 2 — outbreak "cumulative rise" curve. */
 (function () {
   var wrap = document.getElementById('ocWrap');
   var svg  = document.getElementById('ocSvg');
@@ -621,8 +531,6 @@ window.addEventListener('DOMContentLoaded', function () {
             brand.classList.add('spin');
         }
     }
-    // initialsFirst typewriter for a "Track./Intervene./Protect." .hero-title (T·I·P
-    // initials reveal first, hold, then each line types out). Shared by slides 1 & 8.
     function typeTIP(title) {
         if (!title) return;
         const spans = Array.prototype.slice.call(title.querySelectorAll('.hw'));
@@ -668,7 +576,6 @@ window.addEventListener('DOMContentLoaded', function () {
         typeTIP(document.querySelector('#slide-1 .hero-title'));
     }
 
-    // ---- per-slide title typewriter — mirrors the site's AboutBlock title reveal ----
     function prepTitle(el) {
         if (el._prepped) return;
         el._prepped = true;
@@ -768,13 +675,7 @@ window.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-/* Slide 5 — minimalist transmission tree. Vanilla port of nosotrack-mvp's
-   TransmissionTree: nodes at (generation→x, spread→y), consensus infector→
-   infectee links routed as rounded Manhattan paths, and a single rAF progress
-   value (0→1) that fades cases in and draws each link via strokeDashoffset,
-   staggered by x so the tree grows chronologically. Floating network: patient /
-   staff / import / superspreader, plus an undetected host on one link and a
-   forward at-risk prediction (dashed). Replays on slide re-entry. */
+/* Slide 5 — minimalist transmission tree. */
 (function () {
   var NS = 'http://www.w3.org/2000/svg';
   var svg = document.getElementById('ttSvg');
@@ -784,7 +685,6 @@ window.addEventListener('DOMContentLoaded', function () {
     edge:'rgba(230,26,67,.55)', edgeHi:'rgba(230,26,67,.9)', mute:'#767676', alert:'#ff073a',
     grey:'#bfbfbe', undet:'#8b5cf6', undetLine:'#6d28d9' };
 
-  // id → {x, y, kind, imp, label}. Positions are laid out by generation (x).
   var N = {
     n1:{x:74, y:180, kind:'patient', imp:true, label:'1'},
     n2:{x:198,y:108, kind:'patient', label:'2'},
@@ -799,15 +699,11 @@ window.addEventListener('DOMContentLoaded', function () {
   };
   var E = [['n1','n2'],['n1','n3'],['n2','n4'],['n2','n5'],
            ['n5','n7'],['n5','n8'],['n5','n9'],['n3','n6']];
-  // forward-risk (dashed): a still-susceptible patient the model flags next.
   var RISK = [['n6','n10']];
-  // undetected (unobserved) host inferred on the n3→n6 link — a purple dot ON it.
   var UNDET = [{ x:238, y:262, at:332 }];
 
   function rOf(k){ return k==='super'?15 : k==='staff'?13 : 12; }
 
-  // Rounded Manhattan route parent→child, retracted by the child radius so the
-  // arrowhead lands on the node edge (port of layout.ts:manhattanPath).
   function path(ax,ay,bx,by,r,childR){
     var dH = bx>ax?1:bx<ax?-1:0, dV = by>ay?1:by<ay?-1:0;
     if(dV===0){ return 'M '+ax+' '+ay+' L '+(bx-dH*childR)+' '+ay; }
@@ -821,7 +717,6 @@ window.addEventListener('DOMContentLoaded', function () {
   }
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
 
-  // defs — arrowheads
   var defs=el('defs',{});
   [['ttHead',C.edge],['ttHeadHi',C.edgeHi],['ttHeadR',C.alert]].forEach(function(m){
     var mk=el('marker',{id:m[0],viewBox:'0 0 10 10',refX:'8.5',refY:'5',markerWidth:'7',markerHeight:'7',orient:'auto'});
@@ -829,7 +724,6 @@ window.addEventListener('DOMContentLoaded', function () {
   });
   svg.appendChild(defs);
 
-  // edges
   var edges = E.map(function(e){
     var a=N[e[0]], b=N[e[1]];
     var d=path(a.x,a.y,b.x,b.y,7,rOf(b.kind)+3);
@@ -839,7 +733,6 @@ window.addEventListener('DOMContentLoaded', function () {
     return { p:p, childX:b.x };
   });
 
-  // forward-risk arrows — dashed red, most-likely infector → susceptible
   var riskEdges = RISK.map(function(e){
     var a=N[e[0]], b=N[e[1]];
     var d=path(a.x,a.y,b.x,b.y,7,rOf(b.kind)+6);
@@ -849,14 +742,12 @@ window.addEventListener('DOMContentLoaded', function () {
     return { p:p, childX:b.x };
   });
 
-  // undetected hosts — small purple dots ON their link
   var undets = UNDET.map(function(u){
     var c=el('circle',{cx:u.x,cy:u.y,r:'6',fill:C.undet,stroke:C.undetLine,'stroke-width':'1',opacity:'0'});
     svg.appendChild(c);
     return { c:c, at:u.at };
   });
 
-  // nodes
   var nodes = Object.keys(N).map(function(id){
     var n=N[id], r=rOf(n.kind);
     var g=el('g',{transform:'translate('+n.x+','+n.y+')',opacity:'0'});
@@ -878,7 +769,6 @@ window.addEventListener('DOMContentLoaded', function () {
     return { g:g, x:n.x };
   });
 
-  // paint — progress 0→1 staggered along x
   var xs = nodes.map(function(o){return o.x;});
   var xMin=Math.min.apply(null,xs), xMax=Math.max.apply(null,xs);
   var SPREAD=0.82, NODE_WIN=0.12, EDGE_WIN=0.18, EDGE_LEAD=0.06, DUR=2400;
@@ -927,7 +817,7 @@ window.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-/* Slide 3 — grow the hospital penalty bars and count the $ values up on entry. */
+/* Slide 3 — penalty bars. */
 (function () {
   var chart = document.getElementById('penChart');
   var s3 = document.getElementById('slide-3');
@@ -975,14 +865,12 @@ window.addEventListener('DOMContentLoaded', function () {
 })();
 </script>
 <script>
-/* Slide 4 — fragmented evidence. A disc cut into eight fitted jigsaw pieces, the tabs left
-   on the rim standing in for the spike proteins, and the centre piece missing. Geometry and
-   icons are drawn first; the type sits in its own layer over the top. */
+/* Slide 4 — fragmented evidence. */
 (function () {
   var svg = document.getElementById('pzSvg');
   if (!svg) return;
 
-  var CX = 282, CY = 273, R = 228;           // disc centre and radius
+  var CX = 282, CY = 273, R = 228;
   var G = 76, OX = -8, OY = 6;               // centre piece half-width, and its offset off dead centre
   var K = 13, NECK = 11, CR = 9, FR = 4;     // seam knob lobe / neck / corner fillet / neck fillet
   var CK = 17, CNECK = 15, CFR = 5;          // corona knob: the puzzle tab doubles as the spike protein
@@ -990,7 +878,6 @@ window.addEventListener('DOMContentLoaded', function () {
   var UP = [0, -1], DOWN = [0, 1], LEFT = [-1, 0], RIGHT = [1, 0];
   var DEG = 180 / Math.PI;
 
-  /* One monoline system: 24-unit box, stroke 1.5, round joins, no fills. */
   var ICONS = {
     route: '<path d="M3.6 19.4c2.9 0 3.4-2.9 6.1-2.9 2.5 0 3-2.3 5.4-2.3" stroke-dasharray="2.6 2.8"/>' +
            '<circle cx="3.6" cy="19.4" r="1.5"/>' +
@@ -1019,9 +906,6 @@ window.addEventListener('DOMContentLoaded', function () {
   function pstr(p) { return f(p[0]) + ' ' + f(p[1]); }
   function onRim(v) { return Math.sqrt(R * R - v * v); }
 
-  /* A lobe across a neck: the major arc undercuts, and the concave quadratics either side
-     of the neck stop it reading as a circle parked on a line. A narrow neck gives a seam
-     knob; a wide one gives the smooth radial spike on the silhouette. */
   function lobe(m, u, bulge, sweep, k, neck, fr) {
     var half = neck / 2, h = Math.sqrt(k * k - half * half), sgn = sweep ? 1 : -1;
     var o = [m[0] + bulge[0] * h, m[1] + bulge[1] * h];
@@ -1035,8 +919,6 @@ window.addEventListener('DOMContentLoaded', function () {
            ' Q ' + pstr(b2) + ' ' + pstr([b2[0] + u[0] * fr, b2[1] + u[1] * fr]);
   }
 
-  /* An internal cut, defined ONCE and referenced (forward or reversed) by both its pieces,
-     so a tab and its notch can never drift apart. */
   function C(a, b, bulge, pos) { return { k: 'c', a: a, b: b, g: bulge, t: pos }; }
   function RV(c) { return { k: 'c', a: c.b, b: c.a, g: c.g, t: c.t }; }
   function Rim(d0, d1) { return { k: 'r', d0: d0, d1: d1 }; }
@@ -1051,9 +933,6 @@ window.addEventListener('DOMContentLoaded', function () {
     var t = flip ? 1 - s.t : s.t;
     return lobe([s.a[0] + u[0] * L * t, s.a[1] + u[1] * L * t], u, s.g, sweep, K, NECK, FR) + ' L ' + pstr(to);
   }
-  /* The corona: the same puzzle tab as the seams, scaled up, standing in for the spike
-     proteins — exactly ONE per piece, at the middle of that piece's own stretch of rim, so
-     no tab is ever clipped by a seam. Sized off its own angle so no two match. */
   function rimBody(d0, d1) {
     var kd = (d0 + d1) / 2;
     var sc = 0.88 + 0.26 * (Math.abs(Math.round(kd * 13)) % 100) / 100;
@@ -1064,8 +943,6 @@ window.addEventListener('DOMContentLoaded', function () {
            ' A ' + R + ' ' + R + ' 0 0 1 ' + pstr(A(d1));
   }
 
-  /* Trim each element by the fillet radius and bridge the gaps with a quadratic through the
-     original corner — tangent to both sides by construction. */
   function build(segs) {
     var trim = (CR / R) * DEG;
     var e = segs.map(function (s) {
@@ -1087,9 +964,6 @@ window.addEventListener('DOMContentLoaded', function () {
     return p + ' Z';
   }
 
-  /* ---------- the grid ----------
-     Four lines, none through the centre, so the four corner pieces come out different
-     sizes as they would in a real cut. */
   var XL = -G + OX, XR = G + OX, YU = -G + OY, YD = G + OY;
   var xlT = -onRim(XL), xlB = onRim(XL), xrT = -onRim(XR), xrB = onRim(XR);
   var yuL = -onRim(YU), yuR = onRim(YU), ydL = -onRim(YD), ydR = onRim(YD);
@@ -1097,8 +971,6 @@ window.addEventListener('DOMContentLoaded', function () {
   var aTL = ang(XL, xlT), aTR = ang(XR, xrT), aRT = ang(yuR, YU), aRB = ang(ydR, YD);
   var aBR = ang(XR, xrB), aBL = ang(XL, xlB), aLB = ang(ydL, YD), aLT = ang(yuL, YU) + 360;
 
-  /* Every cut bulges AWAY from the labelled corner pieces and into the four plain ones, so
-     no knob lands under a label; the centre piece keeps a tab on all four sides. */
   var v1 = C(P(XL, xlT), P(XL, YU), RIGHT, 0.38), v4 = C(P(XR, xrT), P(XR, YU), LEFT, 0.63);
   var v3 = C(P(XL, YD), P(XL, xlB), RIGHT, 0.60), v6 = C(P(XR, YD), P(XR, xrB), LEFT, 0.37);
   var h1 = C(P(yuL, YU), P(XL, YU), DOWN, 0.40),  h3 = C(P(XR, YU), P(yuR, YU), DOWN, 0.62);
@@ -1123,11 +995,6 @@ window.addEventListener('DOMContentLoaded', function () {
   ];
   var VOID = build([h2, v5, RV(h5), RV(v2)]);
 
-  /* Each label is centred in its own corner cell, held clear of both seams, then walked
-     back towards the middle until its outer corner is inside the rim. Solved rather than
-     hand-placed, because the off-centre grid makes all four cells different sizes. */
-  /* The off-centre grid leaves the bottom-left cell smallest, so the one-word label lives
-     there and the longest one goes in the roomiest (top-right) cell. */
   var LW = 78, LH_ = 66;
   function labelPos(x0, x1, y0, y1) {
     var cx = Math.max(x0 + LW / 2 + 9, Math.min(x1 - LW / 2 - 9, (x0 + x1) / 2));
@@ -1135,8 +1002,6 @@ window.addEventListener('DOMContentLoaded', function () {
     var sx = cx < 0 ? -1 : 1, sy = cy < 0 ? -1 : 1;
     for (var i = 0; i < 80; i++) {
       if (Math.hypot(cx + sx * LW / 2, cy + sy * LH_ / 2) <= R - 7) break;
-      /* Walk in along whichever axis has slack left, so the pull towards the rim never
-         eats the clearance to the seams. */
       var nx = Math.max(x0 + LW / 2 + 8, Math.min(x1 - LW / 2 - 8, cx - sx * 1.5));
       var ny = Math.max(y0 + LH_ / 2 + 8, Math.min(y1 - LH_ / 2 - 8, cy - sy * 1.5));
       if (nx === cx && ny === cy) break;
@@ -1147,8 +1012,6 @@ window.addEventListener('DOMContentLoaded', function () {
   var LAB = { tl: labelPos(yuL, XL, xlT, YU), tr: labelPos(XR, yuR, xrT, YU),
               br: labelPos(XR, ydR, YD, xrB), bl: labelPos(ydL, XL, YD, xlB) };
 
-  /* The Nosotrack mark, as it is drawn on slides 1 and 9: fixed corner brackets with the
-     node network spinning inside them. */
   var BRAND =
     '<path d="M3 8 L3 3 L8 3" stroke-width="1.1"/><path d="M24 3 L29 3 L29 8" stroke-width="1.1"/>' +
     '<path d="M29 24 L29 29 L24 29" stroke-width="1.1"/><path d="M8 29 L3 29 L3 24" stroke-width="1.1"/>' +
@@ -1162,7 +1025,6 @@ window.addEventListener('DOMContentLoaded', function () {
       '<circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none"/>' +
     '</g>';
 
-  /* ---------- layers: geometry, the gap, the centre piece, then type ---------- */
   var defs = el('defs');
   defs.innerHTML =
     '<filter id="pzHole" x="-30%" y="-30%" width="160%" height="160%">' +
@@ -1199,8 +1061,6 @@ window.addEventListener('DOMContentLoaded', function () {
   var voidEl = el('path', { class: 'pz-void', d: VOID, filter: 'url(#pzHole)', opacity: 0 });
   gVoid.appendChild(voidEl);
 
-  /* The centre piece arrives last, carrying the mark; the mark then fades off it to leave
-     the questions. It sits above the gap so it covers the gap's inner shadow on landing. */
   var CENTRE = { land: 4150, from: [70, -330], rot: 22 };
   var centreG = el('g', { class: 'pz-piece', opacity: 0 });
   centreG.appendChild(el('path', { class: 'pz-shape', d: VOID }));
@@ -1211,16 +1071,14 @@ window.addEventListener('DOMContentLoaded', function () {
   gCentre.appendChild(centreG);
   var brandNet = brandG.querySelector('.pz-brand-net');
 
-  /* ---------- the two questions, set over the gap ---------- */
   var ask = el('g', { opacity: 0 });
   ['Who infected', 'whom?', 'Who is at', 'risk?'].forEach(function (ln, i) {
     ask.appendChild(el('text', { class: 'pz-ask', x: f(CX + OX), y: f(CY + OY - 30 + i * 22 + (i > 1 ? 10 : 0)) }, ln));
   });
   gAsk.appendChild(ask);
 
-  /* ---------- timeline ---------- */
   var T = 6200, TRAVEL = 950, DIM = 0.55;
-  var SPIN = 3400, SPIN_MS = 1600, FADE = 5000;   // mark spins, then hands over to the questions
+  var SPIN = 3400, SPIN_MS = 1600, FADE = 5000;
   function ease(p) { return 1 - Math.pow(1 - Math.max(0, Math.min(1, p)), 3); }
   function span(now, at, dur) { return Math.max(0, Math.min(1, (now - at) / dur)); }
 
