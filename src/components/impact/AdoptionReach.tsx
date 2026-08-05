@@ -38,6 +38,7 @@ const TITLE = "Peer-reviewed science, adopted globally.";
 export function AdoptionReach() {
   const box = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState(280);
+  const [narrow, setNarrow] = useState(false);
   const [run, setRun] = useState(false);
 
   const { ref: titleRef, fractional } = useScrollReveal<HTMLHeadingElement>(
@@ -50,12 +51,22 @@ export function AdoptionReach() {
   const isStarted = fractional > 0;
   const isDone = fractional >= TITLE.length;
 
-  // `- 150` reserves room for the arc + figures to the globe's right.
+  // `- 150` reserves room for the arc + figures to the globe's right. Below
+  // ~480px there is no room to reserve, so the arc is dropped and the figures
+  // move under the globe instead (see `narrow`).
   useEffect(() => {
     const el = box.current;
     if (!el) return;
-    const fit = () =>
-      setSize(Math.max(230, Math.min(320, Math.round(el.clientWidth - 150))));
+    const fit = () => {
+      const w = el.clientWidth;
+      const isNarrow = w < 480;
+      setNarrow(isNarrow);
+      setSize(
+        isNarrow
+          ? Math.max(180, Math.min(260, w))
+          : Math.max(230, Math.min(320, Math.round(w - 150))),
+      );
+    };
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
@@ -101,33 +112,51 @@ export function AdoptionReach() {
       </h2>
 
       <div className="mt-10 grid items-start gap-x-12 gap-y-12 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-        <div className="grid grid-cols-3 items-start gap-x-6">
+        <div className="grid grid-cols-3 items-start gap-x-3 sm:gap-x-6">
           {[FOUNDER, ...ADVISORS].map((p) => (
             <Person key={p.name} person={p} position={POSITION[p.name]} />
           ))}
         </div>
 
         <div ref={box} className="relative flex justify-center lg:justify-end">
-          <div
-            className="relative"
-            style={{ width: size + 168, height: size }}
-          >
-            <div
-              className="absolute left-0 top-0"
-              style={{ width: size, height: size }}
-            >
-              <Globe data={geoData} size={size} />
-            </div>
-            {METRICS.map((m, i) => (
-              <div
-                key={m.label}
-                className="absolute whitespace-nowrap"
-                style={pos(AGG_ANGLES[i])}
-              >
-                <Metric metric={m} run={run} delay={i * 120} />
+          {narrow ? (
+            <div className="w-full">
+              <div className="mx-auto" style={{ width: size, height: size }}>
+                <Globe data={geoData} size={size} />
               </div>
-            ))}
-          </div>
+              <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-6">
+                {METRICS.map((m, i) => (
+                  <Metric
+                    key={m.label}
+                    metric={m}
+                    run={run}
+                    delay={i * 120}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div
+              className="relative"
+              style={{ width: size + 168, height: size }}
+            >
+              <div
+                className="absolute left-0 top-0"
+                style={{ width: size, height: size }}
+              >
+                <Globe data={geoData} size={size} />
+              </div>
+              {METRICS.map((m, i) => (
+                <div
+                  key={m.label}
+                  className="absolute whitespace-nowrap"
+                  style={pos(AGG_ANGLES[i])}
+                >
+                  <Metric metric={m} run={run} delay={i * 120} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

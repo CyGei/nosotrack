@@ -292,6 +292,66 @@ h1, h2, h3, h4, h5, h6 { text-wrap:balance; }
   .split, .split-vision { grid-template-columns:1fr; gap:32px; flex:0 1 auto; }
   .ask-grid { grid-template-columns:1fr; }
 }
+/* Phones. Everything below is scoped to <=640px so the laptop/projector
+   rendering is untouched. A phone can't hold a 16:9 slide, so the deck stops
+   pretending to be one: snapping relaxes to proximity and a slide taller than
+   the screen reads as a normal scrolling section instead of fighting the
+   snap. dvh (not vh) because mobile Safari's collapsing URL bar makes 100vh
+   taller than what you can actually see. */
+@media (max-width: 640px) {
+  :root {
+    --fz-display:32px;   /* rule-1 floor, docs/TYPOGRAPHY.md */
+    --edge:20px;
+  }
+  .deck { height:100dvh; scroll-snap-type:y proximity; }
+  .slide { min-height:100dvh; scroll-snap-stop:normal; }
+  .slide-body { padding:22px var(--edge) 30px; }
+  .slide-body > .slide-title { margin-bottom:18px; }
+  /* Repeated verbatim on all nine slides and it collides with the wordmark
+     once the header has 390px to work with. */
+  .slide-tag { display:none; }
+  .slide-top, .slide-bottom { padding:14px var(--edge); }
+  /* Both are desktop affordances: the hint names keys a phone doesn't have,
+     and the rail sits on top of the content at this width. */
+  .kbd-hint, .nav-dots { display:none; }
+
+  /* slide 1 */
+  #slide-1 .slide-body { padding-top:22px; padding-bottom:30px; }
+  .hero-split { gap:22px; }
+  .hero-brand-svg { width:60px; height:60px; }
+  .brand-wordmark { font-size:1.2rem; }
+  .hero-title { font-size:1.7rem; }
+  .hero-right { gap:14px; }
+  .hero-credit { margin-top:22px; }
+
+  /* slide 2 — the 15 point labels need vertical room to de-overlap; the
+     algorithm works in viewBox %, so a short box collapses them onto
+     each other. */
+  .oc-wrap { min-height:460px; }
+
+  /* slide 3 — tighter rows keep all eight hospitals rather than dropping data */
+  .pen-rows { gap:8px; }
+  .pen-row { gap:5px; }
+  .pen-row-top { gap:10px; }
+  .pen-head { text-align:left; }
+
+  /* slide 4 — flex:1 against an auto-height body collapses the figure to
+     nothing, so it needs an explicit floor here. */
+  .pz-fig { flex:none; min-height:270px; }
+
+  /* slide 5 */
+  .eco-tree-figure { min-height:180px; }
+
+  /* slide 7 — the embed is taller than the slide here, so the iframe is sized
+     from the height it reports rather than stretched to fill. */
+  .adoption-frame { flex:none; }
+
+  /* slide 9 — both blocks are absolutely positioned against a two-column
+     layout that no longer exists at this width. */
+  .ask-brand-wrap { position:static; margin-top:30px; justify-content:flex-start; }
+  .ask-lockup { align-items:flex-start; }
+  .ask-credit { position:static; margin-top:30px; text-align:left; align-items:flex-start; }
+}
 </style></head><body><div class="deck" id="deck"><section id="slide-1" class="slide on-dark" data-slide="1" data-section="01"><header class="slide-top"><a class="slide-mark" href="/" target="_top" aria-label="Return to nosotrack.com" title="Return to nosotrack.com"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
 <path d="M3 8 L3 3 L8 3" stroke-width="1.2"/><path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
 <path d="M29 24 L29 29 L24 29" stroke-width="1.2"/><path d="M8 29 L3 29 L3 24" stroke-width="1.2"/>
@@ -415,7 +475,11 @@ window.addEventListener('DOMContentLoaded', function () {
     ['Marburg','Ethiopia','2025-11'], ['Diphtheria','Africa','2025-11'], ['Mpox','Global','2025-12'],
     ['Measles','Bangladesh','2026-04'], ['Ebola','DR Congo & Uganda','2026-05'], ['Hantavirus','Cruise ship','2026-06']
   ];
-  var X0=12, X1=75, Y_TOP=10, Y_BOT=80, Y_AXIS=87, QX=88, QY=3, MIN_DX=2;
+  // Left-hand labels hang off the plot by their own text width, so on a phone
+  // the curve has to start further in or the longest name ("Meningococcal")
+  // runs off the screen. The rise, not the horizontal span, is the message.
+  var narrow = wrap.clientWidth > 0 && wrap.clientWidth < 420;
+  var X0=narrow?38:12, X1=75, Y_TOP=10, Y_BOT=80, Y_AXIS=87, QX=88, QY=3, MIN_DX=2;
   var MONTH=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   function mi(d){var p=d.split('-');return (parseInt(p[0],10)-2025)*12+(parseInt(p[1],10)-1);}
   function shortPlace(c){return c.indexOf(' & ')>=0 ? c.split(' & ')[0]+' +' : c;}
@@ -471,7 +535,8 @@ window.addEventListener('DOMContentLoaded', function () {
 
   function monthX(m){return X0+((m-minMI)/(maxMI-minMI))*(X1-X0);}
   var boundaryX=clamp(monthX(12),X0,X1);
-  var marks=[3,6,9,15].filter(function(m){return m>minMI&&m<maxMI;}).map(function(m){return {x:monthX(m),label:MONTH[m%12]};});
+  // Fewer ticks when the plot is inset — four of them run together at this span.
+  var marks=(narrow?[6,15]:[3,6,9,15]).filter(function(m){return m>minMI&&m<maxMI;}).map(function(m){return {x:monthX(m),label:MONTH[m%12]};});
   var y25=(X0+boundaryX)/2, y26=(boundaryX+X1)/2;
 
   svg.innerHTML =
@@ -664,6 +729,15 @@ window.addEventListener('DOMContentLoaded', function () {
         }
     });
     dots.forEach(btn => { btn.addEventListener('click', () => { go(parseInt(btn.dataset.go, 10) - 1); }); });
+    // Phones only: the adoption embed is taller than slide 7, so size the iframe
+    // from the height it reports instead of letting it clip. Above 640px the
+    // iframe still flexes to fill the slide and this is a no-op.
+    window.addEventListener('message', function (e) {
+        if (!e.data || e.data.type !== 'nt-embed-height') return;
+        if (!window.matchMedia('(max-width:640px)').matches) return;
+        const frame = document.querySelector('.adoption-frame');
+        if (frame) frame.style.height = e.data.height + 'px';
+    });
     setTimeout(() => hint && hint.classList.add('fade'), 6000);
     deck.focus && deck.focus();
     deck.classList.add('anim');
