@@ -318,7 +318,7 @@ export function Globe({
         ref={canvasRef}
         style={{ width: size, height: size, display: "block" }}
         role="img"
-        aria-label={`Globe: the tools are cited from ${data.citationCountryCount} countries and downloaded in ${data.downloadCountryCount} over the past ${data.downloadWindow.days} days`}
+        aria-label={`Globe: the tools are cited from ${data.citationCountryCount} countries and downloaded in ${data.downloadCountryCount} in 2025`}
       />
       {hover && (
         <div
@@ -343,7 +343,7 @@ export function Globe({
                 </span>{" "}
                 download{hover.c.downloads === 1 ? "" : "s"}{" "}
                 <span className="text-faint">
-                  · past {data.downloadWindow.days} days
+                  · in 2025
                 </span>
               </div>
             )}
@@ -355,7 +355,7 @@ export function Globe({
           <li key={c.code}>
             {c.name}: {fmt(c.citations)} citing works
             {c.downloads > 0
-              ? `, ${fmt(c.downloads)} downloads in the past ${data.downloadWindow.days} days`
+              ? `, ${fmt(c.downloads)} downloads in 2025`
               : ""}
           </li>
         ))}

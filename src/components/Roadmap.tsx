@@ -4,8 +4,27 @@ type RoadmapPhase = {
   desc: string;
 };
 
-const ROADMAP_INTRO =
-  "We are seeking collaborators and funding to validate and deploy Nosotrack in two stages.";
+const ROADMAP_INTRO = (
+  <>
+    <strong className="font-medium">
+      Nosotrack is currently at the MVP stage.
+    </strong>
+    <br />
+    A dashboard, live at{" "}
+    <a
+      href="https://nosotrack.onrender.com"
+      target="_blank"
+      rel="noreferrer"
+      className="underline underline-offset-4 decoration-1"
+    >
+      nosotrack.onrender.com
+    </a>
+    , demonstrates the core outbreak-reconstruction engine (outbreaker2) with an
+    integrated LLM interface. Additional modules, including contaminated-source
+    (<em>e.g.</em> medical device) identification and an intervention simulator,
+    are in development.
+  </>
+);
 
 const PHASES: RoadmapPhase[] = [
   {
@@ -32,7 +51,7 @@ export function Roadmap() {
           Next steps.
         </h2>
 
-        <p className="mb-16 max-w-[55ch] font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink">
+        <p className="mb-16 max-w-[55ch] font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink text-justify hyphens-auto [text-wrap:pretty]">
           {ROADMAP_INTRO}
         </p>
 
@@ -66,7 +85,7 @@ export function Roadmap() {
                   </h3>
 
                   <p
-                    className="mb-5 text-[17px] leading-[1.55] tracking-[-0.005em] text-mute"
+                    className="mb-5 text-[17px] leading-[1.55] tracking-[-0.005em] text-mute text-justify hyphens-auto [text-wrap:pretty]"
                     dangerouslySetInnerHTML={{ __html: phase.desc }}
                   />
                 </article>

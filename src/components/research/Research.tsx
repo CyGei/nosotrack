@@ -25,8 +25,16 @@ export function Research() {
             <p>
               Nosotrack reconstructs transmission chains in near real-time
               by integrating epidemiological, genomic and contact data
-              within a unified Bayesian inference framework. The platform
-              identifies the likely source of each infection and quantifies
+              using the open-source Bayesian inference framework{" "}
+              <a
+                href="https://github.com/reconhub/outbreaker2"
+                target="_blank"
+                rel="noreferrer"
+                className="italic underline underline-offset-4 decoration-1"
+              >
+                outbreaker2
+              </a>
+              . It identifies the likely source of each infection and quantifies
               the uncertainty around it.
             </p>
             <p>
