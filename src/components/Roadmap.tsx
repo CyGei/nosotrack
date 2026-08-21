@@ -62,7 +62,7 @@ export function Roadmap() {
           Next steps.
         </h2>
 
-        <p className="mb-16 max-w-[55ch] font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink text-justify hyphens-auto [text-wrap:pretty]">
+        <p className="mb-16 max-w-[55ch] font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink [text-wrap:pretty]">
           {ROADMAP_INTRO}
         </p>
 
@@ -96,7 +96,7 @@ export function Roadmap() {
                   </h3>
 
                   <p
-                    className="mb-5 text-[17px] leading-[1.55] tracking-[-0.005em] text-mute text-justify hyphens-auto [text-wrap:pretty]"
+                    className="mb-5 text-[17px] leading-[1.55] tracking-[-0.005em] text-mute [text-wrap:pretty]"
                     dangerouslySetInnerHTML={{ __html: phase.desc }}
                   />
                 </article>

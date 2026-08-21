@@ -21,7 +21,7 @@ export function Research() {
         </h2>
 
         <div className="mt-12 grid grid-cols-1 items-start gap-12 md:mt-16 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-          <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink text-justify hyphens-auto [text-wrap:pretty]">
+          <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink [text-wrap:pretty]">
             <p>
               Nosotrack reconstructs transmission chains in near real-time
               by integrating epidemiological, genomic and contact data

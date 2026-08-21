@@ -314,7 +314,7 @@ export function ImpactAdoption() {
 
 function LeadCopy() {
   return (
-    <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink text-justify hyphens-auto [text-wrap:pretty]">
+    <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink [text-wrap:pretty]">
       <p>
         Built on over a decade of published methodological research by our team
         and peers. Its inference engine (

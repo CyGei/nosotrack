@@ -419,14 +419,18 @@ function AdvanceCue({
         className="group cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
         {...gate}
       >
-        <span className="hero-cue-bounce flex h-14 w-14 items-center justify-center rounded-full border border-rule-inv-strong transition-colors duration-[var(--transition-duration-fast)] group-hover:border-[var(--color-inv-hi)]">
-          <span
-            aria-hidden
-            className={`hero-pixel-arrow${scattered ? " -scattered" : ""}`}
-          >
-            {PIXEL_DOTS.map((cls) => (
-              <span key={cls} className={cls} />
-            ))}
+        <span className="flex h-14 w-14 items-center justify-center rounded-full border border-rule-inv-strong transition-colors duration-[var(--transition-duration-fast)] group-hover:border-[var(--color-inv-hi)]">
+          {/* Bounce sits on a wrapper: the arrow's own transform carries the
+              scatter offset and would be overwritten by the animation. */}
+          <span className="hero-cue-bounce flex">
+            <span
+              aria-hidden
+              className={`hero-pixel-arrow${scattered ? " -scattered" : ""}`}
+            >
+              {PIXEL_DOTS.map((cls) => (
+                <span key={cls} className={cls} />
+              ))}
+            </span>
           </span>
         </span>
       </button>
