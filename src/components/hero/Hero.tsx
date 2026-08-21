@@ -344,8 +344,8 @@ const PIXEL_DOTS = [
   "hp-c2",
   "hp-c3",
   "hp-c4",
-  "hp-c5",
-  "hp-c6 hp-red", // arrow tip: the logo's signal red
+  "hp-c5 hp-red", // signal red one step in from the tip, as on the news play button
+  "hp-c6",
   "hp-l1",
   "hp-l2",
   "hp-r1",

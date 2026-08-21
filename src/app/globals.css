@@ -355,6 +355,48 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
 .hero-pixel-arrow.-scattered .hp-r1 { transform: translate(calc(var(--hp-dot) * 1),  calc(var(--hp-dot) * 1)); }
 .hero-pixel-arrow.-scattered .hp-r2 { transform: translate(calc(var(--hp-dot) * -1), calc(var(--hp-dot) * -3)); }
 
+/* News play cue: 13-dot pixel triangle, same construction as the hero arrow.
+   Dot coords + scatter offsets come in as inline --px/--py/--sx/--sy. */
+.pixel-play {
+  --pp-dot: 4px;
+  position: relative;
+  width: calc(var(--pp-dot) * 7);
+  height: calc(var(--pp-dot) * 7);
+}
+.pixel-play > span {
+  position: absolute;
+  left: calc(var(--pp-dot) * var(--px));
+  top: calc(var(--pp-dot) * var(--py));
+  width: var(--pp-dot);
+  height: var(--pp-dot);
+}
+.pixel-play > span::after {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  background: var(--color-inv-hi);
+}
+.pixel-play > .pp-red::after { background: var(--color-alert); }
+
+/* Hover: dots fly out to their scatter offset and reassemble — the hero's
+   scatter loop as a single one-shot, so resting cards stay still. */
+@keyframes pixelPlayScatter {
+  0%   { transform: translate(0, 0); opacity: 1; }
+  40%  { transform: translate(calc(var(--pp-dot) * var(--sx)), calc(var(--pp-dot) * var(--sy))); opacity: 0.35; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+.group:hover .pixel-play > span {
+  animation: pixelPlayScatter 0.62s var(--ease-nt);
+}
+
+@keyframes pixelPlayNudge {
+  0%, 100% { transform: translateX(-1px); }
+  50%      { transform: translateX(2px); }
+}
+.group:hover .pixel-play {
+  animation: pixelPlayNudge 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

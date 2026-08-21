@@ -49,6 +49,37 @@ const ITEMS: NewsItem[] = [
 
 const [FEATURED, ...REST] = ITEMS;
 
+// Pixel play triangle: [gridX, gridY, scatterX, scatterY] — same dot-grid
+// construction as the hero's pixel arrow. 7x7 filled triangle; the red signal
+// dot sits one step in from the tip.
+const PLAY_DOTS: [number, number, number, number][] = [
+  [0, 0, -1, -2],
+  [0, 1, -3, -3],
+  [1, 1, 3, 1],
+  [2, 1, -3, -1],
+  [0, 2, 1, -3],
+  [1, 2, 1, -2],
+  [2, 2, -3, -3],
+  [3, 2, -3, -2],
+  [4, 2, -3, 1],
+  [0, 3, 0, -3],
+  [1, 3, 3, 1],
+  [2, 3, -3, -2],
+  [3, 3, 2, 2],
+  [4, 3, 1, -3],
+  [5, 3, 0, -3],  // red
+  [6, 3, -2, -3],
+  [0, 4, 1, 3],
+  [1, 4, -2, -1],
+  [2, 4, 1, -3],
+  [3, 4, 1, 3],
+  [4, 4, 2, -2],
+  [0, 5, -3, 1],
+  [1, 5, 1, 2],
+  [2, 5, -2, -1],
+  [0, 6, -3, 1],
+];
+
 export const metadata: Metadata = {
   title: "Nosotrack · News",
   description: "Awards, talks and product updates from Nosotrack.",
@@ -123,11 +154,24 @@ function NewsCard({
           {item.href.includes("youtube.com") && (
             <span
               aria-hidden
-              className="absolute bottom-4 right-4 flex h-14 w-14 items-center justify-center rounded-full bg-ink/40 text-inv-hi backdrop-blur-sm transition-colors duration-[var(--transition-duration-fast)] group-hover:bg-ink/60"
+              className="absolute bottom-4 right-4 flex h-14 w-14 items-center justify-center rounded-full bg-ink/40 backdrop-blur-sm transition-colors duration-[var(--transition-duration-fast)] group-hover:bg-ink/60"
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 translate-x-[1px]">
-                <path d="m9 7 8 5-8 5V7Z" />
-              </svg>
+              <span className="pixel-play translate-x-[1px]">
+                {PLAY_DOTS.map(([x, y, sx, sy], i) => (
+                  <span
+                    key={i}
+                    className={x === 5 && y === 3 ? "pp-red" : undefined}
+                    style={
+                      {
+                        "--px": x,
+                        "--py": y,
+                        "--sx": sx,
+                        "--sy": sy,
+                      } as React.CSSProperties
+                    }
+                  />
+                ))}
+              </span>
             </span>
           )}
         </div>
