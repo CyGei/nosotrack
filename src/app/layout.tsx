@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { interTight, jetBrainsMono } from "@/lib/fonts";
+import { interTight } from "@/lib/fonts";
 import { LenisProvider } from "@/components/LenisProvider";
 // Required with the JS: without it, wheel events over an <iframe> never reach Lenis and scrolling stalls.
 import "lenis/dist/lenis.css";
@@ -42,10 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className={`${interTight.variable} ${jetBrainsMono.variable}`}
-    >
+    <html lang="en" className={interTight.variable}>
       <body>
         <LenisProvider>{children}</LenisProvider>
       </body>

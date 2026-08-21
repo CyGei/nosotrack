@@ -123,64 +123,24 @@ export function AboutBlock({
 }
 
 export function StepIndicator({ activeId }: { activeId: string }) {
-  const stepLabels = ALL_STEPS.map((s) => (s === activeId ? `[${s}]` : s));
-  const lengths = stepLabels.map((l) => l.length);
-  const stepStarts = lengths.reduce<number[]>((acc, _len, i) => {
-    const prevEnd = i === 0 ? 0 : acc[i - 1] + lengths[i - 1] + 1; // +1 for sep
-    acc.push(prevEnd);
-    return acc;
-  }, []);
-  const total = lengths.reduce((a, b) => a + b, 0) + (ALL_STEPS.length - 1);
-
-  const { ref, fractional } = useScrollReveal<HTMLOListElement>(total, 40);
+  const activeIndex = ALL_STEPS.indexOf(activeId as StepNumber);
 
   return (
-    <ol
-      ref={ref}
-      className="flex items-center gap-3 font-mono text-[12px] uppercase tracking-[0.18em] text-faint"
+    <div
+      role="img"
+      aria-label={`Section ${activeIndex + 1} of ${ALL_STEPS.length}`}
+      className="flex items-center gap-2"
     >
-      {ALL_STEPS.map((s, i) => {
-        const isActive = s === activeId;
-        const label = stepLabels[i];
-        const start = stepStarts[i];
-        const sepAlpha =
-          i > 0 ? Math.max(0, Math.min(1, fractional - (start - 1))) : 1;
-
-        return (
-          <li key={s} className="flex items-center gap-3">
-            {i > 0 && (
-              <span
-                className="h-px w-12 bg-rule-strong md:w-16"
-                aria-hidden
-                style={{
-                  opacity: sepAlpha,
-                  transform: `scaleX(${sepAlpha})`,
-                  transformOrigin: "left center",
-                }}
-              />
-            )}
-            <span
-              className={cn(
-                "transition-colors",
-                isActive ? "text-ink" : "text-faint",
-              )}
-            >
-              {label.split("").map((c, ci) => {
-                const alpha = Math.max(
-                  0,
-                  Math.min(1, fractional - (start + ci)),
-                );
-                return (
-                  <span key={ci} style={{ opacity: alpha }}>
-                    {c}
-                  </span>
-                );
-              })}
-            </span>
-          </li>
-        );
-      })}
-    </ol>
+      {ALL_STEPS.map((s, i) => (
+        <span
+          key={s}
+          className={cn(
+            "w-12 md:w-16",
+            i <= activeIndex ? "h-[2px] bg-ink" : "h-px bg-rule-strong",
+          )}
+        />
+      ))}
+    </div>
   );
 }
 

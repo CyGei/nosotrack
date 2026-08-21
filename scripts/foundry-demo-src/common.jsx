@@ -21,7 +21,7 @@ const COLOR = {
 };
 
 const FONT_DISPLAY = "'Inter Tight', 'Helvetica Neue', Arial, sans-serif";
-const FONT_MONO    = "'JetBrains Mono', ui-monospace, monospace";
+const FONT_MONO    = FONT_DISPLAY;
 
 function FdyBrandMark({
   size = 24,

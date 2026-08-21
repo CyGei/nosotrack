@@ -228,12 +228,6 @@ export function Hero() {
           </div>
         )}
 
-        <SceneIndicator
-          count={SCENE_COUNT}
-          activeScene={activeScene}
-          wrapperRef={wrapperRef}
-        />
-
         <AdvanceCue
           visible={activeScene < SCENE_COUNT - 1}
           hasScrolled={hasUserScrolled}
@@ -345,6 +339,19 @@ function scrollToScene(
   window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
 }
 
+const PIXEL_DOTS = [
+  "hp-c1",
+  "hp-c2",
+  "hp-c3",
+  "hp-c4",
+  "hp-c5",
+  "hp-c6 hp-red", // arrow tip: the logo's signal red
+  "hp-l1",
+  "hp-l2",
+  "hp-r1",
+  "hp-r2",
+];
+
 function AdvanceCue({
   visible,
   hasScrolled,
@@ -358,62 +365,98 @@ function AdvanceCue({
   count: number;
   wrapperRef: React.RefObject<HTMLDivElement | null>;
 }) {
+  const [scattered, setScattered] = useState(false);
+
+  // Attract loop: assemble, hold, scatter. Settles permanently on first scroll.
+  useEffect(() => {
+    if (hasScrolled) {
+      setScattered(false);
+      return;
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let timer: number;
+    const cycle = (next: boolean) => {
+      setScattered(next);
+      timer = window.setTimeout(() => cycle(!next), next ? 600 : 1600);
+    };
+    timer = window.setTimeout(() => cycle(true), 1600);
+    return () => clearTimeout(timer);
+  }, [hasScrolled]);
+
+  const gate = {
+    tabIndex: visible ? 0 : -1,
+    style: { pointerEvents: visible ? ("auto" as const) : ("none" as const) },
+  };
+
   return (
     <div
-      className="pointer-events-none absolute bottom-20 left-1/2 z-20 -translate-x-1/2 md:bottom-auto md:left-auto md:right-16 md:top-1/2 md:translate-x-0 md:-translate-y-1/2"
+      aria-hidden={!visible}
+      className="pointer-events-none absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-4"
       style={{
         opacity: visible ? 1 : 0,
         transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
         color: "var(--color-inv-hi)",
       }}
     >
-      {/* `-m-4 p-4` grows the touch target without shifting the chevron. */}
+      <span
+        className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-[0.2em]"
+        style={{
+          opacity: hasScrolled ? 0 : 1,
+          transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
+        }}
+      >
+        Scroll down
+      </span>
+
+      {/* Ring lives on a span: the global `button { border: none }` reset
+          outranks layered border utilities on the button itself. */}
       <button
         type="button"
         aria-label="Go to next frame"
-        aria-hidden={!visible}
-        tabIndex={visible ? 0 : -1}
         onClick={() =>
           scrollToScene(wrapperRef.current, activeScene + 1, count)
         }
-        className="group -m-4 flex cursor-pointer flex-row items-center gap-3 rounded-md p-4 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
-        style={{ pointerEvents: visible ? "auto" : "none" }}
+        className="group cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
+        {...gate}
       >
-        <span
-          className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-[0.2em]"
-          style={{
-            opacity: hasScrolled ? 0 : 1,
-            transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
-          }}
-        >
-          Scroll down
+        <span className="hero-cue-bounce flex h-14 w-14 items-center justify-center rounded-full border border-rule-inv-strong transition-colors duration-[var(--transition-duration-fast)] group-hover:border-[var(--color-inv-hi)]">
+          <span
+            aria-hidden
+            className={`hero-pixel-arrow${scattered ? " -scattered" : ""}`}
+          >
+            {PIXEL_DOTS.map((cls) => (
+              <span key={cls} className={cls} />
+            ))}
+          </span>
         </span>
-        <svg
-          width="34"
-          height="44"
-          viewBox="0 0 26 34"
-          fill="none"
-          aria-hidden
-          className="transition-transform duration-[var(--transition-duration-fast)] group-hover:translate-y-0.5 group-active:translate-y-1"
-        >
-          <polyline
-            className="hero-arrow-chevron"
-            points="4 6 13 15 22 6"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <polyline
-            className="hero-arrow-chevron hero-arrow-chevron-2"
-            points="4 16 13 25 22 16"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
       </button>
+
+      <div className="flex items-center" role="tablist" aria-label="Hero frames">
+        {Array.from({ length: count }).map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            role="tab"
+            aria-label={`Frame ${i + 1}`}
+            aria-selected={i === activeScene}
+            onClick={() => scrollToScene(wrapperRef.current, i, count)}
+            className="cursor-pointer px-1 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
+            {...gate}
+          >
+            <span
+              aria-hidden
+              className="block w-[30px] transition-colors duration-[var(--transition-duration-base)]"
+              style={{
+                height: i <= activeScene ? 2 : 1,
+                background:
+                  i <= activeScene
+                    ? "var(--color-inv-hi)"
+                    : "var(--color-rule-inv-strong)",
+              }}
+            />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -500,45 +543,3 @@ function BrandOutro({
   );
 }
 
-function SceneIndicator({
-  count,
-  activeScene,
-  wrapperRef,
-}: {
-  count: number;
-  activeScene: number;
-  wrapperRef: React.RefObject<HTMLDivElement | null>;
-}) {
-  const jumpTo = (i: number) => scrollToScene(wrapperRef.current, i, count);
-
-  return (
-    <div className="pointer-events-auto absolute right-8 top-1/2 z-20 -translate-y-1/2">
-      <div className="flex flex-col items-center gap-3">
-        {Array.from({ length: count }).map((_, i) => {
-          const isActive = i === activeScene;
-          return (
-            <button
-              key={i}
-              type="button"
-              aria-label={`Scene ${i + 1}`}
-              onClick={() => jumpTo(i)}
-              className="group relative h-6 w-6 cursor-pointer"
-            >
-              <span
-                aria-hidden
-                className="absolute left-1/2 top-1/2 block -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-[var(--transition-duration-base)]"
-                style={{
-                  width: "5px",
-                  height: isActive ? "24px" : "5px",
-                  background: isActive
-                    ? "var(--color-inv-hi)"
-                    : "var(--color-inv-faint)",
-                }}
-              />
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}

@@ -7,9 +7,11 @@ new rule, not a one-off override.
 
 Font stack:
 
-- `font-display` → **Inter Tight**. Everything except micro-labels.
-- `font-mono` → **JetBrains Mono**. Eyebrows, captions, the hero brand
-  headline, any "system" text.
+- **Inter Tight** is the only family on the site — everything, including
+  eyebrows, captions and the hero brand headline.
+- `font-mono` is kept as a semantic class for micro-labels/"system" text
+  (size/tracking rules below still apply) but resolves to Inter Tight —
+  `--font-mono` points at the display stack in `globals.css`.
 
 Color tokens (defined in `src/app/globals.css`):
 

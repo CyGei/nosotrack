@@ -1,3 +1,5 @@
+import { BrandMark } from "@/components/BrandMark";
+
 type RoadmapPhase = {
   badge: string;
   title: string;
@@ -7,7 +9,7 @@ type RoadmapPhase = {
 const ROADMAP_INTRO = (
   <>
     <strong className="font-medium">
-      Nosotrack is currently at the MVP stage.
+      Nosotrack is currently at the prototype stage.
     </strong>
     <br />
     A dashboard, live at{" "}
@@ -19,10 +21,19 @@ const ROADMAP_INTRO = (
     >
       nosotrack.onrender.com
     </a>
-    , demonstrates the core outbreak-reconstruction engine (outbreaker2) with an
+    , demonstrates the core outbreak-reconstruction engine (
+    <a
+      href="https://github.com/reconhub/outbreaker2"
+      target="_blank"
+      rel="noreferrer"
+      className="italic underline underline-offset-4 decoration-1"
+    >
+      outbreaker2
+    </a>
+    ) with an
     integrated LLM interface. Additional modules, including contaminated-source
     (<em>e.g.</em> medical device) identification and an intervention simulator,
-    are in development.
+    are under development.
   </>
 );
 
@@ -70,9 +81,9 @@ export function Roadmap() {
               >
                 <span
                   aria-hidden
-                  className="absolute -left-9 top-[6px] z-[2] flex h-6 w-6 items-center justify-center bg-bg"
+                  className="absolute -left-10 top-[2px] z-[2] flex h-8 w-8 items-center justify-center bg-bg"
                 >
-                  <span className="block h-[10px] w-[10px] bg-ink" />
+                  <BrandMark className="h-8 w-8 text-ink" />
                 </span>
 
                 <article className="group relative w-full overflow-hidden border border-rule bg-bg-alt px-8 py-7 transition-[border-color,background] duration-[var(--transition-duration-fast)] hover:border-ink">

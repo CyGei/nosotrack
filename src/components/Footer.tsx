@@ -7,13 +7,17 @@ const FOOTER_LINKS: { label: string; href: string }[] = [
   { label: "Team", href: "#team" },
   { label: "Roadmap", href: "#roadmap" },
   { label: "Contact", href: "#contact" },
+  { label: "News", href: "/news/" },
   { label: "Pitch", href: "/pitch/" },
   { label: "Privacy", href: "/privacy/" },
   { label: "Terms", href: "/terms/" },
 ];
 const FOOTER_COPY = "2025 Cyril Geismar. All rights reserved";
 
-export function Footer() {
+export function Footer({ standalone = false }: { standalone?: boolean }) {
+  const resolvedHref = (href: string) =>
+    standalone && href.startsWith("#") ? `/${href}` : href;
+
   return (
     <footer className="border-t border-rule-inv bg-bg-ink text-inv-mute">
       <div
@@ -37,7 +41,7 @@ export function Footer() {
             {FOOTER_LINKS.map((link) => (
               <li key={link.href}>
                 <a
-                  href={link.href}
+                  href={resolvedHref(link.href)}
                   className="font-mono text-[11px] uppercase tracking-[0.16em] text-inv-mute transition-colors duration-[var(--transition-duration-fast)] hover:text-inv-hi"
                 >
                   {link.label}

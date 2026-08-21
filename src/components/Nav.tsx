@@ -8,18 +8,19 @@ import { requestHeroNav } from "@/components/hero/heroNav";
 
 const NAV_LOGO = "Nosotrack";
 const NAV_TAGLINE = "Outbreak forensics and control";
-const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
-  { label: "Platform", href: "https://nosotrack.onrender.com", external: true },
+const NAV_LINKS: { label: string; href: string; newTab?: boolean }[] = [
+  { label: "Platform", href: "https://nosotrack.onrender.com", newTab: true },
   { label: "About", href: "#about" },
   { label: "Research", href: "#research" },
   { label: "Team", href: "#team" },
   { label: "Roadmap", href: "#roadmap" },
+  { label: "News", href: "/news/" },
   { label: "Contact", href: "#contact" },
 ];
 
 const PAST_HERO_PAD = 80;
 
-export function Nav() {
+export function Nav({ standalone = false }: { standalone?: boolean }) {
   const [overHero, setOverHero] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -44,16 +45,25 @@ export function Nav() {
     };
   }, []);
 
-  const dark = overHero;
-  const showScrolledStyle = !overHero;
+  const dark = !standalone && overHero;
+  const showScrolledStyle = standalone || !overHero;
   const closeMobile = () => setMobileOpen(false);
+
+  const resolvedHref = (href: string) =>
+    standalone && href.startsWith("#") ? `/${href}` : href;
+
+  const isCurrentPage = (href: string) =>
+    standalone && href === "/news/";
+
+  const opensNewTab = (link: (typeof NAV_LINKS)[number]) =>
+    Boolean(link.newTab && !isCurrentPage(link.href));
 
   // Hero must collapse its cinematic first, else its completion-lock strands the first click.
   const onSectionLink = (
     e: MouseEvent<HTMLAnchorElement>,
     link: (typeof NAV_LINKS)[number],
   ) => {
-    if (!link.external && requestHeroNav(link.href)) {
+    if (!standalone && link.href.startsWith("#") && requestHeroNav(link.href)) {
       e.preventDefault();
     }
   };
@@ -73,7 +83,7 @@ export function Nav() {
       <div className="nav-inner container-page flex h-[72px] items-center justify-between">
         <div className="nav-brand flex items-center gap-[12px]">
           <a
-            href="#top"
+            href={standalone ? "/" : "#top"}
             aria-hidden
             tabIndex={-1}
             className="nav-mark inline-flex h-10 w-10 shrink-0 items-center justify-center transition-colors duration-[var(--transition-duration-fast)]"
@@ -82,7 +92,7 @@ export function Nav() {
           </a>
           <div className="flex flex-col">
             <a
-              href="#top"
+              href={standalone ? "/" : "#top"}
               aria-label={`${NAV_LOGO} — home`}
               className="nav-logo text-[17px] leading-none transition-colors duration-[var(--transition-duration-fast)]"
             >
@@ -98,21 +108,22 @@ export function Nav() {
         </div>
 
         <ul
-          className="nav-links hidden list-none items-center gap-9 md:flex"
+          className="nav-links hidden list-none items-center gap-6 lg:flex xl:gap-9"
           role="list"
         >
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
               <a
-                href={link.href}
+                href={resolvedHref(link.href)}
                 onClick={(e) => onSectionLink(e, link)}
-                {...(link.external
+                {...(opensNewTab(link)
                   ? { target: "_blank", rel: "noopener noreferrer" }
                   : {})}
+                aria-current={isCurrentPage(link.href) ? "page" : undefined}
                 className="nav-link-underline relative font-mono text-[11px] uppercase tracking-[0.18em] transition-colors duration-[var(--transition-duration-fast)]"
               >
                 {link.label}
-                {link.external && (
+                {opensNewTab(link) && (
                   <span aria-hidden className="ml-[0.35em]">
                     ↗
                   </span>
@@ -126,7 +137,7 @@ export function Nav() {
           type="button"
           aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
           aria-expanded={mobileOpen}
-          className="nav-hamburger flex h-10 w-10 flex-col items-center justify-center gap-[5px] md:hidden"
+          className="nav-hamburger flex h-10 w-10 flex-col items-center justify-center gap-[5px] lg:hidden"
           onClick={() => setMobileOpen((o) => !o)}
         >
           <span
@@ -153,7 +164,7 @@ export function Nav() {
       {mobileOpen && (
         <div
           className={cn(
-            "md:hidden border-t",
+            "border-t lg:hidden",
             dark ? "border-rule-inv bg-bg-ink" : "border-rule bg-bg",
           )}
         >
@@ -161,14 +172,15 @@ export function Nav() {
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
                 <a
-                  href={link.href}
+                  href={resolvedHref(link.href)}
                   onClick={(e) => {
                     onSectionLink(e, link);
                     closeMobile();
                   }}
-                  {...(link.external
+                  {...(opensNewTab(link)
                     ? { target: "_blank", rel: "noopener noreferrer" }
                     : {})}
+                  aria-current={isCurrentPage(link.href) ? "page" : undefined}
                   className={cn(
                     "block border-b py-3 font-mono text-[11px] uppercase tracking-[0.18em]",
                     dark
@@ -177,7 +189,7 @@ export function Nav() {
                   )}
                 >
                   {link.label}
-                  {link.external && (
+                  {opensNewTab(link) && (
                     <span aria-hidden className="ml-[0.35em]">
                       ↗
                     </span>

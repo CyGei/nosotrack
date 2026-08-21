@@ -112,7 +112,7 @@ export function PathogenDossier({ pathogen, onClose }: Props) {
                   href={pathogen.source.nih3dEntryUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="underline-offset-4 hover:text-text hover:underline"
+                  className="underline underline-offset-4 decoration-1 hover:text-text"
                 >
                   NIH 3D Print Exchange
                 </a>{" "}
@@ -173,7 +173,7 @@ function DiseaseXBody() {
         className={[
           "mt-7 inline-flex items-center gap-2",
           "font-mono text-[11px] uppercase tracking-[0.22em] text-text",
-          "underline-offset-4 hover:text-[var(--color-alert)] hover:underline",
+          "underline underline-offset-4 decoration-1 hover:text-[var(--color-alert)]",
         ].join(" ")}
       >
         WHO source
@@ -208,7 +208,7 @@ function PaperRow({ paper }: { paper: PathogenPaper }) {
             {paper.authors}
           </span>
         </div>
-        <p className="mt-2 text-text leading-snug group-hover:text-ink transition-colors">
+        <p className="mt-2 text-text leading-snug underline underline-offset-4 decoration-1 group-hover:text-ink transition-colors">
           {paper.title}
         </p>
         {paper.journal && (

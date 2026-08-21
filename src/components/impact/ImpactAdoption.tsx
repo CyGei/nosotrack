@@ -50,7 +50,7 @@ const METRICS: MetricDef[] = [
       caption: "CRAN downloads of our open-source R packages",
       eyebrow: "Software Downloads",
       blurb:
-        "Each count is a download of one of our open-source R packages from CRAN, the Comprehensive R Archive Network. Figures come straight from the RStudio mirror logs.",
+        "Each count represents a CRAN download of one of our open-source R packages, based on RStudio mirror logs.",
     },
   },
   {
@@ -62,7 +62,7 @@ const METRICS: MetricDef[] = [
       caption: "Peer-reviewed papers that cite our methods",
       eyebrow: "citations",
       blurb:
-      "Peer-reviewed publications citing the team's research, identified through OpenAlex. The headline captures the collective impact of the full research portfolio, while the breakdown highlights citations to the foundational papers behind Nosotrack's core methods."
+      "Peer-reviewed publications citing the team's research, based on OpenAlex data."
     },
   },
   { value: geoData.citationCountryCount, label: "Countries" },

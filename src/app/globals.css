@@ -31,9 +31,11 @@
   /* Signal — product viz only */
   --color-alert: #ff073a;
 
-  /* Typography — family vars are set by next/font in layout.tsx → :root */
+  /* Typography — Inter Tight everywhere; --font-display-stack is set by
+     next/font in layout.tsx → :root. font-mono is kept as a semantic
+     label class but resolves to the same family. */
   --font-display: var(--font-display-stack);
-  --font-mono: var(--font-mono-stack);
+  --font-mono: var(--font-display-stack);
 
   /* Layout */
   --container-page: 1240px;
@@ -75,9 +77,12 @@ body {
   font-feature-settings: "ss01", "cv11";
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+/* Layered so `underline` utilities on links can win the cascade. */
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 img,
@@ -290,27 +295,65 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
   to   { transform: rotate(360deg); }
 }
 
-@keyframes heroArrowSlide {
-  0%   { transform: translateY(-5px); opacity: 0; }
-  30%  { opacity: 1; }
-  60%  { opacity: 1; }
-  100% { transform: translateY(7px);  opacity: 0; }
+/* Hero scroll cue: gentle persistent bounce on the ringed arrow. */
+@keyframes heroCueBounce {
+  0%, 100% { transform: translateY(-2px); }
+  50%      { transform: translateY(3px); }
+}
+.hero-cue-bounce {
+  animation: heroCueBounce 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
-.hero-arrow-chevron {
-  animation: heroArrowSlide 1.5s var(--ease-nt) infinite;
+/* Hero scroll cue: 10-dot pixel arrow (5x6 grid). Dots scatter to per-dot
+   offsets in the -scattered state and reassemble via staggered transitions. */
+.hero-pixel-arrow {
+  --hp-dot: 6px;
+  position: relative;
+  width: calc(var(--hp-dot) * 5);
+  height: calc(var(--hp-dot) * 6);
+  transition:
+    opacity 0.35s var(--ease-nt),
+    transform 0.35s var(--ease-nt);
 }
+.hero-pixel-arrow > span {
+  position: absolute;
+  width: var(--hp-dot);
+  height: var(--hp-dot);
+  transition: transform 0.35s var(--ease-nt);
+}
+.hero-pixel-arrow > span::after {
+  content: "";
+  position: absolute;
+  inset: 20%;
+  background: var(--color-inv-hi);
+}
+.hero-pixel-arrow > .hp-red::after { background: var(--color-alert); }
 
-.hero-arrow-chevron-2 {
-  animation-delay: 0.22s;
-}
+.hero-pixel-arrow .hp-c1 { left: calc(var(--hp-dot) * 2); top: 0; }
+.hero-pixel-arrow .hp-c2 { left: calc(var(--hp-dot) * 2); top: calc(var(--hp-dot) * 1); }
+.hero-pixel-arrow .hp-c3 { left: calc(var(--hp-dot) * 2); top: calc(var(--hp-dot) * 2); }
+.hero-pixel-arrow .hp-c4 { left: calc(var(--hp-dot) * 2); top: calc(var(--hp-dot) * 3); }
+.hero-pixel-arrow .hp-c5 { left: calc(var(--hp-dot) * 2); top: calc(var(--hp-dot) * 4); }
+.hero-pixel-arrow .hp-c6 { left: calc(var(--hp-dot) * 2); top: calc(var(--hp-dot) * 5); }
+.hero-pixel-arrow .hp-l1 { left: calc(var(--hp-dot) * 1); top: calc(var(--hp-dot) * 4); }
+.hero-pixel-arrow .hp-l2 { left: 0;                       top: calc(var(--hp-dot) * 3); }
+.hero-pixel-arrow .hp-r1 { left: calc(var(--hp-dot) * 3); top: calc(var(--hp-dot) * 4); }
+.hero-pixel-arrow .hp-r2 { left: calc(var(--hp-dot) * 4); top: calc(var(--hp-dot) * 3); }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-arrow-chevron {
-    animation: none;
-    opacity: 1;
-  }
+.hero-pixel-arrow.-scattered {
+  opacity: 0;
+  transform: translateY(calc(var(--hp-dot) * -2));
 }
+.hero-pixel-arrow.-scattered .hp-c1 { transform: translate(calc(var(--hp-dot) * 1),  calc(var(--hp-dot) * 1)); }
+.hero-pixel-arrow.-scattered .hp-c2 { transform: translate(calc(var(--hp-dot) * -1), calc(var(--hp-dot) * -3)); }
+.hero-pixel-arrow.-scattered .hp-c3 { transform: translate(calc(var(--hp-dot) * -2), calc(var(--hp-dot) * 1)); }
+.hero-pixel-arrow.-scattered .hp-c4 { transform: translate(calc(var(--hp-dot) * 2),  calc(var(--hp-dot) * -3)); }
+.hero-pixel-arrow.-scattered .hp-c5 { transform: translate(calc(var(--hp-dot) * -2), calc(var(--hp-dot) * -3)); }
+.hero-pixel-arrow.-scattered .hp-c6 { transform: translate(calc(var(--hp-dot) * 3),  calc(var(--hp-dot) * 1)); }
+.hero-pixel-arrow.-scattered .hp-l1 { transform: translate(calc(var(--hp-dot) * -2), calc(var(--hp-dot) * -2)); }
+.hero-pixel-arrow.-scattered .hp-l2 { transform: translate(calc(var(--hp-dot) * 2),  calc(var(--hp-dot) * -1)); }
+.hero-pixel-arrow.-scattered .hp-r1 { transform: translate(calc(var(--hp-dot) * 1),  calc(var(--hp-dot) * 1)); }
+.hero-pixel-arrow.-scattered .hp-r2 { transform: translate(calc(var(--hp-dot) * -1), calc(var(--hp-dot) * -3)); }
 
 @media (prefers-reduced-motion: reduce) {
   *,

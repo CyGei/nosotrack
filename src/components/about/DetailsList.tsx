@@ -12,7 +12,7 @@ export function DetailsList({ rows }: { rows: DetailRow[] }) {
       {rows.map((row, i) =>
         row.kind === "header" ? (
           <li key={i} className="-mb-1 border-b border-rule pb-3">
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-ink">
               {row.title}
             </p>
           </li>

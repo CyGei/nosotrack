@@ -50,6 +50,7 @@ const Easing = {
 };
 
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+const FONT_UI = "'Inter Tight', 'Helvetica Neue', Arial, sans-serif";
 
 function interpolate(input, output, ease = Easing.linear) {
   return (t) => {
@@ -110,7 +111,7 @@ function TextSprite({
   x = 0, y = 0,
   size = 48,
   color = '#111',
-  font = 'Inter, system-ui, sans-serif',
+  font = FONT_UI,
   weight = 600,
   entryDur = 0.45,
   exitDur = 0.35,
@@ -195,7 +196,7 @@ function ImageSprite({
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: 'repeating-linear-gradient(135deg, #e9e6df 0 10px, #dcd8cf 10px 20px)',
       color: '#6b6458',
-      fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+      fontFamily: FONT_UI,
       fontSize: 13,
       letterSpacing: '0.04em',
       textTransform: 'uppercase',
@@ -424,7 +425,7 @@ function Stage({
         display: 'flex', flexDirection: 'column',
         alignItems: 'center',
         background: STAGE_EMBED ? 'transparent' : '#0a0a0a',
-        fontFamily: 'Inter, system-ui, sans-serif',
+        fontFamily: FONT_UI,
       }}
     >
       <div style={{
@@ -525,8 +526,6 @@ function PlaybackBar({ time, duration, playing, onPlayPause, onReset, onSeek, on
     return `${String(m).padStart(1, '0')}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
   };
 
-  const mono = 'JetBrains Mono, ui-monospace, SFMono-Regular, monospace';
-
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12,
@@ -539,7 +538,7 @@ function PlaybackBar({ time, duration, playing, onPlayPause, onReset, onSeek, on
 
       borderRadius: 8,
       color: '#f6f4ef',
-      fontFamily: 'Inter, system-ui, sans-serif',
+      fontFamily: FONT_UI,
       userSelect: 'none',
       flexShrink: 0,
     }}>
@@ -562,7 +561,7 @@ function PlaybackBar({ time, duration, playing, onPlayPause, onReset, onSeek, on
       </IconButton>
 
       <div style={{
-        fontFamily: mono,
+        fontFamily: FONT_UI,
         fontSize: 12,
         fontVariantNumeric: 'tabular-nums',
         width: 64, textAlign: 'right',
@@ -608,7 +607,7 @@ function PlaybackBar({ time, duration, playing, onPlayPause, onReset, onSeek, on
       </div>
 
       <div style={{
-        fontFamily: mono,
+        fontFamily: FONT_UI,
         fontSize: 12,
         fontVariantNumeric: 'tabular-nums',
         width: 64, textAlign: 'left',
@@ -652,4 +651,3 @@ Object.assign(window, {
   TextSprite, ImageSprite, RectSprite,
   Stage, PlaybackBar,
 });
-

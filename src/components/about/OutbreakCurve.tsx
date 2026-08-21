@@ -334,7 +334,9 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
                   <span className="mr-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-faint">
                     {h.outlet}
                   </span>
-                  {h.text}
+                  <span className="underline underline-offset-2 decoration-1">
+                    {h.text}
+                  </span>
                 </span>
                 <ArrowUpRight className="mt-0.5 h-3 w-3 shrink-0 text-faint transition-colors group-hover:text-ink" />
               </a>

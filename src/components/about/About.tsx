@@ -127,8 +127,8 @@ export function About() {
                 desc: "Identifies patient 0, superspreaders, undetected cases, imported cases, estimates the dates of infection and individuals at risk.",
               },
               {
-                title: "Probabilities, not point estimates",
-                desc: "Every transmission chain carries a confidence score indicative of how strong the evidence is for each link.",
+                title: "Probabilities, for every link",
+                desc: "Every transmission chain carries a confidence score indicative of how strong the evidence is for each infector-infectee pair.",
               },
               {
                 title: "Your protocols, your call",

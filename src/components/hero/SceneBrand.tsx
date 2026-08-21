@@ -109,7 +109,7 @@ export function SceneBrand({
             forceImmediate={mode === "frozen"}
             haloLastLine
             initialsFirst
-            className="font-mono font-normal leading-[1.02] tracking-[-0.025em] text-inv-hi text-[clamp(2.2rem,5.4vw,5rem)]"
+            className="font-mono font-normal leading-[1.02] tracking-[-0.025em] text-inv-hi text-[clamp(2.2rem,5.4vw,5rem)] [&>span:first-child]:-translate-x-[0.19em]"
           />
         </div>
       </div>
