@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function CooperlPitchPage() {
   return (
     <iframe
-      src="/cooperl-pitch/index.html"
+      src="/cooperl-pitch/deck.html"
       title="Pitch Nosotrack pour Cooperl"
       style={{
         position: "fixed",
