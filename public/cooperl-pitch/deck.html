@@ -170,6 +170,22 @@
     @media(max-height:690px){.slide-top,.slide-bottom{padding-top:15px;padding-bottom:15px}.slide-body{padding-top:24px;padding-bottom:24px}.slide-title{font-size:clamp(34px,3.7vw,49px);margin-bottom:16px}.slide-lead{font-size:17px}.viz{min-height:260px}.pixel-stage,.data-orbit,.ecosystem{min-height:330px}.eco-tree-figure{min-height:245px}.collab-timeline{min-height:260px}.collab-steps .step{min-height:150px}.collab-steps .step-no{margin-bottom:20px}}
     @media(min-width:901px) and (max-height:690px){#slide-5 .demo-frame-light{max-width:calc((100vh - 300px) * 16 / 9 + 28px)}}
     @media(prefers-reduced-motion:reduce){.deck{scroll-behavior:auto}.reveal{opacity:1;transform:none;transition:none}.hero-statement .halo,.hero-title .accent,.active-slide .hero-brand-net,.active-slide .pixel-links path,.pixel-truck-wrap,.active-slide .data-orbit-wheel,.active-slide .data-node-inner,.active-slide .ecosystem-lines line,.active-slide .eco-product,.active-slide .collab-fill,.active-slide .pig-runner,.active-slide .pig-runner img,.active-slide .collab-steps .step{animation:none!important}.collab-steps .step{opacity:1;transform:none}.collab-fill{width:100%}.pig-runner{left:calc(98% - 18px)}}
+    /* Keep the introduction above the columns so the steps fit short screens. */
+    #slide-5 .solution-intro{flex:none;font-size:18px;line-height:1.22;color:var(--ink);margin-bottom:20px;max-width:1100px}
+    #slide-5 .solution-intro strong{font-weight:700}
+    #slide-5 .split{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:32px}
+    #slide-5 .slide-body{overflow-y:auto}
+    @media(max-height:720px){
+      #slide-5 .slide-body{padding-top:18px;padding-bottom:18px}
+      #slide-5 .slide-title{font-size:clamp(28px,3.4vw,42px);margin-bottom:12px}
+      #slide-5 .solution-intro{font-size:16px;line-height:1.2;margin-bottom:14px}
+      #slide-5 .forensic-stack{font-size:16px;line-height:1.2;gap:10px}
+      #slide-5 .demo-frame-light{max-width:calc((100vh - 350px) * 16 / 9 + 28px)}
+    }
+    @media(max-width:900px){
+      #slide-5 .split{grid-template-columns:1fr;flex:none;gap:20px}
+      #slide-5 .demo-frame-light{width:100%;max-width:560px}
+    }
   </style>
 </head>
 <body>
@@ -253,8 +269,8 @@
 
     <section id="slide-5" class="slide" data-slide="5">
       <header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span></header>
-      <div class="slide-body"><h2 class="slide-title reveal">La forensique des épizooties, de bout en bout.</h2><div class="split">
-        <div class="split-left"><div class="slide-lead forensic-stack reveal"><p><strong>Nosotrack offre une solution analytique complète de réponse aux épizooties, permettant des interventions plus rapides, plus ciblées et moins coûteuses, en 3 étapes :</strong></p><p><strong>Intégration :</strong> les données sanitaires, les mouvements d’animaux et de lots, le séquençage et les contacts entre élevages sont réunis dans un moteur unique.</p><p><strong>Reconstruction :</strong> l’inférence bayésienne reconstitue les chaînes de transmission, identifie les sources probables et les animaux, lots ou élevages les plus à risque.</p><p><strong>Intervention :</strong> un copilote IA évalue en quelques secondes différents scénarios de contrôle et les classe selon leur capacité à contenir l’épizootie, leur coût et leur impact opérationnel.</p></div></div>
+      <div class="slide-body"><h2 class="slide-title reveal">La forensique des épizooties, de bout en bout.</h2><p class="solution-intro reveal"><strong>Nosotrack offre une solution analytique complète de réponse aux épizooties, permettant des interventions plus rapides, plus ciblées et moins coûteuses, en 3 étapes :</strong></p><div class="split">
+        <div class="split-left"><div class="slide-lead forensic-stack reveal"><p><strong>Intégration :</strong> les données sanitaires, les mouvements d’animaux et de lots, le séquençage et les contacts entre élevages sont réunis dans un moteur unique.</p><p><strong>Reconstruction :</strong> l’inférence bayésienne reconstitue les chaînes de transmission, identifie les sources probables et les animaux, lots ou élevages les plus à risque.</p><p><strong>Intervention :</strong> un copilote IA évalue en quelques secondes différents scénarios de contrôle et les classe selon leur capacité à contenir l’épizootie, leur coût et leur impact opérationnel.</p></div></div>
         <div class="split-right reveal"><figure class="demo-frame-light"><span class="br br-tl"></span><span class="br br-tr"></span><span class="br br-bl"></span><span class="br br-br"></span><div class="demo-stage-light"><iframe id="demoIframe" src="/foundry-demo/index.html?embed=1" title="Démonstration vidéo Nosotrack Foundry" loading="lazy" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div><div id="demoPlaybar"></div></figure></div>
       </div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>05 / 09</span></footer>
     </section>
