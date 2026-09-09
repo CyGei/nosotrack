@@ -98,7 +98,11 @@
     .cooperl-label{font-size:23px;font-weight:600;fill:var(--ink);letter-spacing:.08em}.nosotrack-label{font-size:20px;font-weight:500;fill:var(--ink)}
     .step-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;width:100%;align-items:start}.step{position:relative;padding:26px 18px 0;border-top:1px solid var(--ink);min-height:200px}.step::before{content:"";position:absolute;top:-5px;left:18px;width:9px;height:9px;border-radius:50%;background:var(--bg);border:1.5px solid var(--ink)}.step:last-child::before{background:var(--alert);border-color:var(--alert)}.step-no{font-size:12px;letter-spacing:.16em;color:var(--ink);margin-bottom:38px}.step h3{font-size:21px;font-weight:600;color:var(--ink);margin-bottom:9px}.step p{font-size:15px;line-height:1.3;color:var(--ink)}
 
-    .closing-body{justify-content:center;position:relative;padding-bottom:clamp(70px,10vh,108px)}
+    .closing-body{justify-content:center;position:relative;padding-bottom:clamp(118px,15vh,150px)}
+    .closing-credit{position:absolute;left:0;right:0;bottom:clamp(22px,4vh,40px);display:flex;flex-direction:column;gap:6px;text-align:center;align-items:center}
+    .closing-credit .hc-name{font-size:var(--fz-body);color:var(--inv-hi);letter-spacing:-.01em}
+    .closing-credit a{font-size:var(--fz-label);color:var(--inv);letter-spacing:-.005em;text-decoration:none;transition:color .2s ease}
+    .closing-credit a:hover{color:var(--inv-hi)}
     .closing-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,.9fr);gap:70px;align-items:center}
     .closing-title{font-size:clamp(42px,4.3vw,64px);max-width:18ch;margin-bottom:28px}
     .closing-points{display:flex;flex-direction:column;gap:11px;font-size:clamp(18px,1.55vw,23px);line-height:1.18;color:var(--inv-hi)}
@@ -250,7 +254,7 @@
     <section id="slide-5" class="slide" data-slide="5">
       <header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span></header>
       <div class="slide-body"><h2 class="slide-title reveal">La forensique des épizooties, de bout en bout.</h2><div class="split">
-        <div class="split-left"><div class="slide-lead forensic-stack reveal"><p><strong>Intégrer :</strong> les données sanitaires, les mouvements d’animaux et de lots, le séquençage et les contacts entre élevages sont réunis dans un moteur unique.</p><p><strong>Reconstruire :</strong> l’inférence bayésienne reconstitue les chaînes de transmission, identifie les sources probables et les animaux, lots ou élevages les plus à risque.</p><p><strong>Intervenir :</strong> un copilote IA évalue en quelques secondes différents scénarios de contrôle et les classe selon leur capacité à contenir l’épizootie, leur coût et leur impact opérationnel.</p></div></div>
+        <div class="split-left"><div class="slide-lead forensic-stack reveal"><p><strong>Nosotrack offre une solution analytique complète de réponse aux épizooties, permettant des interventions plus rapides, plus ciblées et moins coûteuses, en 3 étapes :</strong></p><p><strong>Intégration :</strong> les données sanitaires, les mouvements d’animaux et de lots, le séquençage et les contacts entre élevages sont réunis dans un moteur unique.</p><p><strong>Reconstruction :</strong> l’inférence bayésienne reconstitue les chaînes de transmission, identifie les sources probables et les animaux, lots ou élevages les plus à risque.</p><p><strong>Intervention :</strong> un copilote IA évalue en quelques secondes différents scénarios de contrôle et les classe selon leur capacité à contenir l’épizootie, leur coût et leur impact opérationnel.</p></div></div>
         <div class="split-right reveal"><figure class="demo-frame-light"><span class="br br-tl"></span><span class="br br-tr"></span><span class="br br-bl"></span><span class="br br-br"></span><div class="demo-stage-light"><iframe id="demoIframe" src="/foundry-demo/index.html?embed=1" title="Démonstration vidéo Nosotrack Foundry" loading="lazy" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div><div id="demoPlaybar"></div></figure></div>
       </div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>05 / 09</span></footer>
     </section>
@@ -295,7 +299,7 @@
       <div class="slide-body closing-body"><div class="closing-grid">
         <div class="reveal"><h2 class="slide-title closing-title">Vers une solution opérationnelle de contrôle des épizooties</h2><div class="closing-points"><span>S’intégrer aux données et aux pratiques de Cooperl.</span><span>Identifier plus vite l’origine et les voies de propagation.</span><span><strong>Permettre des interventions plus rapides, plus ciblées et moins coûteuses.</strong></span></div></div>
         <div class="closing-brand reveal"><svg><use href="#nosotrack-mark"/></svg><div class="closing-wordmark">NOSO<span class="accent">TRACK</span><sup style="font-size:.5em;opacity:.7">™</sup></div><div class="closing-stack"><span>Pister.</span><span>Intervenir.</span><span class="accent-word">Protéger.</span></div></div>
-      </div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>09 / 09</span></footer>
+      </div><div class="closing-credit"><span class="hc-name">Dr Cyril Geismar</span><a href="mailto:c.geismar21@imperial.ac.uk">c.geismar21@imperial.ac.uk</a><a href="https://www.linkedin.com/in/cyril-geismar/" target="_blank" rel="noopener noreferrer">linkedin.com/in/cyril-geismar</a></div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>09 / 09</span></footer>
     </section>
   </main>
 
