@@ -1,0 +1,88 @@
+/* Full-viewport presentation. CSS adapts the composition; JS fits only overflowing content. */
+.deck { height: 100dvh; overscroll-behavior-y: contain; scroll-snap-type: y mandatory; }
+.slide { height: 100dvh; min-height: 0; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; scroll-snap-stop: always; }
+.slide-body { display: block; min-height: 0; overflow: hidden; }
+.slide-content { display: flex; flex-direction: column; justify-content: inherit; gap: inherit; min-width: 0; }
+.slide-content { min-height: var(--slide-room, 0px); transform: scale(var(--slide-scale, 1)); transform-origin: top center; }
+@media (min-width: 901px) {
+  .demo-frame-light { max-width: min(100%, calc((100dvh - 320px) * 16 / 9 + 28px)); align-self: center; }
+  .tt-svg { max-height: 40dvh; }
+}
+.adoption-frame { display: block; flex: none; width: 100%; height: min(520px, 50dvh); border: 0; background: transparent; }
+.slide-content > .adoption-frame { margin-block: auto; }
+.slide-body, .split > *, .hero-split > * { min-width: 0; }
+.slide-body p, .slide-body li, .hc-email { overflow-wrap: anywhere; }
+.slide-top, .slide-bottom { gap: 16px; }
+.slide-mark { min-height: 44px; }
+:focus-visible { outline: 2px solid var(--alert); outline-offset: 4px; }
+.playbar { min-height: 52px; height: auto; gap: 8px; padding: 4px 8px; }
+.playbar-pause, .playbar-spd, .playbar-fs { min-width: 44px; min-height: 44px; flex-shrink: 0; }
+.playbar-track { min-width: 24px; height: 44px; background: transparent; touch-action: none; }
+.playbar-track::before { content: ""; position: absolute; left: 0; right: 0; top: calc(50% - 2px); height: 4px; background: var(--rule-strong); }
+.playbar-fill { top: calc(50% - 2px); height: 4px; }
+.playbar-handle { width: 14px; height: 14px; }
+.playbar-fs { background: transparent; border: 1px solid var(--rule-strong); display: grid; place-items: center; cursor: pointer; }
+.playbar-fs svg { width: 16px; height: 16px; }
+.demo-frame-light.is-fullscreen { position: fixed; inset: 0; z-index: 1000; width: 100% !important; height: 100dvh; max-width: none !important; display: flex; flex-direction: column; justify-content: center; padding: 16px; }
+.demo-frame-light.is-fullscreen .demo-stage-light { flex: 1; min-height: 0; aspect-ratio: auto; }
+.has-playbar-fs .slide-body, .has-playbar-fs .slide-content, .has-playbar-fs .split, .has-playbar-fs .split-right { transform: none !important; will-change: auto !important; overflow: visible; }
+.has-playbar-fs .slide { overflow: visible; }
+.has-playbar-fs .deck { overflow: hidden; }
+.has-playbar-fs .kbd-hint { display: none; }
+.kbd-hint.fade { opacity: 0; pointer-events: none; }
+/* Portrait devices use a single-column composition within the same slide frame. */
+@media (max-width: 900px) and (orientation: portrait) {
+  :root { --edge: clamp(20px, 4vw, 36px); --fz-display: clamp(32px, 5vw, 44px); --fz-lead: 18px; }
+  .slide-body { padding: 20px var(--edge); }
+  .slide-tag, .kbd-hint { display: none; }
+  .split, .hero-split, .closing-grid { grid-template-columns: minmax(0, 1fr); flex: none; gap: 20px; }
+  .split-left, .split-right { justify-content: flex-start; }
+  .hero-right, .closing-brand { align-items: flex-start; }
+  .hero-title { text-align: left; }
+  .hero-credit, .ask-credit { position: static; transform: none; margin-top: 20px; align-items: flex-start; text-align: left; }
+  .pz-fig { height: auto; aspect-ratio: 564 / 546; max-height: 420px; }
+  .eco-tree-figure { min-height: 200px; }
+  /* No delayed reveal should hide content while someone scrolls a tall section. */
+  .deck.anim .slide .slide-content > *, .reveal, .collab-steps .step { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
+@media (max-width: 640px) {
+  :root { --fz-display: clamp(24px, 4.2dvh, 32px); --fz-hero: 30px; --fz-lead: clamp(16px, 2.2dvh, 18px); }
+  .slide-top, .slide-bottom { padding: 14px var(--edge); }
+  .slide-body { padding: 24px var(--edge); }
+  .hero-brand-svg { width: 60px; height: 60px; }
+  .hero-right, .closing-brand { gap: 14px; }
+  .hero-statement { max-width: none; }
+  .brand-wordmark { font-size: 1.2rem; }
+  .hero-title { font-size: 1.7rem; }
+  .playbar-time { font-size: 10px; min-width: 0; letter-spacing: 0; }
+  .playbar-spd { padding: 5px; }
+  .demo-frame-light { padding: 8px; }
+  .collab-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .collab-steps .step { min-width: 0; min-height: 0; padding: 8px 0 0; }
+  .collab-steps .step-no { margin-bottom: 8px; }
+  .collab-steps .step h3 { overflow-wrap: anywhere; }
+}
+/* Short laptops use the same scale and spacing in both decks. */
+@media (max-height: 720px) {
+  :root { --fz-display: clamp(32px, 3.2vw, 44px); --fz-lead: 18px; --fz-hero: clamp(30px,3.4vw,46px); }
+  .slide-body { padding-block: 24px; gap: 20px; }
+  .eco-tree-figure { min-height: 240px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .deck { scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .deck.anim .slide .slide-content > *, .reveal, .collab-steps .step { opacity: 1 !important; transform: none !important; }
+}
+/* Reserve only a quiet slide counter; the presentation has no viewer toolbar. */
+body[data-custom-chrome] .hero-credit { position: static; margin-top: 28px; }
+body[data-custom-chrome] .slide-body { gap: 20px; }
+@media (max-width: 900px) and (orientation: landscape) {
+  :root { --edge: 28px; }
+  .slide .split, .hero-split, .closing-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+}
+@media (max-height: 500px) {
+  .slide-top, .slide-bottom { padding-block: 8px; }
+  .slide-mark { min-height: 28px; }
+  .slide .slide-body { padding-block: 12px; gap: 12px; }
+  .kbd-hint { display: none; }
+}

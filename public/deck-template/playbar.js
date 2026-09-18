@@ -44,9 +44,9 @@
         mount.innerHTML =
             (opts.trackLabel ? '<span class="playbar-tl">' + opts.trackLabel + '</span>' : '') +
             '<button type="button" class="playbar-pause" aria-label="Pause">' + PAUSE_SVG + '</button>' +
-            '<div class="playbar-track"><div class="playbar-fill"></div><div class="playbar-handle"></div></div>' +
+            '<div class="playbar-track" role="slider" tabindex="0" aria-label="Playback position" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0"><div class="playbar-fill"></div><div class="playbar-handle"></div></div>' +
             (showTime ? '<span class="playbar-time">0:00</span>' : '') +
-            '<button type="button" class="playbar-spd">' + fmtSpeed(speeds[speedIdx]) + '</button>' +
+            '<button type="button" class="playbar-spd" aria-label="Change playback speed">' + fmtSpeed(speeds[speedIdx]) + '</button>' +
             (showFullscreen ? '<button type="button" class="playbar-fs" aria-label="Toggle fullscreen">' + FS_SVG + '</button>' : '');
 
         const pauseBtn = mount.querySelector('.playbar-pause');
@@ -65,6 +65,10 @@
                 : 0;
             fill.style.width  = pct + '%';
             handle.style.left = pct + '%';
+            track.setAttribute('aria-valuemax', String(state.duration));
+            track.setAttribute('aria-valuenow', String(Math.min(state.duration, Math.max(0, state.time))));
+            track.setAttribute('aria-valuetext', fmtTime(state.time) + ' of ' + fmtTime(state.duration));
+            spdBtn.setAttribute('aria-label', 'Playback speed ' + fmtSpeed(speeds[speedIdx]) + '. Change speed');
             if (timeLbl) timeLbl.textContent = fmtTime(state.time);
             pauseBtn.innerHTML = state.playing ? PAUSE_SVG : PLAY_SVG;
             pauseBtn.setAttribute('aria-label', state.playing ? 'Pause' : 'Play');
@@ -90,12 +94,32 @@
             if (typeof opts.onSeek === 'function') opts.onSeek(t);
         }
         let dragging = false;
-        track.addEventListener('mousedown', (e) => { dragging = true; seekFromClientX(e.clientX); e.preventDefault(); });
-        window.addEventListener('mousemove', (e) => { if (dragging) seekFromClientX(e.clientX); });
-        window.addEventListener('mouseup',   () => { dragging = false; });
-        track.addEventListener('touchstart', (e) => { dragging = true; seekFromClientX(e.touches[0].clientX); }, { passive: true });
-        window.addEventListener('touchmove', (e) => { if (dragging && e.touches[0]) seekFromClientX(e.touches[0].clientX); }, { passive: true });
-        window.addEventListener('touchend',  () => { dragging = false; });
+        track.addEventListener('pointerdown', (e) => {
+            if (!e.isPrimary || e.button !== 0) return;
+            dragging = true;
+            track.setPointerCapture(e.pointerId);
+            track.focus({ preventScroll: true });
+            seekFromClientX(e.clientX);
+            e.preventDefault();
+        });
+        track.addEventListener('pointermove', (e) => { if (dragging) seekFromClientX(e.clientX); });
+        track.addEventListener('pointerup', () => { dragging = false; });
+        track.addEventListener('pointercancel', () => { dragging = false; });
+        track.addEventListener('lostpointercapture', () => { dragging = false; });
+        track.addEventListener('keydown', (e) => {
+            const step = Math.max(1, state.duration / 100);
+            let time = state.time;
+            if (['ArrowRight', 'ArrowUp'].includes(e.key)) time += step;
+            else if (['ArrowLeft', 'ArrowDown'].includes(e.key)) time -= step;
+            else if (e.key === 'Home') time = 0;
+            else if (e.key === 'End') time = state.duration;
+            else return;
+            e.preventDefault();
+            e.stopPropagation();
+            state.time = Math.max(0, Math.min(state.duration, time));
+            paint();
+            if (typeof opts.onSeek === 'function') opts.onSeek(state.time);
+        });
 
         let isFs = false;
         function setFs(v) {
@@ -103,6 +127,9 @@
             isFs = v;
             if (fsTarget) fsTarget.classList.toggle('is-fullscreen', v);
             document.body.classList.toggle('has-playbar-fs', v);
+            fsBtn?.setAttribute('aria-pressed', String(v));
+            fsBtn?.setAttribute('aria-label', v ? 'Exit fullscreen' : 'Enter fullscreen');
+            if (!v) fsBtn?.focus({ preventScroll: true });
             if (typeof opts.onFullscreen === 'function') opts.onFullscreen(v);
         }
         if (fsBtn && fsTarget) {

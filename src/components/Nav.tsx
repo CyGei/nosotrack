@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { BrandWordmark } from "@/components/BrandWordmark";
 import { BrandMark } from "@/components/BrandMark";
@@ -15,14 +16,34 @@ const NAV_LINKS: { label: string; href: string; newTab?: boolean }[] = [
   { label: "Team", href: "#team" },
   { label: "Roadmap", href: "#roadmap" },
   { label: "News", href: "/news/" },
+  { label: "For partners", href: "/for-partners/" },
   { label: "Contact", href: "#contact" },
 ];
 
 const PAST_HERO_PAD = 80;
 
 export function Nav({ standalone = false }: { standalone?: boolean }) {
+  const pathname = usePathname();
   const [overHero, setOverHero] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && mobileOpen) {
+        setMobileOpen(false);
+        menuButton.current?.focus();
+      }
+    };
+    const desktop = window.matchMedia("(min-width: 1280px)");
+    const closeOnDesktop = () => { if (desktop.matches) setMobileOpen(false); };
+    desktop.addEventListener("change", closeOnDesktop);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      desktop.removeEventListener("change", closeOnDesktop);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [mobileOpen]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -53,7 +74,7 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
     standalone && href.startsWith("#") ? `/${href}` : href;
 
   const isCurrentPage = (href: string) =>
-    standalone && href === "/news/";
+    standalone && href.replace(/\/$/, "") === pathname.replace(/\/$/, "");
 
   const opensNewTab = (link: (typeof NAV_LINKS)[number]) =>
     Boolean(link.newTab && !isCurrentPage(link.href));
@@ -108,7 +129,7 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
         </div>
 
         <ul
-          className="nav-links hidden list-none items-center gap-6 lg:flex xl:gap-9"
+          className="nav-links hidden list-none items-center gap-6 xl:flex 2xl:gap-9"
           role="list"
         >
           {NAV_LINKS.map((link) => (
@@ -120,7 +141,7 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
                   ? { target: "_blank", rel: "noopener noreferrer" }
                   : {})}
                 aria-current={isCurrentPage(link.href) ? "page" : undefined}
-                className="nav-link-underline relative font-mono text-[11px] uppercase tracking-[0.18em] transition-colors duration-[var(--transition-duration-fast)]"
+                className="nav-link-underline relative inline-flex min-h-11 items-center whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.18em] transition-colors duration-[var(--transition-duration-fast)]"
               >
                 {link.label}
                 {opensNewTab(link) && (
@@ -134,10 +155,12 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
         </ul>
 
         <button
+          ref={menuButton}
           type="button"
           aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
           aria-expanded={mobileOpen}
-          className="nav-hamburger flex h-10 w-10 flex-col items-center justify-center gap-[5px] lg:hidden"
+          aria-controls="mobile-navigation"
+          className="nav-hamburger flex h-11 w-11 flex-col items-center justify-center gap-[5px] xl:hidden"
           onClick={() => setMobileOpen((o) => !o)}
         >
           <span
@@ -163,8 +186,9 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
 
       {mobileOpen && (
         <div
+          id="mobile-navigation"
           className={cn(
-            "border-t lg:hidden",
+            "max-h-[calc(100dvh-72px)] overflow-y-auto overscroll-contain border-t xl:hidden",
             dark ? "border-rule-inv bg-bg-ink" : "border-rule bg-bg",
           )}
         >
@@ -182,7 +206,7 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
                     : {})}
                   aria-current={isCurrentPage(link.href) ? "page" : undefined}
                   className={cn(
-                    "block border-b py-3 font-mono text-[11px] uppercase tracking-[0.18em]",
+                    "flex min-h-11 items-center border-b py-3 font-mono text-[11px] uppercase tracking-[0.18em]",
                     dark
                       ? "border-rule-inv text-inv hover:text-inv-hi"
                       : "border-rule text-mute hover:text-ink",

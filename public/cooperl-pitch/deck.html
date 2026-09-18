@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,195 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg:#efeeef; --bg-alt:#f3f3f3; --bg-soft:#fafafb; --bg-ink:#212326;
-      --ink:#1e1e2b; --text:#474852; --mute:#767676; --faint:#a4a4a7;
-      --inv-hi:#efeeef; --inv:#c9c9cc; --inv-mute:#8a8a8f;
-      --rule:rgba(30,30,43,.12); --rule-strong:rgba(30,30,43,.24); --rule-inv:rgba(239,238,239,.14);
-      --alert:#ff073a; --display:'Inter Tight','Helvetica Neue',Arial,sans-serif;
-      --fz-display:clamp(39px,4.25vw,64px); --fz-lead:clamp(18px,1.5vw,23px);
-      --fz-body:18px; --fz-label:15px; --fz-note:12px; --fz-cap:11px;
-      --edge:max(clamp(48px,4vw,60px),calc((100vw - 1240px)/2));
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;overflow:hidden;background:var(--bg)}
-    body{font-family:var(--display);color:var(--text)}
-    button{font:inherit;color:inherit}
-    strong{font-weight:600;color:var(--ink)}
-    .defs{position:absolute;width:0;height:0;overflow:hidden}
-    .deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;scroll-behavior:smooth}
-    .deck::-webkit-scrollbar{display:none}
-    .slide{height:100vh;min-height:100vh;overflow:hidden;scroll-snap-align:start;scroll-snap-stop:always;position:relative;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:var(--bg)}
-    .slide.on-dark{background:var(--bg-ink);color:var(--inv)}
-    .slide-top,.slide-bottom{display:flex;align-items:center;justify-content:space-between;padding:24px var(--edge);font-size:var(--fz-cap);letter-spacing:.18em;text-transform:uppercase;color:var(--mute);position:relative}
-    .slide-top::after,.slide-bottom::before{content:"";position:absolute;left:var(--edge);right:var(--edge);height:1px;background:var(--rule)}
-    .slide-top::after{bottom:0}.slide-bottom::before{top:0}
-    .on-dark .slide-top,.on-dark .slide-bottom{color:var(--inv-mute)}
-    .on-dark .slide-top::after,.on-dark .slide-bottom::before{background:var(--rule-inv)}
-    .slide-mark{display:inline-flex;align-items:center;gap:12px;color:var(--ink);font-size:17px;line-height:1;letter-spacing:normal;text-transform:none}
-    .on-dark .slide-mark{color:var(--inv-hi)}
-    .slide-mark svg{width:18px;height:18px}
-    .wordmark{font-size:.94em;font-weight:500;letter-spacing:-.02em;white-space:nowrap}
-    .accent{color:var(--alert)}
-    .wordmark::after{content:"™";margin-left:.15em;vertical-align:super;font-size:.585em;opacity:.7}
-    .slide-body{display:flex;flex-direction:column;justify-content:flex-start;padding:clamp(38px,5.5vh,72px) var(--edge);width:100%;min-height:0}
-    .slide-title{font-weight:400;font-size:var(--fz-display);color:var(--ink);line-height:1.04;letter-spacing:-.026em;margin:0 0 clamp(20px,2.8vh,34px);max-width:none}
-    .on-dark .slide-title{color:var(--inv-hi)}
-    .split{display:grid;grid-template-columns:minmax(0,4.6fr) minmax(0,7fr);gap:clamp(34px,4.2vw,72px);align-items:stretch;flex:1 1 auto;min-height:0}
-    .split-left,.split-right{min-width:0;display:flex;flex-direction:column;justify-content:center}
-    .slide-lead{font-size:var(--fz-lead);font-weight:400;line-height:1.24;letter-spacing:-.015em;color:var(--ink);text-align:left}
-    .on-dark .slide-lead{color:var(--inv-hi)}
-    .lede{display:block;margin-bottom:1em}
-    .lede-strong{font-weight:700;color:var(--ink)}
-    .body-note{display:block;margin-top:1em;color:var(--ink)}
-    .prompt{display:block;margin-bottom:.5em;color:var(--ink)}
-    .on-dark .prompt{color:var(--inv-mute)}
-    .bullets{list-style:none;display:flex;flex-direction:column;gap:.42em}
-    .bullets li{position:relative;padding-left:1.05em}
-    .bullets li::before{content:"•";position:absolute;left:0;color:var(--ink)}
-    .on-dark .bullets li::before{color:var(--inv-mute)}
-    .viz{position:relative;width:100%;height:100%;min-height:330px;display:flex;align-items:center;justify-content:center}
-    .viz svg{width:100%;height:100%;max-height:450px;overflow:visible}
-    .viz text{font-family:var(--display)}
-    .viz-frame{background:var(--bg-alt);border:1px solid var(--rule);padding:18px}
-    .v-line{fill:none;stroke:rgba(30,30,43,.34);stroke-width:1.5}
-    .v-line-strong{fill:none;stroke:var(--ink);stroke-width:2.2}
-    .v-line-alert{fill:none;stroke:var(--alert);stroke-width:2.2}
-    .v-dash{stroke-dasharray:7 7}
-    .v-node{fill:var(--bg-soft);stroke:rgba(30,30,43,.42);stroke-width:1.3}
-    .v-node-dark{fill:var(--ink);stroke:var(--ink)}
-    .v-node-alert{fill:var(--alert);stroke:var(--alert)}
-    .v-node-risk{fill:var(--bg);stroke:var(--alert);stroke-width:2.5}
-    .v-label{font-size:12px;fill:var(--mute);letter-spacing:.13em}
-    .v-copy{font-size:16px;fill:var(--ink);letter-spacing:-.01em}
-    .v-copy-strong{font-size:18px;font-weight:600;fill:var(--ink)}
-    .v-number{font-size:52px;font-weight:300;fill:rgba(30,30,43,.18)}
-    .badge-label{font-size:11px;fill:var(--mute);letter-spacing:.14em}
-    .nav-dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:11px;align-items:flex-end}
-    .nav-dots button{width:28px;height:22px;background:transparent;border:0;cursor:pointer;padding:0;color:var(--faint);font-size:10px;font-weight:500;letter-spacing:.15em;opacity:.52}
-    .nav-dots button::after{content:"–";margin-left:5px}.nav-dots button.active{color:var(--ink);opacity:1}
-    .on-dark-nav .nav-dots button.active{color:var(--inv-hi)}
-    .kbd-hint{position:fixed;top:84px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute);opacity:.55;pointer-events:none;z-index:99;transition:opacity .4s ease;white-space:nowrap}
-    .kbd-hint.hidden{opacity:0}
-    .on-dark-nav .kbd-hint{color:var(--inv-mute)}
-    .reveal{opacity:0;transform:translateY(8px);transition:opacity .55s ease,transform .55s ease}.active-slide .reveal{opacity:1;transform:none}.reveal:nth-child(2){transition-delay:.08s}.reveal:nth-child(3){transition-delay:.16s}
+  <link rel="stylesheet" href="/deck-template/farm-figures.css">
+<link rel="stylesheet" href="./deck.css">
+<link rel="stylesheet" href="/deck-template/responsive.css">
 
-    .farm-roof{fill:none;stroke:var(--ink);stroke-width:1.4}.farm-body{fill:var(--bg-soft);stroke:rgba(30,30,43,.45);stroke-width:1.2}.farm-door{fill:rgba(30,30,43,.08);stroke:rgba(30,30,43,.28)}
-    .source-q{font-size:42px;font-weight:300;fill:var(--alert)}
-    .hub-ring{fill:var(--bg);stroke:var(--ink);stroke-width:1.5}.hub-dot{fill:var(--alert)}
-    .mini-card{fill:#fafafb;stroke:rgba(30,30,43,.23);stroke-width:1}.mini-icon{fill:none;stroke:var(--ink);stroke-width:1.25}
-    .before-after-title{font-size:14px;font-weight:600;fill:var(--ink);letter-spacing:.08em}.before-after-sub{font-size:11px;fill:var(--mute);letter-spacing:.08em}
-    .divider{stroke:var(--rule-strong);stroke-width:1}.stop-bar{stroke:var(--ink);stroke-width:7}.shield{fill:var(--bg-soft);stroke:var(--ink);stroke-width:1.6}
-    .timeline-stage{fill:var(--bg-soft);stroke:rgba(30,30,43,.22);stroke-width:1}.timeline-stage.hot{stroke:var(--alert);stroke-width:1.8}.timeline-label{font-size:15px;font-weight:600;fill:var(--ink)}.timeline-note{font-size:11px;fill:var(--mute)}
-    #slide-4 .slide-body,#slide-7 .slide-body{padding-top:28px;padding-bottom:28px}
-    #slide-4 .slide-title,#slide-7 .slide-title{font-size:clamp(36px,3.65vw,52px);margin-bottom:18px}
-    #slide-4 .slide-lead,#slide-7 .slide-lead{font-size:18px;line-height:1.18}
-    #slide-4 .bullets,#slide-7 .bullets{gap:.28em}
-    .globe-crop{position:relative;width:100%;height:100%;min-height:350px;overflow:hidden;background:transparent}
-    .globe-crop iframe{position:absolute;width:1280px;height:720px;border:0;left:-560px;top:-170px;transform:scale(.78);transform-origin:0 0;pointer-events:none;background:transparent}
-    .cooperl-label{font-size:23px;font-weight:600;fill:var(--ink);letter-spacing:.08em}.nosotrack-label{font-size:20px;font-weight:500;fill:var(--ink)}
-    .step-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;width:100%;align-items:start}.step{position:relative;padding:26px 18px 0;border-top:1px solid var(--ink);min-height:200px}.step::before{content:"";position:absolute;top:-5px;left:18px;width:9px;height:9px;border-radius:50%;background:var(--bg);border:1.5px solid var(--ink)}.step:last-child::before{background:var(--alert);border-color:var(--alert)}.step-no{font-size:12px;letter-spacing:.16em;color:var(--ink);margin-bottom:38px}.step h3{font-size:21px;font-weight:600;color:var(--ink);margin-bottom:9px}.step p{font-size:15px;line-height:1.3;color:var(--ink)}
-
-    .closing-body{justify-content:center;position:relative;padding-bottom:clamp(118px,15vh,150px)}
-    .closing-credit{position:absolute;left:0;right:0;bottom:clamp(22px,4vh,40px);display:flex;flex-direction:column;gap:6px;text-align:center;align-items:center}
-    .closing-credit .hc-name{font-size:var(--fz-body);color:var(--inv-hi);letter-spacing:-.01em}
-    .closing-credit a{font-size:var(--fz-label);color:var(--inv);letter-spacing:-.005em;text-decoration:none;transition:color .2s ease}
-    .closing-credit a:hover{color:var(--inv-hi)}
-    .closing-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,.9fr);gap:70px;align-items:center}
-    .closing-title{font-size:clamp(42px,4.3vw,64px);max-width:18ch;margin-bottom:28px}
-    .closing-points{display:flex;flex-direction:column;gap:11px;font-size:clamp(18px,1.55vw,23px);line-height:1.18;color:var(--inv-hi)}
-    .closing-points span{display:block}.closing-points strong{color:var(--inv-hi)}
-    .closing-brand{display:flex;flex-direction:column;align-items:center;gap:18px;color:var(--inv-hi)}.closing-brand svg{width:110px;height:110px}.closing-wordmark{font-size:30px;font-weight:500;letter-spacing:-.02em}.closing-stack{font-size:clamp(34px,3.6vw,50px);line-height:.95;letter-spacing:-.03em;text-align:center}.closing-stack span{display:block}.closing-stack .accent-word{text-shadow:0 0 22px rgba(239,238,239,.34)}
-
-    /* Landing slide — copied from the live Nosotrack pitch. */
-    #slide-1 .slide-body{justify-content:center;position:relative;padding-top:clamp(44px,7vh,92px);padding-bottom:clamp(70px,11vh,128px)}
-    .hero-split{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:clamp(40px,5vw,96px);align-items:center;width:100%}
-    .hero-statement{font-weight:400;font-size:clamp(30px,3.7vw,54px);line-height:1.14;letter-spacing:-.025em;color:var(--inv-hi);max-width:24ch;text-align:left}
-    .hero-statement .halo,.hero-title .accent{color:var(--inv-hi);text-shadow:0 0 22px rgba(239,238,239,.32),0 0 8px rgba(239,238,239,.22);animation:accent-breathe 5.2s ease-in-out infinite}
-    .hero-right{display:flex;flex-direction:column;align-items:center;gap:clamp(20px,3.4vh,40px)}
-    .hero-brand{color:var(--inv-hi);line-height:0}.hero-brand-svg{width:clamp(92px,8.5vw,144px);height:clamp(92px,8.5vw,144px);display:block}.hero-brand-net{transform-origin:16px 16px}
-    .brand-wordmark{font-weight:500;font-size:clamp(1.2rem,2.2vw,2rem);letter-spacing:-.02em;color:var(--inv-hi);line-height:1;white-space:nowrap}.brand-wordmark .tm{font-size:.55em;vertical-align:super;line-height:0;margin-left:.15em;opacity:.7}
-    .active-slide .hero-brand-net{animation:heroBrandSpin 1.6s cubic-bezier(.2,0,0,1)}
-    .hero-title{font-weight:400;font-size:clamp(1.7rem,3.4vw,2.9rem);line-height:1.05;letter-spacing:-.025em;color:var(--inv-hi);text-align:center}.hero-title .hw{display:block}
-    .hero-credit{position:absolute;left:0;right:0;bottom:clamp(22px,4vh,40px);display:flex;flex-direction:column;gap:4px;text-align:center;align-items:center}.hero-credit .hc-name{font-size:var(--fz-body);color:var(--inv-hi);letter-spacing:-.01em}.hero-credit .hc-role,.hero-credit .hc-aff{font-size:var(--fz-label);letter-spacing:-.005em;color:var(--inv);line-height:1.5}
-    @keyframes heroBrandSpin{to{transform:rotate(360deg)}}
-    @keyframes accent-breathe{0%,100%{text-shadow:0 0 22px rgba(239,238,239,.28),0 0 8px rgba(239,238,239,.18)}50%{text-shadow:0 0 32px rgba(239,238,239,.48),0 0 12px rgba(239,238,239,.32)}}
-
-    /* Pixel-art farm network. */
-    .pixel-stage{position:relative;width:100%;height:100%;min-height:392px;overflow:hidden;background:transparent;border:0}
-    .pixel-stage::after{display:none}
-    .pixel-links{position:absolute;inset:3% 2%;width:96%;height:94%;z-index:1;overflow:visible}.pixel-links path{fill:none;stroke:rgba(30,30,43,.24);stroke-width:1.6;stroke-dasharray:6 9;vector-effect:non-scaling-stroke}.active-slide .pixel-links path{animation:link-flow 1.8s linear infinite}
-    .pixel-sprite{position:absolute;z-index:3;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 8px 9px rgba(30,30,43,.13))}canvas.pixel-sprite{display:block}.pixel-farm-sm{width:27%;height:34%}.farm-a{left:-1%;top:-1%}.farm-b{right:-1%;top:-2%;transform:scaleX(-1)}.farm-c{left:-2%;bottom:-2%;transform:scaleX(-1)}.farm-d{right:-1%;bottom:-3%}.pixel-hub{left:27%;top:10%;width:47%;height:72%;z-index:4}
-    .pixel-truck-wrap{position:absolute;z-index:6;width:13%;height:13%;opacity:0;pointer-events:none}.pixel-truck-wrap img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 5px 5px rgba(30,30,43,.16))}.transport-a{left:13%;top:15%}.transport-c{left:39%;top:55%}.transport-c img{transform:scaleX(-1)}.active-slide .transport-a{animation:transport-a 15s linear forwards}.active-slide .transport-c{animation:transport-c 15s linear forwards}
-    .enclosure-flow{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none}.enclosure-flow path{fill:none;stroke:rgba(30,30,43,.35);stroke-width:1;stroke-linecap:round;stroke-dasharray:1 7;opacity:.72;vector-effect:non-scaling-stroke}.active-slide .enclosure-flow path{animation:enclosure-dots 1.4s linear infinite}.active-slide .enclosure-flow path:nth-child(2){animation-delay:-.35s}.active-slide .enclosure-flow path:nth-child(3){animation-delay:-.7s}
-    #slide-2.infection-complete .pixel-links path,#slide-2.infection-complete .enclosure-flow path{animation-play-state:paused}
-    @keyframes link-flow{to{stroke-dashoffset:-32}}
-    @keyframes enclosure-dots{to{stroke-dashoffset:-24}}
-    @keyframes transport-a{0%,17%{left:13%;top:15%;opacity:0}19%{left:13%;top:15%;opacity:1}42%{left:39%;top:34%;opacity:1}44%,100%{left:39%;top:34%;opacity:0}}
-    @keyframes transport-c{0%,72%{left:39%;top:55%;opacity:0}74%{left:39%;top:55%;opacity:1}97%{left:10%;top:72%;opacity:1}100%{left:10%;top:72%;opacity:0}}
-
-    /* One clean orbit: unboxed pixel data symbols around the Nosotrack mark. */
-    .data-orbit{--orbit-radius:clamp(116px,12.2vw,146px);position:relative;width:100%;height:100%;min-height:400px;display:grid;place-items:center;overflow:visible}
-    .data-orbit-ring{display:none}
-    .data-core{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);width:94px;height:94px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;box-shadow:none;color:var(--ink)}.data-core svg{width:84px;height:84px}
-    .data-orbit-wheel{position:absolute;z-index:3;left:50%;top:50%;width:0;height:0;transform:translate(-50%,-50%)}.active-slide .data-orbit-wheel{animation:orbit-wheel 26s linear infinite}
-    .data-node{position:absolute;left:0;top:0;width:118px;height:102px;margin:-51px -59px;transform:rotate(var(--a)) translateY(calc(0px - var(--orbit-radius)));background:transparent;border:0;padding:0;opacity:1}
-    .data-node-inner{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transform:rotate(var(--ia))}.active-slide .data-node-inner{animation:counter-orbit 26s linear infinite}.data-node img{width:82px;height:72px;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 5px 6px rgba(30,30,43,.14))}.data-node span{font-size:10px;line-height:1.05;letter-spacing:.11em;text-transform:uppercase;text-align:center;color:var(--ink);white-space:nowrap}.dna-pixel{width:72px;height:72px;display:flex;align-items:center;justify-content:center}.dna-pixel svg{width:60px;height:60px;shape-rendering:crispEdges}
-    @keyframes orbit-wheel{to{transform:translate(-50%,-50%) rotate(360deg)}}@keyframes counter-orbit{from{transform:rotate(var(--ia))}to{transform:rotate(calc(var(--ia) - 360deg))}}
-
-    /* Exact live-pitch transmission tree visual, with Cooperl semantics. */
-    #slide-4 .slide-body{padding-bottom:clamp(28px,4vh,54px)}#slide-4 .slide-title{white-space:pre-wrap}#slide-4 .eco-tree{width:95%;align-self:center}
-    .eco-tree{display:flex;flex-direction:column;gap:clamp(14px,2vh,20px)}.eco-tree-figure{position:relative;padding:clamp(14px,2vh,22px) clamp(14px,1.6vw,20px);background:var(--bg-alt);border:1px solid var(--rule);min-height:300px;display:flex;align-items:center;justify-content:center}.tt-svg{width:100%;height:auto;display:block}.tt-lbl{fill:var(--ink);font-size:var(--fz-note);letter-spacing:.04em;text-anchor:middle}.eco-legend{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}.eco-legend-item{display:flex;align-items:center;gap:8px;font-size:var(--fz-note);letter-spacing:-.005em;color:var(--ink)}.tt-glyph{width:16px;height:16px;flex-shrink:0}
-
-    /* Exact live-pitch product walkthrough frame. */
-    #slide-5 .slide-body{padding-top:28px;padding-bottom:28px}#slide-5 .slide-title{font-size:clamp(36px,3.65vw,52px);margin-bottom:18px}#slide-5 .slide-lead{font-size:18px;line-height:1.18}#slide-5 .bullets{gap:.28em}#slide-5 .demo-frame-light{width:95%;align-self:center}.forensic-stack{display:flex;flex-direction:column;gap:13px;font-size:clamp(15px,1.25vw,18px);line-height:1.22;color:var(--ink)}.forensic-stack p{color:var(--ink)}.forensic-stack strong{font-weight:700}
-    .demo-frame-light{position:relative;background:#fafafa;border:1px solid var(--rule-strong);padding:14px}.demo-frame-light::before{content:"";position:absolute;top:-1px;left:14px;width:96px;height:2px;background:var(--mute)}.demo-frame-light .br{position:absolute;width:14px;height:14px;border:0 solid var(--ink);pointer-events:none}.demo-frame-light .br-tl{top:4px;left:4px;border-top-width:1px;border-left-width:1px}.demo-frame-light .br-tr{top:4px;right:4px;border-top-width:1px;border-right-width:1px}.demo-frame-light .br-bl{bottom:4px;left:4px;border-bottom-width:1px;border-left-width:1px}.demo-frame-light .br-br{bottom:4px;right:4px;border-bottom-width:1px;border-right-width:1px}.demo-stage-light{position:relative;width:100%;aspect-ratio:16/9;background:#fafafa;overflow:hidden}.demo-stage-light iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#fafafa}#demoPlaybar{margin-top:12px}.playbar{height:44px;background:var(--bg-alt);border:1px solid var(--rule);border-top:none;display:flex;align-items:center;gap:12px;padding:0 14px}.playbar-track{flex:1;height:2px;background:var(--rule);position:relative;cursor:pointer;touch-action:none}.playbar-fill{position:absolute;top:0;left:0;height:100%;background:var(--ink);width:0;pointer-events:none}.playbar-handle{position:absolute;top:50%;left:0;width:10px;height:10px;background:var(--ink);transform:translate(-50%,-50%);cursor:grab;z-index:2}.playbar-time{font-size:10px;color:var(--ink);letter-spacing:.08em;white-space:nowrap;min-width:4ch;text-align:right;user-select:none}.playbar-pause,.playbar-spd{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;background:transparent;border:1px solid var(--rule-strong);color:var(--ink);cursor:pointer;white-space:nowrap}.playbar-pause{width:26px;height:26px;padding:0;display:flex;align-items:center;justify-content:center}.playbar-pause svg{width:8px;height:10px}
-
-    /* Cooperl application ecosystem. */
-    .ecosystem{position:relative;width:100%;height:100%;min-height:410px}.ecosystem::before{display:none}.ecosystem-lines{position:absolute;inset:0;width:100%;height:100%;z-index:0}.ecosystem-lines line{stroke:rgba(30,30,43,.22);stroke-width:1.3;stroke-dasharray:4 6}.active-slide .ecosystem-lines line{animation:link-flow 1.8s linear infinite}
-    .eco-core{position:absolute;z-index:4;left:50%;top:50%;width:32%;height:26%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;background:transparent;border:0;box-shadow:none;color:var(--ink)}.eco-core-mark{width:74px;height:74px}.eco-core-wordmark{font-size:17px;font-weight:500;letter-spacing:-.02em;color:var(--ink)}.eco-core-wordmark::after{content:"™";font-size:.55em;vertical-align:super;margin-left:.14em;opacity:.7}
-    .eco-product{position:absolute;z-index:3;width:23%;height:19%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0;background:transparent;border:0;box-shadow:none;transition:transform .25s ease}.eco-product:hover{transform:translateY(-3px)}.eco-product img{max-width:94%;max-height:58px;object-fit:contain}.eco-product .pixel-mini{image-rendering:pixelated;filter:drop-shadow(0 4px 5px rgba(30,30,43,.14))}.eco-product span{font-size:10px;line-height:1.08;text-align:center;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
-    .ep-1{left:0;top:0}.ep-2{left:37.5%;top:0}.ep-3{right:0;top:0}.ep-4{right:0;top:39.5%}.ep-5{right:0;bottom:0}.ep-6{left:37.5%;bottom:0}.ep-7{left:0;bottom:0}.ep-8{left:0;top:39.5%}.active-slide .eco-product{animation:eco-float 3.6s ease-in-out infinite}.active-slide .ep-2,.active-slide .ep-6{animation-delay:-1.2s}.active-slide .ep-3,.active-slide .ep-7{animation-delay:-2.4s}
-    @keyframes eco-float{0%,100%{translate:0 0}50%{translate:0 -4px}}
-
-    /* Monochrome pixel progress bar inspired by the supplied game reference. */
-    .collab-timeline{position:relative;width:100%;min-height:310px;padding-top:96px}.collab-track{position:absolute;z-index:2;left:2%;right:2%;top:62px;height:18px;display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden;border:3px solid var(--ink);background:#d7d7da;clip-path:polygon(4px 0,calc(100% - 4px) 0,calc(100% - 4px) 3px,100% 3px,100% calc(100% - 3px),calc(100% - 4px) calc(100% - 3px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 3px),0 calc(100% - 3px),0 3px,4px 3px)}.collab-track>span{position:relative;z-index:3;border-right:3px solid var(--ink)}.collab-track>span:last-of-type{border-right:0}.collab-fill{position:absolute;z-index:1;inset:0 auto 0 0;width:0;background:repeating-linear-gradient(180deg,#57585f 0 4px,#44454b 4px 8px)}.active-slide .collab-fill{animation:timeline-fill 8s steps(64,end) forwards}.pig-runner{position:absolute;z-index:5;left:calc(2% - 18px);top:58px;width:36px;height:26px}.pig-runner img{position:absolute;left:50%;top:50%;width:340%;height:340%;object-fit:fill;image-rendering:pixelated;filter:drop-shadow(0 2px 2px rgba(30,30,43,.13));transform:translate(-50%,-50%) scaleX(1.06)}.active-slide .pig-runner{animation:pig-run 8s steps(64,end) forwards}.active-slide .pig-runner img{animation:pig-bob .48s steps(2,end) infinite}.collab-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.collab-steps .step{border-top:0;padding:24px 10px 0;min-height:190px;opacity:0;transform:translateY(10px);transition:none}.collab-steps .step::before{display:none}.active-slide .collab-steps .step{animation:step-reveal .5s ease forwards}.active-slide .collab-steps .step:nth-child(1){animation-delay:.45s}.active-slide .collab-steps .step:nth-child(2){animation-delay:2.35s}.active-slide .collab-steps .step:nth-child(3){animation-delay:4.3s}.active-slide .collab-steps .step:nth-child(4){animation-delay:6.25s}.collab-steps .step-no{margin-bottom:22px}.collab-steps .step h3{font-size:20px}.collab-steps .step p{font-size:14px}.collab-steps .step:nth-child(4) h3{font-size:18px;line-height:1.06}
-    .study-link,.study-link:visited{color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:rgba(30,30,43,.5)}.study-link:hover{text-decoration-color:var(--ink)}
-    #slide-3 .slide-lead{font-size:clamp(17px,1.28vw,20px);line-height:1.2}#slide-3 .bullets{gap:.34em}
-    @keyframes timeline-fill{to{width:100%}}@keyframes pig-run{to{left:calc(98% - 18px)}}@keyframes pig-bob{50%{transform:translate(-50%,calc(-50% - 1px)) scaleX(1.06)}}@keyframes step-reveal{to{opacity:1;transform:none}}
-
-    @media(max-width:900px){.slide-body{padding-top:34px;padding-bottom:34px}.slide-title{font-size:clamp(34px,6.3vw,48px)}.split{grid-template-columns:1fr;gap:22px}.split-left{justify-content:flex-start}.slide-lead{font-size:18px}.viz{min-height:260px}.globe-crop{min-height:280px}.globe-crop iframe{transform:translate(-60%,-50%) scale(.5)}.closing-grid{grid-template-columns:1fr 300px;gap:30px}.nav-dots{display:none}.hero-split{grid-template-columns:1fr 1fr}.pixel-stage,.data-orbit,.ecosystem{min-height:300px}.eco-product{height:20%}.collab-timeline{min-height:250px}.collab-steps .step{min-height:150px}}
-    @media(max-height:690px){.slide-top,.slide-bottom{padding-top:15px;padding-bottom:15px}.slide-body{padding-top:24px;padding-bottom:24px}.slide-title{font-size:clamp(34px,3.7vw,49px);margin-bottom:16px}.slide-lead{font-size:17px}.viz{min-height:260px}.pixel-stage,.data-orbit,.ecosystem{min-height:330px}.eco-tree-figure{min-height:245px}.collab-timeline{min-height:260px}.collab-steps .step{min-height:150px}.collab-steps .step-no{margin-bottom:20px}}
-    @media(min-width:901px) and (max-height:690px){#slide-5 .demo-frame-light{max-width:calc((100vh - 300px) * 16 / 9 + 28px)}}
-    @media(prefers-reduced-motion:reduce){.deck{scroll-behavior:auto}.reveal{opacity:1;transform:none;transition:none}.hero-statement .halo,.hero-title .accent,.active-slide .hero-brand-net,.active-slide .pixel-links path,.pixel-truck-wrap,.active-slide .data-orbit-wheel,.active-slide .data-node-inner,.active-slide .ecosystem-lines line,.active-slide .eco-product,.active-slide .collab-fill,.active-slide .pig-runner,.active-slide .pig-runner img,.active-slide .collab-steps .step{animation:none!important}.collab-steps .step{opacity:1;transform:none}.collab-fill{width:100%}.pig-runner{left:calc(98% - 18px)}}
-    /* Keep the introduction above the columns so the steps fit short screens. */
-    #slide-5 .solution-intro{flex:none;font-size:18px;line-height:1.22;color:var(--ink);margin-bottom:20px;max-width:1100px}
-    #slide-5 .solution-intro strong{font-weight:700}
-    #slide-5 .split{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:32px}
-    #slide-5 .slide-body{overflow-y:auto}
-    @media(max-height:720px){
-      #slide-5 .slide-body{padding-top:18px;padding-bottom:18px}
-      #slide-5 .slide-title{font-size:clamp(28px,3.4vw,42px);margin-bottom:12px}
-      #slide-5 .solution-intro{font-size:16px;line-height:1.2;margin-bottom:14px}
-      #slide-5 .forensic-stack{font-size:16px;line-height:1.2;gap:10px}
-      #slide-5 .demo-frame-light{max-width:calc((100vh - 350px) * 16 / 9 + 28px)}
-    }
-    @media(max-width:900px){
-      #slide-5 .split{grid-template-columns:1fr;flex:none;gap:20px}
-      #slide-5 .demo-frame-light{width:100%;max-width:560px}
-    }
-    .playbar-fs{display:flex;align-items:center;justify-content:center;flex:none;width:30px;height:30px;padding:5px;background:transparent;border:1px solid var(--rule-strong);color:var(--ink);cursor:pointer}
-    .playbar-fs:hover{background:var(--rule)}
-    .playbar-fs:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-    .has-playbar-fs .nav-dots,.has-playbar-fs .kbd-hint{display:none}
-    .has-playbar-fs #slide-5 .reveal{transform:none!important;transition:none!important}
-    #slide-5 .demo-frame-light.is-fullscreen{position:fixed;inset:0;z-index:1000;width:100vw;max-width:none;height:100vh;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fafafa;border:0}
-    #slide-5 .is-fullscreen .demo-stage-light{flex:none;width:min(100%,calc((100vh - 100px) * 16 / 9));aspect-ratio:16/9}
-    #slide-5 .is-fullscreen #demoPlaybar{flex:none;align-self:stretch}
-  </style>
 </head>
-<body>
+
+<body data-custom-chrome>
   <svg class="defs" aria-hidden="true">
     <symbol id="nosotrack-mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
       <path d="M3 8 L3 3 L8 3" stroke-width="1.2"/><path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
@@ -213,8 +32,11 @@
   </svg>
 
   <main class="deck" id="deck">
-    <section id="slide-1" class="slide on-dark active-slide" data-slide="1">
-      <header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Investigation &amp; contrôle des épizooties</span></header>
+
+<section id="slide-1" class="slide on-dark active-slide" data-slide="1">
+
+<header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Investigation &amp; contrôle des épizooties</span>
+</header>
       <div class="slide-body">
         <div class="hero-split">
           <div class="hero-left"><h1 class="hero-statement">Nosotrack détermine<br>comment les infections<br>se propagent en temps<br>quasi-réel, permettant aux<br>équipes sanitaires d’<span class="halo">endiguer<br>les épizooties avant qu’elles<br>ne s’aggravent</span>.</h1></div>
@@ -222,49 +44,64 @@
         </div>
         <div class="hero-credit"><span class="hc-name">Cyril Geismar</span><span class="hc-role">Postdoctoral Research Fellow</span><span class="hc-aff">Johns Hopkins Bloomberg School of Public Health</span></div>
       </div>
-      <footer class="slide-bottom"><span>nosotrack.com</span><span>01 / 09</span></footer>
-    </section>
 
-    <section id="slide-2" class="slide" data-slide="2">
-      <header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span></header>
+<footer class="slide-bottom"><span>nosotrack.com</span><span>01 / 09</span>
+</footer>
+
+</section>
+
+<section id="slide-2" class="slide" data-slide="2">
+
+<header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span>
+</header>
       <div class="slide-body"><h1 class="slide-title reveal">Les épizooties sont coûteuses et difficiles à maîtriser.</h1><div class="split">
         <div class="split-left"><div class="slide-lead reveal"><span class="lede lede-strong">Lorsqu’un épisode infectieux apparaît, il faut comprendre rapidement d’où il vient et comment il se propage.</span><span class="prompt">Les équipes sanitaires doivent déterminer :</span><ul class="bullets"><li>où l’infection a été introduite</li><li>quels lots, bâtiments ou élevages sont impliqués</li><li>quelles voies de propagation sont encore actives</li><li>quelles mesures limiteront les contaminations suivantes</li></ul></div></div>
         <div class="split-right reveal"><figure class="pixel-stage" aria-label="Propagation animée d’un cochon infecté de la Ferme A vers le site principal, entre trois enclos, puis vers la Ferme C">
           <svg class="pixel-links" viewBox="0 0 720 430" preserveAspectRatio="none" aria-hidden="true"><path d="M112 92C220 92 252 158 336 190"/><path d="M609 88C520 104 470 153 400 190"/><path d="M108 343C210 326 252 276 335 238"/><path d="M610 342C522 324 474 278 404 238"/><path d="M120 96C132 197 112 254 108 343"/><path d="M607 91C620 192 614 253 610 342"/></svg>
           <canvas id="farmAInfection" class="pixel-sprite pixel-farm-sm farm-a" width="1536" height="1024" role="img" aria-label="Ferme A"></canvas>
-          <img class="pixel-sprite pixel-farm-sm farm-b" src="./assets/pixel-farm-small.png" alt="Ferme B">
+          <img class="pixel-sprite pixel-farm-sm farm-b" src="/deck-template/assets/pixel-farm-small.png" alt="Ferme B">
           <canvas id="farmCInfection" class="pixel-sprite pixel-farm-sm farm-c" width="1536" height="1024" role="img" aria-label="Ferme C"></canvas>
-          <img class="pixel-sprite pixel-farm-sm farm-d" src="./assets/pixel-farm-small.png" alt="Ferme D">
+          <img class="pixel-sprite pixel-farm-sm farm-d" src="/deck-template/assets/pixel-farm-small.png" alt="Ferme D">
           <canvas id="hubInfection" class="pixel-sprite pixel-hub" width="1536" height="1024" role="img" aria-label="Grande ferme centrale avec quatre enclos connectés"></canvas>
           <svg class="enclosure-flow" viewBox="0 0 720 430" preserveAspectRatio="none" aria-hidden="true"><path d="M298 158C310 184 309 220 318 247"/><path d="M430 166C442 190 442 219 429 248"/><path d="M326 266C357 276 389 276 418 265"/></svg>
-          <span class="pixel-truck-wrap transport-a" aria-hidden="true"><img src="./assets/pixel-truck.png" alt=""></span>
-          <span class="pixel-truck-wrap transport-c" aria-hidden="true"><img src="./assets/pixel-truck.png" alt=""></span>
+          <span class="pixel-truck-wrap transport-a" aria-hidden="true"><img src="/deck-template/assets/pixel-truck.png" alt=""></span>
+          <span class="pixel-truck-wrap transport-c" aria-hidden="true"><img src="/deck-template/assets/pixel-truck.png" alt=""></span>
         </figure></div>
-      </div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>02 / 09</span></footer>
-    </section>
+      </div></div>
+<footer class="slide-bottom"><span>nosotrack.com</span><span>02 / 09</span>
+</footer>
 
-    <section id="slide-3" class="slide" data-slide="3">
-      <header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span></header>
+</section>
+
+<section id="slide-3" class="slide" data-slide="3">
+
+<header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span>
+</header>
       <div class="slide-body"><h2 class="slide-title reveal">Les données existent, mais elles restent fragmentées.</h2><div class="split">
         <div class="split-left"><div class="slide-lead reveal"><span class="lede lede-strong">L’investigation des épidémies reste largement manuelle.</span><span class="prompt">Les équipes sanitaires rassemblent des données fragmentées au moyen d’analyses ponctuelles réparties entre plusieurs sources :</span><ul class="bullets"><li>données sanitaires et diagnostiques</li><li>mouvements d’animaux et de lots</li><li>bâtiments et flux de production</li><li>introductions et transports</li><li>séquences génomiques, lorsqu’elles sont disponibles</li></ul><span class="body-note">Ce processus est lent, exigeant en main-d’œuvre, parfois incohérent et difficile à auditer.</span></div></div>
         <div class="split-right reveal"><figure class="data-orbit" aria-label="Cinq sources de données en orbite autour du symbole Nosotrack">
           <div class="data-core" aria-label="Nosotrack"><svg viewBox="0 0 32 32"><use href="#nosotrack-mark"/></svg></div>
           <div class="data-orbit-wheel">
-            <div class="data-node" style="--a:-90deg;--ia:90deg"><div class="data-node-inner"><img src="./assets/pixel-microscope.png" alt=""><span>Diagnostic</span></div></div>
-            <div class="data-node" style="--a:-18deg;--ia:18deg"><div class="data-node-inner"><img src="./assets/pixel-farm-small.png" alt=""><span>Production</span></div></div>
-            <div class="data-node" style="--a:54deg;--ia:-54deg"><div class="data-node-inner"><img src="./assets/pixel-truck.png" alt=""><span>Transport</span></div></div>
+            <div class="data-node" style="--a:-90deg;--ia:90deg"><div class="data-node-inner"><img src="/deck-template/assets/pixel-microscope.png" alt=""><span>Diagnostic</span></div></div>
+            <div class="data-node" style="--a:-18deg;--ia:18deg"><div class="data-node-inner"><img src="/deck-template/assets/pixel-farm-small.png" alt=""><span>Production</span></div></div>
+            <div class="data-node" style="--a:54deg;--ia:-54deg"><div class="data-node-inner"><img src="/deck-template/assets/pixel-truck.png" alt=""><span>Transport</span></div></div>
             <div class="data-node" style="--a:126deg;--ia:-126deg"><div class="data-node-inner"><div class="dna-pixel"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="#1e1e2b"><rect x="5" y="3" width="4" height="4"/><rect x="23" y="3" width="4" height="4"/><rect x="8" y="7" width="4" height="4"/><rect x="20" y="7" width="4" height="4"/><rect x="11" y="11" width="4" height="4"/><rect x="17" y="11" width="4" height="4"/><rect x="14" y="15" width="4" height="4"/><rect x="11" y="19" width="4" height="4"/><rect x="17" y="19" width="4" height="4"/><rect x="8" y="23" width="4" height="4"/><rect x="20" y="23" width="4" height="4"/></g><g fill="#ff073a"><rect x="9" y="4" width="14" height="2"/><rect x="12" y="12" width="8" height="2"/><rect x="12" y="20" width="8" height="2"/><rect x="9" y="26" width="14" height="2"/></g></svg></div><span>Génomique</span></div></div>
-            <div class="data-node" style="--a:198deg;--ia:-198deg"><div class="data-node-inner"><img src="./assets/pixel-pig.png" alt=""><span>Mouvements &amp; lots</span></div></div>
+            <div class="data-node" style="--a:198deg;--ia:-198deg"><div class="data-node-inner"><img src="/deck-template/assets/pixel-pig.png" alt=""><span>Mouvements &amp; lots</span></div></div>
           </div>
         </figure></div>
-      </div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>03 / 09</span></footer>
-    </section>
+      </div></div>
+<footer class="slide-bottom"><span>nosotrack.com</span><span>03 / 09</span>
+</footer>
 
-    <section id="slide-4" class="slide" data-slide="4">
-      <header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span></header>
+</section>
+
+<section id="slide-4" class="slide" data-slide="4">
+
+<header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span>
+</header>
       <div class="slide-body"><h2 class="slide-title reveal">Nosotrack informe sur la propagation.</h2><div class="split">
         <div class="split-left"><div class="slide-lead reveal"><span class="lede lede-strong">Nosotrack transforme ces données dispersées en une reconstruction cohérente de l’épisode infectieux.</span><span class="prompt">La plateforme estime les transmissions probables entre animaux, lots, bâtiments ou élevages afin d’identifier :</span><ul class="bullets"><li>les introductions</li><li>les sources probables de contamination</li><li>les transmissions non détectées</li><li>les principales voies de propagation</li><li>les unités à risque</li></ul></div></div>
-        <div class="split-right reveal"><div class="eco-tree"><div class="eco-tree-figure"><svg id="ttSvg" class="tt-svg" viewBox="0 0 660 360" role="img" aria-label="Arbre de transmission reconstruit entre fermes et bâtiments"></svg></div><div class="eco-legend">
+        <div class="split-right reveal"><div class="eco-tree"><div class="eco-tree-figure"><svg data-transmission-tree="farm" class="tt-svg" viewBox="0 0 660 360" role="img" aria-label="Arbre de transmission reconstruit entre fermes et bâtiments"></svg></div><div class="eco-legend">
           <span class="eco-legend-item"><svg class="tt-glyph" viewBox="-9 -9 18 18" aria-hidden="true"><circle r="7" fill="#e61a43" stroke="#767676" stroke-width="1"/></svg>Ferme</span>
           <span class="eco-legend-item"><svg class="tt-glyph" viewBox="-8 -8 16 16" aria-hidden="true"><polygon points="0,-6.5 6,5 -6,5" fill="#e61a43" stroke="#767676" stroke-width="1"/></svg>Bâtiment</span>
           <span class="eco-legend-item"><svg class="tt-glyph" viewBox="-9 -9 18 18" aria-hidden="true"><circle r="7.5" fill="none" stroke="#ff073a" stroke-width="1.6"/><circle r="4" fill="#e61a43" stroke="#767676" stroke-width="1"/></svg>Introduction</span>
@@ -272,27 +109,42 @@
           <span class="eco-legend-item"><svg class="tt-glyph" viewBox="-8 -8 16 16" aria-hidden="true"><circle r="5.5" fill="#8b5cf6" stroke="#6d28d9" stroke-width="1"/></svg>Non détecté</span>
           <span class="eco-legend-item"><svg class="tt-glyph" viewBox="-9 -9 18 18" aria-hidden="true"><circle r="7.5" fill="none" stroke="#ff073a" stroke-width="1.4" stroke-dasharray="2.5 2.5"/><circle r="4" fill="#bfbfbe" stroke="#767676" stroke-width="1"/></svg>À risque</span>
         </div></div></div>
-      </div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>04 / 09</span></footer>
-    </section>
+      </div></div>
+<footer class="slide-bottom"><span>nosotrack.com</span><span>04 / 09</span>
+</footer>
 
-    <section id="slide-5" class="slide" data-slide="5">
-      <header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span></header>
+</section>
+
+<section id="slide-5" class="slide" data-slide="5">
+
+<header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span>
+</header>
       <div class="slide-body"><h2 class="slide-title reveal">La forensique des épizooties, de bout en bout.</h2><p class="solution-intro reveal"><strong>Nosotrack offre une solution analytique complète de réponse aux épizooties, permettant des interventions plus rapides, plus ciblées et moins coûteuses, en 3 étapes :</strong></p><div class="split">
         <div class="split-left"><div class="slide-lead forensic-stack reveal"><p><strong>Intégration :</strong> les données sanitaires, les mouvements d’animaux et de lots, le séquençage et les contacts entre élevages sont réunis dans un moteur unique.</p><p><strong>Reconstruction :</strong> l’inférence bayésienne reconstitue les chaînes de transmission, identifie les sources probables et les animaux, lots ou élevages les plus à risque.</p><p><strong>Intervention :</strong> un copilote IA évalue en quelques secondes différents scénarios de contrôle et les classe selon leur capacité à contenir l’épizootie, leur coût et leur impact opérationnel.</p></div></div>
-        <div class="split-right reveal"><figure class="demo-frame-light"><span class="br br-tl"></span><span class="br br-tr"></span><span class="br br-bl"></span><span class="br br-br"></span><div class="demo-stage-light"><iframe id="demoIframe" src="/foundry-demo/index.html?embed=1" title="Démonstration vidéo Nosotrack Foundry" loading="lazy" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div><div id="demoPlaybar"></div></figure></div>
-      </div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>05 / 09</span></footer>
-    </section>
+        <div class="split-right reveal"><figure class="demo-frame-light" data-demo><span class="br br-tl"></span><span class="br br-tr"></span><span class="br br-bl"></span><span class="br br-br"></span><div class="demo-stage-light"><iframe  src="/foundry-demo/index.html?embed=1" title="Démonstration vidéo Nosotrack Foundry" loading="lazy" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div><div class="demo-playbar"></div></figure></div>
+      </div></div>
+<footer class="slide-bottom"><span>nosotrack.com</span><span>05 / 09</span>
+</footer>
 
-    <section id="slide-6" class="slide" data-slide="6">
-      <header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span></header>
+</section>
+
+<section id="slide-6" class="slide" data-slide="6">
+
+<header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span>
+</header>
       <div class="slide-body"><h2 class="slide-title reveal">Une approche fondée sur une méthodologie éprouvée.</h2><div class="split">
         <div class="split-left"><div class="slide-lead reveal"><span class="lede">Nosotrack s’appuie sur <strong>outbreaker2</strong> <a class="study-link" href="https://doi.org/10.1371/journal.pcbi.1003457" target="_blank" rel="noopener noreferrer" title="1. Jombart T, Cori A, Didelot X, Cauchemez S, Fraser C, Ferguson N. Bayesian Reconstruction of Disease Outbreaks by Combining Epidemiologic and Genomic Data. PLOS Comput Biol. 2014 Jan 23;10(1):e1003457. doi:10.1371/journal.pcbi.1003457">[1]</a> <a class="study-link" href="https://doi.org/10.1186/s12859-018-2330-z" target="_blank" rel="noopener noreferrer" title="2. Campbell F, Didelot X, Fitzjohn R, Ferguson N, Cori A, Jombart T. outbreaker2: a modular platform for outbreak reconstruction. BMC Bioinformatics. 2018 Oct;19(S11):363. doi:10.1186/s12859-018-2330-z">[2]</a>, une méthode open source développée pour reconstruire les chaînes de transmission.</span><span class="prompt">Des approches comparables ont notamment été appliquées à :</span><ul class="bullets"><li>la fièvre aphteuse <a class="study-link" href="https://doi.org/10.1371/journal.pone.0235660" target="_blank" rel="noopener noreferrer" title="3. Firestone SM, Hayama Y, Lau MSY, Yamamoto T, Nishi T, Bradhurst RA, et al. Transmission network reconstruction for foot-and-mouth disease outbreaks incorporating farm-level covariates. PLOS ONE. 2020 Jul 15;15(7):e0235660. doi:10.1371/journal.pone.0235660">[3]</a> <a class="study-link" href="https://doi.org/10.1038/s41598-019-41103-6" target="_blank" rel="noopener noreferrer" title="4. Firestone SM, Hayama Y, Bradhurst R, Yamamoto T, Tsutsui T, Stevenson MA. Reconstructing foot-and-mouth disease outbreaks: a methods comparison of transmission network models. Sci Rep. 2019 Mar 18;9(1):4809. doi:10.1038/s41598-019-41103-6">[4]</a> <a class="study-link" href="https://doi.org/10.1371/journal.pcbi.1002768" target="_blank" rel="noopener noreferrer" title="5. Morelli MJ, Thébaud G, Chadœuf J, King DP, Haydon DT, Soubeyrand S. A Bayesian inference framework to reconstruct transmission trees using epidemiological and genetic data. PLoS Comput Biol. 2012;8(11):e1002768. doi:10.1371/journal.pcbi.1002768">[5]</a></li><li>la grippe aviaire <a class="study-link" href="https://doi.org/10.1098/rspb.2011.0913" target="_blank" rel="noopener noreferrer" title="6. Ypma RJF, Bataille AMA, Stegeman A, Koch G, Wallinga J, van Ballegooijen WM. Unravelling transmission trees of infectious diseases by combining genetic and epidemiological data. Proc R Soc B Biol Sci. 2011 Jul 6;279(1728):444–50. doi:10.1098/rspb.2011.0913">[6]</a></li><li>le SDRP <a class="study-link" href="https://doi.org/10.1111/eva.13596" target="_blank" rel="noopener noreferrer" title="7. Pamornchainavakul N, Makau DN, Paploski IAD, Corzo CA, VanderWaal K. Unveiling invisible farm-to-farm PRRSV-2 transmission links and routes through transmission tree and network analysis. Evol Appl. 2023;16(10):1721–34. doi:10.1111/eva.13596">[7]</a></li></ul></div></div>
         <div class="split-right reveal"><figure class="globe-crop" aria-label="Globe d’adoption scientifique repris du pitch Nosotrack"><iframe src="/impact-embed/" title="Nosotrack — science évaluée par les pairs et adoptée mondialement" loading="lazy"></iframe></figure></div>
-      </div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>06 / 09</span></footer>
-    </section>
+      </div></div>
+<footer class="slide-bottom"><span>nosotrack.com</span><span>06 / 09</span>
+</footer>
 
-    <section id="slide-7" class="slide" data-slide="7">
-      <header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span></header>
+</section>
+
+<section id="slide-7" class="slide" data-slide="7">
+
+<header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span>
+</header>
       <div class="slide-body"><h2 class="slide-title reveal">Adapter Nosotrack aux systèmes de production de Cooperl.</h2><div class="split">
         <div class="split-left"><div class="slide-lead reveal"><span class="lede lede-strong">L’objectif de la collaboration est de construire une solution adaptée aux données et aux contraintes opérationnelles de Cooperl.</span><span class="prompt">Il faudra notamment comprendre :</span><ul class="bullets"><li>les principales problématiques sanitaires</li><li>les flux entre lots, bâtiments et élevages</li><li>les outils et données actuellement disponibles</li><li>les capacités et stratégies de réponse sanitaire</li></ul></div></div>
         <div class="split-right reveal"><figure class="ecosystem" aria-label="Logo Nosotrack connecté aux applications et systèmes Cooperl">
@@ -304,126 +156,49 @@
           <div class="eco-product ep-4"><img src="./assets/logo-iris-feeding.png" alt="Logo IRIS Feeding"><span>IRIS Feeding</span></div>
           <div class="eco-product ep-5"><img src="./assets/logo-mycooperl-suite.png" alt="Logo My Cooperl Suite"><span>Ma Cooperl Suite</span></div>
           <div class="eco-product ep-6"><img src="./assets/logo-farmapro.png" alt="Logo Farmapro"><span>Farmapro</span></div>
-          <div class="eco-product ep-7"><img class="pixel-mini" src="./assets/pixel-farm-small.png" alt=""><span>Systèmes bâtiment<br>&amp; environnement</span></div>
-          <div class="eco-product ep-8"><img class="pixel-mini" src="./assets/pixel-microscope.png" alt=""><span>Données sanitaires<br>&amp; biosécurité</span></div>
+          <div class="eco-product ep-7"><img class="pixel-mini" src="/deck-template/assets/pixel-farm-small.png" alt=""><span>Systèmes bâtiment<br>&amp; environnement</span></div>
+          <div class="eco-product ep-8"><img class="pixel-mini" src="/deck-template/assets/pixel-microscope.png" alt=""><span>Données sanitaires<br>&amp; biosécurité</span></div>
         </figure></div>
-      </div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>07 / 09</span></footer>
-    </section>
+      </div></div>
+<footer class="slide-bottom"><span>nosotrack.com</span><span>07 / 09</span>
+</footer>
 
-    <section id="slide-8" class="slide" data-slide="8">
-      <header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span></header>
-      <div class="slide-body"><h2 class="slide-title reveal">Une collaboration en quatre étapes.</h2><div class="split" style="grid-template-columns:minmax(0,3.5fr) minmax(0,8fr)">
+</section>
+
+<section id="slide-8" class="slide" data-slide="8">
+
+<header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span>
+</header>
+      <div class="slide-body"><h2 class="slide-title reveal">Une collaboration en quatre étapes.</h2><div class="split split-visual-wide">
         <div class="split-left"><div class="slide-lead reveal"><span class="lede lede-strong">Valider progressivement la solution avant son utilisation opérationnelle.</span></div></div>
-        <div class="split-right reveal"><div class="collab-timeline" aria-label="Progression pixel art monochrome de l’audit au pilote opérationnel"><div class="collab-track" aria-hidden="true"><div class="collab-fill"></div><span></span><span></span><span></span><span></span></div><div class="pig-runner"><img src="./assets/pixel-pig.png" alt="Petit cochon avançant au centre de la progression"></div><div class="collab-steps"><article class="step"><div class="step-no">01</div><h3>Audit</h3><p>Comprendre les pratiques, les données et les besoins.</p></article><article class="step"><div class="step-no">02</div><h3>Simulation</h3><p>Tester Nosotrack dans des scénarios représentatifs.</p></article><article class="step"><div class="step-no">03</div><h3>Rétrospectif</h3><p>Appliquer la plateforme à des épisodes passés.</p></article><article class="step"><div class="step-no">04</div><h3>Pilote opérationnel</h3><p>Intégrer Nosotrack au dispositif de biosécurité de Cooperl.</p></article></div></div></div>
-      </div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>08 / 09</span></footer>
-    </section>
+        <div class="split-right reveal"><div class="collab-timeline" aria-label="Progression pixel art monochrome de l’audit au pilote opérationnel"><div class="collab-track" aria-hidden="true"><div class="collab-fill"></div><span></span><span></span><span></span><span></span></div><div class="pig-runner"><img src="/deck-template/assets/pixel-pig.png" alt="Petit cochon avançant au centre de la progression"></div><div class="collab-steps"><article class="step"><div class="step-no">01</div><h3>Audit</h3><p>Comprendre les pratiques, les données et les besoins.</p></article><article class="step"><div class="step-no">02</div><h3>Simulation</h3><p>Tester Nosotrack dans des scénarios représentatifs.</p></article><article class="step"><div class="step-no">03</div><h3>Rétrospectif</h3><p>Appliquer la plateforme à des épisodes passés.</p></article><article class="step"><div class="step-no">04</div><h3>Pilote opérationnel</h3><p>Intégrer Nosotrack au dispositif de biosécurité de Cooperl.</p></article></div></div></div>
+      </div></div>
+<footer class="slide-bottom"><span>nosotrack.com</span><span>08 / 09</span>
+</footer>
 
-    <section id="slide-9" class="slide on-dark" data-slide="9">
-      <header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span></header>
+</section>
+
+<section id="slide-9" class="slide on-dark" data-slide="9">
+
+<header class="slide-top"><span class="slide-mark"><svg><use href="#nosotrack-mark"/></svg><span class="wordmark">NOSO<span class="accent">TRACK</span></span></span><span>Cooperl · Contrôle des épizooties</span>
+</header>
       <div class="slide-body closing-body"><div class="closing-grid">
         <div class="reveal"><h2 class="slide-title closing-title">Vers une solution opérationnelle de contrôle des épizooties</h2><div class="closing-points"><span>S’intégrer aux données et aux pratiques de Cooperl.</span><span>Identifier plus vite l’origine et les voies de propagation.</span><span><strong>Permettre des interventions plus rapides, plus ciblées et moins coûteuses.</strong></span></div></div>
         <div class="closing-brand reveal"><svg><use href="#nosotrack-mark"/></svg><div class="closing-wordmark">NOSO<span class="accent">TRACK</span><sup style="font-size:.5em;opacity:.7">™</sup></div><div class="closing-stack"><span>Pister.</span><span>Intervenir.</span><span class="accent-word">Protéger.</span></div></div>
-      </div><div class="closing-credit"><span class="hc-name">Dr Cyril Geismar</span><a href="mailto:c.geismar21@imperial.ac.uk">c.geismar21@imperial.ac.uk</a><a href="https://www.linkedin.com/in/cyril-geismar/" target="_blank" rel="noopener noreferrer">linkedin.com/in/cyril-geismar</a></div></div><footer class="slide-bottom"><span>nosotrack.com</span><span>09 / 09</span></footer>
-    </section>
+      </div><div class="closing-credit"><span class="hc-name">Dr Cyril Geismar</span><a href="mailto:c.geismar21@imperial.ac.uk">c.geismar21@imperial.ac.uk</a><a href="https://www.linkedin.com/in/cyril-geismar/" target="_blank" rel="noopener noreferrer">linkedin.com/in/cyril-geismar</a></div></div>
+<footer class="slide-bottom"><span>nosotrack.com</span><span>09 / 09</span>
+</footer>
+
+</section>
   </main>
 
-  <nav class="nav-dots" aria-label="Navigation des diapositives">
-    <button data-go="1" class="active" aria-label="Diapositive 1">01</button><button data-go="2" aria-label="Diapositive 2">02</button><button data-go="3" aria-label="Diapositive 3">03</button><button data-go="4" aria-label="Diapositive 4">04</button><button data-go="5" aria-label="Diapositive 5">05</button><button data-go="6" aria-label="Diapositive 6">06</button><button data-go="7" aria-label="Diapositive 7">07</button><button data-go="8" aria-label="Diapositive 8">08</button><button data-go="9" aria-label="Diapositive 9">09</button>
-  </nav>
   <div class="kbd-hint" id="kbdHint">↓ / Espace / → pour avancer</div>
-  <script defer src="/pitch-deck/playbar.js"></script>
-  <script>
-    window.addEventListener('DOMContentLoaded',()=>{
-      const mount=document.getElementById('demoPlaybar');
-      const frame=document.getElementById('demoIframe');
-      if(!mount||!frame||!window.Nosotrack||!window.Nosotrack.createPlaybar)return;
-      let state={time:0,duration:1,playing:true,speed:1};
-      const send=(cmd,extra)=>{try{frame.contentWindow.postMessage(Object.assign({source:'nosotrack-host',cmd},extra||{}),'*')}catch(_){}};
-      const bar=window.Nosotrack.createPlaybar(mount,{variant:'light',speeds:[1,1.5,2,3],initialSpeedIdx:0,showTime:true,showFullscreen:true,fullscreenTarget:frame.closest('figure'),onFullscreen(expanded){const button=mount.querySelector('.playbar-fs');button.setAttribute('aria-label',expanded?'Réduire la vidéo':'Agrandir la vidéo');button.title=expanded?'Réduire la vidéo (Échap)':'Agrandir la vidéo';button.setAttribute('aria-pressed',String(expanded))},onTogglePlay(){send('toggle')},onSeek(t){send('seek',{t});state.time=t;bar.update(state)},onSpeedChange(s){send('speed',{value:s});state.speed=s;bar.update(state)}});
-      const fullscreenButton=mount.querySelector('.playbar-fs');fullscreenButton.setAttribute('aria-label','Agrandir la vidéo');fullscreenButton.title='Agrandir la vidéo';fullscreenButton.setAttribute('aria-pressed','false');
-      window.addEventListener('message',e=>{const d=e.data;if(!d||typeof d!=='object'||d.source!=='nosotrack-demo')return;if(d.type==='ready'){state.duration=d.duration||state.duration;bar.update(state)}else if(d.type==='tick'){state={time:d.time,duration:d.duration,playing:d.playing,speed:d.speed};bar.update(state)}});
-    });
-  </script>
-  <script>
-    /* Recolour only pigs already present in the original pixel-art farm assets. */
-    (()=>{
-      const slide=document.getElementById('slide-2'),farmA=document.getElementById('farmAInfection'),farmC=document.getElementById('farmCInfection'),hub=document.getElementById('hubInfection');
-      if(!slide||!farmA||!farmC||!hub)return;
-      const DURATION=15000,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const SMALL_PIGS=[[900,535,160,135],[742,608,175,140],[878,695,180,145]];
-      const HUB_PIGS=[[365,195,135,115],[438,604,135,110],[920,640,125,100]];
-      const load=src=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=src});
-      const variant=(image,regions)=>{
-        const surface=document.createElement('canvas');surface.width=image.naturalWidth;surface.height=image.naturalHeight;
-        const context=surface.getContext('2d',{willReadFrequently:true});context.drawImage(image,0,0);
-        const pixels=context.getImageData(0,0,surface.width,surface.height),data=pixels.data;
-        regions.forEach(([x,y,w,h])=>{
-          const x2=Math.min(surface.width,x+w),y2=Math.min(surface.height,y+h);
-          for(let py=Math.max(0,y);py<y2;py++)for(let px=Math.max(0,x);px<x2;px++){
-            const i=(py*surface.width+px)*4,r=data[i],g=data[i+1],b=data[i+2],a=data[i+3];
-            if(a>160&&r>205&&g>95&&b>95&&Math.abs(g-b)<45&&r>g+45){const shade=Math.min(1,Math.max(.78,r/253));data[i]=Math.round(255*shade);data[i+1]=Math.round(7*shade);data[i+2]=Math.round(58*shade)}
-          }
-        });
-        context.putImageData(pixels,0,0);return surface;
-      };
-      const paint=(canvas,frame)=>{const context=canvas.getContext('2d');context.clearRect(0,0,canvas.width,canvas.height);context.imageSmoothingEnabled=false;context.drawImage(frame,0,0,canvas.width,canvas.height)};
-      Promise.all([load('./assets/pixel-farm-small.png'),load('./assets/pixel-farm-hub.png')]).then(([smallImage,hubImage])=>{
-        const smallFrames=[smallImage,variant(smallImage,[SMALL_PIGS[0]])];
-        const hubFrames=[hubImage,...HUB_PIGS.map((_,i)=>variant(hubImage,HUB_PIGS.slice(0,i+1)))];
-        let started=0,wasActive=false,lastA=-1,lastHub=-1,lastC=-1;
-        const draw=(a,h,c)=>{if(a!==lastA){paint(farmA,smallFrames[a]);lastA=a}if(h!==lastHub){paint(hub,hubFrames[h]);lastHub=h}if(c!==lastC){paint(farmC,smallFrames[c]);lastC=c}};
-        if(reduce){draw(1,3,1);slide.classList.add('infection-complete');return}
-        const tick=now=>{
-          const active=slide.classList.contains('active-slide');
-          if(active){
-            if(!wasActive){started=now;lastA=lastHub=lastC=-1}
-            const phase=Math.min(1,(now-started)/DURATION);
-            const a=phase>=.09?1:0;
-            const h=phase<.44?0:phase<.56?1:phase<.68?2:3;
-            const c=phase<.98?0:1;
-            slide.classList.toggle('infection-complete',phase>=1);
-            draw(a,h,c);
-          }else if(wasActive){draw(0,0,0);slide.classList.remove('infection-complete')}
-          wasActive=active;requestAnimationFrame(tick);
-        };
-        draw(0,0,0);requestAnimationFrame(tick);
-      }).catch(()=>{farmA.style.background='center/contain no-repeat url(./assets/pixel-farm-small.png)';farmC.style.background='center/contain no-repeat url(./assets/pixel-farm-small.png)';hub.style.background='center/contain no-repeat url(./assets/pixel-farm-hub.png)'});
-    })();
-  </script>
-  <script>
-    /* Live-pitch transmission tree, adapted only for farm/building node semantics. */
-    (()=>{
-      const NS='http://www.w3.org/2000/svg',svg=document.getElementById('ttSvg');if(!svg)return;
-      const C={case:'#e61a43',gold:'#f5b301',goldLine:'#b8860b',edge:'rgba(230,26,67,.55)',edgeHi:'rgba(230,26,67,.9)',mute:'#767676',alert:'#ff073a',grey:'#bfbfbe',undet:'#8b5cf6',undetLine:'#6d28d9'};
-      const N={n1:{x:74,y:180,kind:'farm',imp:true,label:'1'},n2:{x:198,y:108,kind:'farm',label:'2'},n3:{x:198,y:262,kind:'building',label:'3'},n4:{x:332,y:66,kind:'farm',label:'4'},n5:{x:332,y:170,kind:'super',label:'5'},n6:{x:332,y:292,kind:'farm',label:'6'},n7:{x:480,y:96,kind:'farm',label:'7'},n8:{x:480,y:172,kind:'building',label:'8'},n9:{x:480,y:248,kind:'farm',label:'9'},n10:{x:478,y:320,kind:'atrisk',label:'10'}};
-      const E=[['n1','n2'],['n1','n3'],['n2','n4'],['n2','n5'],['n5','n7'],['n5','n8'],['n5','n9'],['n3','n6']],RISK=[['n6','n10']],UNDET=[{x:238,y:262,at:332}];
-      const rOf=k=>k==='super'?15:k==='building'?10:k==='farm'?13:12;
-      const path=(ax,ay,bx,by,r,childR)=>{const dH=bx>ax?1:bx<ax?-1:0,dV=by>ay?1:by<ay?-1:0;if(dV===0)return`M ${ax} ${ay} L ${bx-dH*childR} ${ay}`;if(dH===0)return`M ${ax} ${ay} L ${ax} ${by-dV*childR}`;const mx=(ax+bx)/2,ex=bx-dH*childR;if(Math.abs(mx-ax)<r*1.5||Math.abs(bx-mx)<r*1.5||Math.abs(by-ay)<r*2)return`M ${ax} ${ay} L ${mx} ${ay} L ${mx} ${by} L ${ex} ${by}`;return`M ${ax} ${ay} L ${mx-r*dH} ${ay} Q ${mx} ${ay}, ${mx} ${ay+r*dV} L ${mx} ${by-r*dV} Q ${mx} ${by}, ${mx+r*dH} ${by} L ${ex} ${by}`};
-      const el=(tag,attrs)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e};
-      const defs=el('defs',{});[['ttHead',C.edge],['ttHeadHi',C.edgeHi],['ttHeadR',C.alert]].forEach(m=>{const mk=el('marker',{id:m[0],viewBox:'0 0 10 10',refX:'8.5',refY:'5',markerWidth:'7',markerHeight:'7',orient:'auto'});mk.appendChild(el('path',{d:'M0 0 L10 5 L0 10 z',fill:m[1]}));defs.appendChild(mk)});svg.appendChild(defs);
-      const edges=E.map(e=>{const a=N[e[0]],b=N[e[1]],p=el('path',{d:path(a.x,a.y,b.x,b.y,7,rOf(b.kind)+3),fill:'none',stroke:C.edge,'stroke-width':'2.2','stroke-linecap':'round',pathLength:'1','stroke-dasharray':'1','stroke-dashoffset':'1'});svg.appendChild(p);return{p,childX:b.x}});
-      const riskEdges=RISK.map(e=>{const a=N[e[0]],b=N[e[1]],p=el('path',{d:path(a.x,a.y,b.x,b.y,7,rOf(b.kind)+6),fill:'none',stroke:C.alert,'stroke-width':'1.5','stroke-dasharray':'4 3',opacity:'0','marker-end':'url(#ttHeadR)'});svg.appendChild(p);return{p,childX:b.x}});
-      const undets=UNDET.map(u=>{const c=el('circle',{cx:u.x,cy:u.y,r:'6',fill:C.undet,stroke:C.undetLine,'stroke-width':'1',opacity:'0'});svg.appendChild(c);return{c,at:u.at}});
-      const nodes=Object.keys(N).map(id=>{const n=N[id],r=rOf(n.kind),g=el('g',{transform:`translate(${n.x},${n.y})`,opacity:'0'});if(n.kind==='super'){const halo=el('circle',{r:r+6,fill:'none',stroke:C.gold,'stroke-width':'1',opacity:'.55'});halo.appendChild(el('animate',{attributeName:'r',values:`${r+4};${r+9};${r+4}`,dur:'1.8s',repeatCount:'indefinite'}));halo.appendChild(el('animate',{attributeName:'opacity',values:'.6;0;.6',dur:'1.8s',repeatCount:'indefinite'}));g.appendChild(halo)}if(n.imp)g.appendChild(el('circle',{r:r+5,fill:'none',stroke:C.alert,'stroke-width':'2'}));if(n.kind==='atrisk')g.appendChild(el('circle',{r:r+4,fill:'none',stroke:C.alert,'stroke-width':'1.5','stroke-dasharray':'3 3'}));if(n.kind==='building')g.appendChild(el('polygon',{points:`0,${-r} ${r},${r*.8} ${-r},${r*.8}`,fill:C.case,stroke:C.mute,'stroke-width':'1'}));else g.appendChild(el('circle',{r,fill:n.kind==='super'?C.gold:n.kind==='atrisk'?C.grey:C.case,stroke:n.kind==='super'?C.goldLine:C.mute,'stroke-width':'1'}));const t=el('text',{x:'0',y:r+15,class:'tt-lbl'});t.textContent=n.label;g.appendChild(t);svg.appendChild(g);return{g,x:n.x}});
-      const xs=nodes.map(o=>o.x),xMin=Math.min(...xs),xMax=Math.max(...xs),SPREAD=.82,NODE_WIN=.12,EDGE_WIN=.18,EDGE_LEAD=.06,DUR=2400,clamp=n=>n<0?0:n>1?1:n,appear=x=>((xMax>xMin?(x-xMin)/(xMax-xMin):0)*SPREAD);
-      const render=prog=>{nodes.forEach(o=>o.g.setAttribute('opacity',clamp((prog-appear(o.x))/NODE_WIN)));edges.forEach(o=>{const rev=clamp((prog-Math.max(0,appear(o.childX)-EDGE_LEAD))/EDGE_WIN);o.p.setAttribute('stroke-dashoffset',1-rev);if(rev>.92){o.p.setAttribute('stroke',C.edgeHi);o.p.setAttribute('marker-end','url(#ttHeadHi)')}else{o.p.setAttribute('stroke',C.edge);o.p.removeAttribute('marker-end')}});undets.forEach(o=>o.c.setAttribute('opacity',clamp((prog-Math.max(0,appear(o.at)-EDGE_LEAD))/EDGE_WIN)));riskEdges.forEach(o=>o.p.setAttribute('opacity',.85*clamp((prog-appear(o.childX))/EDGE_WIN)))};
-      if(matchMedia('(prefers-reduced-motion: reduce)').matches){render(1);return}let raf=0;const play=()=>{cancelAnimationFrame(raf);let start=null;const tick=now=>{if(start===null)start=now;const prog=Math.min(1,(now-start)/DUR);render(prog);if(prog<1)raf=requestAnimationFrame(tick)};tick(performance.now())};render(0);const slide=document.getElementById('slide-4');if(slide&&'IntersectionObserver'in window){let seen=false;new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&e.intersectionRatio>.5){if(!seen){seen=true;render(0);play()}}else if(e.intersectionRatio===0)seen=false}),{threshold:[0,.5]}).observe(slide)}else play();
-    })();
-  </script>
-  <script>
-    (()=>{
-      const deck=document.getElementById('deck');
-      const slides=[...document.querySelectorAll('.slide')];
-      const buttons=[...document.querySelectorAll('.nav-dots button')];
-      const hint=document.getElementById('kbdHint');
-      let active=0,ticking=false;
-      const go=(index)=>{active=Math.max(0,Math.min(slides.length-1,index));slides[active].scrollIntoView({behavior:'smooth',block:'start'});hint.classList.add('hidden')};
-      const update=()=>{const next=Math.max(0,Math.min(slides.length-1,Math.round(deck.scrollTop/window.innerHeight)));active=next;slides.forEach((s,i)=>s.classList.toggle('active-slide',i===active));buttons.forEach((b,i)=>b.classList.toggle('active',i===active));document.body.classList.toggle('on-dark-nav',slides[active].classList.contains('on-dark'));ticking=false};
-      buttons.forEach((b,i)=>b.addEventListener('click',()=>go(i)));
-      addEventListener('keydown',(e)=>{if(document.body.classList.contains('has-playbar-fs'))return;if(['ArrowDown','ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(active+1)}else if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(active-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(slides.length-1)}});
-      deck.addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(update)}},{passive:true});
-      setTimeout(()=>hint.classList.add('hidden'),4200);update();
-    })();
-  </script>
+  <script defer src="/deck-template/playbar.js"></script>
+<script defer src="/deck-template/demo.js"></script>
+
+<script defer src="/deck-template/deck.js"></script>
+<script defer src="/deck-template/transmission-tree.js"></script>
+<script defer src="/deck-template/farm-infection.js"></script>
+
 </body>
 </html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nosotrack · Outbreak forensics and control for farms</title>
+  <meta name="description" content="Reconstruct how infections spread within and between farms, and identify targeted control strategies.">
+  <link rel="canonical" href="https://nosotrack.com/for-farms/">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke='%231e1e2b' stroke-width='2.5' stroke-linecap='square'%3E%3Cpath d='M3 8 L3 3 L8 3'/%3E%3Cpath d='M24 3 L29 3 L29 8'/%3E%3Cpath d='M29 24 L29 29 L24 29'/%3E%3Cpath d='M8 29 L3 29 L3 24'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23ff073a' stroke='none'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="stylesheet" href="/deck-template/deck.css"><link rel="stylesheet" href="/deck-template/farm-figures.css">
+<link rel="stylesheet" href="./deck.css">
+  <link rel="stylesheet" href="/deck-template/responsive.css">
+<script defer src="/deck-template/deck.js"></script><script defer src="/deck-template/jigsaw.js"></script>
+</head>
+
+<body>
+  <svg class="defs" aria-hidden="true">
+    <filter id="animal-cutout" color-interpolation-filters="sRGB"><feComponentTransfer><feFuncA type="linear" slope="50" intercept="-49"/></feComponentTransfer></filter>
+    <symbol id="nosotrack-mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="square">
+      <path d="M3 8 L3 3 L8 3" stroke-width="1.2"/><path d="M24 3 L29 3 L29 8" stroke-width="1.2"/>
+      <path d="M29 24 L29 29 L24 29" stroke-width="1.2"/><path d="M8 29 L3 29 L3 24" stroke-width="1.2"/>
+      <line x1="16" y1="11.2" x2="16" y2="15.6" stroke-width=".55"/><line x1="11.31" y1="19.3" x2="15.13" y2="17.1" stroke-width=".55"/><line x1="20.69" y1="19.3" x2="16.87" y2="17.1" stroke-width=".55"/>
+      <circle cx="16" cy="9" r="2.2" stroke-width=".35"/><circle cx="9.4" cy="20.4" r="2.2" stroke-width=".35"/><circle cx="22.6" cy="20.4" r="2.2" stroke-width=".35"/><circle cx="16" cy="16.6" r="1.05" fill="#ff073a" stroke="none"/>
+    </symbol>
+    <symbol id="pixel-barn" viewBox="0 0 32 28">
+      <path d="M2 12H5V9H8V6H11V3H21V6H24V9H27V12H30V16H2Z" fill="#212326"/>
+      <path d="M6 13H26V27H6Z" fill="#c93b42"/><path d="M9 15H23V27H9Z" fill="#de4d51"/>
+      <path d="M13 19H19V27H13Z" fill="#a3633f"/><path d="M15 21H17V23H15Z" fill="#efb178"/>
+      <path d="M8 15H11V18H8ZM21 15H24V18H21Z" fill="#ffca8a"/>
+    </symbol>
+  </svg>
+
+  <main class="deck" id="deck">
+
+<section id="slide-1" class="slide on-dark active-slide" data-slide="1">
+
+<header class="slide-top"><a href="/">Nosotrack</a>
+</header>
+      <div class="slide-body">
+        <div class="hero-split">
+          <div class="hero-left"><h1 class="hero-statement">Nosotrack infers how infections spread within and between farms, enabling animal health teams to <span class="halo">stop outbreaks before they escalate</span>.</h1></div>
+          <div class="hero-right"><div class="hero-brand"></div><span class="brand-wordmark">NOSO<span class="accent">TRACK</span><sup class="tm">™</sup></span><span class="hero-title"><span class="hw">Track.</span><span class="hw">Intervene.</span><span class="hw accent">Protect.</span></span></div>
+        </div>
+        <div class="hero-credit"><span class="hc-name">Cyril Geismar</span><span class="hc-role">Postdoctoral Research Fellow</span><span class="hc-aff">Johns Hopkins Bloomberg School of Public Health</span></div>
+      </div>
+
+<footer class="slide-bottom">
+</footer>
+
+</section>
+
+<section id="slide-2" class="slide risk-slide" data-slide="2">
+
+<header class="slide-top"><a href="/">Nosotrack</a>
+</header>
+      <div class="slide-body"><h2 class="slide-title reveal">Infectious diseases pose major risks to livestock production.</h2>
+        <div class="split">
+          <div class="split-left"><div class="risk-copy slide-lead reveal">
+            <div class="risk-block"><h3>Operational risk</h3><p>20% of global animal production is lost to disease each year <a class="study-link" href="https://www.woah.org/en/animal-health-receives-as-little-as-0-6-percent-of-global-health-spending-despite-mounting-disease-crises-new-report-warns/" title="WOAH, 13 May 2026: global production losses, 2025–26 HPAI burden and declining capacity among assessed countries." target="_blank" rel="noopener noreferrer">[1]</a></p></div>
+            <div class="risk-block"><h3>Economic risk</h3><p>$300 billion in annual losses for farmers <a class="study-link" href="https://www.woah.org/app/uploads/2026/04/gs93-2026-wd-tech-01-en.pdf#page=7" title="WOAH (2026), Investing in Animal Health, p. 7: estimated annual losses of $300 billion; ASF losses exceeding $141 billion in China by 2019." target="_blank" rel="noopener noreferrer">[2]</a></p></div>
+            <div class="risk-block"><h3>Regulatory risk</h3><p>Outbreaks can trigger mandatory reporting, movement restrictions, culling and trade restrictions <a class="study-link" href="https://food.ec.europa.eu/animals/animal-diseases/diseases-and-control-measures_en" title="European Commission: notification and disease-control measures under the Animal Health Law." target="_blank" rel="noopener noreferrer">[3]</a> <a class="study-link" href="https://www.woah.org/en/disease/foot-and-mouth-disease/" title="WOAH: notification, control measures, trade impacts and suspension of recognised FMD-free status." target="_blank" rel="noopener noreferrer">[4]</a></p></div>
+          </div></div>
+          <div class="split-right"><div class="risk-animals">
+            <figure class="risk-species"><div class="risk-animal" data-animal="chicken"><img src="./assets/chicken-sketchfab.png" alt="chicken" width="512" height="512"></div><figcaption><h3>Highly pathogenic avian influenza</h3><p>+140 million poultry dead or culled last year <a class="study-link" href="https://www.woah.org/en/animal-health-receives-as-little-as-0-6-percent-of-global-health-spending-despite-mounting-disease-crises-new-report-warns/" title="WOAH, 13 May 2026: global production losses, 2025–26 HPAI burden and declining capacity among assessed countries." target="_blank" rel="noopener noreferrer">[1]</a></p></figcaption></figure>
+            <figure class="risk-species"><div class="risk-animal" data-animal="pig"><img src="./assets/pig-sketchfab.png" alt="pig" width="512" height="512"></div><figcaption><h3>African swine fever</h3><p>+$140 billion in losses across China in 2019 (~1% of GDP). <a class="study-link" href="https://data.worldbank.org/indicator/NY.GDP.MKTP.CD?locations=CN&amp;start=2019&amp;end=2019" title="Scale comparison: $141 billion is approximately 1% of China’s 2019 nominal GDP (World Bank). This is not an estimate of GDP contraction." target="_blank" rel="noopener noreferrer">[6]</a> <a class="study-link" href="https://www.woah.org/app/uploads/2026/04/gs93-2026-wd-tech-01-en.pdf#page=7" title="WOAH (2026), Investing in Animal Health, p. 7: estimated annual losses of $300 billion; ASF losses exceeding $141 billion in China by 2019." target="_blank" rel="noopener noreferrer">[2]</a></p></figcaption></figure>
+            <figure class="risk-species"><div class="risk-animal" data-animal="cow"><img src="./assets/cow-sketchfab.png" alt="cow" width="512" height="512"></div><figcaption><h3>Foot-and-mouth disease</h3><p>Up to $21bn/year in FMD-related production losses and control costs in endemic regions <a class="study-link" href="https://doi.org/10.1016/j.prevetmed.2013.07.013" title="Knight-Jones &amp; Rushton (2013): $6.5–21 billion annually in production losses and vaccination costs in FMD-endemic regions; cited by WOAH in 2026." target="_blank" rel="noopener noreferrer">[5]</a></p></figcaption></figure>
+          </div></div>
+        </div>
+        <p class="risk-capacity reveal"><strong>WOAH reports that around 20% of assessed countries have declining veterinary capacity</strong> <a class="study-link" href="https://www.woah.org/en/animal-health-receives-as-little-as-0-6-percent-of-global-health-spending-despite-mounting-disease-crises-new-report-warns/" title="WOAH, 13 May 2026: global production losses, 2025–26 HPAI burden and declining capacity among assessed countries." target="_blank" rel="noopener noreferrer">[1]</a></p>
+      </div>
+<footer class="slide-bottom">
+</footer>
+
+</section>
+
+<section id="slide-3" class="slide" data-slide="3">
+
+<header class="slide-top"><a href="/">Nosotrack</a>
+</header>
+      <div class="slide-body"><h2 class="slide-title reveal">Livestock outbreaks are difficult to control.</h2><div class="split">
+        <div class="split-left"><div class="slide-lead reveal"><span class="lede lede-strong">When an outbreak occurs, teams need to establish quickly where it started and how it is spreading.</span><span class="prompt">Animal health teams need to determine:</span><ul class="bullets"><li>where infection was introduced</li><li>which herds, flocks, buildings or farms are involved</li><li>which routes of transmission remain active</li><li>which measures will prevent further spread</li></ul></div></div>
+        <div class="split-right reveal"><figure class="pixel-stage" aria-label="Illustrative infection spreading from Farm A to three central enclosures and then to Farm C">
+          <svg class="pixel-links" viewBox="0 0 720 430" preserveAspectRatio="none" aria-hidden="true"><path d="M112 92C220 92 252 158 336 190"/><path d="M609 88C520 104 470 153 400 190"/><path d="M108 343C210 326 252 276 335 238"/><path d="M610 342C522 324 474 278 404 238"/><path d="M120 96C132 197 112 254 108 343"/><path d="M607 91C620 192 614 253 610 342"/></svg>
+          <canvas id="farmAInfection" class="pixel-sprite pixel-farm-sm farm-a" width="1536" height="1024" role="img" aria-label="Farm A"></canvas>
+          <img class="pixel-sprite pixel-farm-sm farm-b" src="/deck-template/assets/pixel-farm-small.png" alt="Farm B">
+          <canvas id="farmCInfection" class="pixel-sprite pixel-farm-sm farm-c" width="1536" height="1024" role="img" aria-label="Farm C"></canvas>
+          <img class="pixel-sprite pixel-farm-sm farm-d" src="/deck-template/assets/pixel-farm-small.png" alt="Farm D">
+          <canvas id="hubInfection" class="pixel-sprite pixel-hub" width="1536" height="1024" role="img" aria-label="Central farm with four connected enclosures"></canvas>
+          <svg class="enclosure-flow" viewBox="0 0 720 430" preserveAspectRatio="none" aria-hidden="true"><path d="M298 158C310 184 309 220 318 247"/><path d="M430 166C442 190 442 219 429 248"/><path d="M326 266C357 276 389 276 418 265"/></svg>
+          <span class="pixel-truck-wrap transport-a" aria-hidden="true"><img src="/deck-template/assets/pixel-truck.png" alt=""></span>
+          <span class="pixel-truck-wrap transport-c" aria-hidden="true"><img src="/deck-template/assets/pixel-truck.png" alt=""></span>
+        </figure></div>
+      </div></div>
+<footer class="slide-bottom">
+</footer>
+
+</section>
+
+<section id="slide-4" class="slide" data-slide="4">
+
+<header class="slide-top"><a href="/">Nosotrack</a>
+</header>
+      <div class="slide-body"><h2 class="slide-title reveal">Outbreak data are fragmented, the response cannot be.</h2><div class="split">
+        <div class="split-left"><div class="slide-lead reveal"><span class="lede lede-strong">Outbreak investigation remains largely manual.</span><span class="prompt">Animal health teams piece together fragmented data through ad hoc analyses across multiple sources:</span><ul class="bullets"><li>animal health and diagnostic records</li><li>animal and group movements</li><li>buildings and production flows</li><li>introductions and transport</li><li>genomic sequences, where available</li></ul><span class="body-note">This process is slow, labour-intensive, inconsistent and difficult to audit.</span></div></div>
+        <div class="split-right reveal"><figure class="pz-fig" aria-label="Four sources of farm data assemble around two questions: How disease spread? How to control it?"><svg id="pzSvg" data-movements="Livestock|movements" data-genomics="Diagnostics|& genomics" data-contacts="Animal health|records" data-contacts-icon="ehr" data-records-icon="paper" data-records="Farm|records" data-source="How disease|spread?" data-risk="How to|control it?" class="pz-svg" viewBox="0 0 564 546" role="img" aria-label="Animated jigsaw combining livestock movements, farm records, animal health, and diagnostics and genomics"></svg></figure></div>
+      </div></div>
+<footer class="slide-bottom">
+</footer>
+
+</section>
+
+<section id="slide-5" class="slide" data-slide="5">
+
+<header class="slide-top"><a href="/">Nosotrack</a>
+</header>
+      <div class="slide-body"><h2 class="slide-title reveal">Every outbreak leaves a trail, Nosotrack finds it.</h2><div class="split">
+        <div class="split-left"><div class="slide-lead reveal"><span class="lede lede-strong">Nosotrack turns these scattered data into a coherent reconstruction of the outbreak.</span><span class="prompt">The platform infers the transmission tree, informing how infections spread between animals, groups, buildings or farms to identify:</span><ul class="bullets"><li>introductions</li><li>likely sources of infection</li><li>undetected transmission</li><li>the main routes of spread</li><li>animals and farms at risk</li></ul></div></div>
+        <div class="split-right reveal"><div class="eco-tree"><div class="eco-tree-figure"><svg data-transmission-tree="farm-hierarchy" class="tt-svg" viewBox="0 0 660 360" role="img" aria-label="Transmission between Farms A, B and C, with a detailed view of transmission between buildings within Farm B"></svg></div><div class="eco-legend">
+          <span class="eco-legend-item"><svg class="tt-glyph" viewBox="-9 -9 18 18" aria-hidden="true"><circle r="7" fill="#e61a43" stroke="#767676" stroke-width="1"/></svg>Farm</span>
+          <span class="eco-legend-item"><svg class="tt-glyph" viewBox="-8 -8 16 16" aria-hidden="true"><polygon points="0,-6.5 6,5 -6,5" fill="#e61a43" stroke="#767676" stroke-width="1"/></svg>Building</span>
+          <span class="eco-legend-item"><svg class="tt-glyph" viewBox="-9 -9 18 18" aria-hidden="true"><circle r="7.5" fill="none" stroke="#ff073a" stroke-width="1.6"/><circle r="4" fill="#e61a43" stroke="#767676" stroke-width="1"/></svg>Introduction</span>
+          <span class="eco-legend-item"><svg class="tt-glyph" viewBox="-8 -8 16 16" aria-hidden="true"><circle r="6" fill="#f5b301" stroke="#b8860b" stroke-width="1"/></svg>Superspreader</span>
+          <span class="eco-legend-item"><svg class="tt-glyph" viewBox="-8 -8 16 16" aria-hidden="true"><circle r="5.5" fill="#8b5cf6" stroke="#6d28d9" stroke-width="1"/></svg>Undetected</span>
+          <span class="eco-legend-item"><svg class="tt-glyph" viewBox="-9 -9 18 18" aria-hidden="true"><circle r="7.5" fill="none" stroke="#ff073a" stroke-width="1.4" stroke-dasharray="2.5 2.5"/><circle r="4" fill="#bfbfbe" stroke="#767676" stroke-width="1"/></svg>At risk</span>
+        </div></div></div>
+      </div></div>
+<footer class="slide-bottom">
+</footer>
+
+</section>
+
+<section id="slide-6" class="slide" data-slide="6">
+
+<header class="slide-top"><a href="/">Nosotrack</a>
+</header>
+      <div class="slide-body"><h2 class="slide-title reveal">Outbreak forensics &amp; control, end-to-end</h2><div class="split">
+        <div class="split-left"><div class="slide-lead forensic-stack reveal"><p class="solution-intro"><strong>Nosotrack provides a complete analytical approach to outbreak response, enabling faster, more targeted and less costly interventions in three steps:</strong></p><p><strong>Integrate:</strong> bring animal health records, animal and group movements, sequencing and contacts between farms into a single engine.</p><p><strong>Reconstruct:</strong> Bayesian inference estimates transmission chains, likely sources and the animals, groups or farms most at risk.</p><p><strong>Intervene:</strong> an AI co-pilot evaluates control scenarios in seconds and ranks them by their ability to contain the outbreak, their cost and their operational impact.</p></div></div>
+        <div class="split-right reveal"><figure class="demo-frame-light" data-demo><div class="demo-stage-light"><iframe  src="/foundry-demo/index.html?embed=1" title="Nosotrack Foundry platform demonstration" loading="lazy" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div><div class="demo-playbar"></div></figure></div>
+      </div></div>
+<footer class="slide-bottom">
+</footer>
+
+</section>
+
+<section id="slide-7" class="slide" data-slide="7">
+
+<header class="slide-top"><a href="/">Nosotrack</a>
+</header>
+      <div class="slide-body"><h2 class="slide-title reveal">Built on established methods, adopted globally</h2><div class="split">
+        <div class="split-left"><div class="slide-lead reveal"><span class="lede">Nosotrack builds on <strong>outbreaker2</strong> <a class="study-link" href="https://doi.org/10.1371/journal.pcbi.1003457" target="_blank" rel="noopener noreferrer" title="1. Jombart T, Cori A, Didelot X, Cauchemez S, Fraser C, Ferguson N. Bayesian Reconstruction of Disease Outbreaks by Combining Epidemiologic and Genomic Data. PLOS Comput Biol. 2014 Jan 23;10(1):e1003457. doi:10.1371/journal.pcbi.1003457">[1]</a> <a class="study-link" href="https://doi.org/10.1186/s12859-018-2330-z" target="_blank" rel="noopener noreferrer" title="2. Campbell F, Didelot X, Fitzjohn R, Ferguson N, Cori A, Jombart T. outbreaker2: a modular platform for outbreak reconstruction. BMC Bioinformatics. 2018 Oct;19(S11):363. doi:10.1186/s12859-018-2330-z">[2]</a>, an open-source method developed to reconstruct transmission chains for various diseases and settings.</span><span class="prompt">Related approaches have been applied to:</span><ul class="bullets"><li>foot-and-mouth disease <a class="study-link" href="https://doi.org/10.1371/journal.pone.0235660" target="_blank" rel="noopener noreferrer" title="3. Firestone SM, Hayama Y, Lau MSY, Yamamoto T, Nishi T, Bradhurst RA, et al. Transmission network reconstruction for foot-and-mouth disease outbreaks incorporating farm-level covariates. PLOS ONE. 2020 Jul 15;15(7):e0235660. doi:10.1371/journal.pone.0235660">[3]</a> <a class="study-link" href="https://doi.org/10.1038/s41598-019-41103-6" target="_blank" rel="noopener noreferrer" title="4. Firestone SM, Hayama Y, Bradhurst R, Yamamoto T, Tsutsui T, Stevenson MA. Reconstructing foot-and-mouth disease outbreaks: a methods comparison of transmission network models. Sci Rep. 2019 Mar 18;9(1):4809. doi:10.1038/s41598-019-41103-6">[4]</a> <a class="study-link" href="https://doi.org/10.1371/journal.pcbi.1002768" target="_blank" rel="noopener noreferrer" title="5. Morelli MJ, Thébaud G, Chadœuf J, King DP, Haydon DT, Soubeyrand S. A Bayesian inference framework to reconstruct transmission trees using epidemiological and genetic data. PLoS Comput Biol. 2012;8(11):e1002768. doi:10.1371/journal.pcbi.1002768">[5]</a></li><li>avian influenza <a class="study-link" href="https://doi.org/10.1098/rspb.2011.0913" target="_blank" rel="noopener noreferrer" title="6. Ypma RJF, Bataille AMA, Stegeman A, Koch G, Wallinga J, van Ballegooijen WM. Unravelling transmission trees of infectious diseases by combining genetic and epidemiological data. Proc R Soc B Biol Sci. 2011 Jul 6;279(1728):444–50. doi:10.1098/rspb.2011.0913">[6]</a></li><li>porcine reproductive and respiratory syndrome (PRRS) <a class="study-link" href="https://doi.org/10.1111/eva.13596" target="_blank" rel="noopener noreferrer" title="7. Pamornchainavakul N, Makau DN, Paploski IAD, Corzo CA, VanderWaal K. Unveiling invisible farm-to-farm PRRSV-2 transmission links and routes through transmission tree and network analysis. Evol Appl. 2023;16(10):1721–34. doi:10.1111/eva.13596">[7]</a></li></ul></div></div>
+        <div class="split-right reveal"><iframe class="adoption-frame" src="/impact-globe-embed/" title="Global scientific adoption of the underlying methods" loading="lazy"></iframe></div>
+      </div></div>
+<footer class="slide-bottom">
+</footer>
+
+</section>
+
+<section id="slide-8" class="slide" data-slide="8">
+
+<header class="slide-top"><a href="/">Nosotrack</a>
+</header>
+      <div class="slide-body"><h2 class="slide-title reveal">Adapt Nosotrack to your farming system.</h2><div class="split">
+        <div class="split-left"><div class="slide-lead reveal"><span class="lede lede-strong">The aim is to build a solution that fits your data, production system and operational constraints.</span><span class="prompt">We start by understanding:</span><ul class="bullets"><li>your main animal health challenges</li><li>how your production system operates</li><li>your existing data and tools</li><li>your outbreak prevention and control practices</li></ul></div></div>
+        <div class="split-right reveal"><figure class="ecosystem" aria-label="Nosotrack connected to existing farm data and systems">
+          <div class="eco-core" aria-label="Nosotrack"><svg class="eco-core-mark" viewBox="0 0 32 32"><use href="#nosotrack-mark"/></svg><span class="eco-core-wordmark">NOSO<span class="accent">TRACK</span></span></div>
+          <div class="eco-product ep-1"><strong>Livestock movements</strong></div>
+          <div class="eco-product ep-2"><strong>Farm &amp; production records</strong></div>
+          <div class="eco-product ep-3"><strong>Animal health records</strong></div>
+          <div class="eco-product ep-4"><strong>Diagnostics &amp; genomics</strong></div>
+
+        </figure></div>
+      </div></div>
+<footer class="slide-bottom">
+</footer>
+
+</section>
+
+<section id="slide-9" class="slide" data-slide="9">
+
+<header class="slide-top"><a href="/">Nosotrack</a>
+</header>
+      <div class="slide-body"><h2 class="slide-title reveal">A collaboration in three stages.</h2><div class="split">
+        <div class="split-left"><div class="slide-lead reveal"><span class="lede lede-strong">Validate the solution progressively before putting it into operational use.</span></div></div>
+        <div class="split-right reveal"><div class="collab-timeline" aria-label="Progression from audit to operational pilot"><div class="collab-track" aria-hidden="true"><div class="collab-fill"></div><span></span><span></span><span></span></div><div class="pig-runner"><img src="/deck-template/assets/pixel-pig.png" alt="Pig marking progress through the collaboration"></div><div class="collab-steps"><article class="step"><div class="step-no">01</div><h3>Audit</h3><p>Understand practices, data and needs.</p></article><article class="step"><div class="step-no">02</div><h3>Validation</h3><p>Test Nosotrack in representative scenarios using synthetic or historical data.</p></article><article class="step"><div class="step-no">03</div><h3>Live Pilot</h3><p>Integrate Nosotrack into your biosecurity systems.</p></article></div></div></div>
+      </div></div>
+<footer class="slide-bottom">
+</footer>
+
+</section>
+
+<section id="slide-10" class="slide on-dark" data-slide="10">
+
+<header class="slide-top"><a href="/">Nosotrack</a>
+</header>
+      <div class="slide-body closing-body"><div class="closing-grid">
+        <div class="reveal"><h2 class="slide-title closing-title">Towards an operational solution for livestock outbreak control</h2><div class="closing-points"><span>Work with your existing data and practices.</span><span>Identify sources and routes of spread sooner.</span><span><strong>Enable faster, more targeted and less costly interventions.</strong></span></div></div>
+        <div class="closing-brand reveal"><div class="hero-brand"></div><span class="brand-wordmark">NOSO<span class="accent">TRACK</span><sup class="tm">™</sup></span><span class="hero-title"><span class="hw">Track.</span><span class="hw">Intervene.</span><span class="hw accent">Protect.</span></span></div>
+      </div><div class="ask-credit"><span class="hc-name">Dr Cyril Geismar</span><a href="mailto:c.geismar21@imperial.ac.uk">c.geismar21@imperial.ac.uk</a><a href="https://www.linkedin.com/in/cyril-geismar/" target="_blank" rel="noopener noreferrer">linkedin.com/in/cyril-geismar</a></div></div>
+<footer class="slide-bottom">
+</footer>
+
+</section>
+  </main>
+
+  <div class="kbd-hint" id="kbdHint"></div>
+  <script defer src="/deck-template/playbar.js"></script>
+<script defer src="/deck-template/demo.js"></script>
+
+<script defer src="/deck-template/transmission-tree.js"></script>
+<script defer src="/deck-template/farm-infection.js"></script>
+
+</body>
+</html>

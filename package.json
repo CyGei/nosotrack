@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "audit:responsive": "node scripts/audit-responsive.mjs",
+    "audit:animations": "node scripts/audit-animations.mjs",
     "build:demo": "node scripts/build-demo.mjs",
     "build:hero-clips": "node scripts/build-hero-clips.mjs",
     "fetch:pathogen": "node scripts/fetch-pathogen.mjs",

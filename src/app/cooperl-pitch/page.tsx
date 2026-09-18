@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PitchViewer } from "./PitchViewer";
+import { PitchDeck } from "@/components/partners/PitchDeck";
 
 export const metadata: Metadata = {
   title: "Nosotrack × Cooperl · Contrôle des épizooties",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function CooperlPitchPage() {
-  return <PitchViewer />;
+  return <PitchDeck src="/cooperl-pitch/deck.html" title="Pitch Nosotrack pour Cooperl" lang="fr" />;
 }

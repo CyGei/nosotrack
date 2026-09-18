@@ -44,8 +44,8 @@ export function AboutBlock({
       <div className="container-page section-pad">
         <StepIndicator activeId={id} />
 
-        <div className="mt-14 grid grid-cols-12 gap-x-8 gap-y-10">
-          <div className="col-span-12 md:col-span-4">
+        <div className="mt-14 grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-12">
+          <div className="min-w-0 md:col-span-4">
             <h2
               ref={titleRef}
               className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)] max-w-[14ch]"
@@ -68,7 +68,7 @@ export function AboutBlock({
             </h2>
           </div>
 
-          <div className="col-span-12 md:col-span-8">
+          <div className="min-w-0 md:col-span-8">
             {subtitle && (
               <p className="font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink max-w-[55ch]">
                 {subtitle}

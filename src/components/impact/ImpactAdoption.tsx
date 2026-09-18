@@ -5,10 +5,9 @@ import dynamic from "next/dynamic";
 import metricsData from "@/data/research-metrics.json";
 import geoData from "@/data/research-geo.json";
 import { useCountUp, fmtInt } from "@/lib/useCountUp";
-import { useInViewOnce, useMediaQuery } from "@/lib/hooks";
+import { useMediaQuery } from "@/lib/hooks";
 import { Reveal } from "./Reveal";
-
-const { people, tools } = metricsData;
+import { AdoptionGlobe } from "./AdoptionGlobe";
 
 const Globe = dynamic(() => import("./Globe").then((m) => m.Globe), {
   ssr: false,
@@ -33,60 +32,34 @@ type Breakdown = {
   eyebrow: string;
   blurb: string;
 };
-type MetricDef = {
-  value: number;
-  label: string;
-  plus?: boolean;
-  breakdown?: Breakdown;
+const BREAKDOWNS: Record<string, Breakdown> = {
+  Downloads: {
+    pkgs: DOWNLOAD_PKGS,
+    unit: "Downloads",
+    caption: "CRAN downloads of our open-source R packages",
+    eyebrow: "Software Downloads",
+    blurb: "Each count represents a CRAN download of one of our open-source R packages, based on RStudio mirror logs.",
+  },
+  Citations: {
+    pkgs: CITATION_PKGS,
+    unit: "Cited",
+    caption: "Peer-reviewed papers that cite our methods",
+    eyebrow: "citations",
+    blurb: "Peer-reviewed publications citing the team's research, based on OpenAlex data.",
+  },
 };
-const METRICS: MetricDef[] = [
-  {
-    value: tools.downloads,
-    label: "Downloads",
-    plus: true,
-    breakdown: {
-      pkgs: DOWNLOAD_PKGS,
-      unit: "Downloads",
-      caption: "CRAN downloads of our open-source R packages",
-      eyebrow: "Software Downloads",
-      blurb:
-        "Each count represents a CRAN download of one of our open-source R packages, based on RStudio mirror logs.",
-    },
-  },
-  {
-    value: people.citations,
-    label: "Citations",
-    breakdown: {
-      pkgs: CITATION_PKGS,
-      unit: "Cited",
-      caption: "Peer-reviewed papers that cite our methods",
-      eyebrow: "citations",
-      blurb:
-      "Peer-reviewed publications citing the team's research, based on OpenAlex data."
-    },
-  },
-  { value: geoData.citationCountryCount, label: "Countries" },
-  { value: people.publications, label: "Publications" },
-];
 
 const ARC_OFFSET = 82;
-const AGG_ANGLES = [-36, -12, 12, 36];
 const arc = (n: number, maxA = 40) =>
   Array.from({ length: n }, (_, i) =>
     n === 1 ? 0 : -maxA + (2 * maxA * i) / (n - 1),
   );
 
 export function ImpactAdoption() {
-  const reachRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const [globeSize, setGlobeSize] = useState(340);
   const [openLabel, setOpenLabel] = useState<string | null>(null);
   const wide = useMediaQuery("(min-width: 1100px)");
-
-  const run = useInViewOnce(reachRef, {
-    rootMargin: "0px 0px -15% 0px",
-    mountCheck: true,
-  });
 
   // `- 250` reserves room for the arc + figures to the globe's right.
   useEffect(() => {
@@ -114,7 +87,7 @@ export function ImpactAdoption() {
     return () => window.removeEventListener("keydown", onKey);
   }, [openLabel, close]);
 
-  const open = METRICS.find((m) => m.label === openLabel)?.breakdown ?? null;
+  const open = openLabel ? BREAKDOWNS[openLabel] ?? null : null;
   // Keep the last breakdown mounted so its text survives the closing fade.
   const lastBreakdown = useRef<Breakdown | null>(open);
   if (open) lastBreakdown.current = open;
@@ -146,31 +119,6 @@ export function ImpactAdoption() {
         <Globe data={geoData} size={globeSize} />
         {backArrow}
       </div>
-
-      {METRICS.map((m, i) => (
-        <div
-          key={m.label}
-          className="absolute transition-opacity duration-[var(--transition-duration-base)]"
-          style={{
-            ...pos(AGG_ANGLES[i]),
-            opacity: openLabel ? 0 : 1,
-            pointerEvents: openLabel ? "none" : "auto",
-          }}
-        >
-          {m.breakdown ? (
-            <button
-              type="button"
-              onClick={() => setOpenLabel(m.label)}
-              aria-expanded={openLabel === m.label}
-              className="group block text-left outline-none focus-visible:ring-1 focus-visible:ring-ink"
-            >
-              <Metric metric={m} run={run} delay={i * 120} arched trigger />
-            </button>
-          ) : (
-            <Metric metric={m} run={run} delay={i * 120} arched />
-          )}
-        </div>
-      ))}
 
       {DOWNLOAD_PKGS.map((p, i) => (
         <div
@@ -228,7 +176,7 @@ export function ImpactAdoption() {
         </Reveal>
 
         <Reveal className="mt-12 md:mt-16">
-          <div ref={reachRef}>
+          <div>
             {wide ? (
               <div
                 className="grid items-center gap-12"
@@ -237,7 +185,7 @@ export function ImpactAdoption() {
                 <TextSwap open={open} para={para} />
 
                 <div ref={measureRef} className="relative">
-                  {globeStage}
+                  {openLabel ? globeStage : <AdoptionGlobe onSelectMetric={setOpenLabel} />}
                   <div
                     className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint"
                     style={{ width: globeSize }}
@@ -251,53 +199,16 @@ export function ImpactAdoption() {
                 <LeadCopy />
 
                 <div ref={measureRef}>
-                  <div
-                    className="relative mx-auto"
-                    style={{ width: globeSize, height: globeSize }}
-                  >
-                    <Globe data={geoData} size={globeSize} />
-                    {backArrow}
-                  </div>
-
-                  {open && (
-                    <div className="mt-10">
-                      <Methodology para={open} />
+                  {open ? <>
+                    <div className="relative mx-auto" style={{ width: globeSize, height: globeSize }}>
+                      <Globe data={geoData} size={globeSize} />
+                      {backArrow}
                     </div>
-                  )}
-
-                  {open ? (
+                    <div className="mt-10"><Methodology para={open} /></div>
                     <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8">
-                      {open.pkgs.map((p, i) => (
-                        <PackageMetric
-                          key={p.name}
-                          pkg={p}
-                          unit={open.unit}
-                          run
-                          delay={i * 70}
-                          centered
-                        />
-                      ))}
+                      {open.pkgs.map((p, i) => <PackageMetric key={p.name} pkg={p} unit={open.unit} run delay={i * 70} centered />)}
                     </div>
-                  ) : (
-                    <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-9">
-                      {METRICS.map((m, i) =>
-                        m.breakdown ? (
-                          <button
-                            key={m.label}
-                            type="button"
-                            onClick={() => setOpenLabel(m.label)}
-                            className="group outline-none focus-visible:ring-1 focus-visible:ring-ink"
-                          >
-                            <Metric metric={m} run={run} delay={i * 120} trigger />
-                          </button>
-                        ) : (
-                          <div key={m.label}>
-                            <Metric metric={m} run={run} delay={i * 120} />
-                          </div>
-                        ),
-                      )}
-                    </div>
-                  )}
+                  </> : <AdoptionGlobe onSelectMetric={setOpenLabel} />}
 
                   <div className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
                     {caption}
@@ -400,71 +311,6 @@ function BackArrow({ onClick }: { onClick: () => void }) {
         />
       </svg>
     </button>
-  );
-}
-
-function Metric({
-  metric,
-  run,
-  delay,
-  arched,
-  trigger,
-}: {
-  metric: MetricDef;
-  run: boolean;
-  delay: number;
-  arched?: boolean;
-  trigger?: boolean;
-}) {
-  const v = useCountUp(metric.value, run, 1900, delay);
-  return (
-    <div
-      className={arched ? "whitespace-nowrap text-left" : "text-center"}
-      style={{
-        opacity: run ? 1 : 0,
-        transition: `opacity 640ms var(--ease-nt) ${delay}ms`,
-      }}
-    >
-      <div
-        className={`relative inline-block font-display font-normal leading-none tracking-tight tabular-nums text-ink ${arched
-            ? "text-[clamp(24px,2.6vw,34px)]"
-            : "text-[clamp(30px,4.6vw,44px)]"
-          }`}
-      >
-        {fmtInt(v)}
-        {metric.plus && <span className="text-mute">+</span>}
-        {trigger && (
-          <span
-            aria-hidden
-            className="absolute -bottom-1 left-0 h-px w-0 bg-ink transition-[width] duration-[var(--transition-duration-base)] ease-[var(--ease-nt)] group-hover:w-full"
-          />
-        )}
-      </div>
-      <div
-        className={`mt-2 flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-mute ${arched ? "" : "justify-center"
-          }`}
-      >
-        {metric.label}
-        {trigger && (
-          <svg
-            aria-hidden
-            width="9"
-            height="9"
-            viewBox="0 0 10 10"
-            className="text-faint transition-colors group-hover:text-ink"
-          >
-            <path
-              d="M2 3.5 L5 6.5 L8 3.5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        )}
-      </div>
-    </div>
   );
 }
 

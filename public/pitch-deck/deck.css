@@ -1,0 +1,47 @@
+.oc-wrap { position: relative; width: 100%; height: 100%; min-height: clamp(360px,50vh,480px); }
+.oc-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+#ocClip { transition: width 1.6s cubic-bezier(.2,0,0,1); }
+.oc-overlay { position: absolute; inset: 0; }
+.oc-node { opacity: 0; transition: opacity .5s ease; }
+.oc-wrap.revealed .oc-node { opacity: 1; }
+.oc-label { position: absolute; transform: translateY(-50%); display: flex; flex-direction: column; white-space: nowrap; line-height: 1.1; }
+.oc-label.oc-right { padding-left: 14px; align-items: flex-start; }
+.oc-label.oc-left { transform: translate(-100%,-50%); padding-right: 14px; align-items: flex-end; text-align: right; }
+.oc-dis { font-family: var(--display); font-size: var(--fz-label); color: var(--ink); letter-spacing: -0.01em; line-height: 1.1; }
+.oc-place { font-family: var(--display); font-size: var(--fz-note); color: var(--mute); letter-spacing: -0.005em; line-height: 1.2; }
+.oc-dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); transform: translate(-50%,-50%); }
+.oc-q { position: absolute; transform: translate(-50%,-50%); width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--ink); background: var(--bg); display: flex; align-items: center; justify-content: center; font-family: var(--display); font-size: 22px; color: var(--ink); opacity: 0; transition: opacity .5s ease .9s; }
+.oc-wrap.revealed .oc-q { opacity: 1; }
+.oc-div { position: absolute; width: 1px; height: 40px; background: var(--rule); transform: translateX(-50%); }
+.oc-month { position: absolute; transform: translateX(-50%); font-family: var(--mono); font-size: var(--fz-cap); letter-spacing: .18em; text-transform: uppercase; color: var(--mute); }
+.oc-year { position: absolute; transform: translateX(-50%); font-family: var(--display); font-size: var(--fz-label); color: var(--ink); font-variant-numeric: tabular-nums; }
+.oc-year.dim { color: var(--mute); }
+.pen-chart { display: flex; flex-direction: column; width: 100%; }
+.pen-head { font-family: var(--display); font-size: var(--fz-label); color: var(--mute); letter-spacing: -0.01em; margin: clamp(14px,2vh,20px) 0 0; text-align: right; }
+.pen-rows { display: flex; flex-direction: column; gap: clamp(11px,1.7vh,16px); }
+.pen-row { display: flex; flex-direction: column; gap: 7px; }
+.pen-row-top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.pen-name { font-family: var(--display); font-size: var(--fz-label); color: var(--ink); letter-spacing: -0.01em; line-height: 1.2; }
+.pen-val { font-family: var(--display); font-size: var(--fz-label); color: var(--ink); letter-spacing: -0.01em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pen-track { position: relative; width: 100%; height: 4px; background: var(--bg-tint); }
+.pen-bar { position: absolute; left: 0; top: 0; height: 100%; width: 0; background: var(--ink); transition: width 1s cubic-bezier(.2,0,0,1); }
+.bp-scene { display: grid; grid-template-columns: repeat(3,1fr); gap: clamp(8px,0.9vw,14px); width: min(100%,70dvh); align-self: center; }
+.bp { min-width: 0; aspect-ratio: 1000/1080; }
+.bp svg { width: 100%; height: 100%; display: block; }
+.bp-node { fill: rgba(30,30,43,0.65); }
+.bp-node.flag { fill: var(--alert); filter: drop-shadow(0 0 6px rgba(255,7,58,0.65)); }
+@media (max-width: 640px) {
+  .oc-wrap { min-height: 460px; }
+  .pen-rows { gap: 8px; }
+  .pen-row { gap: 5px; }
+  .pen-row-top { gap: 10px; }
+  .pen-head { text-align: left; }
+}
+.dn { width: 100%; height: auto; display: block; overflow: visible; }
+.dn-seg { transition: stroke-dashoffset .9s cubic-bezier(.2,0,0,1); }
+.dn-labels { opacity: 0; transition: opacity .5s ease .55s; }
+.dn-name { font-family: var(--display); font-size: 18px; fill: var(--ink); letter-spacing: -.01em; }
+.dn-val { font-family: var(--display); font-size: 16px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.pen-head { text-align: center; }
+.cite { font-family: var(--mono); font-size: 10px; line-height: 0; vertical-align: super; letter-spacing: 0; color: var(--faint); text-decoration: none; margin-left: .28em; font-variant-numeric: normal; font-weight: 400; transition: color .2s ease; }
+.cite:hover, .cite:focus-visible { color: var(--alert); }

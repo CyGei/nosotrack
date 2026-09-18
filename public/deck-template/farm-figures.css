@@ -1,0 +1,134 @@
+/* Shared farm illustrations. Partner-specific adjustments belong in local deck.css. */
+.defs { position: absolute; width: 0; height: 0; overflow: hidden }
+.step { position: relative; padding: 26px 18px 0; border-top: 1px solid var(--ink); min-height: 200px }
+.step::before { content: ""; position: absolute; top: -5px; left: 18px; width: 9px; height: 9px; border-radius: 50%; background: var(--bg); border: 1.5px solid var(--ink) }
+.step:last-child::before { background: var(--alert); border-color: var(--alert) }
+.step-no { font-size: 12px; letter-spacing: .16em; color: var(--ink); margin-bottom: 38px }
+.step h3 { font-size: 21px; font-weight: 600; color: var(--ink); margin-bottom: 9px }
+.step p { font-size: 15px; line-height: 1.3; color: var(--ink) }
+.pixel-stage { position: relative; width: 100%; height: 100%; min-height: 392px; overflow: hidden; background: transparent; border: 0 }
+.pixel-stage::after { display: none }
+.pixel-links { position: absolute; inset: 3% 2%; width: 96%; height: 94%; z-index: 1; overflow: visible }
+.pixel-links path { fill: none; stroke: rgba(30,30,43,.24); stroke-width: 1.6; stroke-dasharray: 6 9; vector-effect: non-scaling-stroke }
+.active-slide .pixel-links path { animation: link-flow 1.8s linear infinite }
+.pixel-sprite { position: absolute; z-index: 3; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 8px 9px rgba(30,30,43,.13)) }
+canvas.pixel-sprite { display: block }
+.pixel-farm-sm { width: 27%; height: 34% }
+.farm-a { left: -1%; top: -1% }
+.farm-b { right: -1%; top: -2%; transform: scaleX(-1) }
+.farm-c { left: -2%; bottom: -2%; transform: scaleX(-1) }
+.farm-d { right: -1%; bottom: -3% }
+.pixel-hub { left: 27%; top: 10%; width: 47%; height: 72%; z-index: 4 }
+.pixel-truck-wrap { position: absolute; z-index: 6; width: 13%; height: 13%; opacity: 0; pointer-events: none }
+.pixel-truck-wrap img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 5px 5px rgba(30,30,43,.16)) }
+.transport-a { left: 13%; top: 15% }
+.transport-c { left: 39%; top: 55% }
+.transport-c img { transform: scaleX(-1) }
+.active-slide .transport-a { animation: transport-a 15s linear forwards }
+.active-slide .transport-c { animation: transport-c 15s linear forwards }
+.enclosure-flow { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none }
+.enclosure-flow path { fill: none; stroke: rgba(30,30,43,.35); stroke-width: 1; stroke-linecap: round; stroke-dasharray: 1 7; opacity: .72; vector-effect: non-scaling-stroke }
+.active-slide .enclosure-flow path { animation: enclosure-dots 1.4s linear infinite }
+.active-slide .enclosure-flow path:nth-child(2) { animation-delay: -.35s }
+.active-slide .enclosure-flow path:nth-child(3) { animation-delay: -.7s }
+@keyframes link-flow {
+  to { stroke-dashoffset: -32 }
+}
+@keyframes enclosure-dots {
+  to { stroke-dashoffset: -24 }
+}
+@keyframes transport-a {
+  0%,17% { left: 13%; top: 15%; opacity: 0 }
+  19% { left: 13%; top: 15%; opacity: 1 }
+  42% { left: 39%; top: 34%; opacity: 1 }
+  44%,100% { left: 39%; top: 34%; opacity: 0 }
+}
+@keyframes transport-c {
+  0%,72% { left: 39%; top: 55%; opacity: 0 }
+  74% { left: 39%; top: 55%; opacity: 1 }
+  97% { left: 10%; top: 72%; opacity: 1 }
+  100% { left: 10%; top: 72%; opacity: 0 }
+}
+.data-orbit { --orbit-radius: clamp(116px,12.2vw,146px); position: relative; width: 100%; height: 100%; min-height: 400px; display: grid; place-items: center; overflow: visible }
+.data-core { position: absolute; z-index: 4; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 94px; height: 94px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; box-shadow: none; color: var(--ink) }
+.data-core svg { width: 84px; height: 84px }
+.data-orbit-wheel { position: absolute; z-index: 3; left: 50%; top: 50%; width: 0; height: 0; transform: translate(-50%,-50%) }
+.active-slide .data-orbit-wheel { animation: orbit-wheel 26s linear infinite }
+.data-node { position: absolute; left: 0; top: 0; width: 118px; height: 102px; margin: -51px -59px; transform: rotate(var(--a)) translateY(calc(0px - var(--orbit-radius))); background: transparent; border: 0; padding: 0; opacity: 1 }
+.data-node-inner { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; transform: rotate(var(--ia)) }
+.active-slide .data-node-inner { animation: counter-orbit 26s linear infinite }
+.data-node img { width: 82px; height: 72px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 5px 6px rgba(30,30,43,.14)) }
+.data-node span { font-size: 10px; line-height: 1.05; letter-spacing: .11em; text-transform: uppercase; text-align: center; color: var(--ink); white-space: nowrap }
+.dna-pixel { width: 72px; height: 72px; display: flex; align-items: center; justify-content: center }
+.dna-pixel svg { width: 60px; height: 60px; shape-rendering: crispEdges }
+@keyframes orbit-wheel {
+  to { transform: translate(-50%,-50%) rotate(360deg) }
+}
+@keyframes counter-orbit {
+  from { transform: rotate(var(--ia)) }
+  to { transform: rotate(calc(var(--ia) - 360deg)) }
+}
+.ecosystem { position: relative; width: 100%; height: 100%; min-height: 410px }
+.ecosystem::before { display: none }
+.ecosystem-lines { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0 }
+.ecosystem-lines line { stroke: rgba(30,30,43,.22); stroke-width: 1.3; stroke-dasharray: 4 6 }
+.active-slide .ecosystem-lines line { animation: link-flow 1.8s linear infinite }
+.eco-core { position: absolute; z-index: 4; left: 50%; top: 50%; width: 32%; height: 26%; transform: translate(-50%,-50%); display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: center; background: transparent; border: 0; box-shadow: none; color: var(--ink) }
+.eco-core-mark { width: 74px; height: 74px }
+.eco-core-wordmark { font-size: 17px; font-weight: 500; letter-spacing: -.02em; color: var(--ink) }
+.eco-core-wordmark::after { content: "™"; font-size: .55em; vertical-align: super; margin-left: .14em; opacity: .7 }
+.eco-product { position: absolute; z-index: 3; width: 23%; height: 19%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 0; background: transparent; border: 0; box-shadow: none; transition: transform .25s ease }
+.eco-product:hover { transform: translateY(-3px) }
+.eco-product img { max-width: 94%; max-height: 58px; object-fit: contain }
+.eco-product .pixel-mini { image-rendering: pixelated; filter: drop-shadow(0 4px 5px rgba(30,30,43,.14)) }
+.eco-product span { font-size: 10px; line-height: 1.08; text-align: center; letter-spacing: .06em; text-transform: uppercase; color: var(--ink) }
+.ep-1 { left: 0; top: 0 }
+.ep-2 { left: 37.5%; top: 0 }
+.ep-3 { right: 0; top: 0 }
+.ep-4 { right: 0; top: 39.5% }
+.ep-5 { right: 0; bottom: 0 }
+.ep-6 { left: 37.5%; bottom: 0 }
+.ep-7 { left: 0; bottom: 0 }
+.ep-8 { left: 0; top: 39.5% }
+.active-slide .eco-product { animation: eco-float 3.6s ease-in-out infinite }
+.active-slide .ep-2,.active-slide .ep-6 { animation-delay: -1.2s }
+.active-slide .ep-3,.active-slide .ep-7 { animation-delay: -2.4s }
+@keyframes eco-float {
+  0%,100% { translate: 0 0 }
+  50% { translate: 0 -4px }
+}
+.collab-timeline { position: relative; width: 100%; min-height: 310px; padding-top: 96px }
+.collab-track { position: absolute; z-index: 2; left: 2%; right: 2%; top: 62px; height: 18px; display: grid; grid-template-columns: repeat(4,1fr); overflow: hidden; border: 3px solid var(--ink); background: #d7d7da; clip-path: polygon(4px 0,calc(100% - 4px) 0,calc(100% - 4px) 3px,100% 3px,100% calc(100% - 3px),calc(100% - 4px) calc(100% - 3px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 3px),0 calc(100% - 3px),0 3px,4px 3px) }
+.collab-track>span { position: relative; z-index: 3; border-right: 3px solid var(--ink) }
+.collab-track>span:last-of-type { border-right: 0 }
+.collab-fill { position: absolute; z-index: 1; inset: 0 auto 0 0; width: 0; background: repeating-linear-gradient(180deg,#57585f 0 4px,#44454b 4px 8px) }
+.active-slide .collab-fill { animation: timeline-fill 8s steps(64,end) forwards }
+.pig-runner { position: absolute; z-index: 5; left: calc(2% - 18px); top: 58px; width: 36px; height: 26px }
+.pig-runner img { position: absolute; left: 50%; top: 50%; width: 340%; height: 340%; object-fit: fill; image-rendering: pixelated; filter: drop-shadow(0 2px 2px rgba(30,30,43,.13)); transform: translate(-50%,-50%) scaleX(1.06) }
+.active-slide .pig-runner { animation: pig-run 8s steps(64,end) forwards }
+.active-slide .pig-runner img { animation: pig-bob .48s steps(2,end) infinite }
+.collab-steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px }
+.collab-steps .step { border-top: 0; padding: 24px 10px 0; min-height: 190px; opacity: 0; transform: translateY(10px); transition: none }
+.collab-steps .step::before { display: none }
+.active-slide .collab-steps .step { animation: step-reveal .5s ease forwards }
+.active-slide .collab-steps .step:nth-child(1) { animation-delay: .45s }
+.active-slide .collab-steps .step:nth-child(2) { animation-delay: 2.35s }
+.active-slide .collab-steps .step:nth-child(3) { animation-delay: 4.3s }
+.active-slide .collab-steps .step:nth-child(4) { animation-delay: 6.25s }
+.collab-steps .step-no { margin-bottom: 22px }
+.collab-steps .step h3 { font-size: 20px }
+.collab-steps .step p { font-size: 14px }
+.collab-steps .step:nth-child(4) h3 { font-size: 18px; line-height: 1.06 }
+.study-link:hover { text-decoration-color: var(--ink) }
+@keyframes timeline-fill {
+  to { width: 100% }
+}
+@keyframes pig-run {
+  to { left: calc(98% - 18px) }
+}
+@keyframes pig-bob {
+  50% { transform: translate(-50%,calc(-50% - 1px)) scaleX(1.06) }
+}
+@keyframes step-reveal {
+  to { opacity: 1; transform: none }
+}

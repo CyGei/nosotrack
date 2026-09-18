@@ -8,7 +8,7 @@ const FOOTER_LINKS: { label: string; href: string }[] = [
   { label: "Roadmap", href: "#roadmap" },
   { label: "Contact", href: "#contact" },
   { label: "News", href: "/news/" },
-  { label: "Pitch", href: "/pitch/" },
+  { label: "For partners", href: "/for-partners/" },
   { label: "Privacy", href: "/privacy/" },
   { label: "Terms", href: "/terms/" },
 ];

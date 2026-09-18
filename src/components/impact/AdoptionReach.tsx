@@ -1,194 +1,22 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-import { useScrollReveal } from "@/lib/hooks";
 import Image from "next/image";
-import dynamic from "next/dynamic";
-import geoData from "@/data/research-geo.json";
-import metricsData from "@/data/research-metrics.json";
-import { useCountUp, fmtInt } from "@/lib/useCountUp";
+import { AdoptionGlobe } from "./AdoptionGlobe";
 import { FOUNDER, ADVISORS, type TeamPerson } from "@/components/Team";
 
-const Globe = dynamic(() => import("./Globe").then((m) => m.Globe), {
-  ssr: false,
-});
-
-const { people, tools } = metricsData;
-
-type MetricDef = { value: number; label: string; plus?: boolean };
-const METRICS: MetricDef[] = [
-  { value: tools.downloads, label: "Downloads", plus: true },
-  { value: people.citations, label: "Citations" },
-  { value: geoData.citationCountryCount, label: "Countries" },
-  { value: people.publications, label: "Publications" },
-];
-
-const ARC_OFFSET = 84;
-const AGG_ANGLES = [-36, -12, 12, 36];
-
-// Keyed by the name in <Team>; the affiliation comes from each person's `role`.
 const POSITION: Record<string, string> = {
   "Dr Cyril Geismar": "Postdoctoral Research Fellow",
   "Dr Anne Cori": "Associate Professor",
   "Dr Thibaut Jombart": "Associate Professor",
 };
 
-const TITLE = "Peer-reviewed science, adopted globally.";
-
 export function AdoptionReach() {
-  const box = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState(280);
-  const [narrow, setNarrow] = useState(false);
-  const [run, setRun] = useState(false);
-
-  const { ref: titleRef, fractional } = useScrollReveal<HTMLHeadingElement>(
-    TITLE.length,
-    32,
-  );
-  const headIndex = Math.min(TITLE.length, Math.ceil(fractional));
-  const visibleChars = TITLE.slice(0, headIndex);
-  const hiddenChars = TITLE.slice(headIndex);
-  const isStarted = fractional > 0;
-  const isDone = fractional >= TITLE.length;
-
-  // `- 150` reserves room for the arc + figures to the globe's right. Below
-  // ~480px there is no room to reserve, so the arc is dropped and the figures
-  // move under the globe instead (see `narrow`).
-  useEffect(() => {
-    const el = box.current;
-    if (!el) return;
-    const fit = () => {
-      const w = el.clientWidth;
-      const isNarrow = w < 480;
-      setNarrow(isNarrow);
-      setSize(
-        isNarrow
-          ? Math.max(180, Math.min(260, w))
-          : Math.max(230, Math.min(320, Math.round(w - 150))),
-      );
-    };
-    fit();
-    const ro = new ResizeObserver(fit);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setRun(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
-  const R = size / 2;
-  const Rm = R + ARC_OFFSET;
-  const pos = (deg: number) => {
-    const a = (deg * Math.PI) / 180;
-    return {
-      left: R + Rm * Math.cos(a),
-      top: R + Rm * Math.sin(a),
-      transform: "translateY(-50%)",
-    };
-  };
-
-  return (
-    <section className="container-page" aria-label="Adoption and team">
-      <h2
-        ref={titleRef}
-        className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
-      >
-        {visibleChars.split("").map((c, i) => {
-          const alpha = Math.max(0, Math.min(1, fractional - i));
-          return (
-            <span key={i} style={{ opacity: alpha }}>
-              {c}
-            </span>
-          );
-        })}
-        {isStarted && !isDone && (
-          <span className="typewriter-cursor" aria-hidden />
-        )}
-        {hiddenChars && (
-          <span style={{ visibility: "hidden" }}>{hiddenChars}</span>
-        )}
-      </h2>
-
-      <div className="mt-10 grid items-start gap-x-12 gap-y-12 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-        <div className="grid grid-cols-3 items-start gap-x-3 sm:gap-x-6">
-          {[FOUNDER, ...ADVISORS].map((p) => (
-            <Person key={p.name} person={p} position={POSITION[p.name]} />
-          ))}
-        </div>
-
-        <div ref={box} className="relative flex justify-center lg:justify-end">
-          {narrow ? (
-            <div className="w-full">
-              <div className="mx-auto" style={{ width: size, height: size }}>
-                <Globe data={geoData} size={size} />
-              </div>
-              <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-6">
-                {METRICS.map((m, i) => (
-                  <Metric
-                    key={m.label}
-                    metric={m}
-                    run={run}
-                    delay={i * 120}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div
-              className="relative"
-              style={{ width: size + 168, height: size }}
-            >
-              <div
-                className="absolute left-0 top-0"
-                style={{ width: size, height: size }}
-              >
-                <Globe data={geoData} size={size} />
-              </div>
-              {METRICS.map((m, i) => (
-                <div
-                  key={m.label}
-                  className="absolute whitespace-nowrap"
-                  style={pos(AGG_ANGLES[i])}
-                >
-                  <Metric metric={m} run={run} delay={i * 120} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+  return <section className="w-full" aria-label="Adoption and team">
+    <div className="grid items-center gap-7 min-[901px]:grid-cols-[minmax(0,4.6fr)_minmax(0,7fr)] min-[901px]:gap-[clamp(28px,4vw,56px)]">
+      <div className="grid grid-cols-3 items-start gap-x-3 sm:gap-x-6">
+        {[FOUNDER, ...ADVISORS].map(person => <Person key={person.name} person={person} position={POSITION[person.name]} />)}
       </div>
-    </section>
-  );
-}
-
-function Metric({
-  metric,
-  run,
-  delay,
-}: {
-  metric: MetricDef;
-  run: boolean;
-  delay: number;
-}) {
-  const v = useCountUp(metric.value, run, 1900, delay);
-  return (
-    <div
-      style={{
-        opacity: run ? 1 : 0,
-        transition: `opacity 640ms var(--ease-nt) ${delay}ms`,
-      }}
-    >
-      <div className="font-display font-normal leading-none tracking-tight tabular-nums text-ink text-[clamp(22px,2.4vw,32px)]">
-        {fmtInt(v)}
-        {metric.plus && <span className="text-mute">+</span>}
-      </div>
-      <div className="mt-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-mute">
-        {metric.label}
-      </div>
+      <AdoptionGlobe />
     </div>
-  );
+  </section>;
 }
 
 function Person({

@@ -12,7 +12,9 @@ export function useCountUp(
   startDelay = 0,
 ) {
   const reduce = useReducedMotion();
-  const [value, setValue] = useState(0);
+  // Render real data before hydration or if an off-screen iframe delays frames.
+  // Only the animation itself should ever display an intermediate value.
+  const [value, setValue] = useState(target);
 
   useEffect(() => {
     if (!run) return;
