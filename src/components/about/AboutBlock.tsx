@@ -2,11 +2,8 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { useScrollReveal } from "@/lib/hooks";
 
 export type StepNumber = "0.1" | "0.2" | "0.3" | "0.4";
-
-const ALL_STEPS: StepNumber[] = ["0.1", "0.2", "0.3", "0.4"];
 
 type Tab = "video" | "details";
 
@@ -28,43 +25,15 @@ export function AboutBlock({
   const hasVideo = video != null;
   const [tab, setTab] = useState<Tab>(hasVideo ? "video" : "details");
 
-  const { ref: titleRef, fractional } = useScrollReveal<HTMLHeadingElement>(
-    title.length,
-    32,
-  );
-
-  const headIndex = Math.min(title.length, Math.ceil(fractional));
-  const visibleChars = title.slice(0, headIndex);
-  const hiddenChars = title.slice(headIndex);
-  const isStarted = fractional > 0;
-  const isDone = fractional >= title.length;
-
   return (
-    <article>
+    <article aria-label={`Section ${id}`}>
       <div className="container-page section-pad">
-        <StepIndicator activeId={id} />
-
-        <div className="mt-14 grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-12">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-12">
           <div className="min-w-0 md:col-span-4">
             <h2
-              ref={titleRef}
               className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)] max-w-[14ch]"
             >
-              {visibleChars.split("").map((c, i) => {
-                const alpha = Math.max(0, Math.min(1, fractional - i));
-                return (
-                  <span key={i} style={{ opacity: alpha }}>
-                    {c}
-                  </span>
-                );
-              })}
-              {isStarted && !isDone && (
-                <span className="typewriter-cursor" aria-hidden />
-              )}
-              {hiddenChars && (
-                // Reserves the final heading height so typing causes no layout shift.
-                <span style={{ visibility: "hidden" }}>{hiddenChars}</span>
-              )}
+              {title}
             </h2>
           </div>
 
@@ -119,28 +88,6 @@ export function AboutBlock({
         .animate-tab-in { animation: tabIn 220ms cubic-bezier(.2,0,0,1) both; }
       `}</style>
     </article>
-  );
-}
-
-export function StepIndicator({ activeId }: { activeId: string }) {
-  const activeIndex = ALL_STEPS.indexOf(activeId as StepNumber);
-
-  return (
-    <div
-      role="img"
-      aria-label={`Section ${activeIndex + 1} of ${ALL_STEPS.length}`}
-      className="flex items-center gap-2"
-    >
-      {ALL_STEPS.map((s, i) => (
-        <span
-          key={s}
-          className={cn(
-            "w-12 md:w-16",
-            i <= activeIndex ? "h-[2px] bg-ink" : "h-px bg-rule-strong",
-          )}
-        />
-      ))}
-    </div>
   );
 }
 
