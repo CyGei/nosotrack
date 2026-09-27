@@ -26,7 +26,17 @@ export function About() {
       <AboutBlock
         id="0.2"
         title="Nosocomial outbreaks are deadly, costly and difficult to manage."
-        subtitle="Healthcare facilities are among the highest-risk environments for infectious disease transmission, bringing together vulnerable populations, frequent close contact, and diverse pathogens. Healthcare-associated infections (HAIs) remain among the most common adverse events in healthcare delivery."
+        subtitle={
+          <>
+            <strong style={{ fontWeight: 500 }}>
+              Healthcare facilities are among the highest-risk environments for
+              infectious disease transmission
+            </strong>
+            , bringing together vulnerable populations, frequent close contact,
+            and diverse pathogens. Healthcare-associated infections (HAIs)
+            remain among the most common adverse events in healthcare delivery.
+          </>
+        }
         bare
         details={
           <ProblemStats
@@ -84,7 +94,15 @@ export function About() {
       <AboutBlock
         id="0.3"
         title="Integration unlocks intelligence."
-        subtitle="Current outbreak surveillance tools work in silos. Nosotrack fuses their data streams into a unified analytical engine."
+        subtitle={
+          <>
+            <strong style={{ fontWeight: 500 }}>
+              Current outbreak surveillance tools work in silos
+            </strong>
+            . Nosotrack fuses their data streams into a unified analytical
+            engine.
+          </>
+        }
         video={<FoundryFrame scene="integration" />}
         details={
           <DetailsList
@@ -113,7 +131,16 @@ export function About() {
       <AboutBlock
         id="0.4"
         title="Outbreak forensics, end to end."
-        subtitle="Nosotrack infers who-infected-whom in real-time, enabling infection prevention and control teams to identify how infections spread and design targeted interventions before outbreaks escalate"
+        subtitle={
+          <>
+            <strong style={{ fontWeight: 500 }}>
+              Nosotrack infers who-infected-whom in real-time
+            </strong>
+            , enabling infection prevention and control teams to identify how
+            infections spread and design targeted interventions before outbreaks
+            escalate
+          </>
+        }
         video={<FoundryFrame scene="endtoend" />}
         details={
           <DetailsList

@@ -17,7 +17,7 @@ export function DetailsList({ rows }: { rows: DetailRow[] }) {
             </p>
           </li>
         ) : (
-          <li key={i}>
+          <li data-story-leaf key={i}>
             <p className="font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink">
               {row.title}
             </p>

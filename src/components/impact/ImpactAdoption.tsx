@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import metricsData from "@/data/research-metrics.json";
 import geoData from "@/data/research-geo.json";
 import { useCountUp, fmtInt } from "@/lib/useCountUp";
-import { useMediaQuery } from "@/lib/hooks";
 import { Reveal } from "./Reveal";
 import { AdoptionGlobe } from "./AdoptionGlobe";
 
@@ -38,14 +37,16 @@ const BREAKDOWNS: Record<string, Breakdown> = {
     unit: "Downloads",
     caption: "CRAN downloads of our open-source R packages",
     eyebrow: "Software Downloads",
-    blurb: "Each count represents a CRAN download of one of our open-source R packages, based on RStudio mirror logs.",
+    blurb:
+      "Each count represents a CRAN download of one of our open-source R packages, based on RStudio mirror logs.",
   },
   Citations: {
     pkgs: CITATION_PKGS,
     unit: "Cited",
     caption: "Peer-reviewed papers that cite our methods",
     eyebrow: "citations",
-    blurb: "Peer-reviewed publications citing the team's research, based on OpenAlex data.",
+    blurb:
+      "Peer-reviewed publications citing the team's research, based on OpenAlex data.",
   },
 };
 
@@ -59,7 +60,7 @@ export function ImpactAdoption() {
   const measureRef = useRef<HTMLDivElement>(null);
   const [globeSize, setGlobeSize] = useState(340);
   const [openLabel, setOpenLabel] = useState<string | null>(null);
-  const wide = useMediaQuery("(min-width: 1100px)");
+  const [wide, setWide] = useState(false);
 
   // `- 250` reserves room for the arc + figures to the globe's right.
   useEffect(() => {
@@ -67,17 +68,19 @@ export function ImpactAdoption() {
     if (!el) return;
     const fit = () => {
       const w = el.clientWidth;
+      const fitsArc = w >= 560;
+      setWide(fitsArc);
       setGlobeSize(
-        wide
+        fitsArc
           ? Math.max(300, Math.min(380, Math.round(w - 250)))
-          : Math.max(280, Math.min(440, w)),
+          : Math.max(180, Math.min(440, w)),
       );
     };
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [wide]);
+  }, []);
 
   const close = useCallback(() => setOpenLabel(null), []);
   useEffect(() => {
@@ -87,7 +90,7 @@ export function ImpactAdoption() {
     return () => window.removeEventListener("keydown", onKey);
   }, [openLabel, close]);
 
-  const open = openLabel ? BREAKDOWNS[openLabel] ?? null : null;
+  const open = openLabel ? (BREAKDOWNS[openLabel] ?? null) : null;
   // Keep the last breakdown mounted so its text survives the closing fade.
   const lastBreakdown = useRef<Breakdown | null>(open);
   if (open) lastBreakdown.current = open;
@@ -165,58 +168,88 @@ export function ImpactAdoption() {
   return (
     <section
       id="impact"
+      data-story-chapter
+      data-story-side="left"
       className="scroll-mt-28 bg-bg pb-[var(--spacing-section)]"
       aria-label="Impact and adoption"
     >
       <div className="container-page">
         <Reveal>
-          <h2 className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]">
+          <h2
+            data-story-title
+            className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
+          >
             Peer-reviewed science, adopted globally.
           </h2>
         </Reveal>
 
-        <Reveal className="mt-12 md:mt-16">
-          <div>
-            {wide ? (
-              <div
-                className="grid items-center gap-12"
-                style={{ gridTemplateColumns: "minmax(0,1fr) minmax(0,1.1fr)" }}
-              >
+        <Reveal>
+          {wide ? (
+            <div data-story-fork>
+              <div data-story-branch>
                 <TextSwap open={open} para={para} />
+              </div>
 
-                <div ref={measureRef} className="relative">
-                  {openLabel ? globeStage : <AdoptionGlobe onSelectMetric={setOpenLabel} />}
-                  <div
-                    className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint"
-                    style={{ width: globeSize }}
-                  >
-                    {caption}
-                  </div>
+              <div
+                data-story-branch="quiet"
+                ref={measureRef}
+                className="relative"
+              >
+                {openLabel ? (
+                  globeStage
+                ) : (
+                  <AdoptionGlobe onSelectMetric={setOpenLabel} />
+                )}
+                <div
+                  className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint"
+                  style={{ width: globeSize }}
+                >
+                  {caption}
                 </div>
               </div>
-            ) : (
-              <div className="space-y-12">
+            </div>
+          ) : (
+            <div data-story-fork>
+              <div data-story-branch>
                 <LeadCopy />
+              </div>
 
-                <div ref={measureRef}>
-                  {open ? <>
-                    <div className="relative mx-auto" style={{ width: globeSize, height: globeSize }}>
+              <div data-story-branch="quiet" ref={measureRef}>
+                {open ? (
+                  <>
+                    <div
+                      className="relative mx-auto"
+                      style={{ width: globeSize, height: globeSize }}
+                    >
                       <Globe data={geoData} size={globeSize} />
                       {backArrow}
                     </div>
-                    <div className="mt-10"><Methodology para={open} /></div>
-                    <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8">
-                      {open.pkgs.map((p, i) => <PackageMetric key={p.name} pkg={p} unit={open.unit} run delay={i * 70} centered />)}
+                    <div className="mt-10">
+                      <Methodology para={open} />
                     </div>
-                  </> : <AdoptionGlobe onSelectMetric={setOpenLabel} />}
+                    <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8">
+                      {open.pkgs.map((p, i) => (
+                        <PackageMetric
+                          key={p.name}
+                          pkg={p}
+                          unit={open.unit}
+                          run
+                          delay={i * 70}
+                          centered
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <AdoptionGlobe onSelectMetric={setOpenLabel} />
+                )}
 
-                  <div className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
-                    {caption}
-                  </div>
+                <div className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
+                  {caption}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </Reveal>
       </div>
     </section>
@@ -227,8 +260,11 @@ function LeadCopy() {
   return (
     <div className="space-y-5 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink [text-wrap:pretty]">
       <p>
-        Built on over a decade of published methodological research by our team
-        and peers. Its inference engine (
+        <strong style={{ fontWeight: 500 }}>
+          Built on over a decade of published methodological research by our
+          team and peers.
+        </strong>{" "}
+        Its inference engine (
         <a
           href="https://github.com/reconhub/outbreaker2"
           target="_blank"
@@ -241,13 +277,13 @@ function LeadCopy() {
         of the standard toolkit for outbreak response worldwide.
       </p>
       <p>
-        These methods have supported real-world outbreak investigations by hospitals, research
-        institutions and public health agencies, including SARS-CoV-2 nosocomial
-        outbreaks in Switzerland and the UK, <em>Klebsiella pneumoniae</em> in a
-        Nepali neonatal unit, vancomycin-resistant <em>Enterococcus faecium</em>{" "}
-        in an Australian tertiary hospital, multidrug-resistant{" "}
-        <em>Acinetobacter baumannii</em> at a burn centre in North Carolina, and
-        Ebola in Guinea.
+        These methods have supported real-world outbreak investigations by
+        hospitals, research institutions and public health agencies, including
+        SARS-CoV-2 nosocomial outbreaks in Switzerland and the UK,{" "}
+        <em>Klebsiella pneumoniae</em> in a Nepali neonatal unit,
+        vancomycin-resistant <em>Enterococcus faecium</em> in an Australian
+        tertiary hospital, multidrug-resistant <em>Acinetobacter baumannii</em>{" "}
+        at a burn centre in North Carolina, and Ebola in Guinea.
       </p>
     </div>
   );
@@ -330,7 +366,9 @@ function PackageMetric({
   const v = useCountUp(pkg.value, run, 1500, delay);
   return (
     <div className={centered ? "text-center" : "whitespace-nowrap text-left"}>
-      <div className="font-mono text-[14px] leading-none text-ink">{pkg.name}</div>
+      <div className="font-mono text-[14px] leading-none text-ink">
+        {pkg.name}
+      </div>
       <div className="mt-1.5 font-display text-[clamp(19px,2.2vw,26px)] font-normal leading-none tracking-tight tabular-nums text-ink">
         {fmtInt(v)}
       </div>
