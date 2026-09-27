@@ -1,3 +1,4 @@
+import { TransmissionStory } from "@/components/story/TransmissionStory";
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/hero/Hero";
 import { Marquee } from "@/components/Marquee";
@@ -17,12 +18,14 @@ export default function HomePage() {
       <main id="top">
         <Hero />
         <Marquee />
-        <About />
-        <Research />
-        <ImpactAdoption />
-        <Team />
-        <Roadmap />
-        <Contact />
+        <TransmissionStory>
+          <About />
+          <Research />
+          <ImpactAdoption />
+          <Team />
+          <Roadmap />
+          <Contact />
+        </TransmissionStory>
       </main>
 
       <Footer />

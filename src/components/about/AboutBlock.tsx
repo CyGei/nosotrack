@@ -1,5 +1,7 @@
 "use client";
 
+import { AnimatedTitle } from "./AnimatedTitle";
+
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +19,7 @@ export function AboutBlock({
 }: {
   id: StepNumber;
   title: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
   video?: React.ReactNode;
   details: React.ReactNode;
   bare?: boolean;
@@ -26,47 +28,37 @@ export function AboutBlock({
   const [tab, setTab] = useState<Tab>(hasVideo ? "video" : "details");
 
   return (
-    <article aria-label={`Section ${id}`}>
+    <article
+      data-story-chapter
+      data-story-side={id === "0.2" || id === "0.4" ? "left" : "right"}
+      aria-label={`Section ${id}`}
+    >
       <div className="container-page section-pad">
-        <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-12">
-          <div className="min-w-0 md:col-span-4">
-            <h2
-              className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)] max-w-[14ch]"
-            >
-              {title}
-            </h2>
-          </div>
-
-          <div className="min-w-0 md:col-span-8">
+        <h2
+          data-story-title
+          className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
+        >
+          <AnimatedTitle text={title} />
+        </h2>
+        <div data-story-fork data-story-reverse={id === "0.4" ? "" : undefined}>
+          <div data-story-branch>
             {subtitle && (
               <p className="font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink max-w-[55ch]">
                 {subtitle}
               </p>
             )}
-
+          </div>
+          <div data-story-branch>
             {hasVideo && (
-              <Switch
-                tab={tab}
-                onChange={setTab}
-                className={subtitle ? "mt-7" : "mt-0"}
-              />
+              <Switch tab={tab} onChange={setTab} className="mb-6" />
             )}
 
             {bare && !hasVideo ? (
-              <div
-                key="details"
-                className={cn("animate-tab-in", subtitle ? "mt-10" : "mt-0")}
-                aria-live="polite"
-              >
+              <div key="details" className="animate-tab-in" aria-live="polite">
                 {details}
               </div>
             ) : (
-              <div
-                className={cn(
-                  "rounded-[14px] border border-rule-strongest bg-bg overflow-hidden",
-                  hasVideo ? "mt-6" : subtitle ? "mt-8" : "mt-0",
-                )}
-              >
+              <div className="rounded-[14px] border border-rule-strongest bg-bg overflow-hidden">
                 <div
                   key={hasVideo ? tab : "details"}
                   className="animate-tab-in p-4 lg:p-6"
@@ -131,7 +123,10 @@ function Switch({
       <SwitchButton active={tab === "video"} onClick={() => onChange("video")}>
         Video
       </SwitchButton>
-      <SwitchButton active={tab === "details"} onClick={() => onChange("details")}>
+      <SwitchButton
+        active={tab === "details"}
+        onClick={() => onChange("details")}
+      >
         Details
       </SwitchButton>
     </div>

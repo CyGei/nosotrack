@@ -1,13 +1,11 @@
 "use client";
 
 import { useDrawProgress } from "@/lib/hooks";
+import { heroTreePath } from "./treePath";
+import { TREE_STYLE } from "../story/treeDesign";
 import { clamp01 } from "@/lib/utils";
 import { TreeStage, TreeStageDefs } from "./TreeStage";
-import {
-  PROJECTIONS,
-  SUSC_BY_ID,
-  TREE_NODE_BY_ID,
-} from "./treeTopology";
+import { PROJECTIONS, SUSC_BY_ID, TREE_NODE_BY_ID } from "./treeTopology";
 
 const DRAW_DURATION_MS = 1_000;
 
@@ -27,7 +25,7 @@ export function Scene4Stop({ active }: Scene4StopProps) {
       <svg
         viewBox="0 0 1000 600"
         preserveAspectRatio="xMidYMid meet"
-        className="absolute inset-0 h-full w-full text-alert"
+        className="absolute inset-0 h-full w-full text-[var(--color-inv)]"
         aria-hidden
       >
         <TreeStageDefs />
@@ -46,48 +44,67 @@ export function Scene4Stop({ active }: Scene4StopProps) {
             <path
               d="M 0 0 L 10 5 L 0 10"
               fill="none"
-              stroke="currentColor"
+              stroke="var(--color-alert)"
               strokeWidth="1.2"
             />
           </marker>
         </defs>
 
-        <g opacity={DIM_OPACITY}>
-          <TreeStage progress={1} staticDecorations />
-        </g>
-
-        {/* Drawn after the dimmed layer so it sits on top; arrows before
-            rings so they slide under them. */}
+        {/* Connections are painted beneath the nodes and their target rings. */}
         <g>
           {PROJECTIONS.map((proj, i) => {
             const from = TREE_NODE_BY_ID[proj.fromNodeId];
             const to = SUSC_BY_ID[proj.toSuscId];
             if (!from || !to) return null;
-            const reveal = clamp01((p2 - proj.appearAt) / PROJECTION_REVEAL_SPAN);
+            const reveal = clamp01(
+              (p2 - proj.appearAt) / PROJECTION_REVEAL_SPAN,
+            );
             if (reveal <= 0) return null;
-            const dx = to.x - from.x;
-            const dy = to.y - from.y;
-            const len = Math.sqrt(dx * dx + dy * dy);
+            const d = heroTreePath(from.x, from.y, to.x, to.y, 10);
             return (
-              <line
-                key={`proj-${i}`}
-                x1={from.x}
-                y1={from.y}
-                x2={from.x + dx * reveal}
-                y2={from.y + dy * reveal}
-                stroke="currentColor"
-                strokeWidth={1.3}
-                strokeOpacity={0.95}
-                strokeDasharray="4 3"
-                // Synced dashoffset keeps the gaps from reshuffling as the
-                // line extends.
-                strokeDashoffset={(1 - reveal) * len}
-                markerEnd={
-                  reveal > 0.6 ? "url(#heroProjArrow)" : undefined
-                }
-              />
+              <g key={`proj-${i}`}>
+                <mask
+                  id={`hero-projection-${i}`}
+                  maskUnits="userSpaceOnUse"
+                  x="0"
+                  y="0"
+                  width="1000"
+                  height="600"
+                >
+                  <path
+                    d={d}
+                    fill="none"
+                    stroke="white"
+                    strokeWidth={8}
+                    pathLength={1}
+                    strokeDasharray={1}
+                    strokeDashoffset={1 - reveal}
+                  />
+                  {/* Keep dashes out of the source even while its fill is dimmed. */}
+                  <circle
+                    cx={from.x}
+                    cy={from.y}
+                    r={TREE_STYLE.radius + TREE_STYLE.outline}
+                    fill="black"
+                  />
+                </mask>
+                <path
+                  d={d}
+                  fill="none"
+                  stroke="var(--color-alert)"
+                  strokeWidth={TREE_STYLE.edge}
+                  strokeOpacity={0.85}
+                  strokeDasharray="4 3"
+                  mask={`url(#hero-projection-${i})`}
+                  markerEnd={reveal > 0.9 ? "url(#heroProjArrow)" : undefined}
+                />
+              </g>
             );
           })}
+
+          <g opacity={DIM_OPACITY}>
+            <TreeStage progress={1} staticDecorations />
+          </g>
 
           {PROJECTIONS.map((proj) => {
             const to = SUSC_BY_ID[proj.toSuscId];
@@ -106,7 +123,7 @@ export function Scene4Stop({ active }: Scene4StopProps) {
                 <circle
                   r={13}
                   fill="none"
-                  stroke="currentColor"
+                  stroke="var(--color-alert)"
                   strokeWidth="1.2"
                   strokeDasharray="3 2"
                   opacity={0.95}

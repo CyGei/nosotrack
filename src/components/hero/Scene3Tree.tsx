@@ -17,7 +17,7 @@ export function Scene3Tree({ active }: Scene3TreeProps) {
       <svg
         viewBox="0 0 1000 600"
         preserveAspectRatio="xMidYMid meet"
-        className="absolute inset-0 h-full w-full text-alert"
+        className="absolute inset-0 h-full w-full text-[var(--color-inv)]"
         aria-hidden
       >
         <TreeStageDefs />

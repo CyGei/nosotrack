@@ -44,19 +44,24 @@ export function Contact() {
   return (
     <section
       id="contact"
+      data-story-chapter
+      data-story-side="right"
       className="on-dark section-pad border-t border-rule-inv bg-bg-ink"
       aria-label="Contact"
     >
       <div className="container-page">
-        <div className="grid grid-cols-1 gap-y-14 md:grid-cols-2 md:gap-x-24">
-          <div>
-            <h2 className="font-display font-normal leading-[1.05] tracking-tight text-inv-hi text-[clamp(32px,3.6vw,56px)] max-w-[16ch]">
-              {CONTACT_TITLE.map((line, i) => (
-                <span key={i} className="block">
-                  {line}
-                </span>
-              ))}
-            </h2>
+        <h2
+          data-story-title
+          className="font-display font-normal leading-[1.05] tracking-tight text-inv-hi text-[clamp(32px,3.6vw,56px)] max-w-[16ch]"
+        >
+          {CONTACT_TITLE.map((line, i) => (
+            <span key={i} className="block">
+              {line}
+            </span>
+          ))}
+        </h2>
+        <div data-story-fork>
+          <div data-story-branch>
             <p className="mt-8 max-w-[55ch] font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-inv-hi">
               {CONTACT_SUBTITLE}
             </p>
@@ -83,7 +88,7 @@ export function Contact() {
             </div>
           </div>
 
-          <div>
+          <div data-story-branch>
             <form
               action={FORM_ACTION}
               method="POST"
@@ -94,7 +99,7 @@ export function Contact() {
               <Field label="Email" name="email" type="email" required />
               <Field label="Message" name="message" as="textarea" required />
 
-              <div className="mt-3 flex items-center gap-5">
+              <div className="mt-3 flex flex-wrap items-center gap-5">
                 <button
                   type="submit"
                   disabled={state === "sending"}
@@ -189,7 +194,7 @@ function Field({
   required?: boolean;
 }) {
   return (
-    <label>
+    <label data-story-leaf>
       <span>
         {label}
         {required && (

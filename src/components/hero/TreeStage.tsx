@@ -1,5 +1,7 @@
 "use client";
 
+import { heroTreePath } from "./treePath";
+import { TREE_STYLE } from "../story/treeDesign";
 import { clamp01 } from "@/lib/utils";
 import {
   TREE_NODES,
@@ -16,9 +18,9 @@ const GREY_RADIUS = 7;
 const GREY_OPACITY = 0.85;
 
 function baseRadius(kind: TreeNode["kind"]) {
-  if (kind === "p0") return 14;
-  if (kind === "superspread") return 12;
-  return 9;
+  if (kind === "p0") return TREE_STYLE.radius;
+  if (kind === "superspread") return TREE_STYLE.largeRadius;
+  return TREE_STYLE.radius;
 }
 
 export type TreeStageProps = {
@@ -28,7 +30,10 @@ export type TreeStageProps = {
   staticDecorations?: boolean;
 };
 
-export function TreeStage({ progress, staticDecorations = false }: TreeStageProps) {
+export function TreeStage({
+  progress,
+  staticDecorations = false,
+}: TreeStageProps) {
   const p = clamp01(progress);
 
   return (
@@ -52,21 +57,23 @@ export function TreeStage({ progress, staticDecorations = false }: TreeStageProp
           const b = TREE_NODE_BY_ID[e.to];
           if (!a || !b) return null;
           const reveal = clamp01((p - e.appearAt) / 0.1);
-          const dx = b.x - a.x;
-          const dy = b.y - a.y;
-          const len = Math.sqrt(dx * dx + dy * dy);
           return (
-            <line
+            <path
               key={`tree-edge-${i}`}
-              x1={a.x}
-              y1={a.y}
-              x2={b.x}
-              y2={b.y}
-              stroke="currentColor"
-              strokeWidth={1.4}
+              d={heroTreePath(
+                a.x,
+                a.y,
+                b.x,
+                b.y,
+                baseRadius(b.kind) + TREE_STYLE.clearance,
+              )}
+              fill="none"
+              pathLength={1}
+              stroke="var(--color-alert)"
+              strokeWidth={TREE_STYLE.edge}
               strokeOpacity={0.85}
-              strokeDasharray={`${len}`}
-              strokeDashoffset={len * (1 - reveal)}
+              strokeDasharray={1}
+              strokeDashoffset={1 - reveal}
               opacity={reveal}
               markerEnd={reveal > 0.9 ? "url(#heroTreeArrow)" : undefined}
             />
@@ -82,9 +89,13 @@ export function TreeStage({ progress, staticDecorations = false }: TreeStageProp
 
           return (
             <g key={n.id} transform={`translate(${n.x}, ${n.y})`}>
-              <circle r={GREY_RADIUS} fill={COLOR_GREY} opacity={GREY_OPACITY} />
+              <circle
+                r={GREY_RADIUS}
+                fill={COLOR_GREY}
+                opacity={GREY_OPACITY}
+              />
 
-              <g opacity={colorReveal}>
+              <g opacity={colorReveal} style={{ color: "var(--color-alert)" }}>
                 {n.kind === "p0" && (
                   <circle
                     r={r + 10}
@@ -145,7 +156,7 @@ export function TreeStage({ progress, staticDecorations = false }: TreeStageProp
                   r={r}
                   fill={n.kind === "undetected" ? COLOR_INK : "currentColor"}
                   stroke="currentColor"
-                  strokeWidth={n.kind === "undetected" ? 1.5 : 1}
+                  strokeWidth={TREE_STYLE.outline}
                   strokeDasharray={n.kind === "undetected" ? "3 2" : undefined}
                 />
               </g>
@@ -184,7 +195,7 @@ export function TreeStageDefs() {
         markerUnits="userSpaceOnUse"
         orient="auto"
       >
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-alert)" />
       </marker>
     </defs>
   );

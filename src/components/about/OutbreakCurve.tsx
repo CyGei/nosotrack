@@ -223,6 +223,7 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
             <button
               type="button"
               onClick={() => setOpenId(isOpen ? null : o.id)}
+              data-story-connect={i === 0 ? "" : undefined}
               aria-label={`${o.short} — ${fullDate(o.date)}`}
               className="absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300"
               style={{

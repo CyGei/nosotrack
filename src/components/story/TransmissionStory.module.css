@@ -1,0 +1,218 @@
+.story {
+  position: relative;
+}
+.tree {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+  fill: none;
+}
+.light {
+  --tree-ink: var(--color-ink);
+  --tree-bg: var(--color-bg);
+}
+.dark {
+  --tree-ink: var(--color-inv-hi);
+  --tree-bg: var(--color-bg-ink);
+}
+.ghost {
+  stroke: var(--tree-ink);
+  stroke-width: var(--tree-edge-width);
+  opacity: 0.07;
+}
+.edge {
+  stroke: var(--tree-ink);
+  stroke-opacity: 0.55;
+  stroke-width: var(--tree-edge-width);
+  stroke-dasharray: 1;
+}
+.trunk {
+  stroke-width: var(--tree-strong-width);
+  stroke-opacity: 0.85;
+}
+.major,
+.minor {
+  stroke: var(--tree-ink);
+  fill: var(--tree-bg);
+  stroke-width: var(--tree-outline-width);
+}
+.major[data-state="past"],
+.major[data-state="current"] {
+  fill: var(--tree-ink);
+}
+.minor[data-state="past"],
+.minor[data-state="current"] {
+  fill: var(--tree-ink);
+}
+.major[data-state="future"],
+.minor[data-state="future"] {
+  stroke-opacity: 0.3;
+}
+
+.story [data-story-chapter] {
+  --story-split: 32%;
+  position: relative;
+  border-top: 0;
+  padding-block: 140px 100px;
+}
+.story [data-story-side="left"] {
+  --story-split: 68%;
+}
+.story :global(#about) {
+  border: 0;
+}
+.story [data-story-chapter] > :global(.section-pad) {
+  padding-block: 0;
+}
+.story [data-story-title] {
+  width: calc(100% - var(--story-split) - 64px);
+  max-width: none;
+  margin: 0 0 0 auto;
+}
+.story [data-story-side="left"] [data-story-title] {
+  width: calc(var(--story-split) - 64px);
+  margin: 0 auto 0 0;
+  text-align: right;
+}
+.story [data-story-fork] {
+  display: grid;
+  grid-template-columns: minmax(0, calc(var(--story-split) - 64px)) minmax(
+      0,
+      1fr
+    );
+  align-items: start;
+  column-gap: 128px;
+  row-gap: 88px;
+  margin-top: 112px;
+}
+.story [data-story-branch] {
+  min-width: 0;
+}
+.story [data-story-leaf] {
+  position: relative;
+}
+.story[data-ready] [data-story-branch],
+.story[data-ready] [data-story-leaf] {
+  opacity: calc(0.16 + var(--story-reveal, 1) * 0.84);
+}
+.story [data-story-branch]:focus-within,
+.story [data-story-branch]:focus-within [data-story-leaf] {
+  opacity: 1;
+}
+/* Three equal peers, with a shared branch above the portraits. */
+.story :global(.team-card) {
+  display: block;
+}
+.story :global(.team-card) > :first-child {
+  width: min(100%, 240px);
+  margin-bottom: 24px;
+}
+.story :global(.team-card) > :last-child {
+  padding-top: 0;
+}
+@media (min-width: 900px) {
+  .story :global(#team) [data-story-fork] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 64px;
+    padding-top: 72px;
+  }
+}
+@media (max-width: 899px) {
+  .story :global(#team) [data-story-fork] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .story :global(#team) [data-story-branch] {
+    padding-left: 64px;
+  }
+}
+@media (max-width: 899px) {
+  .story [data-story-chart] button > :first-child {
+    font-size: 12px;
+  }
+  .story [data-story-chart] button > :nth-child(2) {
+    font-size: 11px;
+  }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+  .story [data-story-chapter] {
+    --story-split: 40%;
+  }
+  .story [data-story-side="left"] {
+    --story-split: 60%;
+  }
+  .story [data-story-title] {
+    width: calc(100% - var(--story-split) - 48px);
+  }
+  .story [data-story-side="left"] [data-story-title] {
+    width: calc(var(--story-split) - 48px);
+  }
+  .story [data-story-fork] {
+    column-gap: 96px;
+    grid-template-columns: minmax(0, calc(var(--story-split) - 48px)) minmax(
+        0,
+        1fr
+      );
+  }
+}
+@media (max-width: 599px) {
+  .story [data-story-chapter] {
+    padding-block: 88px 64px;
+  }
+  .story [data-story-chapter] > :global(.container-page) {
+    padding-left: 64px;
+    padding-right: 24px;
+  }
+  .story [data-story-title],
+  .story [data-story-side="left"] [data-story-title] {
+    width: 100%;
+    text-align: left;
+  }
+  .story [data-story-fork] {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 64px;
+    margin-top: 76px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .story[data-ready] [data-story-branch],
+  .story[data-ready] [data-story-leaf] {
+    opacity: 1;
+  }
+  .edge {
+    stroke-dashoffset: 0 !important;
+  }
+}
+@media print {
+  .tree {
+    display: none;
+  }
+  .story[data-ready] [data-story-branch],
+  .story[data-ready] [data-story-leaf] {
+    opacity: 1;
+  }
+}
+
+/* Mirror the forensics visual into the generous column. */
+@media (min-width: 600px) {
+  .story [data-story-reverse] > :first-child {
+    order: 2;
+  }
+  .story [data-story-reverse] > :last-child {
+    order: 1;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 899px) {
+  .story :global(#team) [data-story-title] {
+    width: calc(100% - 64px);
+  }
+}
+@media (max-width: 599px) {
+  .story :global(#team) [data-story-branch] {
+    padding-left: 0;
+  }
+}
