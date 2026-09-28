@@ -7,9 +7,9 @@ type RoadmapPhase = {
 const ROADMAP_INTRO = (
   <>
     <strong className="font-medium">
-      Nosotrack is currently at the prototype stage.
+      Nosotrack is currently at the research and development stage.
     </strong>
-    <br />A dashboard, live at{" "}
+    <br />A prototype, live at{" "}
     <a
       href="https://nosotrack.onrender.com"
       target="_blank"

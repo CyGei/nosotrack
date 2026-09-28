@@ -165,11 +165,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
           </clipPath>
         </defs>
 
-        <line
-          x1={pts[0].x} y1={Y_AXIS} x2={QX} y2={Y_AXIS}
-          stroke="var(--color-rule)" strokeWidth="1" vectorEffect="non-scaling-stroke"
-        />
-
         <g clipPath="url(#ocReveal)">
           <path d={areaPath} fill="url(#ocFill)" />
           <path
@@ -241,9 +236,24 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
       </span>
 
       <div aria-label="Timeline: 2025 to 2026">
-        {[{ year: "2025", x: X0 }, { year: "2026", x: boundaryX }].map(({ year, x }) => (
-          <div key={year} className="absolute" style={{ left: `${x}%`, top: `${Y_AXIS}%` }}>
-            <span className="mt-3 block font-display text-[11px] font-normal leading-none tabular-nums tracking-[0.02em] text-mute">{year}</span>
+        {[
+          { year: "2025", start: X0, end: boundaryX },
+          { year: "2026", start: boundaryX, end: QX },
+        ].map(({ year, start, end }, i) => (
+          <div
+            key={year}
+            className="absolute flex -translate-y-1/2 items-center gap-3 text-center"
+            style={{
+              left: i === 0 ? `${start}%` : `calc(${start}% + 4px)`,
+              width: `calc(${end - start}% - 4px)`,
+              top: `${Y_AXIS}%`,
+            }}
+          >
+            <span aria-hidden className="min-w-0 flex-1 border-t border-rule-strong" />
+            <span className="shrink-0 font-display text-[13px] font-medium leading-none tabular-nums tracking-[0.08em] text-mute">
+              {year}
+            </span>
+            <span aria-hidden className="min-w-0 flex-1 border-t border-rule-strong" />
           </div>
         ))}
       </div>
