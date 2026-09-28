@@ -192,7 +192,7 @@ function manhattanPath(ax, ay, bx, by, r = 6, childR = 13) {
   return { d, len };
 }
 
-function DashboardScene({ logoX = LOGO_X, logoY = LOGO_Y } = {}) {
+function DashboardScene({ logoX = LOGO_X, logoY = LOGO_Y, frameless = false } = {}) {
   const { localTime: t } = useSprite();
 
   const cursorVisP   = clamp((t - 1.0) / 0.3, 0, 1);
@@ -220,10 +220,11 @@ function DashboardScene({ logoX = LOGO_X, logoY = LOGO_Y } = {}) {
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      {showChrome && <FdyChrome chapter="Analytics" />}
+      {showChrome && !frameless && <FdyChrome chapter="Analytics" />}
 
       {dashOpen > 0 && (
         <DashboardFrame
+          frameless={frameless}
           openP={dashOpen}
           treeP={treeP}
           popupP={popupP * (1 - popupOutP)}
@@ -249,8 +250,25 @@ function DashboardScene({ logoX = LOGO_X, logoY = LOGO_Y } = {}) {
   );
 }
 
+function DashboardHeading({ chapter }) {
+  return (
+    <React.Fragment>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <FdyBrandMark size={18} />
+          <FdyWordmark size={13} />
+        </div>
+        <div style={{ width: 1, height: 18, background: COLOR.rule }} />
+        <div style={{
+          fontFamily: FONT_MONO, fontSize: 10,
+          letterSpacing: '0.22em', textTransform: 'uppercase',
+          color: COLOR.mute,
+        }}>{chapter}</div>
+    </React.Fragment>
+  );
+}
+
 function DashboardFrame({
-  openP, treeP, popupP, popupVisible, chatP,
+  openP, treeP, popupP, popupVisible, chatP, frameless = false,
   promptChars, sent, thinkingP, strategiesP, deployClickP, t,
   logoX = LOGO_X, logoY = LOGO_Y,
 }) {
@@ -266,9 +284,9 @@ function DashboardFrame({
       transform: `scale(${eased})`,
       transformOrigin: `${ox}px ${oy}px`,
       background: '#fff',
-      border: `1px solid ${COLOR.panelLine}`,
-      borderRadius: 6,
-      boxShadow: '0 12px 40px rgba(0,0,0,0.10)',
+      border: frameless ? 'none' : `1px solid ${COLOR.panelLine}`,
+      borderRadius: frameless ? 0 : 6,
+      boxShadow: frameless ? 'none' : '0 12px 40px rgba(0,0,0,0.10)',
       overflow: 'hidden',
     }}>
       <div style={{
@@ -278,16 +296,9 @@ function DashboardFrame({
         padding: '0 18px', gap: 18,
         background: '#fcfcfb',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <FdyBrandMark size={18} />
-          <FdyWordmark size={13} />
-        </div>
-        <div style={{ width: 1, height: 18, background: COLOR.rule }} />
-        <div style={{
-          fontFamily: FONT_MONO, fontSize: 10,
-          letterSpacing: '0.22em', textTransform: 'uppercase',
-          color: COLOR.mute,
-        }}>Outbreak Forensics</div>
+        <DashboardHeading chapter={frameless
+          ? (t < 3.48 ? 'Inbox' : t < 14 ? 'Outbreak Forensics' : 'Outbreak Control')
+          : 'Outbreak Forensics'} />
         <div style={{ flex: 1 }} />
         <StatsStrip treeP={treeP} />
         <div style={{
@@ -898,7 +909,7 @@ function StrategyDrawer({ p, deployClickP }) {
   );
 }
 
-function NotificationLogo({ logoX = 640, logoY = 360 } = {}) {
+function NotificationLogo({ logoX = 640, logoY = 360, frameless = false } = {}) {
   const { localTime: t } = useSprite();
 
   const incrementTimes = [0.2, 0.8, 1.4];
@@ -930,7 +941,14 @@ function NotificationLogo({ logoX = 640, logoY = 360 } = {}) {
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
       <div style={{ opacity: collapseOp }}>
-        <FdyChrome chapter="Inbox" />
+        {frameless ? (
+          <div style={{ position: 'absolute', left: 80, top: 80, width: 1120,
+            height: 44, boxSizing: 'border-box', padding: '0 18px', gap: 18,
+            display: 'flex', alignItems: 'center', background: '#fcfcfb',
+            borderBottom: `1px solid ${COLOR.rule}` }}>
+            <DashboardHeading chapter="Inbox" />
+          </div>
+        ) : <FdyChrome chapter="Inbox" />}
       </div>
 
       <div

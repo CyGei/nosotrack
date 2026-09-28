@@ -20,15 +20,20 @@ function IntegrationLoop() {
 }
 
 function EndToEndLoop() {
-  // Both sprites must start at stage_t 0 so their lt 2.0 click moments coincide.
+  // Crop only the outer framing. Both sprites and the cursor retain their
+  // original coordinate system, timing, and shared lt 2.0 click moment.
   return (
-    <Stage width={1280} height={720} duration={DURATION_ENDTOEND} background="#fafafa" loop={true}>
-      <Sprite start={0} end={4}>
-        <NotificationLogo logoX={ENDTOEND_LOGO_X} logoY={ENDTOEND_LOGO_Y} />
-      </Sprite>
-      <Sprite start={0} end={DURATION_ENDTOEND}>
-        <DashboardScene logoX={ENDTOEND_LOGO_X} logoY={ENDTOEND_LOGO_Y} />
-      </Sprite>
+    <Stage width={1120} height={560} duration={DURATION_ENDTOEND} background="#fff" loop={true}>
+      <div style={{ position: 'absolute', left: 0, top: 0, width: 1120, height: 560, overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', left: -80, top: -80, width: 1280, height: 720 }}>
+          <Sprite start={0} end={4}>
+            <NotificationLogo logoX={ENDTOEND_LOGO_X} logoY={ENDTOEND_LOGO_Y} frameless />
+          </Sprite>
+          <Sprite start={0} end={DURATION_ENDTOEND}>
+            <DashboardScene logoX={ENDTOEND_LOGO_X} logoY={ENDTOEND_LOGO_Y} frameless />
+          </Sprite>
+        </div>
+      </div>
     </Stage>
   );
 }
