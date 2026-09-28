@@ -99,7 +99,7 @@ export function About() {
             <strong style={{ fontWeight: 500 }}>
               Current outbreak surveillance tools work in silos
             </strong>
-            . Nosotrack fuses their data streams into a unified analytical
+            . Nosotrack fuses their data streams into a unified outbreak analytics
             engine.
           </>
         }

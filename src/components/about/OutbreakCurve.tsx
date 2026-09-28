@@ -11,7 +11,6 @@ const MONTHS_FULL = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-const MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 function monthIndex(date: string) {
   const [y, m] = date.split("-").map(Number);
@@ -49,7 +48,7 @@ function smoothPath(pts: Pt[]) {
 }
 
 // viewBox is 0..100 in both axes (preserveAspectRatio="none").
-const X0 = 12, X1 = 75, Y_TOP = 10, Y_BOT = 80, Y_AXIS = 87, QX = 88, QY = 3, MIN_DX = 2;
+const X0 = 12, X1 = 75, Y_TOP = 10, Y_BOT = 80, Y_AXIS = 93, QX = 88, QY = 3, MIN_DX = 2;
 const HEIGHT = 430;
 
 export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
@@ -111,7 +110,7 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
   // so labels must be biased away from the line or it strikes through them.
   const LINE_CLEAR = 4;
   ordered.forEach((_, i) => (labelY[i] += sides[i] ? -LINE_CLEAR : LINE_CLEAR));
-  const over = Math.max(...Object.values(labelY)) - (Y_AXIS - 3);
+  const over = Math.max(...Object.values(labelY)) - (Y_AXIS - 9);
   if (over > 0) Object.keys(labelY).forEach((k) => (labelY[+k] -= over));
   const under = 2 - Math.min(...Object.values(labelY));
   if (under > 0) Object.keys(labelY).forEach((k) => (labelY[+k] += under));
@@ -129,11 +128,6 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
 
   const monthX = (mi: number) => X0 + ((mi - minMI) / (maxMI - minMI)) * (X1 - X0);
   const boundaryX = clamp(monthX(12), X0, X1); // Jan 2026
-  const monthMarks = [3, 6, 9, 15]
-    .filter((mi) => mi > minMI && mi < maxMI)
-    .map((mi) => ({ mi, x: monthX(mi), label: MONTH_ABBR[mi % 12] }));
-  const year25X = (X0 + boundaryX) / 2;
-  const year26X = (boundaryX + X1) / 2;
 
   const { ref, fractional } = useScrollReveal<HTMLDivElement>(n + 1, 6);
   const revealW = Math.min(100, (fractional / (n + 1)) * 100);
@@ -173,7 +167,7 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
 
         <line
           x1={pts[0].x} y1={Y_AXIS} x2={QX} y2={Y_AXIS}
-          stroke="var(--color-rule-strong)" strokeWidth="1.25" vectorEffect="non-scaling-stroke"
+          stroke="var(--color-rule)" strokeWidth="1" vectorEffect="non-scaling-stroke"
         />
 
         <g clipPath="url(#ocReveal)">
@@ -246,46 +240,13 @@ export function OutbreakCurve({ outbreaks }: { outbreaks: Outbreak[] }) {
         ?
       </span>
 
-      <div
-        className="absolute w-px -translate-x-1/2 bg-rule"
-        style={{ left: `${boundaryX}%`, top: `${Y_AXIS}%`, height: 40 }}
-      />
-      {monthMarks.map((m) => (
-        <div
-          key={m.mi}
-          className="absolute -translate-x-1/2 font-mono text-[9.5px] uppercase tracking-[0.22em] text-faint"
-          style={{ left: `${m.x}%`, top: `calc(${Y_AXIS}% + 11px)` }}
-        >
-          {m.label}
-        </div>
-      ))}
-      <span
-        className="absolute -translate-x-1/2 font-display text-[clamp(15px,1.5vw,18px)] font-normal leading-none tracking-[0.01em] tabular-nums text-mute"
-        style={{ left: `${year25X}%`, top: `calc(${Y_AXIS}% + 30px)` }}
-      >
-        2025
-      </span>
-      <span
-        className="absolute -translate-x-1/2 font-display text-[clamp(15px,1.5vw,18px)] font-normal leading-none tracking-[0.01em] tabular-nums text-ink"
-        style={{ left: `${year26X}%`, top: `calc(${Y_AXIS}% + 30px)` }}
-      >
-        2026
-      </span>
-      <span
-        aria-hidden
-        className="absolute -translate-y-1/2"
-        style={{ left: `${QX}%`, top: `${Y_AXIS}%` }}
-      >
-        <svg width="8" height="11" viewBox="0 0 8 11" fill="none" className="-translate-x-px block">
-          <path
-            d="M1.5 1.5 L6.5 5.5 L1.5 9.5"
-            stroke="var(--color-rule-strong)"
-            strokeWidth="1.25"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
+      <div aria-label="Timeline: 2025 to 2026">
+        {[{ year: "2025", x: X0 }, { year: "2026", x: boundaryX }].map(({ year, x }) => (
+          <div key={year} className="absolute" style={{ left: `${x}%`, top: `${Y_AXIS}%` }}>
+            <span className="mt-3 block font-display text-[11px] font-normal leading-none tabular-nums tracking-[0.02em] text-mute">{year}</span>
+          </div>
+        ))}
+      </div>
 
       {open && (
         <div

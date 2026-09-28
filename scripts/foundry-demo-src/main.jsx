@@ -3,7 +3,7 @@ const SCENE = PARAMS.get('scene');
 
 const DURATION_FULL = 48.5;
 
-const DURATION_STEADY = 26;
+const DURATION_STEADY = INTEGRATION_DURATION;
 
 const ENDTOEND_LOGO_X = 640;
 const ENDTOEND_LOGO_Y = 360;
@@ -11,7 +11,7 @@ const DURATION_ENDTOEND = 30;
 
 function IntegrationLoop() {
   return (
-    <Stage width={1280} height={720} duration={DURATION_STEADY} background="#fafafa" loop={true}>
+    <Stage width={1280} height={720} duration={DURATION_STEADY} background="#efeeef" loop={true}>
       <Sprite start={0} end={DURATION_STEADY}>
         <IntegrationScene />
       </Sprite>
