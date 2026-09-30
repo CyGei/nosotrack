@@ -3,7 +3,7 @@ import * as THREE from "three";
 export const PALETTE_GREY = new THREE.Color(0x7a7d83);
 export const PALETTE_RED = new THREE.Color(0xff073a);
 
-// MAD outlier multiplier; 2.0 empirically isolates the spike clusters on every shipped specimen.
+// Geometric outlier threshold; this estimates protrusions, not protein identity.
 const MAD_MULT = 2.0;
 
 const MIN_CLUSTER = 3;

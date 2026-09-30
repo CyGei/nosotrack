@@ -12,12 +12,14 @@ type Props = {
 };
 
 const HERO_SIZE = 332;
-const DOT_SIZE = 72;
-const ARC_RADIUS = 215;
+const DOT_SIZE = 80;
+const ARC_RADIUS = 275;
+const ARC_VERTICAL_RADIUS = 215;
 // Visible band spans -VIS_ANGLE..+VIS_ANGLE (degrees) on the right of the hero.
 const VIS_ANGLE = 32;
-const VISIBLE_FRAC = 0.23; // fraction of the loop on the band => ~3 shown at once
-const PERIOD_S = 22;
+const VISIBLE_FRAC = 0.34; // roughly four specimens in the existing vertical band
+// Preserve the original five-second passage while introducing specimens more often.
+const PERIOD_S = (22 * 0.23) / VISIBLE_FRAC;
 const EDGE = 0.18; // fade in/out ramp, as a fraction of the visible sweep
 
 export function PathogenArc({ hero, others }: Props) {
@@ -27,8 +29,8 @@ export function PathogenArc({ hero, others }: Props) {
   const N = others.length;
 
   const cx = HERO_SIZE / 2;
-  const sweep = ARC_RADIUS * Math.sin((VIS_ANGLE * Math.PI) / 180);
-  const stageH = Math.max(HERO_SIZE, 2 * sweep + DOT_SIZE);
+  // Use the extra horizontal room without increasing the original section height.
+  const stageH = HERO_SIZE;
   const stageW = cx + ARC_RADIUS + DOT_SIZE / 2;
   const cy = stageH / 2;
 
@@ -54,7 +56,7 @@ export function PathogenArc({ hero, others }: Props) {
     const placeAt = (el: HTMLDivElement, u: number, opacity: number) => {
       const a = ((-VIS_ANGLE + 2 * VIS_ANGLE * u) * Math.PI) / 180;
       const left = cx + ARC_RADIUS * Math.cos(a);
-      const top = cy + ARC_RADIUS * Math.sin(a);
+      const top = cy + ARC_VERTICAL_RADIUS * Math.sin(a);
       el.style.transform = `translate(${left}px, ${top}px) translate(-50%, -50%)`;
       el.style.opacity = String(opacity);
       el.style.pointerEvents = opacity > 0.6 ? "auto" : "none";
@@ -91,7 +93,8 @@ export function PathogenArc({ hero, others }: Props) {
         let s = ((i / N + base) % 1 + 1) % 1;
         if (s <= VISIBLE_FRAC) {
           const u = s / VISIBLE_FRAC;
-          const opacity = Math.max(0, Math.min(u / EDGE, (1 - u) / EDGE, 1));
+          const fade = Math.max(0, Math.min(u / EDGE, (1 - u) / EDGE, 1));
+          const opacity = fade * fade * (3 - 2 * fade);
           placeAt(el, u, opacity);
         } else {
           el.style.opacity = "0";
@@ -104,16 +107,12 @@ export function PathogenArc({ hero, others }: Props) {
 
     const onEnter = () => (paused = true);
     const onLeave = () => (paused = false);
-    wrap?.addEventListener("pointerenter", onEnter);
-    wrap?.addEventListener("pointerleave", onLeave);
     wrap?.addEventListener("focusin", onEnter);
     wrap?.addEventListener("focusout", onLeave);
 
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
-      wrap?.removeEventListener("pointerenter", onEnter);
-      wrap?.removeEventListener("pointerleave", onLeave);
       wrap?.removeEventListener("focusin", onEnter);
       wrap?.removeEventListener("focusout", onLeave);
     };
