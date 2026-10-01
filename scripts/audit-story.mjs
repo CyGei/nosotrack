@@ -16,7 +16,6 @@ for (const name of (process.env.AUDIT_BROWSERS || 'chromium,firefox,webkit').spl
     await page.goto(base);
     await page.evaluate(() => document.fonts.ready);
     await page.waitForSelector('[data-ready]');
-    await page.waitForFunction(() => !document.querySelector('[data-hero-snap]'));
     for (const [width, height] of sizes) {
       await page.setViewportSize({ width, height });
       await page.waitForTimeout(250);

@@ -169,6 +169,10 @@ export function TransmissionStory({ children }: { children: ReactNode }) {
           center = first.x + first.width + 32;
         }
         if (terminal) center = small ? 24 : titleBox.x - 32;
+        if (index === 0) {
+          document.querySelector<HTMLElement>("[data-hero-connection]")
+            ?.style.setProperty("--story-entry-x", `${center + box.left}px`);
+        }
         let lastConnection = y;
         layer = add(
           "g",

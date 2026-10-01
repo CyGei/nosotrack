@@ -1,0 +1,56 @@
+.signature {
+  --signature-brand-width: 72px;
+  --signature-gap: 16px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 220px;
+  height: 146px;
+  color: var(--color-inv-hi);
+}
+.brand {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--signature-brand-width);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transform: translate(-50%, -50%);
+  transition: left 700ms var(--ease-nt);
+}
+.signature[data-expanded="true"] .brand { left: calc(var(--signature-brand-width) / 2); }
+.mark { width: 64px; height: 64px; }
+.wordmark { font-size: 13px; line-height: 1; }
+.copy {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--signature-brand-width) + var(--signature-gap));
+  right: 0;
+  transform: translateY(-50%);
+  opacity: 0;
+  color: var(--color-inv-hi);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  text-align: left;
+  transition: opacity 480ms var(--ease-nt) 60ms;
+}
+.signature[data-expanded="true"] .copy { opacity: 1; }
+/* Inter Tight 400: T's stem starts at 520/2048em; I and P at 132/2048em.
+   Let the T crossbar overhang so all three vertical strokes share an axis. */
+.copy > span:first-child { transform: translateX(-0.189453125em); }
+@media (max-width: 1100px) {
+  .signature { width: 104px; height: 146px; }
+  .brand, .signature[data-expanded="true"] .brand { left: 50%; top: 30px; }
+  .mark { width: 48px; height: 48px; }
+  .wordmark { display: none; }
+  .copy { top: 102px; left: 0; font-size: 21px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand { left: calc(var(--signature-brand-width) / 2); transition: none; }
+  .copy { opacity: 1; transition: none; }
+}

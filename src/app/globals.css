@@ -157,11 +157,9 @@ html {
   scrollbar-color: var(--color-rule-strong) transparent;
 }
 
-/* Hero frame-snapping, touch only — desktop uses Lenis's JS Snap (Hero.tsx). */
-@media (pointer: coarse) {
-  html:has([data-hero-snap]) {
-    scroll-snap-type: y proximity;
-  }
+/* Keep section destinations clear of the fixed navigation. */
+main section[id] {
+  scroll-margin-top: 88px;
 }
 
 .container-page {
@@ -203,7 +201,8 @@ html {
   background: currentColor;
   transition: width var(--transition-duration-base) var(--ease-nt);
 }
-.nav-link-underline:hover::after {
+.nav-link-underline:hover::after,
+.nav-link-underline[aria-current="page"]::after {
   width: 100%;
 }
 
@@ -232,13 +231,35 @@ nav.main-nav[data-theme="light"] .nav-tagline {
   color: var(--color-mute);
 }
 nav.main-nav[data-theme="light"] .nav-links a {
-  color: var(--color-mute);
+  color: var(--color-text);
 }
 nav.main-nav[data-theme="light"] .nav-links a:hover {
   color: var(--color-ink);
 }
 nav.main-nav[data-theme="light"] .nav-hamburger span {
   background: var(--color-ink);
+}
+
+nav.main-nav[data-theme="dark"] .nav-links .nav-cta {
+  color: var(--color-inv-hi);
+  background: transparent;
+  border: 1px solid var(--color-rule-inv-strong);
+}
+nav.main-nav[data-theme="dark"] .nav-links .nav-cta:hover {
+  color: var(--color-inv-hi);
+  border-color: var(--color-inv-hi);
+}
+nav.main-nav[data-theme="light"] .nav-links .nav-cta {
+  color: var(--color-ink);
+  background: transparent;
+  border: 1px solid var(--color-rule-strong);
+}
+nav.main-nav[data-theme="light"] .nav-links .nav-cta:hover {
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+nav.main-nav[data-theme="dark"] :focus-visible {
+  outline-color: var(--color-inv-hi);
 }
 
 .brand-mark-network {
@@ -253,26 +274,6 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
   .brand-mark-network { transition: none; }
   .nav-brand:hover .brand-mark-network,
   .footer-brand:hover .brand-mark-network { transform: none; }
-}
-
-.hero-accent {
-  text-shadow:
-    0 0 22px rgba(239, 238, 239, 0.32),
-    0 0 8px  rgba(239, 238, 239, 0.22);
-  animation: accent-breathe 5.2s ease-in-out infinite;
-}
-
-@keyframes accent-breathe {
-  0%, 100% {
-    text-shadow:
-      0 0 22px rgba(239, 238, 239, 0.28),
-      0 0 8px  rgba(239, 238, 239, 0.18);
-  }
-  50% {
-    text-shadow:
-      0 0 32px rgba(239, 238, 239, 0.48),
-      0 0 12px rgba(239, 238, 239, 0.32);
-  }
 }
 
 .typewriter-cursor {

@@ -21,31 +21,6 @@ export function useReducedMotion(): boolean {
   return useMediaQuery("(prefers-reduced-motion: reduce)");
 }
 
-export function useDrawProgress(active: boolean, durationMs: number): number {
-  const reduce = useReducedMotion();
-  const [t, setT] = useState(0);
-
-  useEffect(() => {
-    if (!active || reduce) return;
-    setT(0);
-    let rafId = 0;
-    let start: number | null = null;
-    const tick = (now: number) => {
-      if (start === null) start = now;
-      const elapsed = now - start;
-      const next = Math.min(1, elapsed / durationMs);
-      setT(next);
-      if (next < 1) {
-        rafId = requestAnimationFrame(tick);
-      }
-    };
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [active, reduce, durationMs]);
-
-  return reduce ? 1 : active ? t : 0;
-}
-
 export function useScrollReveal<T extends Element>(length: number, cps: number) {
   const ref = useRef<T | null>(null);
   const [fractional, setFractional] = useState(0);

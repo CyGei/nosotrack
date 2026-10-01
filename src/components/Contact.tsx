@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Github, Linkedin } from "lucide-react";
+import { ContactSignature } from "./ContactSignature";
 
 const CONTACT_TITLE = ["Let’s work", "together."];
 const CONTACT_SUBTITLE =
@@ -87,7 +88,8 @@ export function Contact() {
             </div>
           </div>
 
-          <div data-story-branch>
+          <div data-story-branch className="relative">
+            <ContactSignature />
             <form
               action={FORM_ACTION}
               method="POST"
@@ -175,6 +177,14 @@ export function Contact() {
           margin-bottom: 6px;
         }
         .contact-form-dark label:first-of-type { margin-top: 0; }
+        .contact-form-dark label:nth-of-type(-n+2) {
+          width: calc(100% - 244px);
+        }
+        @media (max-width: 1100px) {
+          .contact-form-dark label:nth-of-type(-n+2) {
+            width: calc(100% - 128px);
+          }
+        }
         .contact-form-dark input,
         .contact-form-dark textarea {
           width: 100%;

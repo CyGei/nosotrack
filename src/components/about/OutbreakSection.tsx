@@ -1,7 +1,5 @@
 "use client";
 
-import { AnimatedTitle } from "./AnimatedTitle";
-
 import { OutbreakCurve } from "./OutbreakCurve";
 import { OUTBREAKS_2026 } from "./outbreaks2026";
 
@@ -15,7 +13,7 @@ export function OutbreakSection() {
           data-story-title
           className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
         >
-          <AnimatedTitle text={TITLE} />
+          {TITLE}
         </h2>
         <div data-story-fork>
           <div data-story-branch>
