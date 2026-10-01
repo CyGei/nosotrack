@@ -1,5 +1,5 @@
 // Pathogen names are matched against NAME_TO_ID in papersByPathogen.ts; "Various pathogens" is the broadcast key.
-export type TimelinePathogen = {
+type TimelinePathogen = {
   name: string;
   applicationYear: string;
   icon: string;

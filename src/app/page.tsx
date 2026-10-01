@@ -1,7 +1,6 @@
 import { TransmissionStory } from "@/components/story/TransmissionStory";
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/hero/Hero";
-import { Marquee } from "@/components/Marquee";
 import { About } from "@/components/about/About";
 import { Settings } from "@/components/settings/Settings";
 import { Research } from "@/components/research/Research";
@@ -18,7 +17,6 @@ export default function HomePage() {
 
       <main id="top">
         <Hero />
-        <Marquee />
         <TransmissionStory>
           <About />
           <Research />

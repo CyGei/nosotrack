@@ -8,7 +8,7 @@ import { useInViewOnce } from "@/lib/hooks";
 import { useCountUp, fmtInt } from "@/lib/useCountUp";
 
 const Globe = dynamic(() => import("./Globe").then(m => m.Globe), { ssr: false });
-export const ADOPTION_METRICS = [
+const ADOPTION_METRICS = [
   { value: metricsData.tools.downloads, label: "Downloads", plus: true },
   { value: metricsData.people.citations, label: "Citations" },
   { value: geoData.citationCountryCount, label: "Countries" },

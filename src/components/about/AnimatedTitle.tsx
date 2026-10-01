@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { useReducedMotion, useScrollReveal } from "@/lib/hooks";
 
 /** The original title typewriter, with its final height reserved throughout. */
-export function AnimatedTitle({ text }: { text: string }) {
-  const { ref, fractional } = useScrollReveal<HTMLSpanElement>(text.length, 32);
+export function AnimatedTitle({ text, enabled = true, rootMargin }: { text: string; enabled?: boolean; rootMargin?: string }) {
+  const { ref, fractional } = useScrollReveal<HTMLSpanElement>(text.length, 32, enabled, rootMargin);
   const reduce = useReducedMotion();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const progress = !mounted || reduce ? text.length : fractional;
+  const progress = !enabled ? 0 : !mounted || reduce ? text.length : fractional;
   const count = Math.ceil(progress);
 
   return (

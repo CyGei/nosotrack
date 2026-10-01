@@ -3,7 +3,7 @@ import { BrandMark } from "@/components/BrandMark";
 
 const FOOTER_LINKS: { label: string; href: string }[] = [
   { label: "About", href: "#about" },
-  { label: "Research", href: "#research" },
+  { label: "Research", href: "#impact" },
   { label: "Team", href: "#team" },
   { label: "Roadmap", href: "#roadmap" },
   { label: "Contact", href: "#contact" },

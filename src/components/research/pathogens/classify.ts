@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
-export const PALETTE_GREY = new THREE.Color(0x7a7d83);
-export const PALETTE_RED = new THREE.Color(0xff073a);
+const PALETTE_GREY = new THREE.Color(0x7a7d83);
+const PALETTE_RED = new THREE.Color(0xff073a);
 
 // Geometric outlier threshold; this estimates protrusions, not protein identity.
 const MAD_MULT = 2.0;

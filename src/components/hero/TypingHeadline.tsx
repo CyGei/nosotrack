@@ -10,7 +10,7 @@ export type TypingHeadlineProps = {
   charDelayMs?: number;
   lineDelayMs?: number;
   className?: string;
-  haloLastLine?: boolean;
+  as?: "h1" | "h2" | "p";
   /** Reveal every line's first letter first, hold, then type the rest. */
   initialsFirst?: boolean;
   initialStaggerMs?: number;
@@ -24,7 +24,7 @@ export function TypingHeadline({
   charDelayMs = 26,
   lineDelayMs = 140,
   className = "",
-  haloLastLine = false,
+  as: Tag = "h1",
   initialsFirst = false,
   initialStaggerMs = 200,
   initialHoldMs = 550,
@@ -157,16 +157,14 @@ export function TypingHeadline({
   }
 
   return (
-    <h1 className={className}>
+    <Tag className={className}>
       {rendered.map((line, i) => {
-        const isFinalLine = i === lines.length - 1;
-        const haloClass = haloLastLine && isFinalLine ? "block hero-accent" : "block";
         return (
-          <span key={i} className={haloClass}>
+          <span key={i} className="block">
             {line || " "}
           </span>
         );
       })}
-    </h1>
+    </Tag>
   );
 }

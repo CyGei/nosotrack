@@ -10,7 +10,7 @@ export const SHIP_STBD_CABIN_H = 70;
 export const SHIP_PORT_CORR = { x: 160, y: 355, w: 660, h: 18 } as const;
 export const SHIP_STBD_CORR = { x: 160, y: 425, w: 660, h: 18 } as const;
 
-export const SHIP_AFT_BLOCK_X = 165;
+const SHIP_AFT_BLOCK_X = 165;
 export const SHIP_AFT_CABINS = 9;
 const SHIP_AFT_CABIN_W = 28;
 const SHIP_AFT_CABIN_GAP = 2;
@@ -18,7 +18,7 @@ export const shipAftX = (i: number) =>
   SHIP_AFT_BLOCK_X + i * (SHIP_AFT_CABIN_W + SHIP_AFT_CABIN_GAP);
 export const SHIP_AFT_CABIN_W_EXPORT = SHIP_AFT_CABIN_W;
 
-export const SHIP_FWD_BLOCK_X = 665;
+const SHIP_FWD_BLOCK_X = 665;
 export const SHIP_FWD_CABINS = 5;
 const SHIP_FWD_CABIN_W = 28;
 const SHIP_FWD_CABIN_GAP = 2;
@@ -57,7 +57,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
           letterSpacing="0.12em"
           fill="rgba(30,30,43,0.95)"
         >
-          CARIBBEAN CRUISE
+          CRUISE SHIP
         </text>
         <text
           x="940"

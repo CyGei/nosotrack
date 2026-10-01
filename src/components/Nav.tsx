@@ -1,22 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { BrandWordmark } from "@/components/BrandWordmark";
 import { BrandMark } from "@/components/BrandMark";
-import { requestHeroNav } from "@/components/hero/heroNav";
 
 const NAV_LOGO = "Nosotrack";
 const NAV_TAGLINE = "Outbreak forensics and control";
-const NAV_LINKS: { label: string; href: string; newTab?: boolean }[] = [
-  { label: "Platform", href: "https://nosotrack.onrender.com", newTab: true },
+const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "About", href: "#about" },
-  { label: "Research", href: "#research" },
-  { label: "Team", href: "#team" },
-  { label: "Roadmap", href: "#roadmap" },
-  { label: "News", href: "/news/" },
   { label: "For partners", href: "/for-partners/" },
+  { label: "Research", href: "#impact" },
+  { label: "Team", href: "#team" },
+  { label: "News", href: "/news/" },
+  { label: "Platform", href: "https://nosotrack.onrender.com", external: true },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -25,6 +23,7 @@ const PAST_HERO_PAD = 80;
 export function Nav({ standalone = false }: { standalone?: boolean }) {
   const pathname = usePathname();
   const [overHero, setOverHero] = useState(true);
+  const [hasScrolled, setHasScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
 
@@ -35,7 +34,7 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
         menuButton.current?.focus();
       }
     };
-    const desktop = window.matchMedia("(min-width: 1280px)");
+    const desktop = window.matchMedia("(min-width: 1024px)");
     const closeOnDesktop = () => { if (desktop.matches) setMobileOpen(false); };
     desktop.addEventListener("change", closeOnDesktop);
     document.addEventListener("keydown", closeOnEscape);
@@ -47,6 +46,7 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
 
   useEffect(() => {
     const onScroll = () => {
+      setHasScrolled(window.scrollY > 24);
       const hero = document.getElementById("hero");
       const heroH = hero?.offsetHeight ?? 0;
       if (heroH > 0) {
@@ -76,19 +76,6 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
   const isCurrentPage = (href: string) =>
     standalone && href.replace(/\/$/, "") === pathname.replace(/\/$/, "");
 
-  const opensNewTab = (link: (typeof NAV_LINKS)[number]) =>
-    Boolean(link.newTab && !isCurrentPage(link.href));
-
-  // Hero must collapse its cinematic first, else its completion-lock strands the first click.
-  const onSectionLink = (
-    e: MouseEvent<HTMLAnchorElement>,
-    link: (typeof NAV_LINKS)[number],
-  ) => {
-    if (!standalone && link.href.startsWith("#") && requestHeroNav(link.href)) {
-      e.preventDefault();
-    }
-  };
-
   return (
     <nav
       className={cn(
@@ -96,7 +83,9 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
         "transition-[background-color,border-color] duration-[var(--transition-duration-base)] ease-[var(--ease-nt)]",
         showScrolledStyle
           ? "border-rule bg-[rgba(239,238,239,0.92)] backdrop-blur-[8px] backdrop-saturate-[140%]"
-          : "border-transparent bg-transparent",
+          : hasScrolled
+            ? "border-transparent bg-[rgba(33,35,38,0.88)] backdrop-blur-[8px]"
+            : "border-transparent bg-transparent",
       )}
       data-theme={dark ? "dark" : "light"}
       aria-label="Primary"
@@ -129,26 +118,22 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
         </div>
 
         <ul
-          className="nav-links hidden list-none items-center gap-6 xl:flex 2xl:gap-9"
+          className="nav-links hidden list-none items-center gap-5 lg:flex xl:gap-7"
           role="list"
         >
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
               <a
                 href={resolvedHref(link.href)}
-                onClick={(e) => onSectionLink(e, link)}
-                {...(opensNewTab(link)
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
+                {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 aria-current={isCurrentPage(link.href) ? "page" : undefined}
-                className="nav-link-underline relative inline-flex min-h-11 items-center whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.18em] transition-colors duration-[var(--transition-duration-fast)]"
+                className={cn(
+                  "relative inline-flex min-h-11 items-center whitespace-nowrap text-[14px] transition-colors duration-[var(--transition-duration-fast)]",
+                  link.href === "#contact" ? "nav-cta px-5" : "nav-link-underline",
+                )}
               >
                 {link.label}
-                {opensNewTab(link) && (
-                  <span aria-hidden className="ml-[0.35em]">
-                    ↗
-                  </span>
-                )}
+                {link.external && <><span aria-hidden className="ml-1.5">↗</span><span className="sr-only"> (opens in a new tab)</span></>}
               </a>
             </li>
           ))}
@@ -160,7 +145,7 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
           aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
           aria-expanded={mobileOpen}
           aria-controls="mobile-navigation"
-          className="nav-hamburger flex h-11 w-11 flex-col items-center justify-center gap-[5px] xl:hidden"
+          className="nav-hamburger flex h-11 w-11 flex-col items-center justify-center gap-[5px] lg:hidden"
           onClick={() => setMobileOpen((o) => !o)}
         >
           <span
@@ -188,7 +173,7 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
         <div
           id="mobile-navigation"
           className={cn(
-            "max-h-[calc(100dvh-72px)] overflow-y-auto overscroll-contain border-t xl:hidden",
+            "max-h-[calc(100dvh-72px)] overflow-y-auto overscroll-contain border-t lg:hidden",
             dark ? "border-rule-inv bg-bg-ink" : "border-rule bg-bg",
           )}
         >
@@ -197,27 +182,18 @@ export function Nav({ standalone = false }: { standalone?: boolean }) {
               <li key={link.href}>
                 <a
                   href={resolvedHref(link.href)}
-                  onClick={(e) => {
-                    onSectionLink(e, link);
-                    closeMobile();
-                  }}
-                  {...(opensNewTab(link)
-                    ? { target: "_blank", rel: "noopener noreferrer" }
-                    : {})}
+                  {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  onClick={closeMobile}
                   aria-current={isCurrentPage(link.href) ? "page" : undefined}
                   className={cn(
-                    "flex min-h-11 items-center border-b py-3 font-mono text-[11px] uppercase tracking-[0.18em]",
+                    "flex min-h-11 items-center border-b py-3 text-[16px]",
                     dark
                       ? "border-rule-inv text-inv hover:text-inv-hi"
                       : "border-rule text-mute hover:text-ink",
                   )}
                 >
                   {link.label}
-                  {opensNewTab(link) && (
-                    <span aria-hidden className="ml-[0.35em]">
-                      ↗
-                    </span>
-                  )}
+                  {link.external && <><span aria-hidden className="ml-1.5">↗</span><span className="sr-only"> (opens in a new tab)</span></>}
                 </a>
               </li>
             ))}

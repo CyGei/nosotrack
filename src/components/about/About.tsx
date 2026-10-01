@@ -19,7 +19,7 @@ export function About() {
     <section
       id="about"
       className="border-t border-rule bg-bg"
-      aria-label="How Nosotrack works"
+      aria-label="About Nosotrack"
     >
       <OutbreakSection />
 

@@ -1,0 +1,74 @@
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow-anchor: none;
+  background: var(--color-bg-ink);
+  color: var(--color-inv-hi);
+}
+.opening { position: relative; min-height: max(85svh, 390px); }
+.media, .shade { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.media { opacity: var(--media-opacity, 1); }
+.shade { background: linear-gradient(180deg, transparent 35%, rgba(33, 35, 38, 0.12) 55%, var(--color-bg-ink) 100%); }
+.inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: inherit;
+  padding-top: 112px;
+  padding-bottom: clamp(72px, 10svh, 112px);
+}
+.title {
+  color: var(--color-inv-hi);
+  font-size: clamp(44px, 6.4vw, 92px);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-wrap: initial;
+}
+.title > span { display: block; }
+.description {
+  max-width: 660px;
+  margin-top: 24px;
+  color: var(--color-inv-hi);
+  font-size: 22px;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+.title .period { display: inline-block; width: 0.085em; height: 0.085em; margin-left: 0.06em; border-radius: 50%; background: currentColor; }
+.hero[data-tree-ready] .period { opacity: 0; }
+.tree { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; overflow: visible; fill: none; }
+.reconstruct { padding-top: 8px; }
+.chapterTitle {
+  width: calc(68% - 64px);
+  margin-left: auto;
+  color: var(--color-inv-hi);
+  font-size: clamp(40px, 4.5vw, 64px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+.branchSpace { height: clamp(240px, 32svh, 300px); }
+.stop { margin-top: -40px; padding-top: 0; padding-bottom: 56px; }
+.hero :focus-visible { outline-color: var(--color-inv-hi); outline-offset: 5px; }
+/* The following section supplies its actual trunk position. */
+.connection { position: absolute; left: var(--story-entry-x, 32%); bottom: 0; width: 2.6px; height: 1px; transform: translateX(-50%); pointer-events: none; }
+@media (max-width: 899px) {
+  .connection { left: var(--story-entry-x, 24px); }
+  .reconstruct, .stop { padding-left: 56px; }
+  .reconstruct { padding-top: 8px; }
+  .chapterTitle { width: 100%; font-size: clamp(32px, 5vw, 48px); }
+  .branchSpace { height: 240px; }
+  .stop { margin-top: 0; padding-top: 16px; padding-bottom: 40px; }
+}
+@media (max-width: 599px) {
+  .description { font-size: 18px; }
+  .title { font-size: clamp(28px, 8.8vw, 52px); }
+  .inner { padding-bottom: 72px; }
+  .chapterTitle { font-size: clamp(32px, 8.8vw, 42px); }
+}
+@media (max-height: 540px) and (min-width: 600px) {
+  .opening { min-height: max(100svh, 320px); }
+  .inner { padding-bottom: 104px; }
+  .title { font-size: clamp(36px, 5vw, 54px); }
+}

@@ -34,25 +34,32 @@ const srcFor = (id: string) => `/hero/${id}.mp4`;
 const TREATMENT =
   "grayscale(0.7) contrast(1.05) brightness(0.78) hue-rotate(190deg)";
 
-function ClipVideo({ clip, isActive }: { clip: Clip; isActive: boolean }) {
+function ClipVideo({ clip, isActive, playing }: { clip: Clip; isActive: boolean; playing: boolean }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // The neighbour pre-mounts with autoPlay running, so it is already
-  // mid-stream by its turn; re-base to t=0 or it starts at a random offset.
+  // Start each incoming shot at its beginning; pause/resume preserves position.
   useEffect(() => {
     if (!isActive) return;
     const v = videoRef.current;
     if (!v) return;
     if (v.currentTime > 0.25) v.currentTime = 0;
-    if (v.paused) v.play().catch(() => {});
   }, [isActive]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (playing && isActive && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  }, [playing, isActive]);
 
   return (
     <video
       ref={videoRef}
       src={srcFor(clip.id)}
       poster={POSTER}
-      autoPlay
       muted
       loop
       playsInline
@@ -106,7 +113,7 @@ export function Scene1Field({ active }: Scene1FieldProps) {
           const isActive = i === idx;
           const isNeighbor = i === (idx + 1) % CLIPS.length;
           if (!isActive && !isNeighbor) return null;
-          return <ClipVideo key={clip.id} clip={clip} isActive={isActive} />;
+          return <ClipVideo key={clip.id} clip={clip} isActive={isActive} playing={active} />;
         })}
 
       <div
