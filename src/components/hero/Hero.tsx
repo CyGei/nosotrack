@@ -9,10 +9,9 @@ import { TypingHeadline } from "./TypingHeadline";
 import { Scene1Field } from "./Scene1Field";
 import { Scene3Tree } from "./Scene3Tree";
 import { Scene4Stop } from "./Scene4Stop";
-import { SceneBlueprints } from "./SceneBlueprints";
 import { SceneBrand } from "./SceneBrand";
 
-type SceneId = "field" | "tree" | "stop" | "blueprints" | "brand";
+type SceneId = "field" | "tree" | "stop" | "brand";
 
 type SceneSpec = {
   id: SceneId;
@@ -36,10 +35,6 @@ const SCENES: SceneSpec[] = [
     lines: ["Stop", "the spread."],
   },
   {
-    id: "blueprints",
-    lines: ["Deployable", "anywhere."],
-  },
-  {
     id: "brand",
     lines: ["Track.", "Intervene.", "Protect."],
     haloLastLine: true,
@@ -54,6 +49,7 @@ const SCENE_COUNT = SCENES.length;
 const WRAPPER_VH = (SCENE_COUNT + 1) * 100;
 
 const FADE_MS = 500;
+const SCENE_FADE_MS = 700;
 
 const BRAND_SCENE = SCENES.find((s) => s.id === "brand")!;
 
@@ -61,8 +57,9 @@ const BRAND_SCENE = SCENES.find((s) => s.id === "brand")!;
 function scrollToId(lenis: ReturnType<typeof useLenis>, id: string) {
   const el = document.getElementById(id);
   if (!el) return;
-  if (lenis) lenis.scrollTo(el);
-  else el.scrollIntoView({ behavior: "smooth" });
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (lenis) lenis.scrollTo(el, { immediate: reduce });
+  else el.scrollIntoView({ behavior: reduce ? "instant" : "smooth" });
 }
 
 export function Hero() {
@@ -74,6 +71,21 @@ export function Hero() {
   const [hasUserScrolled, setHasUserScrolled] = useState(false);
   const completionShrinkRef = useRef(0);
   const pendingScrollIdRef = useRef<string | null>(null);
+
+  // Reduced motion presents the final brand panel without a long scroll runway.
+  useEffect(() => {
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const finish = () => {
+      const wrapper = wrapperRef.current;
+      if (!motion.matches || hasCompleted || !wrapper) return;
+      completionShrinkRef.current =
+        wrapper.offsetHeight - (wrapper.firstElementChild as HTMLElement).offsetHeight;
+      setHasCompleted(true);
+    };
+    finish();
+    motion.addEventListener("change", finish);
+    return () => motion.removeEventListener("change", finish);
+  }, [hasCompleted, wrapperRef]);
 
   // Guard: without a real scroll first, the sentinel IO fires immediately
   // on a refresh-while-past-hero and collapses the hero unprompted.
@@ -96,7 +108,7 @@ export function Hero() {
       ([entry]) => {
         if (!entry.isIntersecting) return;
         completionShrinkRef.current =
-          wrapper.offsetHeight - window.innerHeight;
+          wrapper.offsetHeight - (wrapper.firstElementChild as HTMLElement).offsetHeight;
         setHasCompleted(true);
       },
       { threshold: 0 },
@@ -154,7 +166,7 @@ export function Hero() {
     (id: string) => {
       const wrapper = wrapperRef.current;
       if (!hasCompleted && wrapper) {
-        completionShrinkRef.current = wrapper.offsetHeight - window.innerHeight;
+        completionShrinkRef.current = wrapper.offsetHeight - (wrapper.firstElementChild as HTMLElement).offsetHeight;
         pendingScrollIdRef.current = id;
         setHasCompleted(true);
       } else {
@@ -184,6 +196,7 @@ export function Hero() {
         className="on-dark relative isolate h-[100svh] overflow-hidden bg-[var(--color-bg-ink)]"
       >
         <SceneBrand active={true} lines={BRAND_SCENE.lines} frozen />
+        <BrandOutro visible onLearnMore={goToAbout} />
       </section>
     );
   }
@@ -205,7 +218,7 @@ export function Hero() {
               className="absolute inset-0"
               style={{
                 opacity,
-                transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
+                transition: `opacity ${SCENE_FADE_MS}ms ease-in-out`,
                 pointerEvents: i === activeScene ? "auto" : "none",
               }}
             >
@@ -214,8 +227,7 @@ export function Hero() {
           );
         })}
 
-        {!SCENES[activeScene].selfContained &&
-          SCENES[activeScene].id !== "blueprints" && <HeadlineScrim />}
+        {!SCENES[activeScene].selfContained && <HeadlineScrim />}
 
         {!SCENES[activeScene].selfContained && (
           <div className="container-page absolute inset-0 z-10 flex flex-col justify-center">
@@ -228,13 +240,7 @@ export function Hero() {
           </div>
         )}
 
-        <AdvanceCue
-          visible={activeScene < SCENE_COUNT - 1}
-          hasScrolled={hasUserScrolled}
-          activeScene={activeScene}
-          count={SCENE_COUNT}
-          wrapperRef={wrapperRef}
-        />
+        <ScrollCue visible={activeScene === 0 && !hasUserScrolled} />
         <BrandOutro
           visible={activeScene === SCENE_COUNT - 1}
           onLearnMore={goToAbout}
@@ -282,8 +288,6 @@ function SceneBackground({
       return <Scene3Tree active={active} />;
     case "stop":
       return <Scene4Stop active={active} />;
-    case "blueprints":
-      return <SceneBlueprints />;
     case "brand":
       return <SceneBrand active={active} lines={scene.lines} />;
   }
@@ -312,7 +316,7 @@ function SceneCopy({
   active: boolean;
 }) {
   return (
-    <div className="container-page relative z-10 flex h-full flex-col justify-center">
+    <div className="relative z-10 flex h-full flex-col justify-center">
       <TypingHeadline
         lines={lines}
         haloLastLine={haloLastLine}
@@ -323,144 +327,33 @@ function SceneCopy({
   );
 }
 
-// rect.height is read at call time so the math holds whether the wrapper
-// is full-height or mid-completion.
-function scrollToScene(
-  wrapper: HTMLElement | null,
-  index: number,
-  count: number,
-) {
-  if (!wrapper) return;
-  const rect = wrapper.getBoundingClientRect();
-  const totalScroll = rect.height - window.innerHeight;
-  const targetP = (index + 0.5) / count;
-  const y = window.scrollY + rect.top + totalScroll * targetP;
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
-}
-
-const PIXEL_DOTS = [
-  "hp-c1",
-  "hp-c2",
-  "hp-c3",
-  "hp-c4",
-  "hp-c5 hp-red", // signal red one step in from the tip, as on the news play button
-  "hp-c6",
-  "hp-l1",
-  "hp-l2",
-  "hp-r1",
-  "hp-r2",
-];
-
-function AdvanceCue({
-  visible,
-  hasScrolled,
-  activeScene,
-  count,
-  wrapperRef,
-}: {
-  visible: boolean;
-  hasScrolled: boolean;
-  activeScene: number;
-  count: number;
-  wrapperRef: React.RefObject<HTMLDivElement | null>;
-}) {
-  const [scattered, setScattered] = useState(false);
-
-  // Attract loop: assemble, hold, scatter. Settles permanently on first scroll.
-  useEffect(() => {
-    if (hasScrolled) {
-      setScattered(false);
-      return;
-    }
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let timer: number;
-    const cycle = (next: boolean) => {
-      setScattered(next);
-      timer = window.setTimeout(() => cycle(!next), next ? 600 : 1600);
-    };
-    timer = window.setTimeout(() => cycle(true), 1600);
-    return () => clearTimeout(timer);
-  }, [hasScrolled]);
-
-  const gate = {
-    tabIndex: visible ? 0 : -1,
-    style: { pointerEvents: visible ? ("auto" as const) : ("none" as const) },
-  };
-
+function ScrollCue({ visible }: { visible: boolean }) {
   return (
     <div
       aria-hidden={!visible}
-      className="pointer-events-none absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-4"
+      className="pointer-events-none absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-3"
       style={{
         opacity: visible ? 1 : 0,
-        transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
+        transition: `opacity ${FADE_MS}ms ease-in-out`,
         color: "var(--color-inv-hi)",
       }}
     >
-      <span
-        className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-[0.2em]"
-        style={{
-          opacity: hasScrolled ? 0 : 1,
-          transition: `opacity ${FADE_MS}ms var(--ease-nt)`,
-        }}
-      >
-        Scroll down
+      <span className="whitespace-nowrap font-mono text-[10px] font-medium uppercase tracking-[0.2em]">
+        Scroll to explore
       </span>
-
-      {/* Ring lives on a span: the global `button { border: none }` reset
-          outranks layered border utilities on the button itself. */}
-      <button
-        type="button"
-        aria-label="Go to next frame"
-        onClick={() =>
-          scrollToScene(wrapperRef.current, activeScene + 1, count)
-        }
-        className="group cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
-        {...gate}
+      <svg
+        width="16"
+        height="24"
+        viewBox="0 0 16 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
       >
-        <span className="flex h-14 w-14 items-center justify-center rounded-full border border-rule-inv-strong transition-colors duration-[var(--transition-duration-fast)] group-hover:border-[var(--color-inv-hi)]">
-          {/* Bounce sits on a wrapper: the arrow's own transform carries the
-              scatter offset and would be overwritten by the animation. */}
-          <span className="hero-cue-bounce flex">
-            <span
-              aria-hidden
-              className={`hero-pixel-arrow${scattered ? " -scattered" : ""}`}
-            >
-              {PIXEL_DOTS.map((cls) => (
-                <span key={cls} className={cls} />
-              ))}
-            </span>
-          </span>
-        </span>
-      </button>
-
-      <div className="flex items-center" role="tablist" aria-label="Hero frames">
-        {Array.from({ length: count }).map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            role="tab"
-            aria-label={`Frame ${i + 1}`}
-            aria-selected={i === activeScene}
-            onClick={() => scrollToScene(wrapperRef.current, i, count)}
-            className="cursor-pointer px-1 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-inv-hi)]"
-            {...gate}
-          >
-            <span
-              aria-hidden
-              className="block w-[30px] transition-colors duration-[var(--transition-duration-base)]"
-              style={{
-                height: i <= activeScene ? 2 : 1,
-                background:
-                  i <= activeScene
-                    ? "var(--color-inv-hi)"
-                    : "var(--color-rule-inv-strong)",
-              }}
-            />
-          </button>
-        ))}
-      </div>
+        <path d="M8 2v19m-5-5 5 5 5-5" />
+      </svg>
     </div>
   );
 }

@@ -30,18 +30,18 @@ export function AboutBlock({
   return (
     <article
       data-story-chapter
-      data-story-side={id === "0.2" || id === "0.4" ? "left" : "right"}
+      data-story-side={(id === "0.2" || id === "0.4") ? "right" : "left"}
       aria-label={`Section ${id}`}
     >
       <div className="container-page section-pad">
-        <h2
-          data-story-title
-          className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
-        >
-          <AnimatedTitle text={title} />
-        </h2>
-        <div data-story-fork data-story-reverse={id === "0.4" ? "" : undefined}>
-          <div data-story-branch>
+        <div data-story-fork data-story-reverse={(id === "0.2" || id === "0.4") ? "" : undefined}>
+          <div data-story-branch data-story-intro>
+            <h2
+              data-story-title
+              className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
+            >
+              <AnimatedTitle text={title} />
+            </h2>
             {subtitle && (
               <p className="font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink max-w-[55ch]">
                 {subtitle}
@@ -61,7 +61,7 @@ export function AboutBlock({
               <div className="rounded-[14px] border border-rule-strongest bg-bg overflow-hidden">
                 <div
                   key={hasVideo ? tab : "details"}
-                  className="animate-tab-in p-4 lg:p-6"
+                  className={cn("animate-tab-in", hasVideo && tab === "video" ? "p-2 sm:p-3" : "p-4 lg:p-6")}
                   aria-live="polite"
                 >
                   {hasVideo && tab === "video" ? video : details}
@@ -148,7 +148,7 @@ function SwitchButton({
       aria-selected={active}
       type="button"
       onClick={onClick}
-      className="relative z-10 flex-1 font-mono uppercase"
+      className="relative z-10 flex-1 whitespace-nowrap font-mono uppercase"
       style={{
         padding: "4px 14px",
         borderRadius: 9999,

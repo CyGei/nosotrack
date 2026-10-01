@@ -295,67 +295,7 @@ nav.main-nav[data-theme="light"] .nav-hamburger span {
   to   { transform: rotate(360deg); }
 }
 
-/* Hero scroll cue: gentle persistent bounce on the ringed arrow. */
-@keyframes heroCueBounce {
-  0%, 100% { transform: translateY(-2px); }
-  50%      { transform: translateY(3px); }
-}
-.hero-cue-bounce {
-  animation: heroCueBounce 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-
-/* Hero scroll cue: 10-dot pixel arrow (5x6 grid). Dots scatter to per-dot
-   offsets in the -scattered state and reassemble via staggered transitions. */
-.hero-pixel-arrow {
-  --hp-dot: 6px;
-  position: relative;
-  width: calc(var(--hp-dot) * 5);
-  height: calc(var(--hp-dot) * 6);
-  transition:
-    opacity 0.35s var(--ease-nt),
-    transform 0.35s var(--ease-nt);
-}
-.hero-pixel-arrow > span {
-  position: absolute;
-  width: var(--hp-dot);
-  height: var(--hp-dot);
-  transition: transform 0.35s var(--ease-nt);
-}
-.hero-pixel-arrow > span::after {
-  content: "";
-  position: absolute;
-  inset: 20%;
-  background: var(--color-inv-hi);
-}
-.hero-pixel-arrow > .hp-red::after { background: var(--color-alert); }
-
-.hero-pixel-arrow .hp-c1 { left: calc(var(--hp-dot) * 2); top: 0; }
-.hero-pixel-arrow .hp-c2 { left: calc(var(--hp-dot) * 2); top: calc(var(--hp-dot) * 1); }
-.hero-pixel-arrow .hp-c3 { left: calc(var(--hp-dot) * 2); top: calc(var(--hp-dot) * 2); }
-.hero-pixel-arrow .hp-c4 { left: calc(var(--hp-dot) * 2); top: calc(var(--hp-dot) * 3); }
-.hero-pixel-arrow .hp-c5 { left: calc(var(--hp-dot) * 2); top: calc(var(--hp-dot) * 4); }
-.hero-pixel-arrow .hp-c6 { left: calc(var(--hp-dot) * 2); top: calc(var(--hp-dot) * 5); }
-.hero-pixel-arrow .hp-l1 { left: calc(var(--hp-dot) * 1); top: calc(var(--hp-dot) * 4); }
-.hero-pixel-arrow .hp-l2 { left: 0;                       top: calc(var(--hp-dot) * 3); }
-.hero-pixel-arrow .hp-r1 { left: calc(var(--hp-dot) * 3); top: calc(var(--hp-dot) * 4); }
-.hero-pixel-arrow .hp-r2 { left: calc(var(--hp-dot) * 4); top: calc(var(--hp-dot) * 3); }
-
-.hero-pixel-arrow.-scattered {
-  opacity: 0;
-  transform: translateY(calc(var(--hp-dot) * -2));
-}
-.hero-pixel-arrow.-scattered .hp-c1 { transform: translate(calc(var(--hp-dot) * 1),  calc(var(--hp-dot) * 1)); }
-.hero-pixel-arrow.-scattered .hp-c2 { transform: translate(calc(var(--hp-dot) * -1), calc(var(--hp-dot) * -3)); }
-.hero-pixel-arrow.-scattered .hp-c3 { transform: translate(calc(var(--hp-dot) * -2), calc(var(--hp-dot) * 1)); }
-.hero-pixel-arrow.-scattered .hp-c4 { transform: translate(calc(var(--hp-dot) * 2),  calc(var(--hp-dot) * -3)); }
-.hero-pixel-arrow.-scattered .hp-c5 { transform: translate(calc(var(--hp-dot) * -2), calc(var(--hp-dot) * -3)); }
-.hero-pixel-arrow.-scattered .hp-c6 { transform: translate(calc(var(--hp-dot) * 3),  calc(var(--hp-dot) * 1)); }
-.hero-pixel-arrow.-scattered .hp-l1 { transform: translate(calc(var(--hp-dot) * -2), calc(var(--hp-dot) * -2)); }
-.hero-pixel-arrow.-scattered .hp-l2 { transform: translate(calc(var(--hp-dot) * 2),  calc(var(--hp-dot) * -1)); }
-.hero-pixel-arrow.-scattered .hp-r1 { transform: translate(calc(var(--hp-dot) * 1),  calc(var(--hp-dot) * 1)); }
-.hero-pixel-arrow.-scattered .hp-r2 { transform: translate(calc(var(--hp-dot) * -1), calc(var(--hp-dot) * -3)); }
-
-/* News play cue: 13-dot pixel triangle, same construction as the hero arrow.
+/* News play cue: 13-dot pixel triangle.
    Dot coords + scatter offsets come in as inline --px/--py/--sx/--sy. */
 .pixel-play {
   --pp-dot: 4px;

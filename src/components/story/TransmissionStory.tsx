@@ -9,6 +9,9 @@ type Edge = {
   element: SVGPathElement;
   start: number;
   end: number;
+  length: number;
+  main: boolean;
+  sweep: boolean;
 };
 const clamp = (n: number) => Math.max(0, Math.min(1, n));
 
@@ -22,7 +25,7 @@ export function TransmissionStory({ children }: { children: ReactNode }) {
     const motion = matchMedia("(prefers-reduced-motion: reduce)");
     let edges: Edge[] = [];
     let nodes: { element: SVGGElement; y: number }[] = [];
-    let reveals: { element: HTMLElement; y: number }[] = [];
+    let disposed = false;
     let frame = 0;
     let layoutFrame = 0;
     let layer: SVGElement = svg;
@@ -40,20 +43,27 @@ export function TransmissionStory({ children }: { children: ReactNode }) {
       return el;
     }
 
-    function edge(d: string, main = false) {
+    function edge(d: string, main = false, sweep = false) {
       add("path", { d, class: styles.ghost });
       const element = add("path", {
         d,
         pathLength: 1,
+        ...(sweep ? { "data-story-sweep": "" } : {}),
         class: `${styles.edge} ${main ? styles.trunk : ""}`,
       });
       const length = element.getTotalLength();
       const item = {
         element,
-        start: element.getPointAtLength(0).y - (main ? 0 : 64),
+        start: element.getPointAtLength(0).y,
         end: element.getPointAtLength(length).y,
+        length,
+        main,
+        sweep,
       };
+      // Horizontal branches unfold after the trunk reaches their junction.
+      if (!main) item.end = Math.max(item.end, item.start + 80);
       edges.push(item);
+      return item.end;
     }
 
     // Leave the trunk with one rounded elbow; no intermediate zigzag.
@@ -61,30 +71,42 @@ export function TransmissionStory({ children }: { children: ReactNode }) {
       const endX = point.x - Math.sign(point.x - x) * clearance;
       const direction = Math.sign(endX - x);
       const r = Math.min(TREE_STYLE.corner, Math.abs(endX - x));
-      edge(
+      return edge(
         `M ${x} ${point.y - r} Q ${x} ${point.y} ${x + direction * r} ${point.y} H ${endX}`,
       );
     }
 
-    function node(point: Point, radius: number, major = false) {
+    function node(point: Point, radius: number, major = false, reachedAt = point.y) {
       const group = add("g", {
         transform: `translate(${point.x} ${point.y})`,
         class: major ? styles.major : styles.minor,
       });
       add("circle", { r: radius }, group);
-      nodes.push({ element: group, y: point.y });
+      nodes.push({ element: group, y: reachedAt });
     }
 
     function update() {
       frame = 0;
       const front = innerHeight * 0.64 - root.getBoundingClientRect().top;
       edges.forEach((e) => {
-        const progress =
+        let progress =
           motion.matches || front >= e.end
             ? 1
             : front <= e.start
               ? 0
               : clamp((front - e.start) / (e.end - e.start));
+        if (e.main && !e.sweep && progress > 0 && progress < 1) {
+          // Vertical runs track the viewport. Sweeps use path distance so
+          // long horizontal turns draw progressively instead of appearing at once.
+          let low = 0;
+          let high = e.length;
+          for (let i = 0; i < 14; i++) {
+            const mid = (low + high) / 2;
+            if (e.element.getPointAtLength(mid).y <= front) low = mid;
+            else high = mid;
+          }
+          progress = low / e.length;
+        }
         e.element.style.strokeDashoffset = String(1 - progress);
       });
       const current = nodes.filter((n) => n.y <= front).at(-1);
@@ -96,12 +118,6 @@ export function TransmissionStory({ children }: { children: ReactNode }) {
               ? "past"
               : "future";
       });
-      reveals.forEach(({ element, y }) =>
-        element.style.setProperty(
-          "--story-reveal",
-          String(motion.matches ? 1 : clamp((front - y + 30) / 130)),
-        ),
-      );
     }
 
     function measure() {
@@ -109,9 +125,8 @@ export function TransmissionStory({ children }: { children: ReactNode }) {
       svg.replaceChildren();
       edges = [];
       nodes = [];
-      reveals = [];
       const box = root.getBoundingClientRect();
-      const small = box.width < 600;
+      const small = box.width < 900;
       const nodeRadius = small ? 7 : TREE_STYLE.radius;
       const titleRadius = small ? TREE_STYLE.radius : TREE_STYLE.largeRadius;
       svg.setAttribute("viewBox", `0 0 ${box.width} ${root.offsetHeight}`);
@@ -140,23 +155,20 @@ export function TransmissionStory({ children }: { children: ReactNode }) {
         const y =
           titleBox.y + parseFloat(getComputedStyle(title).lineHeight) / 2;
         const team = chapter.id === "team";
-        const gap = team && !small ? (box.width < 900 ? 48 : 64) : 36;
+        const terminal = chapter.hasAttribute("data-story-end");
         let center = small
-          ? index % 2 === 0
-            ? 22
-            : 34
+          ? 24
           : chapter.dataset.storySide === "left"
-            ? titleBox.x + titleBox.width + gap
-            : titleBox.x - gap;
+            ? titleBox.x + titleBox.width + 36
+            : titleBox.x - 36;
         const branches = Array.from(
           chapter.querySelectorAll<HTMLElement>("[data-story-branch]"),
         );
         if (team && box.width >= 900) {
           const first = bounds(branches[0]);
           center = first.x + first.width + 32;
-        } else if (team && !small) {
-          center = bounds(branches[0]).x + 14;
         }
+        if (terminal) center = small ? 24 : titleBox.x - 32;
         let lastConnection = y;
         layer = add(
           "g",
@@ -183,31 +195,13 @@ export function TransmissionStory({ children }: { children: ReactNode }) {
            H ${center - direction * radius}
            Q ${center} ${turnY} ${center} ${turnY + radius} V ${y - (titleRadius + TREE_STYLE.clearance)}`,
           true,
+          direction !== 0,
         );
         node({ x: center, y }, titleRadius, true);
         previousX = center;
 
-        if (team && box.width >= 900) {
-          const portraits = branches.map((branch) =>
-            bounds(branch.querySelector<HTMLElement>("[data-story-anchor]")!),
-          );
-          const forkY = portraits[0].y - 72;
-          const first = portraits[0],
-            last = portraits[portraits.length - 1];
-          offshoot(
-            center,
-            { x: first.x + first.width / 2 + TREE_STYLE.corner, y: forkY },
-            0,
-          );
-          offshoot(
-            center,
-            { x: last.x + last.width / 2 - TREE_STYLE.corner, y: forkY },
-            0,
-          );
-        }
-
         branches.forEach((branch, branchIndex) => {
-          const b = bounds(branch);
+          if (terminal) return;
           const leaves = Array.from(
             branch.querySelectorAll<HTMLElement>("[data-story-leaf]"),
           );
@@ -246,37 +240,44 @@ export function TransmissionStory({ children }: { children: ReactNode }) {
                   : right
                     ? (team ? anchorBox.x : t.x) - 18
                     : t.x + t.width + 18,
-                y: peers ? anchorBox.y - 24 : anchorBox.y + anchorOffset,
+                y: peers
+                  ? anchorBox.y - 24
+                  : Math.max(
+                      anchorBox.y + anchorOffset,
+                      y + titleRadius + TREE_STYLE.corner + TREE_STYLE.clearance + 8,
+                    ),
               };
+              let reachedAt: number;
               if (peers) {
                 const forkY = point.y - 48;
                 const direction = Math.sign(point.x - center);
                 const r = TREE_STYLE.corner;
-                edge(`M ${point.x - direction * r} ${forkY}
+                reachedAt = edge(`M ${center} ${forkY - r}
+                  Q ${center} ${forkY} ${center + direction * r} ${forkY}
+                  H ${point.x - direction * r}
                   Q ${point.x} ${forkY} ${point.x} ${forkY + r}
                   V ${point.y - nodeRadius - TREE_STYLE.clearance}`);
               } else {
-                offshoot(center, point, nodeRadius + TREE_STYLE.clearance);
+                reachedAt = offshoot(center, point, nodeRadius + TREE_STYLE.clearance);
               }
-              node(point, nodeRadius);
+              node(point, nodeRadius, false, reachedAt);
               lastConnection = Math.max(lastConnection, point.y);
             });
           }
-          reveals.push({ element: branch, y: b.y });
-          leaves.forEach((leaf) =>
-            reveals.push({ element: leaf, y: bounds(leaf).y }),
-          );
         });
         const bottom =
           index === chapters.length - 1
             ? lastConnection
             : bounds(chapters[index + 1]).y;
-        edge(`M ${center} ${y + titleRadius} V ${bottom}`, true);
+        if (!terminal && bottom > y + titleRadius) {
+          edge(`M ${center} ${y + titleRadius} V ${bottom}`, true);
+        }
         // Nodes sit above connections, retaining the product's crisp outlined circles.
         nodes.forEach(({ element }) => {
           if (element.parentNode === layer) layer.appendChild(element);
         });
       });
+      nodes.sort((a, b) => a.y - b.y);
       update();
       root.dataset.ready = "true";
     }
@@ -313,7 +314,9 @@ export function TransmissionStory({ children }: { children: ReactNode }) {
     addEventListener("resize", layout);
     motion.addEventListener("change", schedule);
     measure();
+    document.fonts.ready.then(() => { if (!disposed) layout(); });
     return () => {
+      disposed = true;
       resize.disconnect();
       mutations.disconnect();
       cancelAnimationFrame(frame);

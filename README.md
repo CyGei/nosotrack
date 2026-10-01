@@ -10,6 +10,7 @@ implements the website; HTML/CSS and small browser scripts implement the decks.
 - `npm run build` type-checks and exports the site to `out/`.
 - `npm run build:demo` rebuilds the embedded product demo from `scripts/foundry-demo-src/`.
 - `npm run audit:responsive` checks layouts and presentation navigation with Playwright.
+- `npm run audit:story` checks transmission-line alignment and scroll progression in Chromium, Firefox, and WebKit across phone, tablet, landscape, and desktop sizes. Set `PLAYWRIGHT_MODULE` if Playwright is supplied outside this project.
 - `npm run audit:animations` checks hospital chart playback and replay with motion enabled.
 
 Stop the development server before building: Next.js shares `.next/` between

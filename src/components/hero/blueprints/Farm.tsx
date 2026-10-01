@@ -11,9 +11,9 @@ export const FARM_MILK_ROOM = { x: 780, y: 520, w: 160, h: 300 } as const;
 export const FARM_ALLEY = { x: 80, y: 850, w: 860, h: 50 } as const;
 
 export function FarmBlueprint({ className, style }: Props) {
-  const stroke = "rgba(239,238,239,0.34)";
-  const strokeFaint = "rgba(239,238,239,0.16)";
-  const textFaint = "rgba(239,238,239,0.34)";
+  const stroke = "rgba(30,30,43,0.52)";
+  const strokeFaint = "rgba(30,30,43,0.28)";
+  const textFaint = "rgba(30,30,43,0.52)";
 
   return (
     <svg
@@ -30,7 +30,7 @@ export function FarmBlueprint({ className, style }: Props) {
           fontSize="18"
           fontWeight="500"
           letterSpacing="0.12em"
-          fill="rgba(239,238,239,0.95)"
+          fill="rgba(30,30,43,0.95)"
         >
           DAIRY FARM
         </text>
@@ -43,9 +43,9 @@ export function FarmBlueprint({ className, style }: Props) {
           fill={textFaint}
         >
           DIGITAL TWIN
-          <tspan fill="rgba(239,238,239,0.22)">{"  ·  "}</tspan>
+          <tspan fill="rgba(30,30,43,0.38)">{"  ·  "}</tspan>
           BARN 02
-          <tspan fill="rgba(239,238,239,0.22)">{"  ·  "}</tspan>
+          <tspan fill="rgba(30,30,43,0.38)">{"  ·  "}</tspan>
           MILKING SHIFT
         </text>
       </g>
@@ -101,7 +101,7 @@ export function FarmBlueprint({ className, style }: Props) {
           y1={FARM_PASTURE.y + 200}
           x2={FARM_PASTURE.x + FARM_PASTURE.w}
           y2={FARM_PASTURE.y + 280}
-          stroke="rgba(33,35,38,1)"
+          stroke="var(--color-bg)"
           strokeWidth="2"
         />
 
@@ -149,7 +149,7 @@ export function FarmBlueprint({ className, style }: Props) {
           y1={FARM_STALLS.y + FARM_STALLS.h}
           x2={FARM_STALLS.x + 180}
           y2={FARM_STALLS.y + FARM_STALLS.h}
-          stroke="rgba(33,35,38,1)"
+          stroke="var(--color-bg)"
           strokeWidth="2"
         />
 
@@ -172,7 +172,7 @@ export function FarmBlueprint({ className, style }: Props) {
           y1={FARM_HOLDING.y + 60}
           x2={FARM_HOLDING.x + FARM_HOLDING.w}
           y2={FARM_HOLDING.y + 110}
-          stroke="rgba(33,35,38,1)"
+          stroke="var(--color-bg)"
           strokeWidth="2"
         />
 
@@ -272,7 +272,7 @@ export function FarmBlueprint({ className, style }: Props) {
           y1={FARM_MILK_ROOM.y}
           x2={FARM_MILK_ROOM.x + 110}
           y2={FARM_MILK_ROOM.y}
-          stroke="rgba(33,35,38,1)"
+          stroke="var(--color-bg)"
           strokeWidth="2"
         />
 

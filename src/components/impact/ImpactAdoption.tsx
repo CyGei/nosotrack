@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import metricsData from "@/data/research-metrics.json";
 import geoData from "@/data/research-geo.json";
 import { useCountUp, fmtInt } from "@/lib/useCountUp";
-import { Reveal } from "./Reveal";
 import { AdoptionGlobe } from "./AdoptionGlobe";
 
 const Globe = dynamic(() => import("./Globe").then((m) => m.Globe), {
@@ -165,6 +164,15 @@ export function ImpactAdoption() {
     </div>
   );
 
+  const heading = (
+    <h2
+      data-story-title
+      className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
+    >
+      Peer-reviewed science, adopted globally.
+    </h2>
+  );
+
   return (
     <section
       id="impact"
@@ -174,83 +182,74 @@ export function ImpactAdoption() {
       aria-label="Impact and adoption"
     >
       <div className="container-page">
-        <Reveal>
-          <h2
-            data-story-title
-            className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
-          >
-            Peer-reviewed science, adopted globally.
-          </h2>
-        </Reveal>
+        {wide ? (
+          <div data-story-fork>
+            <div data-story-branch data-story-intro>
+              {heading}
+              <TextSwap open={open} para={para} />
+            </div>
 
-        <Reveal>
-          {wide ? (
-            <div data-story-fork>
-              <div data-story-branch>
-                <TextSwap open={open} para={para} />
-              </div>
-
+            <div
+              data-story-branch="quiet"
+              ref={measureRef}
+              className="relative"
+            >
+              {openLabel ? (
+                globeStage
+              ) : (
+                <AdoptionGlobe onSelectMetric={setOpenLabel} />
+              )}
               <div
-                data-story-branch="quiet"
-                ref={measureRef}
-                className="relative"
+                className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint"
+                style={{ width: globeSize }}
               >
-                {openLabel ? (
-                  globeStage
-                ) : (
-                  <AdoptionGlobe onSelectMetric={setOpenLabel} />
-                )}
-                <div
-                  className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint"
-                  style={{ width: globeSize }}
-                >
-                  {caption}
-                </div>
+                {caption}
               </div>
             </div>
-          ) : (
-            <div data-story-fork>
-              <div data-story-branch>
-                <LeadCopy />
-              </div>
+          </div>
+        ) : (
+          <div data-story-fork>
+            <div data-story-branch data-story-intro>
+              {heading}
+              <LeadCopy />
+            </div>
 
-              <div data-story-branch="quiet" ref={measureRef}>
-                {open ? (
-                  <>
-                    <div
-                      className="relative mx-auto"
-                      style={{ width: globeSize, height: globeSize }}
-                    >
-                      <Globe data={geoData} size={globeSize} />
-                      {backArrow}
-                    </div>
-                    <div className="mt-10">
-                      <Methodology para={open} />
-                    </div>
-                    <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8">
-                      {open.pkgs.map((p, i) => (
-                        <PackageMetric
-                          key={p.name}
-                          pkg={p}
-                          unit={open.unit}
-                          run
-                          delay={i * 70}
-                          centered
-                        />
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <AdoptionGlobe onSelectMetric={setOpenLabel} />
-                )}
+            <div data-story-branch="quiet" ref={measureRef}>
+              {open ? (
+                <>
+                  <div
+                    className="relative mx-auto"
+                    style={{ width: globeSize, height: globeSize }}
+                  >
+                    <Globe data={geoData} size={globeSize} />
+                    {backArrow}
+                  </div>
+                  <div className="mt-10">
+                    <Methodology para={open} />
+                  </div>
+                  <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8">
+                    {open.pkgs.map((p, i) => (
+                      <PackageMetric
+                        key={p.name}
+                        pkg={p}
+                        unit={open.unit}
+                        run
+                        delay={i * 70}
+                        centered
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <AdoptionGlobe onSelectMetric={setOpenLabel} />
+              )}
 
-                <div className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
-                  {caption}
-                </div>
+              <div className="mt-8 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
+                {caption}
               </div>
             </div>
-          )}
-        </Reveal>
+          </div>
+        )}
       </div>
     </section>
   );

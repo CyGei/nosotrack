@@ -51,25 +51,25 @@ export function Roadmap() {
     <section
       id="roadmap"
       data-story-chapter
-      data-story-side="left"
+      data-story-side="right"
       className="section-pad border-t border-rule bg-bg"
       aria-label="Roadmap"
     >
       <div className="container-page">
-        <h2
-          data-story-title
-          className="mb-8 max-w-[20ch] font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
-        >
-          Next steps.
-        </h2>
-
-        <div data-story-fork>
-          <p
-            data-story-branch
-            className="mb-16 max-w-[55ch] font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink [text-wrap:pretty]"
-          >
-            {ROADMAP_INTRO}
-          </p>
+        <div data-story-fork data-story-reverse>
+          <div data-story-branch data-story-intro>
+            <h2
+              data-story-title
+              className="mb-8 max-w-[20ch] font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
+            >
+              Next steps.
+            </h2>
+            <p
+              className="max-w-[55ch] font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink [text-wrap:pretty]"
+            >
+              {ROADMAP_INTRO}
+            </p>
+          </div>
 
           <div data-story-branch>
             {PHASES.map((phase, i) => {

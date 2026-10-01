@@ -27,9 +27,9 @@ export const HOSP_EAST_W = 200;
 export const HOSP_LW_ROOM_H = LW_ROOM_H;
 
 export function HospitalBlueprint({ className, style }: Props) {
-  const stroke = "rgba(239,238,239,0.34)";
-  const strokeFaint = "rgba(239,238,239,0.16)";
-  const textFaint = "rgba(239,238,239,0.34)";
+  const stroke = "rgba(30,30,43,0.52)";
+  const strokeFaint = "rgba(30,30,43,0.28)";
+  const textFaint = "rgba(30,30,43,0.52)";
 
   const shell =
     "M 60 60 L 940 60 L 940 480 L 480 480 L 480 940 L 60 940 Z";
@@ -76,7 +76,7 @@ export function HospitalBlueprint({ className, style }: Props) {
                 y1={220}
                 x2={x + TOP_ROOM_W / 2 - 14}
                 y2={220}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <line
@@ -84,7 +84,7 @@ export function HospitalBlueprint({ className, style }: Props) {
                 y1={220}
                 x2={x + TOP_ROOM_W - 12}
                 y2={220}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <rect
@@ -108,7 +108,7 @@ export function HospitalBlueprint({ className, style }: Props) {
                 y1={270}
                 x2={x + TOP_ROOM_W / 2 - 14}
                 y2={270}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <line
@@ -116,7 +116,7 @@ export function HospitalBlueprint({ className, style }: Props) {
                 y1={270}
                 x2={x + TOP_ROOM_W - 12}
                 y2={270}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <rect
@@ -140,7 +140,7 @@ export function HospitalBlueprint({ className, style }: Props) {
                 y1={y + 12}
                 x2={220}
                 y2={y + LW_ROOM_H / 2 - 12}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <line
@@ -148,7 +148,7 @@ export function HospitalBlueprint({ className, style }: Props) {
                 y1={y + LW_ROOM_H / 2 + 12}
                 x2={220}
                 y2={y + LW_ROOM_H - 12}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <rect
@@ -172,7 +172,7 @@ export function HospitalBlueprint({ className, style }: Props) {
                 y1={y + 12}
                 x2={270}
                 y2={y + LW_ROOM_H / 2 - 12}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <line
@@ -180,7 +180,7 @@ export function HospitalBlueprint({ className, style }: Props) {
                 y1={y + LW_ROOM_H / 2 + 12}
                 x2={270}
                 y2={y + LW_ROOM_H - 12}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <rect
@@ -216,7 +216,7 @@ export function HospitalBlueprint({ className, style }: Props) {
           fontSize="18"
           fontWeight="500"
           letterSpacing="0.12em"
-          fill="rgba(239,238,239,0.95)"
+          fill="rgba(30,30,43,0.95)"
         >
           ACUTE CARE HOSPITAL
         </text>
@@ -229,9 +229,9 @@ export function HospitalBlueprint({ className, style }: Props) {
           fill={textFaint}
         >
           DIGITAL TWIN
-          <tspan fill="rgba(239,238,239,0.22)">{"  ·  "}</tspan>
+          <tspan fill="rgba(30,30,43,0.38)">{"  ·  "}</tspan>
           WARD A
-          <tspan fill="rgba(239,238,239,0.22)">{"  ·  "}</tspan>
+          <tspan fill="rgba(30,30,43,0.38)">{"  ·  "}</tspan>
           LEVEL 3
         </text>
       </g>
