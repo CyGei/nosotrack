@@ -10,6 +10,8 @@ import styles from "./Hero.module.css";
 export function Hero() {
   const heroRef = useRef<HTMLElement>(null);
   const openingRef = useRef<HTMLDivElement>(null);
+  const reconstructRef = useRef<HTMLHeadingElement>(null);
+  const [reconstructReady, setReconstructReady] = useState(false);
   const [inView, setInView] = useState(true);
   const [pageVisible, setPageVisible] = useState(true);
   const reduce = useReducedMotion();
@@ -39,6 +41,40 @@ export function Hero() {
     };
   }, [reduce]);
 
+  useEffect(() => {
+    const heading = reconstructRef.current!;
+    let lastY = Math.max(0, window.scrollY);
+    // A restored scroll position already represents progress into the page.
+    let movedDown = lastY > 0;
+    let frame = 0;
+    let revealed = false;
+    const check = () => {
+      frame = 0;
+      const { top, bottom } = heading.getBoundingClientRect();
+      if (movedDown && window.scrollY > 0 && top < innerHeight * 0.82 && bottom > 0) {
+        revealed = true;
+        setReconstructReady(true);
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", schedule);
+      }
+    };
+    const schedule = () => { if (!revealed && !frame) frame = requestAnimationFrame(check); };
+    const onScroll = () => {
+      const y = Math.max(0, window.scrollY);
+      if (y > lastY) movedDown = true;
+      lastY = y;
+      schedule();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", schedule);
+    check();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", schedule);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
   return (
     <section ref={heroRef} id="hero" className={`on-dark ${styles.hero}`} aria-labelledby="hero-title">
       <div ref={openingRef} data-intro-opening className={styles.opening}>
@@ -58,8 +94,8 @@ export function Hero() {
         </div>
       </div>
       <div className={`container-page ${styles.reconstruct}`}>
-        <h2 data-intro-reconstruct className={styles.chapterTitle}>
-          <AnimatedTitle text="Nosotrack reconstructs the chain of transmission." />
+        <h2 ref={reconstructRef} data-intro-reconstruct className={styles.chapterTitle}>
+          <AnimatedTitle text="Nosotrack reconstructs the chain of transmission." enabled={reconstructReady} rootMargin="0px" />
         </h2>
         <div data-intro-branches className={styles.branchSpace} aria-hidden="true" />
       </div>

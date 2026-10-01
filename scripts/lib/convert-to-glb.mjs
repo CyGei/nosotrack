@@ -72,7 +72,7 @@ class FakeFileReader {
 globalThis.FileReader = FakeFileReader;
 
 // mergeVertices is required: gltfpack's simplifier is a no-op on non-indexed geometry.
-export function loadMesh(srcPath, format) {
+function loadMesh(srcPath, format) {
   const fmt = (format ?? srcPath.split(".").pop()).toLowerCase();
   if (fmt === "wrl" || fmt === "vrml") {
     const text = readFileSync(srcPath, "utf8");
@@ -110,7 +110,7 @@ function weldGroup(group, tolerance) {
   });
 }
 
-export async function exportGroupToGlb(group, outPath) {
+async function exportGroupToGlb(group, outPath) {
   const exporter = new GLTFExporter();
   const result = await exporter.parseAsync(group, { binary: true });
   writeFileSync(outPath, Buffer.from(result));

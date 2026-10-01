@@ -1,4 +1,4 @@
-export type PathogenFraming = {
+type PathogenFraming = {
   targetRadius?: number;
   cameraZ?: number;
   fov?: number;
@@ -9,13 +9,13 @@ export type PathogenFraming = {
   rotationAxis?: "x" | "y" | "z";
 };
 
-export type PathogenLicense =
+type PathogenLicense =
   | "CC-BY 4.0"
   | "CC-BY-NC 4.0"
   | "CC0"
   | "Public Domain";
 
-export type PathogenSource = {
+type PathogenSource = {
   nih3dEntryId: string;
   nih3dEntryUrl: string;
   // Licensing/attribution provenance for the GLB; intentionally not rendered.

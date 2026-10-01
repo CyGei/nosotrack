@@ -3,7 +3,7 @@
 // outbreak. Vector-borne / water-borne / non-person-to-person events are excluded,
 // as are duplicate DON updates of the same outbreak.
 
-export type OutbreakHeadline = { outlet: string; text: string; href: string };
+type OutbreakHeadline = { outlet: string; text: string; href: string };
 
 export type Outbreak = {
   id: string;

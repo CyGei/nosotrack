@@ -10,12 +10,9 @@ export const TREE_STYLE = {
   clearance: 3,
 } as const;
 
-// Original at-risk target treatment from the hero's Stop the spread scene.
+// Containment brackets in the hero.
 export const TREE_TARGET = {
   clearance: 6,
   outline: 1.2,
-  dash: "3 2",
   opacity: 0.95,
 } as const;
-
-export { manhattanPath } from "./manhattanPath";

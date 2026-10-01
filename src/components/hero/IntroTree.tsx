@@ -27,7 +27,9 @@ export function IntroTree({ rootRef }: { rootRef: RefObject<HTMLElement> }) {
     let nodes: Node[] = [];
     let network: SVGGElement;
     let dot: SVGCircleElement;
-    let target: SVGCircleElement;
+    let target: SVGGElement;
+    let targetCorners: { element: SVGPathElement; x: number; y: number }[] = [];
+    let potential: SVGGElement;
     let initialRadius = 0;
     let dotOrigin: Point = { x: 0, y: 0 };
     let nodeRadius: number = TREE_STYLE.radius;
@@ -107,7 +109,17 @@ export function IntroTree({ rootRef }: { rootRef: RefObject<HTMLElement> }) {
       dot.setAttribute("cy", String(dotOrigin.y + expansion));
       dot.setAttribute("r", String(initialRadius + (spineRadius - initialRadius) * grow));
       dot.setAttribute("stroke-width", String(TREE_STYLE.outline * grow));
-      target.style.opacity = String(TREE_TARGET.opacity * (motion.matches ? 1 : clamp((front - targetY + 36) / 72)));
+      // Let visitors see the threatened onward cases before the intervention.
+      const containment = motion.matches ? 1 : clamp((front - targetY - 50) / 120);
+      const eased = containment * containment * (3 - 2 * containment);
+      target.style.opacity = String(TREE_TARGET.opacity * (motion.matches ? 1 : clamp((front - targetY + 24) / 24)));
+      targetCorners.forEach(({ element, x, y }) => {
+        const travel = 8 * (1 - eased);
+        element.setAttribute("transform", `translate(${x * travel} ${y * travel})`);
+      });
+      // Possible future transmission disappears; established cases stay visible.
+      const reveal = clamp((front - targetY + 40) / 40);
+      potential.style.opacity = String(motion.matches ? 0 : 0.55 * reveal * (1 - eased));
     }
 
     function measure() {
@@ -132,35 +144,62 @@ export function IntroTree({ rootRef }: { rootRef: RefObject<HTMLElement> }) {
       initialRadius = punctuation.width / 2;
       const expandedOrigin = { x: origin.x + spineRadius - initialRadius, y: origin.y + spineRadius - initialRadius };
       const heading = bounds(reconstruct);
-      const finish = bounds(stop);
+      const closing = bounds(stop);
+      const closingLineHeight = parseFloat(getComputedStyle(stop).lineHeight);
       const treeBox = bounds(branches);
       const entry = bounds(connection);
       const trunkX = entry.x + entry.width / 2;
       const first = { x: trunkX, y: heading.y + parseFloat(getComputedStyle(reconstruct).lineHeight) / 2 };
-      const risk = { x: trunkX, y: finish.y + parseFloat(getComputedStyle(stop).lineHeight) / 2 };
-      targetY = risk.y;
       const rowY = treeBox.y + treeBox.height * 0.30;
       const leafY = treeBox.y + treeBox.height * 0.72;
       const leftX = small ? 32 : trunkX - Math.min(300, box.width * 0.23);
       const rightX = small ? box.width - 32 : trunkX + Math.min(400, box.width * 0.30);
       const leaves = Array.from({ length: 5 }, (_, i) => ({ x: leftX + (rightX - leftX) * i / 4, y: leafY }));
+      // Contain an existing second-generation case, not an extra generation.
+      const risk = leaves[1];
+      targetY = risk.y;
       const left = { x: (leaves[0].x + leaves[1].x) / 2, y: rowY };
       const right = { x: leaves[3].x, y: rowY };
 
-      route({ x: expandedOrigin.x, y: expandedOrigin.y + spineRadius }, first, opening.offsetHeight - 100, true, spineRadius + TREE_STYLE.clearance);
-      fork(first, [left, right], treeBox.y + 44, 0, spineRadius);
-      fork(left, leaves.slice(0, 2), rowY + 60, 1);
-      fork(right, leaves.slice(2), rowY + 60);
-      // One second-generation case leads to the next at-risk node below the tree.
-      route({ x: leaves[1].x, y: leafY + nodeRadius }, risk, leafY + 48, true, spineRadius + TREE_STYLE.clearance);
-      edge(`M ${risk.x} ${risk.y + spineRadius} V ${box.height}`, true);
+      route({ x: expandedOrigin.x, y: expandedOrigin.y + spineRadius }, first, opening.offsetHeight - 28, true, spineRadius + TREE_STYLE.clearance);
+      fork(first, [left, right], treeBox.y + 28, 0, spineRadius);
+      fork(left, leaves.slice(0, 2), rowY + 36, 1);
+      fork(right, leaves.slice(2), rowY + 36);
+      // Show two possible onward cases in the existing tree's visual language.
+      // Use the same shared stem and mirrored rounded forks as established cases.
+      const frameRadius = nodeRadius + TREE_TARGET.clearance;
+      potential = add("g", { "data-intro-potential": "", stroke: "var(--tree-ink)", "stroke-width": TREE_STYLE.edge, fill: "none" });
+      // Align the desktop endpoints with the closing statement's second line.
+      // Mobile keeps the branch above the copy, where they share horizontal space.
+      const futureY = small
+        ? risk.y + 68
+        : Math.max(risk.y + 84, closing.y + Math.min(closing.height - closingLineHeight / 2, closingLineHeight * 1.5));
+      const splitY = risk.y + Math.max(34, (futureY - risk.y) * 0.42);
+      const spread = small ? 28 : 48;
+      const futureXs = [risk.x - spread, risk.x + spread];
+      const r = TREE_STYLE.corner;
+      add("path", { d: `M ${risk.x} ${risk.y + nodeRadius} V ${splitY - r}` }, potential);
+      futureXs.forEach(x => {
+        const direction = Math.sign(x - risk.x);
+        add("path", { d: `M ${risk.x} ${splitY - r} Q ${risk.x} ${splitY} ${risk.x + direction * r} ${splitY} H ${x - direction * r} Q ${x} ${splitY} ${x} ${splitY + r} V ${futureY - nodeRadius - TREE_STYLE.clearance}` }, potential);
+      });
+      futureXs.forEach(x => add("circle", { cx: x, cy: futureY, r: nodeRadius, fill: "var(--tree-bg)", "stroke-width": TREE_STYLE.outline }, potential));
+      // The editorial spine resumes at the section boundary after a clear gap.
+      // It is not an onward transmission edge from the contained node.
+      add("path", { d: `M ${trunkX} ${box.height - 20} V ${box.height}`, class: story.ghost, "data-intro-editorial": "" });
       node(first, true);
       [left, right, ...leaves].forEach(point => node(point));
-      node(risk, true);
       nodes.sort((a, b) => a.y - b.y);
       dot = add("circle", { cx: origin.x, cy: origin.y, r: initialRadius, fill: "var(--color-inv-hi)", stroke: "var(--color-inv-hi)", "data-intro-root": "" }, svg);
-      // Reuse the original Stop scene's targeting treatment around the normal node.
-      target = add("circle", { cx: risk.x, cy: risk.y, r: spineRadius + TREE_TARGET.clearance, fill: "none", stroke: "var(--color-alert)", "stroke-width": TREE_TARGET.outline, "stroke-dasharray": TREE_TARGET.dash, "data-intro-target": "" });
+      // Exact corner geometry and proportions from BrandMark's 32px viewBox.
+      // The four brackets settle inward as the onward transmission disappears.
+      target = add("g", { fill: "none", stroke: "var(--color-alert)", "stroke-width": TREE_TARGET.outline, "stroke-linecap": "square", transform: `translate(${risk.x} ${risk.y}) scale(${frameRadius / 13}) translate(-16 -16)`, "data-intro-target": "" });
+      targetCorners = [
+        { d: "M3 8 L3 3 L8 3", x: -1, y: -1 },
+        { d: "M24 3 L29 3 L29 8", x: 1, y: -1 },
+        { d: "M29 24 L29 29 L24 29", x: 1, y: 1 },
+        { d: "M8 29 L3 29 L3 24", x: -1, y: 1 },
+      ].map(({ d, x, y }) => ({ element: add("path", { d }, target), x, y }));
       root.dataset.treeReady = "true";
       update();
     }
