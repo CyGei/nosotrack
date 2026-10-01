@@ -30,7 +30,7 @@ export function AboutBlock({
   return (
     <article
       data-story-chapter
-      data-story-side={id === "0.2" || id === "0.4" ? "left" : "right"}
+      data-story-side={(id === "0.2" || id === "0.4") ? "left" : "right"}
       aria-label={`Section ${id}`}
     >
       <div className="container-page section-pad">
@@ -61,7 +61,7 @@ export function AboutBlock({
               <div className="rounded-[14px] border border-rule-strongest bg-bg overflow-hidden">
                 <div
                   key={hasVideo ? tab : "details"}
-                  className="animate-tab-in p-4 lg:p-6"
+                  className={cn("animate-tab-in", hasVideo && tab === "video" ? "p-2 sm:p-3" : "p-4 lg:p-6")}
                   aria-live="polite"
                 >
                   {hasVideo && tab === "video" ? video : details}
@@ -148,7 +148,7 @@ function SwitchButton({
       aria-selected={active}
       type="button"
       onClick={onClick}
-      className="relative z-10 flex-1 font-mono uppercase"
+      className="relative z-10 flex-1 whitespace-nowrap font-mono uppercase"
       style={{
         padding: "4px 14px",
         borderRadius: 9999,

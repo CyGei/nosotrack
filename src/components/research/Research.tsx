@@ -24,7 +24,6 @@ export function Research() {
         >
           Pathogen agnostic, ready for Disease X.
         </h2>
-
         <div data-story-fork>
           <div
             data-story-branch

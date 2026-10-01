@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import extraHabitats from "../settings/habitats.json";
 import { useReducedMotion } from "@/lib/hooks";
 import { HospitalBlueprint } from "./blueprints/Hospital";
 import { CruiseShipBlueprint } from "./blueprints/CruiseShip";
@@ -47,24 +48,26 @@ type Particle = {
   corridor?: HabitatMotion;
 };
 
-const COLOR_SUSCEPT = "rgba(220,220,224,0.92)";
+const COLOR_SUSCEPT = "rgba(30,30,43,0.75)";
 const COLOR_INFECT = "rgba(255,7,58,0.98)";
-const COLOR_EDGE = "rgba(239,238,239,0.22)";
+const COLOR_EDGE = "rgba(30,30,43,0.22)";
 const COLOR_EDGE_HOT = "rgba(255,7,58,0.78)";
 
-export type SceneId = "hospital" | "ship" | "farm";
+export type SceneId = "hospital" | "ship" | "farm" | "school" | "care" | "city";
 
 export type HeroBackdropProps = {
   scene: SceneId;
+  overlayOnly?: boolean;
 };
 
 const HABITATS_BY_SCENE: Record<SceneId, Habitat[]> = {
   hospital: HOSPITAL_HABITATS,
   ship: SHIP_HABITATS,
   farm: FARM_HABITATS,
+  ...extraHabitats,
 };
 
-export function HeroBackdrop({ scene }: HeroBackdropProps) {
+export function HeroBackdrop({ scene, overlayOnly = false }: HeroBackdropProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
@@ -272,14 +275,15 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
       for (const p of ps) {
         const cx = offsetX + p.x * scale;
         const cy = offsetY + p.y * scale;
-        const r = p.infected ? 4.4 : 3.6;
+        const markerScale = Math.min(1, Math.max(0.4, scale * 2.5));
+        const r = (p.infected ? 4.4 : 3.6) * markerScale;
         ctx.fillStyle = p.infected ? COLOR_INFECT : COLOR_SUSCEPT;
         drawShape(ctx, p.shape, cx, cy, r);
         if (p.infected) {
           ctx.strokeStyle = "rgba(255,7,58,0.32)";
           ctx.lineWidth = 1;
           ctx.beginPath();
-          ctx.arc(cx, cy, 8 + Math.sin(now / 380) * 1.6, 0, Math.PI * 2);
+          ctx.arc(cx, cy, (8 + Math.sin(now / 380) * 1.6) * markerScale, 0, Math.PI * 2);
           ctx.stroke();
         }
       }
@@ -300,15 +304,14 @@ export function HeroBackdrop({ scene }: HeroBackdropProps) {
       aria-hidden
       className="pointer-events-none absolute inset-0 overflow-hidden"
     >
-      <div className="absolute inset-0">
+      {!overlayOnly && <div className="absolute inset-0">
         {scene === "hospital" && <HospitalBlueprint className="h-full w-full" />}
         {scene === "ship" && <CruiseShipBlueprint className="h-full w-full" />}
         {scene === "farm" && <FarmBlueprint className="h-full w-full" />}
-      </div>
+      </div>}
       <canvas
         ref={canvasRef}
         className="absolute inset-0"
-        style={{ mixBlendMode: "screen" }}
       />
     </div>
   );

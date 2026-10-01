@@ -31,9 +31,9 @@ export const SHIP_ATRIUM = { x: 425, y: 374, w: 50, h: 50 } as const;
 export const SHIP_DINING = { x: 485, y: 374, w: 170, h: 50 } as const;
 
 export function CruiseShipBlueprint({ className, style }: Props) {
-  const stroke = "rgba(239,238,239,0.34)";
-  const strokeFaint = "rgba(239,238,239,0.16)";
-  const textFaint = "rgba(239,238,239,0.34)";
+  const stroke = "rgba(30,30,43,0.52)";
+  const strokeFaint = "rgba(30,30,43,0.28)";
+  const textFaint = "rgba(30,30,43,0.52)";
 
   const hull =
     "M 80 260 L 860 260 Q 940 260 960 360 Q 970 400 960 440 Q 940 540 860 540 L 80 540 Q 40 540 40 460 L 40 340 Q 40 260 80 260 Z";
@@ -55,7 +55,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
           fontSize="18"
           fontWeight="500"
           letterSpacing="0.12em"
-          fill="rgba(239,238,239,0.95)"
+          fill="rgba(30,30,43,0.95)"
         >
           CARIBBEAN CRUISE
         </text>
@@ -68,7 +68,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
           fill={textFaint}
         >
           DIGITAL TWIN
-          <tspan fill="rgba(239,238,239,0.22)">{"  ·  "}</tspan>
+          <tspan fill="rgba(30,30,43,0.38)">{"  ·  "}</tspan>
           MAIN FLOOR
         </text>
       </g>
@@ -121,7 +121,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
                 y1={SHIP_PORT_CABIN_Y + SHIP_PORT_CABIN_H}
                 x2={x + SHIP_AFT_CABIN_W / 2 - 3}
                 y2={SHIP_PORT_CABIN_Y + SHIP_PORT_CABIN_H}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <line
@@ -129,7 +129,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
                 y1={SHIP_PORT_CABIN_Y + SHIP_PORT_CABIN_H}
                 x2={x + SHIP_AFT_CABIN_W - 4}
                 y2={SHIP_PORT_CABIN_Y + SHIP_PORT_CABIN_H}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
             </g>
@@ -151,7 +151,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
                 y1={SHIP_STBD_CABIN_Y}
                 x2={x + SHIP_AFT_CABIN_W / 2 - 3}
                 y2={SHIP_STBD_CABIN_Y}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <line
@@ -159,7 +159,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
                 y1={SHIP_STBD_CABIN_Y}
                 x2={x + SHIP_AFT_CABIN_W - 4}
                 y2={SHIP_STBD_CABIN_Y}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
             </g>
@@ -181,7 +181,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
                 y1={SHIP_PORT_CABIN_Y + SHIP_PORT_CABIN_H}
                 x2={x + SHIP_FWD_CABIN_W / 2 - 3}
                 y2={SHIP_PORT_CABIN_Y + SHIP_PORT_CABIN_H}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <line
@@ -189,7 +189,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
                 y1={SHIP_PORT_CABIN_Y + SHIP_PORT_CABIN_H}
                 x2={x + SHIP_FWD_CABIN_W - 4}
                 y2={SHIP_PORT_CABIN_Y + SHIP_PORT_CABIN_H}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
             </g>
@@ -211,7 +211,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
                 y1={SHIP_STBD_CABIN_Y}
                 x2={x + SHIP_FWD_CABIN_W / 2 - 3}
                 y2={SHIP_STBD_CABIN_Y}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
               <line
@@ -219,7 +219,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
                 y1={SHIP_STBD_CABIN_Y}
                 x2={x + SHIP_FWD_CABIN_W - 4}
                 y2={SHIP_STBD_CABIN_Y}
-                stroke="rgba(33,35,38,1)"
+                stroke="var(--color-bg)"
                 strokeWidth="2"
               />
             </g>
@@ -243,7 +243,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
           y1={SHIP_ATRIUM.y}
           x2={SHIP_ATRIUM.x + SHIP_ATRIUM.w - 10}
           y2={SHIP_ATRIUM.y}
-          stroke="rgba(33,35,38,1)"
+          stroke="var(--color-bg)"
           strokeWidth="2"
         />
         <line
@@ -251,7 +251,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
           y1={SHIP_ATRIUM.y + SHIP_ATRIUM.h}
           x2={SHIP_ATRIUM.x + SHIP_ATRIUM.w - 10}
           y2={SHIP_ATRIUM.y + SHIP_ATRIUM.h}
-          stroke="rgba(33,35,38,1)"
+          stroke="var(--color-bg)"
           strokeWidth="2"
         />
 
@@ -279,7 +279,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
           y1={SHIP_DINING.y}
           x2={SHIP_DINING.x + SHIP_DINING.w - 30}
           y2={SHIP_DINING.y}
-          stroke="rgba(33,35,38,1)"
+          stroke="var(--color-bg)"
           strokeWidth="2"
         />
         <line
@@ -287,7 +287,7 @@ export function CruiseShipBlueprint({ className, style }: Props) {
           y1={SHIP_DINING.y + SHIP_DINING.h}
           x2={SHIP_DINING.x + SHIP_DINING.w - 30}
           y2={SHIP_DINING.y + SHIP_DINING.h}
-          stroke="rgba(33,35,38,1)"
+          stroke="var(--color-bg)"
           strokeWidth="2"
         />
 

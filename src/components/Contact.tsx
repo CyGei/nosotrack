@@ -3,15 +3,13 @@
 import { useState } from "react";
 import { Github, Linkedin } from "lucide-react";
 
-const CONTACT_TITLE = ["Let's Work", "Together"];
+const CONTACT_TITLE = ["Let’s work", "together."];
 const CONTACT_SUBTITLE =
   "We are actively seeking collaborations and funding. Please reach out!";
 const GITHUB = {
-  label: "github.com/CyGei",
   url: "https://github.com/CyGei",
 };
 const LINKEDIN = {
-  label: "linkedin.com/in/cyril-geismar",
   url: "https://www.linkedin.com/in/cyril-geismar-900926240/",
 };
 const FORM_ACTION = "https://formspree.io/f/maqdqzqw";
@@ -45,45 +43,46 @@ export function Contact() {
     <section
       id="contact"
       data-story-chapter
-      data-story-side="right"
+      data-story-side="left"
+      data-story-end
       className="on-dark section-pad border-t border-rule-inv bg-bg-ink"
       aria-label="Contact"
     >
       <div className="container-page">
-        <h2
-          data-story-title
-          className="font-display font-normal leading-[1.05] tracking-tight text-inv-hi text-[clamp(32px,3.6vw,56px)] max-w-[16ch]"
-        >
-          {CONTACT_TITLE.map((line, i) => (
-            <span key={i} className="block">
-              {line}
-            </span>
-          ))}
-        </h2>
         <div data-story-fork>
-          <div data-story-branch>
-            <p className="mt-8 max-w-[55ch] font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-inv-hi">
+          <div data-story-branch data-story-intro>
+            <h2
+              data-story-title
+              className="font-display font-normal leading-[1.05] tracking-tight text-inv-hi text-[clamp(40px,4.5vw,64px)]"
+            >
+              {CONTACT_TITLE.map((line, i) => (
+                <span key={i} className="block">
+                  {line}
+                </span>
+              ))}
+            </h2>
+            <p className="max-w-[30ch] font-display text-[20px] font-normal leading-[1.45] tracking-[-0.015em] text-inv">
               {CONTACT_SUBTITLE}
             </p>
 
-            <div className="mt-14 flex flex-wrap items-center gap-x-10 gap-y-5">
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
               <a
                 href={GITHUB.url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-inv-mute transition-colors hover:text-inv-hi"
+                className="inline-flex min-h-11 items-center gap-2 text-[14px] text-inv transition-colors hover:text-inv-hi"
               >
-                <Github className="h-[20px] w-[20px]" strokeWidth={1.6} />
-                {GITHUB.label}
+                <Github className="h-[20px] w-[20px] shrink-0" strokeWidth={1.6} />
+                GitHub
               </a>
               <a
                 href={LINKEDIN.url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-inv-mute transition-colors hover:text-inv-hi"
+                className="inline-flex min-h-11 items-center gap-2 text-[14px] text-inv transition-colors hover:text-inv-hi"
               >
-                <Linkedin className="h-[20px] w-[20px]" strokeWidth={1.6} />
-                {LINKEDIN.label}
+                <Linkedin className="h-[20px] w-[20px] shrink-0" strokeWidth={1.6} />
+                LinkedIn
               </a>
             </div>
           </div>
@@ -143,14 +142,36 @@ export function Contact() {
       </div>
 
       <style>{`
+        .contact-form-dark button[type="submit"] {
+          min-height: 44px;
+          padding: 12px 22px;
+          border: 1px solid var(--color-inv-hi);
+          background: var(--color-inv-hi);
+          color: var(--color-bg-ink);
+          font-size: 12px;
+          letter-spacing: 0.08em;
+        }
+        .contact-form-dark button[type="submit"]:hover {
+          background: transparent;
+          color: var(--color-inv-hi);
+        }
+        .contact-form-dark button[type="reset"] {
+          min-height: 44px;
+          font-size: 12px;
+          letter-spacing: 0.08em;
+        }
+        .contact-form-dark :focus-visible {
+          outline: 1px solid var(--color-inv-hi);
+          outline-offset: 4px;
+        }
         .contact-form-dark label {
           display: block;
-          margin-top: 18px;
+          margin-top: 22px;
           font-family: var(--font-mono);
           font-size: 11px;
           letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: var(--color-inv-mute);
+          color: var(--color-inv);
           margin-bottom: 6px;
         }
         .contact-form-dark label:first-of-type { margin-top: 0; }
@@ -204,7 +225,7 @@ function Field({
         )}
       </span>
       {as === "textarea" ? (
-        <textarea name={name} required={required} rows={4} />
+        <textarea name={name} required={required} rows={3} />
       ) : (
         <input name={name} type={type} required={required} />
       )}

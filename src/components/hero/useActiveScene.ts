@@ -16,7 +16,7 @@ export function useActiveScene(sceneCount: number) {
     const compute = () => {
       scheduled = false;
       const rect = el.getBoundingClientRect();
-      const totalScroll = rect.height - window.innerHeight;
+      const totalScroll = rect.height - (el.firstElementChild as HTMLElement).offsetHeight;
       if (totalScroll <= 0) {
         setActiveScene((prev) => (prev === 0 ? prev : 0));
         return;

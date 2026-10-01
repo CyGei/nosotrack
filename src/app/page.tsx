@@ -3,6 +3,7 @@ import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/hero/Hero";
 import { Marquee } from "@/components/Marquee";
 import { About } from "@/components/about/About";
+import { Settings } from "@/components/settings/Settings";
 import { Research } from "@/components/research/Research";
 import { ImpactAdoption } from "@/components/impact/ImpactAdoption";
 import { Team } from "@/components/Team";
@@ -21,6 +22,7 @@ export default function HomePage() {
         <TransmissionStory>
           <About />
           <Research />
+          <Settings />
           <ImpactAdoption />
           <Team />
           <Roadmap />

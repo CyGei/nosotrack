@@ -1,0 +1,39 @@
+.grid {
+  width: 100%;
+  max-width: 560px;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.plan {
+  min-width: 0;
+  margin: 0;
+}
+.title {
+  min-height: 1.3em;
+  color: var(--color-ink);
+  font-size: clamp(16px, 1.3vw, 19px);
+  font-weight: 500;
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+.drawing {
+  position: relative;
+  aspect-ratio: 1;
+}
+.drawing svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.plan:not(:last-child) .drawing svg * {
+  vector-effect: non-scaling-stroke;
+}
+/* Fit the drawings to their actual column, including the stacked tablet view. */
+@container (min-width: 520px) {
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 599px) {
+  .title { font-size: 16px; }
+}
