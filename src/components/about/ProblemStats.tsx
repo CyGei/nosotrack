@@ -15,12 +15,12 @@ export function ProblemStats({
 }) {
   return (
     <div>
-      <div className="grid gap-10">
+      <div className="grid gap-6">
         {stats.map((s) => (
           <div data-story-leaf key={s.figure}>
             <div
               data-story-anchor
-              className="font-display text-[clamp(36px,3.6vw,50px)] font-normal leading-[0.95] tracking-[-0.03em] tabular-nums text-ink"
+              className="font-display text-[clamp(32px,3.2vw,44px)] font-normal leading-[0.95] tracking-[-0.03em] tabular-nums text-ink"
             >
               {s.figure}
             </div>
@@ -34,7 +34,7 @@ export function ProblemStats({
         ))}
       </div>
 
-      <div data-story-leaf className="mt-12">
+      <div data-story-leaf className="mt-8">
         <p
           data-story-anchor
           className="font-display text-[clamp(20px,1.9vw,24px)] font-normal leading-[1.3] tracking-[-0.02em] text-ink max-w-[40ch]"

@@ -52,20 +52,17 @@
   stroke-opacity: 0.3;
 }
 
-/* Give supporting visuals the larger column; the line follows the layout. */
+/* Main-branch composition, with compact vertical spacing. */
 .story [data-story-chapter] {
-  --story-split: 40%;
-  --story-half-gap: 48px;
+  --story-split: 32%;
+  --story-half-gap: 64px;
   position: relative;
   border-top: 0;
   padding-block: 64px 40px;
   scroll-margin-top: 80px;
 }
-.story [data-story-side="right"] {
-  --story-split: 60%;
-}
-.story :global(#impact) {
-  --story-split: 46%;
+.story [data-story-side="left"] {
+  --story-split: 68%;
 }
 .story :global(#about) {
   border: 0;
@@ -74,10 +71,15 @@
   padding-block: 0;
 }
 .story [data-story-title] {
-  width: 100%;
+  width: calc(100% - var(--story-split) - var(--story-half-gap));
   max-width: none;
-  margin: 0;
+  margin: 0 0 0 auto;
   text-align: left;
+}
+.story [data-story-side="left"] [data-story-title] {
+  width: calc(var(--story-split) - var(--story-half-gap));
+  margin: 0 auto 0 0;
+  text-align: right;
 }
 .story [data-story-intro] > [data-story-title] {
   margin-bottom: 24px;
@@ -88,7 +90,7 @@
   align-items: start;
   column-gap: calc(2 * var(--story-half-gap));
   row-gap: 32px;
-  margin-top: 0;
+  margin-top: 36px;
 }
 .story [data-story-branch] {
   min-width: 0;
@@ -112,10 +114,16 @@
 /* Finish the story beside the invitation, leaving the form unobstructed. */
 .story :global(#contact) {
   --story-split: 42%;
+  --story-half-gap: 48px;
   padding-block: 72px;
 }
 .story :global(#contact) > :global(.container-page) {
   padding-left: max(56px, var(--spacing-pad));
+}
+.story :global(#contact) [data-story-title] {
+  width: 100%;
+  margin: 0 0 24px;
+  text-align: left;
 }
 .story :global(#contact) [data-story-fork] {
   margin-top: 0;
@@ -159,7 +167,7 @@
   .story [data-story-fork] {
     grid-template-columns: minmax(0, 1fr);
     gap: 28px;
-    margin-top: 0;
+    margin-top: 28px;
   }
   .story :global(#team) [data-story-fork] {
     margin-top: 28px;

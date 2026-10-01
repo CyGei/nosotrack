@@ -51,19 +51,19 @@ export function Roadmap() {
     <section
       id="roadmap"
       data-story-chapter
-      data-story-side="right"
+      data-story-side="left"
       className="section-pad border-t border-rule bg-bg"
       aria-label="Roadmap"
     >
       <div className="container-page">
-        <div data-story-fork data-story-reverse>
-          <div data-story-branch data-story-intro>
-            <h2
-              data-story-title
-              className="mb-8 max-w-[20ch] font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
-            >
-              Next steps.
-            </h2>
+        <h2
+          data-story-title
+          className="mb-8 max-w-[20ch] font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
+        >
+          Next steps.
+        </h2>
+        <div data-story-fork>
+          <div data-story-branch>
             <p
               className="max-w-[55ch] font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink [text-wrap:pretty]"
             >
@@ -78,22 +78,20 @@ export function Roadmap() {
                 <div
                   data-story-leaf
                   key={i}
-                  className={`relative flex items-start ${isLast ? "pb-0" : "pb-12"}`}
+                  className={`relative flex items-start ${isLast ? "pb-0" : "pb-7"}`}
                 >
-                  <article className="group relative w-full overflow-hidden border border-rule bg-bg-alt px-8 py-7 transition-[border-color,background] duration-[var(--transition-duration-fast)] hover:border-ink">
+                  <article className="group relative w-full overflow-hidden border border-rule bg-bg-alt px-6 py-6 transition-[border-color,background] duration-[var(--transition-duration-fast)] hover:border-ink">
                     <div className="mb-[14px] inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-mute">
                       {phase.badge}
                     </div>
-
                     <h3
                       data-story-anchor
                       className="mb-3 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink"
                     >
                       {phase.title}
                     </h3>
-
                     <p
-                      className="mb-5 text-[17px] leading-[1.55] tracking-[-0.005em] text-mute [text-wrap:pretty]"
+                      className="text-[17px] leading-[1.55] tracking-[-0.005em] text-mute [text-wrap:pretty]"
                       dangerouslySetInnerHTML={{ __html: phase.desc }}
                     />
                   </article>

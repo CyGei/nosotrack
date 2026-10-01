@@ -182,10 +182,10 @@ export function ImpactAdoption() {
       aria-label="Impact and adoption"
     >
       <div className="container-page">
+        {heading}
         {wide ? (
           <div data-story-fork>
-            <div data-story-branch data-story-intro>
-              {heading}
+            <div data-story-branch>
               <TextSwap open={open} para={para} />
             </div>
 
@@ -209,8 +209,7 @@ export function ImpactAdoption() {
           </div>
         ) : (
           <div data-story-fork>
-            <div data-story-branch data-story-intro>
-              {heading}
+            <div data-story-branch>
               <LeadCopy />
             </div>
 

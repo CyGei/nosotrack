@@ -30,18 +30,18 @@ export function AboutBlock({
   return (
     <article
       data-story-chapter
-      data-story-side={(id === "0.2" || id === "0.4") ? "right" : "left"}
+      data-story-side={(id === "0.2" || id === "0.4") ? "left" : "right"}
       aria-label={`Section ${id}`}
     >
       <div className="container-page section-pad">
-        <div data-story-fork data-story-reverse={(id === "0.2" || id === "0.4") ? "" : undefined}>
-          <div data-story-branch data-story-intro>
-            <h2
-              data-story-title
-              className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
-            >
-              <AnimatedTitle text={title} />
-            </h2>
+        <h2
+          data-story-title
+          className="font-display font-normal leading-[1.05] tracking-tight text-ink text-[clamp(32px,3.6vw,56px)]"
+        >
+          <AnimatedTitle text={title} />
+        </h2>
+        <div data-story-fork data-story-reverse={id === "0.4" ? "" : undefined}>
+          <div data-story-branch>
             {subtitle && (
               <p className="font-display text-[22px] font-normal leading-[1.2] tracking-[-0.015em] text-ink max-w-[55ch]">
                 {subtitle}
