@@ -46,8 +46,6 @@ strong { font-weight: 600; color: var(--ink) }
 #slide-4 .slide-title,#slide-7 .slide-title { font-size: clamp(36px,3.65vw,52px); margin-bottom: 18px }
 #slide-4 .slide-lead,#slide-7 .slide-lead { font-size: 18px; line-height: 1.18 }
 #slide-4 .bullets,#slide-7 .bullets { gap: .28em }
-.globe-crop { position: relative; width: 100%; height: 100%; min-height: 350px; overflow: hidden; background: transparent }
-.globe-crop iframe { position: absolute; width: 1280px; height: 720px; border: 0; left: -560px; top: -170px; transform: scale(.78); transform-origin: 0 0; pointer-events: none; background: transparent }
 .closing-body { justify-content: center; position: relative; padding-bottom: clamp(118px,15vh,150px) }
 .closing-credit { position: absolute; left: 0; right: 0; bottom: clamp(22px,4vh,40px); display: flex; flex-direction: column; gap: 6px; text-align: center; align-items: center }
 .closing-credit .hc-name { font-size: var(--fz-body); color: var(--inv-hi); letter-spacing: -.01em }
@@ -133,8 +131,6 @@ strong { font-weight: 600; color: var(--ink) }
   .split { grid-template-columns: 1fr; gap: 22px }
   .split-left { justify-content: flex-start }
   .slide-lead { font-size: 18px }
-  .globe-crop { min-height: 280px }
-  .globe-crop iframe { transform: translate(-60%,-50%) scale(.5) }
   .closing-grid { grid-template-columns: 1fr 300px; gap: 30px }
   .hero-split { grid-template-columns: 1fr 1fr }
   .pixel-stage,.data-orbit,.ecosystem { min-height: 300px }
